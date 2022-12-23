@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Entities
 {
+    // Test
     public abstract class BaseEntity
     {
         public DateTime Created { get; set; }
