@@ -22,7 +22,7 @@ namespace DataAccess.Entities
 
         public DateTime LastLogin { get; set; }
 
-        public DateTime Birt { get; set; }
+        public DateTime Birth { get; set; }
 
         public bool  IsDeleted { get; set; }
 
