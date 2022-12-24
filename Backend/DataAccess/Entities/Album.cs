@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,12 @@ namespace DataAccess.Entities
 
         public DateTime Release { get; set; }
 
+        public string Description { get; set; }
 
+        public bool IsSingle { get; set; }
+
+        public List<Song> Songs { get; set; }
+
+        public List<ArtistAlbum> Artists { get; set; }
     }
 }

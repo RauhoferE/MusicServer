@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Entities
 {
-    public class Song : BaseEntity
+    public class ArtistAlbum : CompositeBaseEntity
     {
-        public Guid Id { get; set; }
+        //public long ID { get; set; }    
 
-        public double Length { get; set; }
+        public Artist Artist { get; set; }
 
         public Album Album { get; set; }
 
-        public List<ArtistSong> Artists { get; set; }
+        //public DateTime Added { get; set; }
     }
 }

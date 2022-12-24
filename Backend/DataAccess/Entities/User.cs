@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,19 +7,13 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Entities
 {
-    public class User : BaseEntity
+    public class User : IdentityUser<Guid>
     {
-        public Guid Id { get; set; }
-
-        //public string Name { get; set; }
-
-        public string Email { get; set; }
-
         public string Description { get; set; }
 
-        //public DateTime Created { get; set; }
+        public DateTime Created { get; set; }
 
-        //public DateTime Modified { get; set; }
+        public DateTime Modified { get; set; }
 
         public DateTime LastLogin { get; set; }
 
@@ -26,10 +21,16 @@ namespace DataAccess.Entities
 
         public bool  IsDeleted { get; set; }
 
-        public bool EmailConfirmed { get; set; }
-
         public bool DemandPasswordChange { get; set; }
 
-        // Missing Artists, Users, Songs, Playlists
+        public List<Artist> FollowedArtists { get; set; }
+
+        public List<Song> Favorites { get; set; }
+
+        public List<User> FollowedUsers { get; set; }
+
+        public List<PlaylistUser> Playlists { get; set; }
+
+        public ICollection<UserRole> UserRoles { get; set; }
     }
 }
