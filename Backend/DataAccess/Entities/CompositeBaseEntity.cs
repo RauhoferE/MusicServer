@@ -8,8 +8,8 @@ namespace DataAccess.Entities
 {
     public abstract class CompositeBaseEntity
     {
-        public long ID { get; set; }
+        public long Id { get; set; }
 
-        public DateTime Added { get; set; }
+        public DateTime Added { get; set; } = DateTime.Now;
     }
 }

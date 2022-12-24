@@ -13,12 +13,12 @@ namespace DataAccess.Entities
 
         public DateTime Release { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public bool IsSingle { get; set; }
+        public bool IsSingle { get; set; } = false;
 
-        public List<Song> Songs { get; set; }
+        public List<Song> Songs { get; set; } = new List<Song>();
 
-        public List<ArtistAlbum> Artists { get; set; }
+        public List<ArtistAlbum> Artists { get; set; } = new List<ArtistAlbum>();
     }
 }

@@ -14,6 +14,8 @@ namespace DataAccess.Entities
 
         public Album Album { get; set; }
 
-        public List<ArtistSong> Artists { get; set; }
+        public List<ArtistSong> Artists { get; set; } = new List<ArtistSong>();
+
+        public List<PlaylistSong> Playlists { get; set; } = new List<PlaylistSong>();
     }
 }

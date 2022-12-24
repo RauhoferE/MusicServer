@@ -8,13 +8,13 @@ namespace DataAccess.Entities
 {
     public class Playlist : BaseEntity
     {
-        public Guid ID { get; set; }
+        public Guid Id { get; set; }
 
-        public DateTime LastListened { get; set; }
+        public DateTime? LastListened { get; set; }
 
-        public bool IsPublic { get; set; }
+        public bool IsPublic { get; set; } = false;
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public List<PlaylistSong> Songs { get; set; }
 

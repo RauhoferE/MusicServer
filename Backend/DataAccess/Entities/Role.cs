@@ -9,14 +9,14 @@ namespace DataAccess.Entities
 {
     public class Role : IdentityRole<Guid>
     {
-        public DateTime Created { get; set; }
+        public DateTime Created { get; set; } = DateTime.Now;
 
-        public DateTime Modified { get; set; }
+        public DateTime Modified { get; set; } = DateTime.Now;
 
-        public User Modifiedby { get; set; }
+        public User? Modifiedby { get; set; }
 
-        public List<UserRole> UserRoles { get; set; }
+        public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
 
-        public List<RoleClaim> RoleClaims { get; set; }
+        public List<RoleClaim> RoleClaims { get; set; } = new List<RoleClaim>();
     }
 }

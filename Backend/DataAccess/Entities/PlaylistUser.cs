@@ -12,6 +12,6 @@ namespace DataAccess.Entities
 
         public User User { get; set; }
 
-        public bool IsModifieable { get; set; }
+        public bool IsModifieable { get; set; } = true;
     }
 }

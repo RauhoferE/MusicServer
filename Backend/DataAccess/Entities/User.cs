@@ -9,28 +9,30 @@ namespace DataAccess.Entities
 {
     public class User : IdentityUser<Guid>
     {
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public DateTime Created { get; set; }
+        public DateTime Created { get; set; } = DateTime.Now;
 
-        public DateTime Modified { get; set; }
+        public DateTime Modified { get; set; } = DateTime.Now;
 
-        public DateTime LastLogin { get; set; }
+        public DateTime? LastLogin { get; set; }
 
         public DateTime Birth { get; set; }
 
-        public bool  IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
-        public bool DemandPasswordChange { get; set; }
+        public bool IsLocked { get; set; } = false;
 
-        public List<Artist> FollowedArtists { get; set; }
+        public bool DemandPasswordChange { get; set; } = false;
 
-        public List<Song> Favorites { get; set; }
+        public List<Artist> FollowedArtists { get; set; } = new List<Artist>();
 
-        public List<User> FollowedUsers { get; set; }
+        public List<Song> Favorites { get; set; } = new List<Song>();
 
-        public List<PlaylistUser> Playlists { get; set; }
+        public List<User> FollowedUsers { get; set; } = new List<User>();
 
-        public ICollection<UserRole> UserRoles { get; set; }
+        public List<PlaylistUser> Playlists { get; set; } = new List<PlaylistUser>();
+
+        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 }

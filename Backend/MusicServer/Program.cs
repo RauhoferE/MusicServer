@@ -1,17 +1,27 @@
-var builder = WebApplication.CreateBuilder(args);
+using DataAccess;
+using Microsoft.EntityFrameworkCore;
 
-// Add services to the container.
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+        // Add services to the container.
 
-var app = builder.Build();
+        builder.Services.AddControllers();
+        builder.Services.AddDbContext<MusicServerDBContext>(
+            options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDBConnection")));
+        var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+        // Configure the HTTP request pipeline.
 
-app.UseHttpsRedirection();
+        app.UseHttpsRedirection();
 
-app.UseAuthorization();
+        app.UseAuthorization();
 
-app.MapControllers();
+        app.MapControllers();
 
-app.Run();
+        app.Run();
+    }
+}
