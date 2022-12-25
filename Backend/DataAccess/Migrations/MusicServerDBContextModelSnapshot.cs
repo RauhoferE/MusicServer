@@ -17,10 +17,10 @@ namespace DataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.1")
+                .HasAnnotation("ProductVersion", "6.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("DataAccess.Entities.Album", b =>
                 {
@@ -41,7 +41,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Release")
@@ -68,7 +67,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UserId")
@@ -87,15 +85,15 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<DateTime>("Added")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("AlbumId")
+                    b.Property<Guid?>("AlbumId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ArtistId")
+                    b.Property<Guid?>("ArtistId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -113,15 +111,15 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<DateTime>("Added")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("ArtistId")
+                    b.Property<Guid?>("ArtistId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("SongId")
+                    b.Property<Guid?>("SongId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -155,7 +153,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -169,15 +166,15 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<DateTime>("Added")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PlaylistId")
+                    b.Property<Guid?>("PlaylistId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("SongId")
+                    b.Property<Guid?>("SongId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -195,7 +192,7 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<DateTime>("Added")
                         .HasColumnType("datetime2");
@@ -203,10 +200,10 @@ namespace DataAccess.Migrations
                     b.Property<bool>("IsModifieable")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("PlaylistId")
+                    b.Property<Guid?>("PlaylistId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -260,24 +257,27 @@ namespace DataAccess.Migrations
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
-                            Created = new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5445),
-                            Modified = new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5479),
+                            ConcurrencyStamp = "75499802-10b0-44cb-a708-fa7ec9ae2cd6",
+                            Created = new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1863),
+                            Modified = new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1902),
                             Name = "Root",
                             NormalizedName = "ROOT"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000002"),
-                            Created = new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5496),
-                            Modified = new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5497),
+                            ConcurrencyStamp = "4e9e8399-503e-48bc-a736-59fbfca34f23",
+                            Created = new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1950),
+                            Modified = new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1951),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000003"),
-                            Created = new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5500),
-                            Modified = new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5501),
+                            ConcurrencyStamp = "4d656093-136a-4362-878a-dbfd781509d6",
+                            Created = new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1958),
+                            Modified = new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1960),
                             Name = "User",
                             NormalizedName = "User"
                         });
@@ -289,7 +289,7 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -313,7 +313,7 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AlbumId")
+                    b.Property<Guid?>("AlbumId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Created")
@@ -326,7 +326,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UserId")
@@ -374,9 +373,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsLocked")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastLogin")
@@ -460,7 +456,7 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -529,15 +525,11 @@ namespace DataAccess.Migrations
                 {
                     b.HasOne("DataAccess.Entities.Album", "Album")
                         .WithMany("Artists")
-                        .HasForeignKey("AlbumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AlbumId");
 
                     b.HasOne("DataAccess.Entities.Artist", "Artist")
                         .WithMany("Albums")
-                        .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ArtistId");
 
                     b.Navigation("Album");
 
@@ -548,15 +540,11 @@ namespace DataAccess.Migrations
                 {
                     b.HasOne("DataAccess.Entities.Artist", "Artist")
                         .WithMany("Songs")
-                        .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ArtistId");
 
                     b.HasOne("DataAccess.Entities.Song", "Song")
                         .WithMany("Artists")
-                        .HasForeignKey("SongId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SongId");
 
                     b.Navigation("Artist");
 
@@ -567,15 +555,11 @@ namespace DataAccess.Migrations
                 {
                     b.HasOne("DataAccess.Entities.Playlist", "Playlist")
                         .WithMany("Songs")
-                        .HasForeignKey("PlaylistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PlaylistId");
 
                     b.HasOne("DataAccess.Entities.Song", "Song")
                         .WithMany("Playlists")
-                        .HasForeignKey("SongId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SongId");
 
                     b.Navigation("Playlist");
 
@@ -586,15 +570,11 @@ namespace DataAccess.Migrations
                 {
                     b.HasOne("DataAccess.Entities.Playlist", "Playlist")
                         .WithMany("Users")
-                        .HasForeignKey("PlaylistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PlaylistId");
 
                     b.HasOne("DataAccess.Entities.User", "User")
                         .WithMany("Playlists")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Playlist");
 
@@ -625,9 +605,7 @@ namespace DataAccess.Migrations
                 {
                     b.HasOne("DataAccess.Entities.Album", "Album")
                         .WithMany("Songs")
-                        .HasForeignKey("AlbumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AlbumId");
 
                     b.HasOne("DataAccess.Entities.User", null)
                         .WithMany("Favorites")

@@ -21,8 +21,6 @@ namespace DataAccess.Entities
 
         public bool IsDeleted { get; set; } = false;
 
-        public bool IsLocked { get; set; } = false;
-
         public bool DemandPasswordChange { get; set; } = false;
 
         public List<Artist> FollowedArtists { get; set; } = new List<Artist>();

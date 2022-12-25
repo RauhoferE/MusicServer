@@ -3,14 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace DataAccess.Migrations
 {
-    /// <inheritdoc />
-    public partial class Inital : Migration
+    public partial class Initial : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -23,7 +19,7 @@ namespace DataAccess.Migrations
                     IsSingle = table.Column<bool>(type: "bit", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Modified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -41,7 +37,6 @@ namespace DataAccess.Migrations
                     LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Birth = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    IsLocked = table.Column<bool>(type: "bit", nullable: false),
                     DemandPasswordChange = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -79,7 +74,7 @@ namespace DataAccess.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Modified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -95,7 +90,7 @@ namespace DataAccess.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Modified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -196,11 +191,11 @@ namespace DataAccess.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Length = table.Column<double>(type: "float", nullable: false),
-                    AlbumId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AlbumId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Modified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -209,8 +204,7 @@ namespace DataAccess.Migrations
                         name: "FK_Songs_Albums_AlbumId",
                         column: x => x.AlbumId,
                         principalTable: "Albums",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Songs_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -224,8 +218,8 @@ namespace DataAccess.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PlaylistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PlaylistId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsModifieable = table.Column<bool>(type: "bit", nullable: false),
                     Added = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -236,14 +230,12 @@ namespace DataAccess.Migrations
                         name: "FK_PlaylistUsers_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_PlaylistUsers_Playlists_PlaylistId",
                         column: x => x.PlaylistId,
                         principalTable: "Playlists",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -252,8 +244,8 @@ namespace DataAccess.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ArtistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AlbumId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ArtistId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AlbumId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Added = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -263,14 +255,12 @@ namespace DataAccess.Migrations
                         name: "FK_ArtistAlbums_Albums_AlbumId",
                         column: x => x.AlbumId,
                         principalTable: "Albums",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ArtistAlbums_Artists_ArtistId",
                         column: x => x.ArtistId,
                         principalTable: "Artists",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -325,8 +315,8 @@ namespace DataAccess.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ArtistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SongId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ArtistId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SongId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Added = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -336,14 +326,12 @@ namespace DataAccess.Migrations
                         name: "FK_ArtistSongs_Artists_ArtistId",
                         column: x => x.ArtistId,
                         principalTable: "Artists",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ArtistSongs_Songs_SongId",
                         column: x => x.SongId,
                         principalTable: "Songs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -352,8 +340,8 @@ namespace DataAccess.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PlaylistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SongId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PlaylistId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SongId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Added = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -363,25 +351,28 @@ namespace DataAccess.Migrations
                         name: "FK_PlaylistSongs_Playlists_PlaylistId",
                         column: x => x.PlaylistId,
                         principalTable: "Playlists",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_PlaylistSongs_Songs_SongId",
                         column: x => x.SongId,
                         principalTable: "Songs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Created", "Modified", "ModifiedbyId", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { new Guid("00000000-0000-0000-0000-000000000001"), null, new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5445), new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5479), null, "Root", "ROOT" },
-                    { new Guid("00000000-0000-0000-0000-000000000002"), null, new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5496), new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5497), null, "Admin", "ADMIN" },
-                    { new Guid("00000000-0000-0000-0000-000000000003"), null, new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5500), new DateTime(2022, 12, 24, 15, 9, 36, 507, DateTimeKind.Local).AddTicks(5501), null, "User", "User" }
-                });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "75499802-10b0-44cb-a708-fa7ec9ae2cd6", new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1863), new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1902), null, "Root", "ROOT" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Created", "Modified", "ModifiedbyId", "Name", "NormalizedName" },
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000002"), "4e9e8399-503e-48bc-a736-59fbfca34f23", new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1950), new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1951), null, "Admin", "ADMIN" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Created", "Modified", "ModifiedbyId", "Name", "NormalizedName" },
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000003"), "4d656093-136a-4362-878a-dbfd781509d6", new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1958), new DateTime(2022, 12, 25, 16, 36, 45, 593, DateTimeKind.Local).AddTicks(1960), null, "User", "User" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ArtistAlbums_AlbumId",
@@ -488,7 +479,6 @@ namespace DataAccess.Migrations
                 column: "UserId");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
