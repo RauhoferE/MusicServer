@@ -26,6 +26,8 @@
   },
 
   "AppSettings": {
+      "AllowedCorsHosts": [ "localhost" ],
+    "CookieExpirationTimeInMinutes":  60
 
   },
   "MailSettings": {
