@@ -22,4 +22,8 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MusicServer.Core\MusicServer.Core.csproj" />
+  </ItemGroup>
+
 </Project>

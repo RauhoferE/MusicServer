@@ -5,7 +5,9 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MusicServer", "MusicServer.csproj", "{B66E1C4B-FFCA-4559-8D9A-EEF0345D26AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "..\DataAccess\DataAccess.csproj", "{EB72A191-F93B-41DD-AEDB-955A42A33370}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "..\DataAccess\DataAccess.csproj", "{EB72A191-F93B-41DD-AEDB-955A42A33370}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicServer.Core", "..\MusicServer.Core\MusicServer.Core.csproj", "{51DDF54B-8AC9-4463-9979-F11C184DFBE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{EB72A191-F93B-41DD-AEDB-955A42A33370}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB72A191-F93B-41DD-AEDB-955A42A33370}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB72A191-F93B-41DD-AEDB-955A42A33370}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51DDF54B-8AC9-4463-9979-F11C184DFBE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51DDF54B-8AC9-4463-9979-F11C184DFBE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51DDF54B-8AC9-4463-9979-F11C184DFBE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51DDF54B-8AC9-4463-9979-F11C184DFBE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

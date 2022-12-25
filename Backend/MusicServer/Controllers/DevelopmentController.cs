@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicServer.Const;
+using MusicServer.Core.Const;
 
 namespace MusicServer.Controllers
 {
@@ -16,6 +17,7 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Development.Test)]
+        [Authorize(Roles = RolesEnum.Admin)]
         public async  Task<IActionResult> Test()
         {
             return Ok();

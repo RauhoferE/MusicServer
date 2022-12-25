@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using MusicServer.Core.Const;
 
 namespace DataAccess
 {
@@ -119,20 +120,20 @@ namespace DataAccess
                     new Role()
                     {
                         Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                        Name = "Root",
-                        NormalizedName = "ROOT"
+                        Name = RolesEnum.Root,
+                        NormalizedName = RolesEnum.Root.ToUpper(),
                     },
                     new Role()
                     {
                         Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
-                        Name = "Admin",
-                        NormalizedName = "ADMIN"
+                        Name = RolesEnum.Admin,
+                        NormalizedName = RolesEnum.Admin.ToUpper(),
                     },
                     new Role()
                     {
                         Id = Guid.Parse("00000000-0000-0000-0000-000000000003"),
-                        Name = "User",
-                        NormalizedName = "User"
+                        Name = RolesEnum.User,
+                        NormalizedName = RolesEnum.User.ToUpper(),
                     }
                     );
             });
