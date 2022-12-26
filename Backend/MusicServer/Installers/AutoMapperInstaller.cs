@@ -10,14 +10,6 @@ namespace MusicServer.Installers
     {
         public void InstallService(WebApplicationBuilder builder)
         {
-            //var config = new MapperConfiguration(cfg =>
-            //{
-            //    cfg.AddMaps(Assembly.GetExecutingAssembly());
-            //    //cfg.AddProfile<DtoToResponse>();
-            //    //cfg.AddProfile<RequestToDto>();
-            //});
-            //var c = config.CreateMapper();
-
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }
     }

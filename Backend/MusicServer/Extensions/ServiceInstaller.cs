@@ -26,6 +26,7 @@ namespace MusicServer.Extensions
             builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
             // Add Services
+            builder.Services.AddTransient<IDevService, DevService>();
             builder.Services.AddTransient<IUserService, UserService>();
         }
 

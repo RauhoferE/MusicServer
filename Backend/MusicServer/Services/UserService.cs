@@ -26,7 +26,7 @@ namespace MusicServer.Services
             this.dBContext= dbContext;
         }
 
-        public async Task ConfirmRegistration(string email, string token)
+        public async Task ConfirmRegistrationAsync(string email, string token)
         {
             var user = await this._userManager.FindByEmailAsync(email) ?? throw new UserNotFoundException();
 
@@ -75,7 +75,7 @@ namespace MusicServer.Services
             return claims;
         }
 
-        public async Task<ICollection<Claim>> RefreshCookie(Guid userId)
+        public async Task<ICollection<Claim>> RefreshCookieAsync(Guid userId)
         {
             // Get user
             var user = await this._userManager.FindByIdAsync(userId.ToString()) ?? throw new UserNotFoundException();
@@ -96,7 +96,7 @@ namespace MusicServer.Services
             return claims;
         }
 
-        public async Task RegisterUser(User userdata, string password)
+        public async Task RegisterUserAsync(User userdata, string password)
         {
             var user = await this._userManager.FindByEmailAsync(userdata.Email);
             if (user != null)
