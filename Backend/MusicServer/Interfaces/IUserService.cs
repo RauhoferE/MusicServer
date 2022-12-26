@@ -7,10 +7,10 @@ namespace MusicServer.Interfaces
     {
         public Task<ICollection<Claim>> LoginUserAsync(string username, string password);
 
-        public Task RegisterUser(User userdata, string password);
+        public Task RegisterUserAsync(User userdata, string password);
 
-        public Task ConfirmRegistration(string email, string token);
+        public Task ConfirmRegistrationAsync(string email, string token);
 
-        public Task<ICollection<Claim>> RefreshCookie(Guid userId);
+        public Task<ICollection<Claim>> RefreshCookieAsync(Guid userId);
     }
 }

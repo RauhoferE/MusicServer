@@ -39,7 +39,7 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> Register([FromBody, Required] Register register)
         {
             var userdata = this.mapper.Map<Register, User>(register);
-            await this.userService.RegisterUser(userdata, register.Password);
+            await this.userService.RegisterUserAsync(userdata, register.Password);
             return NoContent();
         }
 
@@ -82,7 +82,7 @@ namespace MusicServer.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmMail([FromRoute, Required] string email, [FromRoute, Required] string token)
         {
-            await this.userService.ConfirmRegistration(email, token);
+            await this.userService.ConfirmRegistrationAsync(email, token);
 
             return NoContent();
         }
