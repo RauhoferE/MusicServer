@@ -1,4 +1,5 @@
-﻿using MusicServer.Entities.DTOs;
+﻿using DataAccess.Entities;
+using MusicServer.Entities.DTOs;
 
 namespace MusicServer.Interfaces
 {
@@ -6,7 +7,7 @@ namespace MusicServer.Interfaces
     {
         public Task<Guid> CreatePlaylistAsync(string name, string description, bool isPublic);
 
-        public Task UpdatePlaylistAsync(Guid id, string name, string description, bool isPublic);
+        public Task UpdatePlaylistAsync(Guid playlistId, string name, string description, bool isPublic);
 
         public Task DeletePlaylistAsync(Guid playlistId);
 
@@ -20,7 +21,15 @@ namespace MusicServer.Interfaces
 
         public Task UpdatePlaylistShareListAsync(Guid playlistId, List<UserPlaylistModifieable> dtos);
 
+        public Task CopyPlaylistToLibraryAsync(Guid playlistId);
 
+        public Task<List<PlaylistDto>> GetPlaylistsAsync();
+
+        public Task<List<PlaylistDto>> GetUserPlaylists(Guid userId);
+
+        public Task<List<PlaylistDto>> GetPublicPlaylists();
+
+        public Task<List<SongDto>> GetSongsInPlaylist(Guid playlistId);
 
 
     }

@@ -21,5 +21,15 @@
             public const string Test = "test";
             public const string CreateArtistsAndSongs = "create/{artists}/{albums}/{songs}";
         }
+
+        public static class Song
+        {
+            public const string Playlist = "playlist";
+            public const string PlaylistSongs = "playlist/songs";
+            public const string PlaylistAlbum = "playlist/album";
+            public const string PlaylistShare = "playlist/share";
+            public const string PlaylistCopy = "playlist/copy";
+            public const string PlaylistUser = "playlist/user";
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using MusicServer.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Net;
@@ -28,6 +29,54 @@ namespace MusicServer.Middleware
             // ** Default 
             var statusCode = (int)HttpStatusCode.BadRequest;
             var responseMessage = exception.Message;
+
+            if (exception.GetType() == typeof(PlaylistNotFoundException))
+            {
+                statusCode = (int)HttpStatusCode.BadRequest;
+                responseMessage = "Playlist was not found.";
+            }
+
+
+            if (exception.GetType() == typeof(UserNotFoundException))
+            {
+                statusCode = (int)HttpStatusCode.BadRequest;
+                responseMessage = "User was not found.";
+            }
+
+
+            if (exception.GetType() == typeof(PlaylistNotFoundException))
+            {
+                statusCode = (int)HttpStatusCode.BadRequest;
+                responseMessage = "Playlist was not found.";
+            }
+
+
+            if (exception.GetType() == typeof(NotAllowedException))
+            {
+                statusCode = (int)HttpStatusCode.BadRequest;
+                responseMessage = "Action is not allowed.";
+            }
+
+
+            if (exception.GetType() == typeof(PlayListAlreadyInUseException))
+            {
+                statusCode = (int)HttpStatusCode.BadRequest;
+                responseMessage = "Playlist was already added to user.";
+            }
+
+
+            if (exception.GetType() == typeof(SongNotFoundException))
+            {
+                statusCode = (int)HttpStatusCode.BadRequest;
+                responseMessage = "Song was not found.";
+            }
+
+
+            if (exception.GetType() == typeof(AlbumNotFoundException))
+            {
+                statusCode = (int)HttpStatusCode.BadRequest;
+                responseMessage = "Album was not found.";
+            }
 
             // Maybe, logging the exception
             _logger.LogError(context.Exception, errorMessage);
