@@ -71,6 +71,7 @@ namespace MusicServer.Services
             roles.ToList().ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role)));
             var u = this.dBContext.Users.FirstOrDefault(x => x.Id == user.Id) ?? throw new UserNotFoundException();
             u.LastLogin = DateTime.Now;
+            await this.dBContext.SaveChangesAsync();
 
             return claims;
         }
