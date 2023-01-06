@@ -3,7 +3,7 @@ using MusicServer.Entities.DTOs;
 
 namespace MusicServer.Interfaces
 {
-    public interface ISongService
+    public interface IPlaylistService
     {
         public Task<Guid> CreatePlaylistAsync(string name, string description, bool isPublic);
 
@@ -29,7 +29,7 @@ namespace MusicServer.Interfaces
 
         public Task<List<PlaylistDto>> GetPublicPlaylists();
 
-        public Task<List<SongDto>> GetSongsInPlaylist(Guid playlistId);
+        public Task<PlaylistDto> GetSongsInPlaylist(Guid playlistId);
 
 
     }

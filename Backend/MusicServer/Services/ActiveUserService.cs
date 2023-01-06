@@ -10,7 +10,7 @@ namespace MusicServer.Services
     {
         private readonly User user;
 
-        public ActiveUserService(HttpContextAccessor contextAccessor,
+        public ActiveUserService(IHttpContextAccessor contextAccessor,
             UserManager<User> userManager)
         {
             if (contextAccessor.HttpContext?.User.Identity == null)

@@ -1,4 +1,5 @@
-﻿using DataAccess;
+﻿using AutoMapper;
+using DataAccess;
 using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using MusicServer.Entities.DTOs;
@@ -7,17 +8,21 @@ using MusicServer.Interfaces;
 
 namespace MusicServer.Services
 {
-    public class SongService : ISongService
+    public class PlaylistService : IPlaylistService
     {
         private readonly MusicServerDBContext dBContext;
 
         private readonly IActiveUserService activeUserService;
 
-        public SongService(IActiveUserService activeUserService,
-            MusicServerDBContext dBContext)
+        private readonly IMapper mapper;
+
+        public PlaylistService(IActiveUserService activeUserService,
+            MusicServerDBContext dBContext,
+            IMapper mapper)
         {
             this.activeUserService = activeUserService;
             this.dBContext = dBContext;
+            this.mapper = mapper;
         }
 
         public async Task AddAlbumSongsToPlaylistAsync(Guid albumId, Guid playlistId)
@@ -109,17 +114,19 @@ namespace MusicServer.Services
 
         public async Task CopyPlaylistToLibraryAsync(Guid playlistId)
         {
-            var user = this.dBContext.Users
-.Include(x => x.Playlists)
-.ThenInclude(x => x.Playlist)
-.FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+            var playlist = this.dBContext.Playlists
+                .Include(x => x.Songs)
+                .ThenInclude(x => x.Song)
+                .FirstOrDefault(x => x.Id == playlistId) ?? throw new PlaylistNotFoundException();
 
-            var playlist = user.Playlists.FirstOrDefault(x => x.Playlist.Id == playlistId) ?? throw new PlaylistNotFoundException();
-
-            if (!playlist.Playlist.IsPublic)
+            if (!playlist.IsPublic)
             {
                 throw new NotAllowedException();
             }
+
+            var guid = await this.CreatePlaylistAsync(playlist.Name, playlist.Description, playlist.IsPublic);
+
+            await this.AddSongsToPlaylistAsync(guid, playlist.Songs.Select(x => x.Song.Id).ToList());
         }
 
         public async Task<Guid> CreatePlaylistAsync(string name, string description, bool isPublic)
@@ -163,24 +170,58 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public Task<List<PlaylistDto>> GetPlaylistsAsync()
+        public async Task<List<PlaylistDto>> GetPlaylistsAsync()
         {
-            throw new NotImplementedException();
+            var user = this.dBContext.Users
+    .Include(x => x.Playlists)
+    .ThenInclude(x => x.Playlist)
+    .ThenInclude(x => x.Users)
+    .ThenInclude(x => x.User)
+    .Include(x => x.Playlists)
+    .ThenInclude(x => x.Playlist)
+    .ThenInclude(x => x.Songs)
+.FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
+            return this.mapper.Map<List<Playlist>, List<PlaylistDto>>(user.Playlists.Select(x => x.Playlist).ToList());
         }
 
-        public Task<List<PlaylistDto>> GetPublicPlaylists()
+        public async Task<List<PlaylistDto>> GetPublicPlaylists()
         {
-            throw new NotImplementedException();
+            var playlists = this.dBContext.Playlists
+                .Include(x => x.Songs)
+                .ThenInclude(x => x.Song)
+                .Include(x => x.Users)
+                .ThenInclude(x => x.User)
+                .Where(x => x.IsPublic);
+
+            return this.mapper.Map<List<Playlist>, List<PlaylistDto>>(playlists.ToList());
         }
 
-        public Task<List<SongDto>> GetSongsInPlaylist(Guid playlistId)
+        public async Task<PlaylistDto> GetSongsInPlaylist(Guid playlistId)
         {
-            throw new NotImplementedException();
+            var playlist = this.dBContext.Playlists
+            .Include(x => x.Songs)
+            .ThenInclude(x => x.Song)
+            .Include(x => x.Users)
+            .ThenInclude(x => x.User)
+            .FirstOrDefault(x => x.Id == playlistId) ?? throw new PlaylistNotFoundException();
+
+            return this.mapper.Map<Playlist, PlaylistDto>(playlist);
         }
 
-        public Task<List<PlaylistDto>> GetUserPlaylists(Guid userId)
+        public async Task<List<PlaylistDto>> GetUserPlaylists(Guid userId)
         {
-            throw new NotImplementedException();
+            var user = this.dBContext.Users
+.Include(x => x.Playlists)
+.ThenInclude(x => x.Playlist)
+.ThenInclude(x => x.Users)
+.ThenInclude(x => x.User)
+.Include(x => x.Playlists)
+.ThenInclude(x => x.Playlist)
+.ThenInclude(x => x.Songs)
+.FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
+
+            return this.mapper.Map<List<Playlist>, List<PlaylistDto>>(user.Playlists.Where(x => x.Playlist.IsPublic).Select(x => x.Playlist).ToList());
         }
 
         public async Task RemoveSongsFromPlaylistAsync(Guid playlistId, List<Guid> songIds)

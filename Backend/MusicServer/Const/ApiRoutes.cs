@@ -25,11 +25,13 @@
         public static class Song
         {
             public const string Playlist = "playlist";
+            public const string Playlists = "playlists";
+            public const string UserPlaylists = "user/{userId}/playlists";
+            public const string PublicPlaylist = "public/playlists";
             public const string PlaylistSongs = "playlist/songs";
             public const string PlaylistAlbum = "playlist/album";
             public const string PlaylistShare = "playlist/share";
             public const string PlaylistCopy = "playlist/copy";
-            public const string PlaylistUser = "playlist/user";
         }
     }
 }
