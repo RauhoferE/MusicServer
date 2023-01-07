@@ -22,16 +22,16 @@
             public const string CreateArtistsAndSongs = "create/{artists}/{albums}/{songs}";
         }
 
-        public static class Song
+        public static class Playlist
         {
-            public const string Playlist = "playlist";
+            public const string Default = "";
             public const string Playlists = "playlists";
-            public const string UserPlaylists = "user/{userId}/playlists";
-            public const string PublicPlaylist = "public/playlists";
-            public const string PlaylistSongs = "playlist/songs";
-            public const string PlaylistAlbum = "playlist/album";
-            public const string PlaylistShare = "playlist/share";
-            public const string PlaylistCopy = "playlist/copy";
+            public const string UserPlaylists = "user/{userId}";
+            public const string PublicPlaylist = "public";
+            public const string PlaylistSongs = "songs";
+            public const string PlaylistAlbum = "album";
+            public const string PlaylistShare = "share";
+            public const string PlaylistCopy = "copy";
         }
     }
 }

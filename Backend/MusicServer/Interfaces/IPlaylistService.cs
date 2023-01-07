@@ -21,6 +21,8 @@ namespace MusicServer.Interfaces
 
         public Task UpdatePlaylistShareListAsync(Guid playlistId, List<UserPlaylistModifieable> dtos);
 
+        public Task RemoveUsersFromPlaylist(Guid playlistId, List<Guid> userIds);
+
         public Task CopyPlaylistToLibraryAsync(Guid playlistId);
 
         public Task<List<PlaylistDto>> GetPlaylistsAsync();

@@ -47,12 +47,14 @@ namespace DataAccess
                 u.HasMany(e => e.FollowedUsers);
                 
                 u.HasMany(e => e.Playlists)
-                .WithOne(p => p.User);
+                .WithOne(p => p.User)
+                .OnDelete(DeleteBehavior.Cascade);
 
                 u.HasMany(e => e.UserRoles)
                 .WithOne()
                 .HasForeignKey(ur => ur.UserId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Artist>(entity =>
@@ -61,10 +63,12 @@ namespace DataAccess
                 entity.Property(n => n.Id).ValueGeneratedOnAdd();
 
                 entity.HasMany(e => e.Albums)
-                    .WithOne(p => p.Artist);
+                    .WithOne(p => p.Artist)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasMany(e => e.Songs)
-                    .WithOne(p => p.Artist);
+                    .WithOne(p => p.Artist)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Album>(entity =>
@@ -73,10 +77,12 @@ namespace DataAccess
                 entity.Property(n => n.Id).ValueGeneratedOnAdd();
 
                 entity.HasMany(e => e.Songs)
-                    .WithOne(p => p.Album);
+                    .WithOne(p => p.Album)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasMany(e => e.Artists)
-                    .WithOne(p => p.Album);
+                    .WithOne(p => p.Album)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Song>(entity =>
@@ -85,12 +91,14 @@ namespace DataAccess
                 entity.Property(n => n.Id).ValueGeneratedOnAdd();
 
                 entity.HasMany(e => e.Artists)
-                    .WithOne(p => p.Song);
+                    .WithOne(p => p.Song)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(e => e.Album);
 
                 entity.HasMany(e => e.Playlists)
-    .WithOne(p => p.Song);
+                    .WithOne(p => p.Song)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Playlist>(entity =>
@@ -99,10 +107,12 @@ namespace DataAccess
                 entity.Property(n => n.Id).ValueGeneratedOnAdd();
 
                 entity.HasMany(e => e.Songs)
-                    .WithOne(p => p.Playlist);
+                    .WithOne(p => p.Playlist)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasMany(e => e.Users)
-                .WithOne(p => p.Playlist);
+                .WithOne(p => p.Playlist)
+                .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Role>(entity =>

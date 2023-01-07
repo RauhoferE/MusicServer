@@ -68,7 +68,7 @@ namespace MusicServer.Services
             var canUserSeePlaylist = user.Playlists.FirstOrDefault(x => x.Playlist.Id == sourcePlaylistId) == null ? false : true;
 
 
-            if (!targetPlaylist.IsModifieable || (!sourcePlayList.IsPublic || !canUserSeePlaylist))
+            if (!targetPlaylist.IsModifieable || (!sourcePlayList.IsPublic && !canUserSeePlaylist))
             {
                 throw new NotAllowedException();
             }
@@ -117,9 +117,13 @@ namespace MusicServer.Services
             var playlist = this.dBContext.Playlists
                 .Include(x => x.Songs)
                 .ThenInclude(x => x.Song)
+                .Include(x => x.Users)
+                .ThenInclude(x => x.User)
                 .FirstOrDefault(x => x.Id == playlistId) ?? throw new PlaylistNotFoundException();
 
-            if (!playlist.IsPublic)
+            var user = playlist.Users.FirstOrDefault(x => x.User.Id == this.activeUserService.Id);
+
+            if (!playlist.IsPublic && user == null)
             {
                 throw new NotAllowedException();
             }
@@ -138,6 +142,7 @@ namespace MusicServer.Services
             {
                 IsModifieable= true,
                 User = user,
+                IsCreator=true,
                 Playlist = new Playlist()
                 {
                     Description= description,
@@ -173,14 +178,22 @@ namespace MusicServer.Services
         public async Task<List<PlaylistDto>> GetPlaylistsAsync()
         {
             var user = this.dBContext.Users
-    .Include(x => x.Playlists)
-    .ThenInclude(x => x.Playlist)
-    .ThenInclude(x => x.Users)
-    .ThenInclude(x => x.User)
-    .Include(x => x.Playlists)
-    .ThenInclude(x => x.Playlist)
-    .ThenInclude(x => x.Songs)
-.FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+                .Include(x => x.Playlists)
+                .ThenInclude(x => x.Playlist)
+                .ThenInclude(x => x.Users)
+                .ThenInclude(x => x.User)
+                .Include(x => x.Playlists)
+                .ThenInclude(x => x.Playlist)
+                .ThenInclude(x => x.Songs)
+                .ThenInclude(x => x.Song)
+                .ThenInclude(x => x.Album)
+                .Include(x => x.Playlists)
+                .ThenInclude(x => x.Playlist)
+                .ThenInclude(x => x.Songs)
+                .ThenInclude(x => x.Song)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+            .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
             return this.mapper.Map<List<Playlist>, List<PlaylistDto>>(user.Playlists.Select(x => x.Playlist).ToList());
         }
@@ -192,6 +205,13 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Song)
                 .Include(x => x.Users)
                 .ThenInclude(x => x.User)
+                .Include(x => x.Songs)
+                .ThenInclude(x => x.Song)
+                .ThenInclude(x => x.Album)
+                .Include(x => x.Songs)
+                .ThenInclude(x => x.Song)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
                 .Where(x => x.IsPublic);
 
             return this.mapper.Map<List<Playlist>, List<PlaylistDto>>(playlists.ToList());
@@ -204,7 +224,21 @@ namespace MusicServer.Services
             .ThenInclude(x => x.Song)
             .Include(x => x.Users)
             .ThenInclude(x => x.User)
+                        .Include(x => x.Songs)
+            .ThenInclude(x => x.Song)
+            .ThenInclude(x => x.Album)
+            .Include(x => x.Songs)
+            .ThenInclude(x => x.Song)
+            .ThenInclude(x => x.Artists)
+            .ThenInclude(x => x.Artist)
             .FirstOrDefault(x => x.Id == playlistId) ?? throw new PlaylistNotFoundException();
+
+            var user = playlist.Users.FirstOrDefault(x => x.User.Id == this.activeUserService.Id);
+
+            if ((!playlist.IsPublic && user == null))
+            {
+                throw new NotAllowedException();
+            }
 
             return this.mapper.Map<Playlist, PlaylistDto>(playlist);
         }
@@ -212,13 +246,21 @@ namespace MusicServer.Services
         public async Task<List<PlaylistDto>> GetUserPlaylists(Guid userId)
         {
             var user = this.dBContext.Users
-.Include(x => x.Playlists)
-.ThenInclude(x => x.Playlist)
-.ThenInclude(x => x.Users)
-.ThenInclude(x => x.User)
-.Include(x => x.Playlists)
-.ThenInclude(x => x.Playlist)
-.ThenInclude(x => x.Songs)
+                .Include(x => x.Playlists)
+                .ThenInclude(x => x.Playlist)
+                .ThenInclude(x => x.Users)
+                .ThenInclude(x => x.User)
+                .Include(x => x.Playlists)
+                .ThenInclude(x => x.Playlist)
+                .ThenInclude(x => x.Songs)
+                .ThenInclude(x => x.Song)
+                .ThenInclude(x => x.Album)
+                .Include(x => x.Playlists)
+                .ThenInclude(x => x.Playlist)
+                .ThenInclude(x => x.Songs)
+                .ThenInclude(x => x.Song)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
 .FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
 
             return this.mapper.Map<List<Playlist>, List<PlaylistDto>>(user.Playlists.Where(x => x.Playlist.IsPublic).Select(x => x.Playlist).ToList());
@@ -230,6 +272,7 @@ namespace MusicServer.Services
 .Include(x => x.Playlists)
 .ThenInclude(x => x.Playlist)
 .ThenInclude(x => x.Songs)
+.ThenInclude(x => x.Song)
 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
             var playlist = user.Playlists.FirstOrDefault(x => x.Playlist.Id == playlistId) ?? throw new PlaylistNotFoundException();
@@ -244,6 +287,42 @@ namespace MusicServer.Services
                 var song = playlist.Playlist.Songs.FirstOrDefault(x => x.Song.Id == songId) ?? throw new SongNotFoundException();
 
                 playlist.Playlist.Songs.Remove(song);
+            }
+
+            await this.dBContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveUsersFromPlaylist(Guid playlistId, List<Guid> userIds)
+        {
+            var user = this.dBContext.Users
+                .Include(x => x.Playlists)
+                .ThenInclude(x => x.Playlist)
+                //.Include(x => x.Playlists)
+                //.ThenInclude(x => x.User)
+                .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
+            var playlist = user.Playlists.FirstOrDefault(x => x.Playlist.Id == playlistId) ?? throw new PlaylistNotFoundException();
+
+            if (!playlist.IsModifieable || !playlist.IsCreator)
+            {
+                throw new NotAllowedException();
+            }
+
+            var playlistEntity = this.dBContext.PlaylistUsers
+                .Include(x => x.Playlist)
+                .Include(x => x.User)
+                .Where(x => x.Playlist.Id == playlistId);
+
+            foreach (var userId in userIds)
+            {
+                if (userId == this.activeUserService.Id)
+                {
+                    continue;
+                }
+
+                var entityToRemove = playlistEntity.FirstOrDefault(x => x.User.Id == userId) ?? throw new UserNotFoundException();
+
+                this.dBContext.Remove(entityToRemove);
             }
 
             await this.dBContext.SaveChangesAsync();
@@ -278,19 +357,31 @@ namespace MusicServer.Services
 
             var playlist = user.Playlists.FirstOrDefault(x => x.Playlist.Id == playlistId) ?? throw new PlaylistNotFoundException();
 
-            if (!playlist.IsModifieable)
+            if (!playlist.IsModifieable || !playlist.IsCreator)
             {
                 throw new NotAllowedException();
             }
 
             foreach (var dto in dtos)
             {
-                var p = this.dBContext.PlaylistUsers.FirstOrDefault(x => x.Playlist.Id == playlistId && x.User.Id == dto.UserId) ?? throw new PlayListAlreadyInUseException();
+                var p = this.dBContext.PlaylistUsers.FirstOrDefault(x => x.Playlist.Id == playlistId && x.User.Id == dto.UserId);
                 var targetUser = this.dBContext.Users.FirstOrDefault(x => x.Id == dto.UserId) ?? throw new UserNotFoundException();
+
+                if (p.IsCreator)
+                {
+                    throw new NotAllowedException();
+                }
+
+                if (p != null)
+                {
+                    p.IsModifieable = dto.CanModify;
+                    continue;
+                }
 
                 this.dBContext.PlaylistUsers.Add(new PlaylistUser()
                 {
                     IsModifieable = dto.CanModify,
+                    IsCreator = false,
                     User = targetUser,
                     Playlist = playlist.Playlist
                 });
