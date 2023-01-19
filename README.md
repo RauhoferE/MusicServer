@@ -71,6 +71,9 @@
         "Password": "",
         "SongFolder": "",
         "ProfilePictureFolder": ""
+    },
+        "MusicDataSettings": {
+        "SourceFolder": ""
     }
 }
 
