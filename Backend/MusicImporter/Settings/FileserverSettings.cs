@@ -8,7 +8,7 @@ namespace MusicImporter.Settings
 {
     public class FileserverSettings
     {
-        public string Location { get; set; }
+        public string Location { get; set; }  
 
         public string Username { get; set; }
 
