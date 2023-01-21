@@ -29,8 +29,10 @@ var host = Host.CreateDefaultBuilder()
                 });
 
                 var appSettings = context.Configuration.GetSection("FileserverSettings").Get<FileserverSettings>();
+                var musicDataSettings = context.Configuration.GetSection("MusicDataSettings").Get<MusicDataSettings>();
 
                 services.AddSingleton(appSettings);
+                services.AddSingleton(musicDataSettings);
                 services.AddTransient<IImportService, ImportService>();
             })
             .UseSerilog()
