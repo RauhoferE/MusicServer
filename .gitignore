@@ -350,3 +350,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /Backend/MusicServer/appsettings.Development.json
+/Backend/MusicServer/../MusicImporter/appsettings.Development.json
+/Backend/MusicServer/../MusicImporter/appsettings.Development.json
