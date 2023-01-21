@@ -351,4 +351,4 @@ MigrationBackup/
 .ionide/
 /Backend/MusicServer/appsettings.Development.json
 /Backend/MusicServer/../MusicImporter/appsettings.Development.json
-/Backend/MusicServer/../MusicImporter/appsettings.Development.json
+/Backend/MusicServer/../DataAccess/Migrations
