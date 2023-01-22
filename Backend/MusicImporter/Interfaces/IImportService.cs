@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MusicImporter.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,10 +11,10 @@ namespace MusicImporter.Interfaces
     {
         public Task StartImportProcess();
 
-        public Task GetMetaDataFromMp3(string file);
+        public Task<ID3MetaData> GetMetaDataFromMp3(string file);
 
-        public Task ImportMp3DataToDatabase();
+        public Task<Guid> ImportMp3DataToDatabase(ID3MetaData metaData);
 
-        public Task CopyMp3ToFileServer(string file);
+        public Task CopyMp3ToFileServer(string file, Guid songId);
     }
 }

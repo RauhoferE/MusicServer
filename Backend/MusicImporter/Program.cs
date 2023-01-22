@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using MusicImporter.Interfaces;
 using MusicImporter.Services;
 using MusicImporter.Settings;
+using MusicServer.Core.Settings;
+using MusicServer.Core.Interfaces;
+using MusicServer.Core.Services;
 
 var host = Host.CreateDefaultBuilder()
             .ConfigureHostConfiguration(c =>
@@ -28,11 +31,16 @@ var host = Host.CreateDefaultBuilder()
                     options.UseSqlServer(context.Configuration.GetConnectionString("DefaultDBConnection"));
                 });
 
-                var appSettings = context.Configuration.GetSection("FileserverSettings").Get<FileserverSettings>();
+                var fileserverSettings = context.Configuration.GetSection("FileserverSettings").Get<FileserverSettings>();
                 var musicDataSettings = context.Configuration.GetSection("MusicDataSettings").Get<MusicDataSettings>();
+                var fileserverCredentials = context.Configuration.GetSection("FileServerCredentials").Get<FileServerCredentials>();
 
-                services.AddSingleton(appSettings);
+                services.AddSingleton(fileserverSettings);
                 services.AddSingleton(musicDataSettings);
+                services.AddSingleton(fileserverCredentials);
+                services.AddHttpClient();
+                services.AddTransient<ISftpService, SftpService>();
+                services.AddTransient<IMusicBrainzService, MusicBrainzService>();
                 services.AddTransient<IImportService, ImportService>();
             })
             .UseSerilog()
@@ -40,6 +48,6 @@ var host = Host.CreateDefaultBuilder()
 
 using (var scope = host.Services.CreateScope())
 {
-    //var copyService = scope.ServiceProvider.GetRequiredService<ICopyJobImportService>();
-    //await copyService.StartCopyJobImportService();
+    var importService = scope.ServiceProvider.GetRequiredService<IImportService>();
+    await importService.StartImportProcess();
 }

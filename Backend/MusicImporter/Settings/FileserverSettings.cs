@@ -8,14 +8,12 @@ namespace MusicImporter.Settings
 {
     public class FileserverSettings
     {
-        public string Location { get; set; }  
-
-        public string Username { get; set; }
-
-        public string Password { get; set; }
-
         public string SongFolder { get; set; }
 
-        public string ProfilePictureFolder { get; set; }
+        public string ProfileCoverFolder { get; set; }
+
+        public string AlbumCoverFolder { get; set; }
+
+        public string PlaylistCoverFolder { get; set; }
     }
 }
