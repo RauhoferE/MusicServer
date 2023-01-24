@@ -2,9 +2,11 @@
 using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using MusicImporter.DTOs;
+using MusicImporter.Exceptions;
 using MusicImporter.Interfaces;
 using MusicImporter.Settings;
 using MusicServer.Core.Interfaces;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,45 +27,53 @@ namespace MusicImporter.Services
 
         private readonly IMusicBrainzService musicBrainzService;
 
+        private readonly IFfmpegService ffmpegService;
+
         public ImportService(FileserverSettings fileserverSettings, 
             MusicDataSettings musicDataSettings,
             MusicServerDBContext dBContext,
             ISftpService sftpService,
-            IMusicBrainzService musicBrainzService)
+            IMusicBrainzService musicBrainzService,
+            IFfmpegService ffmpegService)
         {
             this.fileserverSettings = fileserverSettings;
             this.musicDataSettings= musicDataSettings;
             this.dBContext = dBContext;
             this.sftpService = sftpService;
             this.musicBrainzService = musicBrainzService;
+            this.ffmpegService = ffmpegService;
         }
 
-        public Task CopyMp3ToFileServer(string file, Guid songId)
+        public async Task CopyMp3ToFileServer(string file, Guid songId)
         {
-            throw new NotImplementedException();
+            if (!File.Exists(file))
+            {
+                throw new NotFoundException($"Song file {file} not found.");
+            }
+            //TODO: Error permission denied
+            using (var fs = new FileStream(file, FileMode.Open))
+            {
+                await this.sftpService.UploadFile(fs, $@"{fileserverSettings.SongFolder}/{songId}.mp3");
+            }
         }
 
         public async Task<ID3MetaData> GetMetaDataFromMp3(string file)
         {
             var mp3 = TagLib.File.Create(file);
-            // Get length of mp3 from ffmpeg
+
+            var duration = await this.ffmpegService.GetDurationOfMp3(file);
             return new ID3MetaData()
             {
                 Album = mp3.Tag.Album,
                 AlbumArtists = mp3.Tag.AlbumArtists,
                 SongArtists = mp3.Tag.Performers,
-                Name = mp3.Name
+                Name = mp3.Tag.Title,
+                Length = duration
             };
         }
 
         public async Task<Guid> ImportMp3DataToDatabase(ID3MetaData metaData)
         {
-            // Check if artists exist
-            // Check if album exists
-            // Add new Song
-
-
-
             var  album = this.dBContext.Albums.FirstOrDefault(x => x.Name == metaData.Album);
 
             if (album == null)
@@ -75,12 +85,18 @@ namespace MusicImporter.Services
                 }).Entity;
             }
 
-            var song = this.dBContext.Songs.Add(new Song()
+            var song = this.dBContext.Songs.FirstOrDefault(x => x.Name == metaData.Name && x.Length == metaData.Length && x.Album == album);
+
+            if (song != null)
+            {
+                throw new SongExistsException(song.Id.ToString());
+            }
+
+            song = this.dBContext.Songs.Add(new Song()
             {
                 Length = metaData.Length,
                 Name = metaData.Name,
                 Album = album
-
             }).Entity;
 
             foreach (var artist in metaData.AlbumArtists)
@@ -150,7 +166,23 @@ namespace MusicImporter.Services
 
             foreach (var song in Directory.GetFiles(this.musicDataSettings.SourceFolder, "*.mp3"))
             {
-                var data = await this.GetMetaDataFromMp3(song);
+                Log.Information($"Starting to import file: {song}");
+                try
+                {
+                    var data = await this.GetMetaDataFromMp3(song);
+                    var songId = await this.ImportMp3DataToDatabase(data);
+                    await this.CopyMp3ToFileServer(song, songId);
+                }
+                catch (SongExistsException ex)
+                {
+                    Log.Information($"Song already imported: {ex.Message}");
+                }
+                catch(NotFoundException ex)
+                {
+                    Log.Information($"{ex.Message}");
+                }
+
+
             }
         }
     }

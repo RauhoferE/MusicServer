@@ -9,5 +9,6 @@ namespace MusicImporter.Settings
     public class MusicDataSettings
     {
         public string SourceFolder { get; set; }
+        public string MP3InfoPath { get; set; }
     }
 }

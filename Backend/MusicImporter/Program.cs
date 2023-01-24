@@ -40,6 +40,7 @@ var host = Host.CreateDefaultBuilder()
                 services.AddSingleton(fileserverCredentials);
                 services.AddHttpClient();
                 services.AddTransient<ISftpService, SftpService>();
+                services.AddTransient<IFfmpegService, FfmpegService>();
                 services.AddTransient<IMusicBrainzService, MusicBrainzService>();
                 services.AddTransient<IImportService, ImportService>();
             })
@@ -48,6 +49,19 @@ var host = Host.CreateDefaultBuilder()
 
 using (var scope = host.Services.CreateScope())
 {
+    Log.Information($"Starting import process.");
     var importService = scope.ServiceProvider.GetRequiredService<IImportService>();
-    await importService.StartImportProcess();
+    try
+    {
+        await importService.StartImportProcess();
+    }
+    catch (DirectoryNotFoundException ex)
+    {
+        Log.Error($"Couldn't find source directory of songs.");
+    }
+    catch (Exception ex)
+    {
+        Log.Error($"Unknown exception occured: {ex.Message}", ex);
+    }
+    
 }
