@@ -50,7 +50,7 @@ namespace MusicImporter.Services
             {
                 throw new NotFoundException($"Song file {file} not found.");
             }
-            //TODO: Error permission denied
+            
             using (var fs = new FileStream(file, FileMode.Open))
             {
                 await this.sftpService.UploadFile(fs, $@"{fileserverSettings.SongFolder}/{songId}.mp3");
