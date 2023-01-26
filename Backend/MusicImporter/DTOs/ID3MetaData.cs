@@ -17,7 +17,5 @@ namespace MusicImporter.DTOs
         public string[] AlbumArtists { get; set; }
 
         public double Length { get; set; }
-
-        public DateTime ReleaseDate { get; set; }
     }
 }

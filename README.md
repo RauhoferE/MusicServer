@@ -34,8 +34,17 @@
 
   },
   "FileserverSettings": {
-
-  }
+        "SongFolder": "/songs",
+        "ProfileCoverFolder": "/profiles",
+        "AlbumCoverFolder": "/albums",
+        "PlaylistCoverFolder": "/playlists"
+  },
+    "FileServerCredentials": {
+        "UserName": "",
+        "Password": "",
+        "Host": "",
+        "Port": 22
+    },
 }
 
 
@@ -65,16 +74,22 @@
       }
     ]
   },
-    "FileserverSettings": {
-        "Location": "",
-        "Username": "",
-        "Password": "",
-        "SongFolder": "",
-        "ProfilePictureFolder": ""
-    },
-        "MusicDataSettings": {
-        "SourceFolder": ""
-    }
+  "FileserverSettings": {
+      "SongFolder": "/songs",
+      "ProfileCoverFolder": "/profiles",
+      "AlbumCoverFolder": "/albums",
+      "PlaylistCoverFolder": "/playlists"
+  },
+  "FileServerCredentials": {
+      "UserName": "",
+      "Password": "",
+      "Host": "",
+      "Port": 22
+  },
+  "MusicDataSettings": {
+      "SourceFolder": "D:\\Music_FileServer\\Downloads",
+      "MP3InfoPath": "C:\\Tools\\mp3info.exe"
+  }
 }
 
 

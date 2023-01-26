@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicImporter.Settings
+namespace MusicServer.Core.Settings
 {
     public class FileserverSettings
     {

@@ -2,6 +2,8 @@
 using MusicImporter.Interfaces;
 using MusicImporter.JsonObjects;
 using MusicImporter.Settings;
+using MusicServer.Core.Interfaces;
+using MusicServer.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,15 +20,22 @@ namespace MusicImporter.Services
 
         private readonly FileserverSettings fileserverSettings;
 
-        public MusicBrainzService(IHttpClientFactory httpClientFactory, FileserverSettings fileserverSettings)
+        private readonly ISftpService sftpService;
+
+        public MusicBrainzService(IHttpClientFactory httpClientFactory, 
+            FileserverSettings fileserverSettings,
+            ISftpService sftpService)
         {
             this.httpClientFactory = httpClientFactory;
             this.fileserverSettings = fileserverSettings;
+            this.sftpService = sftpService;
         }
 
         public async Task DownloadAlbumCover(string albumName, Guid albumId)
         {
             var client = this.httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.UserAgent
+                .Add(new System.Net.Http.Headers.ProductInfoHeaderValue("Musicimporter", "0.1"));
 
             // Get MBID
             //https://musicbrainz.org/ws/2/release?query=No%20grave%20But%20the%20Sea%20(deluxe%20edition)&limit=1&fmt=json
@@ -47,7 +56,7 @@ namespace MusicImporter.Services
             // Get Cover Art xml
             // https://coverartarchive.org/release/21234ce3-9283-4eeb-9df7-0e938b1f46af
 
-            var coverArtInfoResp = await client.GetAsync($"https://coverartarchive.org/release/{mbidRespAsJson.Releases[0].Id}/index.json");
+            var coverArtInfoResp = await client.GetAsync($"https://coverartarchive.org/release/{mbidRespAsJson.Releases[0].Id}");
 
             if (mbidResp.StatusCode == HttpStatusCode.NotFound)
             {
@@ -69,12 +78,18 @@ namespace MusicImporter.Services
             var bytes = await client.GetByteArrayAsync(coverArtInfoAsJson.Images[0].Thumbnails.Large);
 
             // Save File on samba server
+            using (var ms = new MemoryStream(bytes))
+            {
+                await this.sftpService.UploadFile(ms, $"{fileserverSettings.AlbumCoverFolder}/{albumId}.jpg");
+            }
+            
         }
 
         public async Task<DateTime> GetAlbumReleaseDate(string albumName)
         {
             var client = this.httpClientFactory.CreateClient();
-
+            client.DefaultRequestHeaders.UserAgent
+    .Add(new System.Net.Http.Headers.ProductInfoHeaderValue("Musicimporter", "0.1"));
             // Get MBID
             //https://musicbrainz.org/ws/2/release?query=No%20grave%20But%20the%20Sea%20(deluxe%20edition)&limit=1&fmt=json
             var mbidResp = await client.GetAsync($"https://musicbrainz.org/ws/2/release?query={WebUtility.UrlEncode(albumName)}&limit=1&fmt=json");

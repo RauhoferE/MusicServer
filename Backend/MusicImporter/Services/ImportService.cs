@@ -6,6 +6,7 @@ using MusicImporter.Exceptions;
 using MusicImporter.Interfaces;
 using MusicImporter.Settings;
 using MusicServer.Core.Interfaces;
+using MusicServer.Core.Settings;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -62,6 +63,7 @@ namespace MusicImporter.Services
             var mp3 = TagLib.File.Create(file);
 
             var duration = await this.ffmpegService.GetDurationOfMp3(file);
+            
             return new ID3MetaData()
             {
                 Album = mp3.Tag.Album,
@@ -78,11 +80,15 @@ namespace MusicImporter.Services
 
             if (album == null)
             {
+                var releaseDatae = await this.musicBrainzService.GetAlbumReleaseDate(metaData.Album);
                 album = this.dBContext.Albums.Add(new Album()
                 {
                     Name = metaData.Album,
-                    Created = metaData.ReleaseDate
+                    Created = releaseDatae
                 }).Entity;
+
+                // Download Album Cover and Save it 
+                await this.musicBrainzService.DownloadAlbumCover(metaData.Album, album.Id);
             }
 
             var song = this.dBContext.Songs.FirstOrDefault(x => x.Name == metaData.Name && x.Length == metaData.Length && x.Album == album);
@@ -167,6 +173,7 @@ namespace MusicImporter.Services
             foreach (var song in Directory.GetFiles(this.musicDataSettings.SourceFolder, "*.mp3"))
             {
                 Log.Information($"Starting to import file: {song}");
+
                 try
                 {
                     var data = await this.GetMetaDataFromMp3(song);
