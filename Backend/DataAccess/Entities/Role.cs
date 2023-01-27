@@ -15,8 +15,8 @@ namespace DataAccess.Entities
 
         public User? Modifiedby { get; set; }
 
-        public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 
-        public List<RoleClaim> RoleClaims { get; set; } = new List<RoleClaim>();
+        public ICollection<RoleClaim> RoleClaims { get; set; } = new List<RoleClaim>();
     }
 }

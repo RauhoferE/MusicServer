@@ -8,9 +8,9 @@
 
         public double Length { get; set; }
 
-        public string Album { get; set; }
+        public GuidNameDto Album { get; set; }
 
-        public string[] Artists { get; set; }
+        public GuidNameDto[] Artists { get; set; }
 
         public DateTime Created { get; set; }
 

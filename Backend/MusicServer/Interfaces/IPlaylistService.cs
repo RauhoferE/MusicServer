@@ -25,13 +25,15 @@ namespace MusicServer.Interfaces
 
         public Task CopyPlaylistToLibraryAsync(Guid playlistId);
 
-        public Task<List<PlaylistDto>> GetPlaylistsAsync();
+        public Task<PlaylistShortDto[]> GetPlaylistsAsync(int page, int take);
 
-        public Task<List<PlaylistDto>> GetUserPlaylists(Guid userId);
+        public Task<PlaylistShortDto[]> GetUserPlaylists(Guid userId, int page, int take);
 
-        public Task<List<PlaylistDto>> GetPublicPlaylists();
+        public Task<PlaylistShortDto[]> GetPublicPlaylists(int page, int take);
 
-        public Task<PlaylistDto> GetSongsInPlaylist(Guid playlistId);
+        public Task<PlaylistDto> GetPlaylistInfo(Guid playlistId);
+
+        public Task<SongDto[]> GetSongsInPlaylist(Guid playlistId, int page, int take);
 
 
     }

@@ -10,7 +10,11 @@ namespace MusicServer.Mapper
         {
             this.CreateMap<PlaylistSong, SongDto>(MemberList.Destination)
                 .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.Song.Album.Name))
-                .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Song.Artists.Select(x => x.Artist.Name)))
+                .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Song.Artists.Select(x => new GuidNameDto()
+                {
+                    Id = x.Artist.Id,
+                    Name = x.Artist.Name
+                })))
                 .ForMember(dest => dest.Length, opt => opt.MapFrom(ps => ps.Song.Length))
                 .ForMember(dest => dest.Modified, opt => opt.MapFrom(ps => ps.Song.Modified))
                 .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Song.Created))
@@ -23,7 +27,6 @@ namespace MusicServer.Mapper
                 .ForMember(dest => dest.IsModifieable, opt => opt.MapFrom(ps => ps.IsModifieable));
 
             this.CreateMap<Playlist, PlaylistDto>(MemberList.Destination)
-                .ForMember(dest => dest.Songs, opt => opt.MapFrom(ps => ps.Songs))
                 .ForMember(dest => dest.Users, opt => opt.MapFrom(ps => ps.Users));
         }
     }

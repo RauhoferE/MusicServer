@@ -53,33 +53,33 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Default)]
-        public async Task<IActionResult> GetPlaylist([FromQuery, Required] Guid playlistId)
+        public async Task<IActionResult> GetPlaylist([FromQuery, Required] Guid playlistId, [FromQuery, Required] int page, [FromQuery, Required] int take)
         {
-            var t = await this.playlistService.GetSongsInPlaylist(playlistId);
+            var t = await this.playlistService.GetSongsInPlaylist(playlistId, page, take);
             return Ok(t);
         }
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Playlists)]
-        public async Task<IActionResult> GetPlaylists()
+        public async Task<IActionResult> GetPlaylists([FromQuery, Required] int page, [FromQuery, Required] int take)
         {
-            var t = await this.playlistService.GetPlaylistsAsync();
+            var t = await this.playlistService.GetPlaylistsAsync(page, take);
             return Ok(t);
         }
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.UserPlaylists)]
-        public async Task<IActionResult> GetUserPlaylists([FromRoute, Required] Guid userId)
+        public async Task<IActionResult> GetUserPlaylists([FromRoute, Required] Guid userId, [FromQuery, Required] int page, [FromQuery, Required] int take)
         {
-            var t = await this.playlistService.GetUserPlaylists(userId);
+            var t = await this.playlistService.GetUserPlaylists(userId, page, take);
             return Ok(t);
         }
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.PublicPlaylist)]
-        public async Task<IActionResult> GetPublicPlaylists()
+        public async Task<IActionResult> GetPublicPlaylists([FromQuery, Required] int page, [FromQuery, Required] int take)
         {
-            var t = await this.playlistService.GetPublicPlaylists();
+            var t = await this.playlistService.GetPublicPlaylists(page, take);
             return Ok(t);
         }
 

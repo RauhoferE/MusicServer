@@ -17,8 +17,8 @@ namespace DataAccess.Entities
 
         public bool IsSingle { get; set; } = false;
 
-        public List<Song> Songs { get; set; } = new List<Song>();
+        public ICollection<Song> Songs { get; set; } = new List<Song>();
 
-        public List<ArtistAlbum> Artists { get; set; } = new List<ArtistAlbum>();
+        public ICollection<ArtistAlbum> Artists { get; set; } = new List<ArtistAlbum>();
     }
 }

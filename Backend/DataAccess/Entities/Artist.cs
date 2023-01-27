@@ -12,8 +12,8 @@ namespace DataAccess.Entities
 
         public string? Description { get; set; }
 
-        public List<ArtistAlbum> Albums { get; set; } = new List<ArtistAlbum>();
+        public ICollection<ArtistAlbum> Albums { get; set; } = new List<ArtistAlbum>();
 
-        public List<ArtistSong> Songs { get; set; } = new List<ArtistSong>();
+        public ICollection<ArtistSong> Songs { get; set; } = new List<ArtistSong>();
     }
 }

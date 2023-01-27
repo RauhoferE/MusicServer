@@ -16,8 +16,6 @@
 
         public DateTime Modified { get; set; }
 
-        public SongDto[] Songs { get; set; }
-
         public PlaylistUserDto[] Users { get; set; } 
     }
 }

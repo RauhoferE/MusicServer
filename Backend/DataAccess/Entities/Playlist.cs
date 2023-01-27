@@ -16,8 +16,8 @@ namespace DataAccess.Entities
 
         public string? Description { get; set; }
 
-        public List<PlaylistSong> Songs { get; set; }
+        public ICollection<PlaylistSong> Songs { get; set; }
 
-        public List<PlaylistUser> Users { get; set; }
+        public ICollection<PlaylistUser> Users { get; set; }
     }
 }

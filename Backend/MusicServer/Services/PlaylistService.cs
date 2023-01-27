@@ -175,7 +175,13 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task<List<PlaylistDto>> GetPlaylistsAsync()
+        public async Task<PlaylistDto> GetPlaylistInfo(Guid playlistId)
+        {
+            //TODO: Implement me
+            throw new NotImplementedException();
+        }
+
+        public async Task<PlaylistShortDto[]> GetPlaylistsAsync(int page, int take)
         {
             var user = this.dBContext.Users
                 .Include(x => x.Playlists)
@@ -195,10 +201,13 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artist)
             .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            return this.mapper.Map<List<Playlist>, List<PlaylistDto>>(user.Playlists.Select(x => x.Playlist).ToList());
+            return this.mapper.Map<Playlist[], PlaylistShortDto[]>(user.Playlists
+                .Skip((page - 1) * take)
+                .Take(take)
+                .Select(x => x.Playlist).ToArray());
         }
 
-        public async Task<List<PlaylistDto>> GetPublicPlaylists()
+        public async Task<PlaylistShortDto[]> GetPublicPlaylists(int page, int take)
         {
             var playlists = this.dBContext.Playlists
                 .Include(x => x.Songs)
@@ -214,36 +223,38 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artist)
                 .Where(x => x.IsPublic);
 
-            return this.mapper.Map<List<Playlist>, List<PlaylistDto>>(playlists.ToList());
+            return this.mapper.Map<Playlist[], PlaylistShortDto[]>(playlists.Skip((page - 1) * take).Take(take).ToArray());
         }
 
-        public async Task<PlaylistDto> GetSongsInPlaylist(Guid playlistId)
+        public async Task<SongDto[]> GetSongsInPlaylist(Guid playlistId, int page, int take)
         {
-            var playlist = this.dBContext.Playlists
-            .Include(x => x.Songs)
-            .ThenInclude(x => x.Song)
-            .Include(x => x.Users)
-            .ThenInclude(x => x.User)
-                        .Include(x => x.Songs)
-            .ThenInclude(x => x.Song)
-            .ThenInclude(x => x.Album)
-            .Include(x => x.Songs)
-            .ThenInclude(x => x.Song)
-            .ThenInclude(x => x.Artists)
-            .ThenInclude(x => x.Artist)
-            .FirstOrDefault(x => x.Id == playlistId) ?? throw new PlaylistNotFoundException();
+            var songs = this.dBContext.PlaylistSongs
+                .Include(x => x.Playlist)
+                .ThenInclude(x => x.Users)
+                .ThenInclude(x => x.User)
+                .Include(x => x.Song)
+                .ThenInclude(x => x.Album)
+                .Include(x => x.Song)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Where(x => x.Playlist.Id == playlistId);
 
-            var user = playlist.Users.FirstOrDefault(x => x.User.Id == this.activeUserService.Id);
+            if (songs.Count() == 0)
+            {
+                throw new PlaylistNotFoundException();
+            }
 
-            if ((!playlist.IsPublic && user == null))
+            var user = songs.First().Playlist.Users.FirstOrDefault(x => x.User.Id == this.activeUserService.Id);
+
+            if ((!songs.First().Playlist.IsPublic && user == null))
             {
                 throw new NotAllowedException();
             }
 
-            return this.mapper.Map<Playlist, PlaylistDto>(playlist);
+            return this.mapper.Map<PlaylistSong[], SongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray());
         }
 
-        public async Task<List<PlaylistDto>> GetUserPlaylists(Guid userId)
+        public async Task<PlaylistShortDto[]> GetUserPlaylists(Guid userId, int page, int take)
         {
             var user = this.dBContext.Users
                 .Include(x => x.Playlists)
@@ -263,7 +274,9 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artist)
 .FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
 
-            return this.mapper.Map<List<Playlist>, List<PlaylistDto>>(user.Playlists.Where(x => x.Playlist.IsPublic).Select(x => x.Playlist).ToList());
+            return this.mapper.Map<Playlist[], PlaylistShortDto[]>(
+                user.Playlists.Where(x => x.Playlist.IsPublic)
+                .Skip((page - 1) * take).Take(take).Select(x => x.Playlist).ToArray());
         }
 
         public async Task RemoveSongsFromPlaylistAsync(Guid playlistId, List<Guid> songIds)
