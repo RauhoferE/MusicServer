@@ -53,7 +53,15 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Default)]
-        public async Task<IActionResult> GetPlaylist([FromQuery, Required] Guid playlistId, [FromQuery, Required] int page, [FromQuery, Required] int take)
+        public async Task<IActionResult> GetPlaylistInfo([FromQuery, Required] Guid playlistId)
+        {
+            var t = await this.playlistService.GetPlaylistInfo(playlistId);
+            return Ok(t);
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.Playlist.Songs)]
+        public async Task<IActionResult> GetSongsInPlaylist([FromQuery, Required] Guid playlistId, [FromQuery, Required] int page, [FromQuery, Required] int take)
         {
             var t = await this.playlistService.GetSongsInPlaylist(playlistId, page, take);
             return Ok(t);

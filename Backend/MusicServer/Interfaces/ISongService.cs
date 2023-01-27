@@ -4,7 +4,7 @@ namespace MusicServer.Interfaces
 {
     public interface ISongService
     {
-        public Task<ArtistDto[]> GetArtist(Guid artistId);
+        public Task<ArtistDto> GetArtist(Guid artistId);
 
         public Task<AlbumDto[]> GetAlbumsOfArtist(Guid artistId, int take, int skip);
 

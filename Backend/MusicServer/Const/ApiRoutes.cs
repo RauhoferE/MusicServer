@@ -25,6 +25,7 @@
         public static class Playlist
         {
             public const string Default = "";
+            public const string Songs = "songs";
             public const string Playlists = "playlists";
             public const string UserPlaylists = "user/{userId}";
             public const string PublicPlaylist = "public";

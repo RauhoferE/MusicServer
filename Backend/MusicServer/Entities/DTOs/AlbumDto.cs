@@ -8,7 +8,7 @@
 
         public GuidNameDto[] Artists { get; set; }
 
-        public DateTime ReleaseDate { get; set; }
+        public DateTime Release { get; set; }
 
         public int SongCount { get; set; }
 
