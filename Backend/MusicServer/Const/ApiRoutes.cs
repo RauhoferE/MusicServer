@@ -24,6 +24,7 @@
 
         public static class Playlist
         {
+            //TODO: Change routes
             public const string Default = "";
             public const string Songs = "songs";
             public const string Playlists = "playlists";
