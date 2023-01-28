@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MusicServer.Entities.DTOs;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
+using System.Diagnostics;
 
 namespace MusicServer.Services
 {
@@ -24,7 +25,7 @@ namespace MusicServer.Services
             this._mapper = mapper;
         }
 
-        public async Task<AlbumDto[]> GetAlbumsOfArtist(Guid artistId, int take, int skip)
+        public async Task<AlbumDto[]> GetAlbumsOfArtist(Guid artistId, int page, int take)
         {
             var artist = this._dbContext.Artists.FirstOrDefault(x => x.Id == artistId) ?? throw new ArtistNotFoundException();
             var albums = this._dbContext.Artists
@@ -39,16 +40,42 @@ namespace MusicServer.Services
 
         public async Task<ArtistDto> GetArtist(Guid artistId)
         {
-            var artist = this._dbContext.Artists.FirstOrDefault(x => x.Id == artistId) ?? throw new ArtistNotFoundException();
-            throw new NotImplementedException();
+            var artist = this._dbContext.Artists
+                .Include(x => x.Albums)
+                .ThenInclude(x => x.Album)
+                .Include(x => x.Songs)
+                .ThenInclude(x => x.Song)
+                .FirstOrDefault(x => x.Id == artistId) ?? throw new ArtistNotFoundException();
+
+            return this._mapper.Map<ArtistDto>(artist);
+            
         }
 
-        public Task<SongDto> GetSongInformation(Guid songId)
+        public async Task<SongDto> GetSongInformation(Guid songId)
         {
-            throw new NotImplementedException();
+            var song = this._dbContext.Songs
+                .Include(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Album)
+                .FirstOrDefault(x => x.Id == songId) ?? throw new SongNotFoundException();
+
+            return this._mapper.Map<SongDto>(song);
         }
 
-        public Task<SongDto[]> GetSongsInAlbum(Guid albumId, int take, int skip)
+        public async Task<SongDto[]> GetSongsInAlbum(Guid albumId, int page, int take)
+        {
+            var album = this._dbContext.Albums.FirstOrDefault(x => x.Id == albumId) ?? throw new AlbumNotFoundException();
+
+            var songs = this._dbContext.Songs
+                .Include(x => x.Artists)
+                .ThenInclude(x=> x.Artist)
+                .Include(x => x.Album)
+                .Where(x => x.Album.Id == albumId);
+
+            return this._mapper.Map<SongDto[]>(songs.Skip((page - 1) * take).Take(take));
+        }
+
+        public Task<SearchResultDto> Search(string filter, int page, int take)
         {
             throw new NotImplementedException();
         }

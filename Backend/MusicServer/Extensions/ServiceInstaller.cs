@@ -30,6 +30,7 @@ namespace MusicServer.Extensions
             builder.Services.AddTransient<IActiveUserService, ActiveUserService>();
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IPlaylistService, PlaylistService>();
+            builder.Services.AddTransient<ISongService, SongService>();
         }
 
 

@@ -6,10 +6,12 @@ namespace MusicServer.Interfaces
     {
         public Task<ArtistDto> GetArtist(Guid artistId);
 
-        public Task<AlbumDto[]> GetAlbumsOfArtist(Guid artistId, int take, int skip);
+        public Task<AlbumDto[]> GetAlbumsOfArtist(Guid artistId, int page, int take);
 
-        public Task<SongDto[]> GetSongsInAlbum(Guid albumId, int take, int skip);
+        public Task<SongDto[]> GetSongsInAlbum(Guid albumId, int page, int take);
 
         public Task<SongDto> GetSongInformation(Guid songId);
+
+        public Task<SearchResultDto> Search(string filter, int page, int take);
     }
 }

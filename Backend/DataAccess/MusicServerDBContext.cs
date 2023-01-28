@@ -130,20 +130,20 @@ namespace DataAccess
                     new Role()
                     {
                         Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                        Name = RolesEnum.Root,
-                        NormalizedName = RolesEnum.Root.ToUpper(),
+                        Name = MusicServer.Core.Const.Roles.Root,
+                        NormalizedName = MusicServer.Core.Const.Roles.Root.ToUpper(),
                     },
                     new Role()
                     {
                         Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
-                        Name = RolesEnum.Admin,
-                        NormalizedName = RolesEnum.Admin.ToUpper(),
+                        Name = MusicServer.Core.Const.Roles.Admin,
+                        NormalizedName = MusicServer.Core.Const.Roles.Admin.ToUpper(),
                     },
                     new Role()
                     {
                         Id = Guid.Parse("00000000-0000-0000-0000-000000000003"),
-                        Name = RolesEnum.User,
-                        NormalizedName = RolesEnum.User.ToUpper(),
+                        Name = MusicServer.Core.Const.Roles.User,
+                        NormalizedName = MusicServer.Core.Const.Roles.User.ToUpper(),
                     }
                     );
             });

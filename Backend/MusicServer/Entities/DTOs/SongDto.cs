@@ -8,7 +8,7 @@
 
         public double Length { get; set; }
 
-        public GuidNameDto Album { get; set; }
+        public AlbumArtistDto Album { get; set; }
 
         public GuidNameDto[] Artists { get; set; }
 

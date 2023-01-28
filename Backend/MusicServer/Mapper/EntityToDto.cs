@@ -40,21 +40,26 @@ namespace MusicServer.Mapper
 
             this.CreateMap<Artist, GuidNameDto>(MemberList.Destination);
 
-            this.CreateMap<Album, GuidNameDto>(MemberList.Destination);
-
             this.CreateMap<ArtistSong, GuidNameDto>(MemberList.Destination)
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Artist.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Artist.Name));
 
-            this.CreateMap<ArtistAlbum, GuidNameDto>(MemberList.Destination)
-    .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Artist.Id))
-    .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Artist.Name));
+            this.CreateMap<ArtistSong, SongArtistDto>(MemberList.Destination)
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Song.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Song.Name))
+                .ForMember(dest => dest.Length, opt => opt.MapFrom(ps => ps.Song.Length));
+
+            this.CreateMap<Album, AlbumArtistDto>(MemberList.Destination);
+
 
             this.CreateMap<Album, AlbumDto>(MemberList.Destination)
                 .ForMember(dest => dest.SongCount, opt => opt.MapFrom(ps => ps.Songs.Count))
                 .ForMember(dest => dest.Duration, opt => opt.MapFrom(ps => ps.Songs.Sum(x => x.Length)))
                 .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Artists));
 
+            this.CreateMap<Song, SongDto>(MemberList.Destination)
+                .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.Album))
+                .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Artists));
         }
     }
 }
