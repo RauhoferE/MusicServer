@@ -34,5 +34,13 @@
             public const string PlaylistShare = "share";
             public const string PlaylistCopy = "copy";
         }
+
+        public static class Song
+        {
+            public const string Default = "";
+            public const string Album = "album/{albumId}";
+            public const string Artist = "artist/{artistId}";
+            public const string AlbumSong = "album/{albumId}/songs";
+        }
     }
 }

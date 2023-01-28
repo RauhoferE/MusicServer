@@ -2,14 +2,14 @@
 {
     public class SearchResultDto
     {
-        public PlaylistShortDto[] Playlists { get; set; }
+        public PlaylistShortDto[] Playlists { get; set; } = new PlaylistShortDto[0];
 
-        public GuidNameDto[] Artists { get; set; }
+        public GuidNameDto[] Artists { get; set; } = new GuidNameDto[0];
 
-        public SongDto[] Songs { get; set; }
+        public SongDto[] Songs { get; set; } = new SongDto[0];
 
-        public AlbumDto[] Albums { get;set; }
+        public AlbumDto[] Albums { get;set; } = new AlbumDto[0];
 
-        public UserDto[] Users { get; set; }
+        public UserDto[] Users { get; set; } = new UserDto[0];
     }
 }

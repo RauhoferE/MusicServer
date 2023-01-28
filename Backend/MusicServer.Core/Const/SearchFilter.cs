@@ -13,5 +13,11 @@ namespace MusicServer.Core.Const
         public const string Songs = "Songs";
         public const string Playlists = "Playlists";
         public const string Users = "Users";
+        public const string All = "All";
+
+        public static List<string> SearchFilters = new List<string>()
+        {
+            Albums, Artists, Songs, Playlists, Users, All
+        };
     }
 }
