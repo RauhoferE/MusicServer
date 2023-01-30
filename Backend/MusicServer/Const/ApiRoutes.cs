@@ -24,24 +24,23 @@
 
         public static class Playlist
         {
-            //TODO: Change routes
             public const string Default = "";
-            public const string Songs = "songs";
+            public const string Songs = "songs/{playlistId}";
             public const string Playlists = "playlists";
             public const string UserPlaylists = "user/{userId}";
             public const string PublicPlaylist = "public";
-            public const string PlaylistSongs = "songs";
-            public const string PlaylistAlbum = "album";
-            public const string PlaylistShare = "share";
-            public const string PlaylistCopy = "copy";
+            public const string PlaylistAlbum = "album/{playlistId}";
+            public const string PlaylistShare = "share/{playlistId}";
+            public const string PlaylistCopy = "copy/{playlistId}";
         }
 
         public static class Song
         {
-            public const string Default = "";
-            public const string Album = "album/{albumId}";
             public const string Artist = "artist/{artistId}";
-            public const string AlbumSong = "album/{albumId}/songs";
+            public const string ArtistAlbums = "artist/{artistId}/albums";
+            public const string SongsInAlbum = "album/{albumId}";
+            public const string SongDefault = "{songId}";
+            public const string Search = "search";
         }
     }
 }

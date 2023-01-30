@@ -61,7 +61,7 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Songs)]
-        public async Task<IActionResult> GetSongsInPlaylist([FromQuery, Required] Guid playlistId, [FromQuery, Required] int page, [FromQuery, Required] int take)
+        public async Task<IActionResult> GetSongsInPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] int page, [FromQuery, Required] int take)
         {
             var t = await this.playlistService.GetSongsInPlaylist(playlistId, page, take);
             return Ok(t);
@@ -92,16 +92,16 @@ namespace MusicServer.Controllers
         }
 
         [HttpPost]
-        [Route(ApiRoutes.Playlist.PlaylistSongs)]
-        public async Task<IActionResult> AddSongsToPlaylist([FromQuery, Required] Guid playlistId, [FromBody, Required] SongsToPlaylist request)
+        [Route(ApiRoutes.Playlist.Songs)]
+        public async Task<IActionResult> AddSongsToPlaylist([FromRoute, Required] Guid playlistId, [FromBody, Required] SongsToPlaylist request)
         {
             await this.playlistService.AddSongsToPlaylistAsync(playlistId, request.SongIds.ToList());
             return NoContent();
         }
 
         [HttpDelete]
-        [Route(ApiRoutes.Playlist.PlaylistSongs)]
-        public async Task<IActionResult> RemoveSongsFromPlaylist([FromQuery, Required] Guid playlistId, [FromBody, Required] SongsToPlaylist request)
+        [Route(ApiRoutes.Playlist.Songs)]
+        public async Task<IActionResult> RemoveSongsFromPlaylist([FromRoute, Required] Guid playlistId, [FromBody, Required] SongsToPlaylist request)
         {
             await this.playlistService.RemoveSongsFromPlaylistAsync(playlistId, request.SongIds.ToList());
             return NoContent();
@@ -109,7 +109,7 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.PlaylistAlbum)]
-        public async Task<IActionResult> AddAlbumToPlaylist([FromQuery, Required] Guid playlistId, [FromQuery, Required] Guid albumId)
+        public async Task<IActionResult> AddAlbumToPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] Guid albumId)
         {
             await this.playlistService.AddAlbumSongsToPlaylistAsync(albumId, playlistId);
             return NoContent();
@@ -117,7 +117,7 @@ namespace MusicServer.Controllers
 
         [HttpPost]
         [Route(ApiRoutes.Playlist.PlaylistShare)]
-        public async Task<IActionResult> UpdatePlaylistShareList([FromQuery, Required] Guid playlistId, [FromBody, Required] PlaylistShareList request)
+        public async Task<IActionResult> UpdatePlaylistShareList([FromRoute, Required] Guid playlistId, [FromBody, Required] PlaylistShareList request)
         {
             await this.playlistService.UpdatePlaylistShareListAsync(playlistId, request.UserList.ToList());
             return NoContent();
@@ -126,7 +126,7 @@ namespace MusicServer.Controllers
 
         [HttpDelete]
         [Route(ApiRoutes.Playlist.PlaylistShare)]
-        public async Task<IActionResult> RemoveUserFromPlaylist([FromQuery, Required] Guid playlistId, [FromBody, Required] UserIds request)
+        public async Task<IActionResult> RemoveUserFromPlaylist([FromRoute, Required] Guid playlistId, [FromBody, Required] UserIds request)
         {
             await this.playlistService.RemoveUsersFromPlaylist(playlistId, request.UserIdArray.ToList());
             return NoContent();
@@ -134,7 +134,7 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.PlaylistCopy)]
-        public async Task<IActionResult> CopyPlaylistToLibrary([FromQuery, Required] Guid playlistId)
+        public async Task<IActionResult> CopyPlaylistToLibrary([FromRoute, Required] Guid playlistId)
         {
             await this.playlistService.CopyPlaylistToLibraryAsync(playlistId);
             return NoContent();
