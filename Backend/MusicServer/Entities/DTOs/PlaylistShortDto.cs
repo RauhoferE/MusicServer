@@ -6,6 +6,8 @@
 
         public string Name { get; set; }
 
+        public UserDto[] Users { get; set; }
+
         public int SongCount { get; set; }
     }
 }

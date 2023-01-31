@@ -7,6 +7,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MusicServer.Controllers
 {
+    [ApiController]
+    [Route(ApiRoutes.Base)]
     [Authorize]
     public class SongController : Controller
     {
@@ -28,7 +30,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Song.ArtistAlbums)]
         public async Task<IActionResult> GetAlbumsOfArtists([FromRoute, Required] Guid artistId, [FromQuery, Required] int page, [FromQuery, Required] int take)
         {
-            return Ok(await this.songService.GetAlbumsOfArtist(artistId, take, page));
+            return Ok(await this.songService.GetAlbumsOfArtist(artistId, page, take));
         }
 
         [HttpGet]
@@ -45,7 +47,7 @@ namespace MusicServer.Controllers
             return Ok(await this.songService.GetSongInformation(songId));
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route(ApiRoutes.Song.Search)]
         public async Task<IActionResult> Search([FromQuery, Required] int page, [FromQuery, Required] int take, [FromBody, Required] Search request)
         {

@@ -84,7 +84,7 @@ namespace MusicImporter.Services
                 album = this.dBContext.Albums.Add(new Album()
                 {
                     Name = metaData.Album,
-                    Created = releaseDatae
+                    Release = releaseDatae
                 }).Entity;
 
                 // Download Album Cover and Save it 

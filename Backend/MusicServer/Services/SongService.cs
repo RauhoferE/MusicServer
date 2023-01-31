@@ -33,14 +33,17 @@ namespace MusicServer.Services
         public async Task<AlbumDto[]> GetAlbumsOfArtist(Guid artistId, int page, int take)
         {
             var artist = this._dbContext.Artists.FirstOrDefault(x => x.Id == artistId) ?? throw new ArtistNotFoundException();
-            var albums = this._dbContext.Artists
-                .Include(x => x.Albums)
-                .ThenInclude(x => x.Album)
-                .Include(x => x.Songs)
-                .ThenInclude(x => x.Song)
-                .Where(x => x.Id == artistId);
 
-            return this._mapper.Map<AlbumDto[]>(albums.ToArray());
+            var albums = this._dbContext.ArtistAlbums
+                .Include(x => x.Artist)
+                .Include(x => x.Album)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Album)
+                .ThenInclude(x => x.Songs)
+                .Where(x => x.Artist.Id == artistId);
+
+            return this._mapper.Map<AlbumDto[]>(albums.Skip((page - 1) * take).Take(take).Select(x => x.Album).ToArray());
         }
 
         public async Task<ArtistDto> GetArtist(Guid artistId)
@@ -103,13 +106,25 @@ namespace MusicServer.Services
 
         private async Task<SearchResultDto> FilterAll(string searchTerm, int page, int take)
         {
-            var songs = this._dbContext.Songs.Where(x => true);
+            var songs = this._dbContext.Songs
+                .Include(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Album)
+                .Where(x => true);
 
-            var albums = this._dbContext.Albums.Where(x => true);
+            var albums = this._dbContext.Albums
+                .Include(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Songs)
+                .Where(x => true);
 
             var artists = this._dbContext.Artists.Where(x => true);
-
-            var playlists = this._dbContext.Playlists.Where(x => true);
+            // TODO: Fix playlist filtering
+            var playlists = this._dbContext.Playlists
+                .Include(x => x.Users)
+                .ThenInclude(x => x.User)
+                
+                .Where(x => true);
 
             var users = this._dbContext.Users.Where(x => true);
 
@@ -118,7 +133,8 @@ namespace MusicServer.Services
                 songs = songs.Where(x => x.Name.Contains(searchTerm));
                 albums = albums.Where(x => x.Name.Contains(searchTerm));
                 artists = artists.Where(x => x.Name.Contains(searchTerm));
-                playlists = playlists.Where(x => x.Name.Contains(searchTerm));
+                // TODO: Fix playlist filtering
+                playlists = playlists.Where(x => x.Name.Contains(searchTerm) && x.IsPublic);
                 users = users.Where(x => x.UserName.Contains(searchTerm));
             }
 
@@ -134,7 +150,11 @@ namespace MusicServer.Services
 
         private async Task<SearchResultDto> FilterAllAlbums(string searchTerm, int page, int take)
         {
-            var albums = this._dbContext.Albums.Where(x => true);
+            var albums = this._dbContext.Albums
+                .Include(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Songs)
+                .Where(x => true);
 
             if (searchTerm != string.Empty)
             {
@@ -164,7 +184,11 @@ namespace MusicServer.Services
 
         private async Task<SearchResultDto> FilterAllSongs(string searchTerm, int page, int take)
         {
-            var songs = this._dbContext.Songs.Where(x => true);
+            var songs = this._dbContext.Songs
+                                .Include(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Album)
+                .Where(x => true);
 
             if (searchTerm != string.Empty)
             {
@@ -180,7 +204,10 @@ namespace MusicServer.Services
 
         private async Task<SearchResultDto> FilterAllPlaylists(string searchTerm, int page, int take)
         {
-            var playlists = this._dbContext.Playlists.Where(x => true);
+            var playlists = this._dbContext.Playlists
+                                .Include(x => x.Users)
+                .ThenInclude(x => x.User)
+                .Where(x => true);
 
             if (searchTerm != string.Empty)
             {
