@@ -119,12 +119,11 @@ namespace MusicServer.Services
                 .Where(x => true);
 
             var artists = this._dbContext.Artists.Where(x => true);
-            // TODO: Fix playlist filtering
-            var playlists = this._dbContext.Playlists
-                .Include(x => x.Users)
-                .ThenInclude(x => x.User)
-                
-                .Where(x => true);
+
+            var playlistUsers = this._dbContext.PlaylistUsers
+                .Include(x => x.User)
+                .Include(x => x.Playlist)
+                .ThenInclude(x => x.Songs).Where(x => true);
 
             var users = this._dbContext.Users.Where(x => true);
 
@@ -133,10 +132,15 @@ namespace MusicServer.Services
                 songs = songs.Where(x => x.Name.Contains(searchTerm));
                 albums = albums.Where(x => x.Name.Contains(searchTerm));
                 artists = artists.Where(x => x.Name.Contains(searchTerm));
-                // TODO: Fix playlist filtering
-                playlists = playlists.Where(x => x.Name.Contains(searchTerm) && x.IsPublic);
+                playlistUsers = playlistUsers.Where(x => x.Playlist.Name.Contains(searchTerm) && (x.Playlist.IsPublic || x.User.Id == this._activeUserService.Id));
                 users = users.Where(x => x.UserName.Contains(searchTerm));
             }
+
+            var playlists = this._dbContext.Playlists
+    .Include(x => x.Songs)
+    .Include(x => x.Users)
+    .ThenInclude(x => x.User)
+    .Where(x => playlistUsers.Select(x => x.Playlist.Id).Contains(x.Id));
 
             return new SearchResultDto()
             {
@@ -204,15 +208,24 @@ namespace MusicServer.Services
 
         private async Task<SearchResultDto> FilterAllPlaylists(string searchTerm, int page, int take)
         {
-            var playlists = this._dbContext.Playlists
-                                .Include(x => x.Users)
-                .ThenInclude(x => x.User)
+            var playlistUsers = this._dbContext.PlaylistUsers
+                                .Include(x => x.User)
+                .Include(x => x.Playlist)
+                .ThenInclude(x => x.Songs)
                 .Where(x => true);
 
             if (searchTerm != string.Empty)
             {
-                playlists = playlists.Where(x => x.Name.Contains(searchTerm));
+                playlistUsers = playlistUsers.Where(x => x.Playlist.Name.Contains(searchTerm));
             }
+
+            playlistUsers = playlistUsers.Where(x => x.Playlist.IsPublic || x.User.Id == this._activeUserService.Id);
+
+            var playlists = this._dbContext.Playlists
+                .Include(x => x.Songs)
+                .Include(x => x.Users)
+                .ThenInclude(x => x.User)
+                .Where(x => playlistUsers.Select(x => x.Playlist.Id).Contains(x.Id));
             
             return new SearchResultDto()
             {

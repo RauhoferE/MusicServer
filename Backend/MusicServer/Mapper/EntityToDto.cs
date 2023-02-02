@@ -17,24 +17,26 @@ namespace MusicServer.Mapper
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Song.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Song.Name));
 
-            this.CreateMap<PlaylistUser, PlaylistUserDto>(MemberList.Destination)
-                .ForMember(dest => dest.UserId, opt => opt.MapFrom(ps => ps.User.Id))
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(ps => ps.User.UserName))
-                .ForMember(dest => dest.IsModifieable, opt => opt.MapFrom(ps => ps.IsModifieable));
-
             this.CreateMap<Playlist, PlaylistDto>(MemberList.Destination)
-                .ForMember(dest => dest.Users, opt => opt.MapFrom(ps => ps.Users))
+                .ForMember(dest => dest.Users, opt => opt.MapFrom(ps => ps.Users.ToArray()))
                 .ForMember(dest => dest.SongCount, opt => opt.MapFrom(ps => ps.Songs.Count));
+
+            this.CreateMap<PlaylistUser, PlaylistUserDto>(MemberList.Destination)
+    .ForMember(dest => dest.UserId, opt => opt.MapFrom(ps => ps.User.Id))
+    .ForMember(dest => dest.UserName, opt => opt.MapFrom(ps => ps.User.UserName))
+    .ForMember(dest => dest.IsModifieable, opt => opt.MapFrom(ps => ps.IsModifieable));
 
             this.CreateMap<Playlist, PlaylistShortDto>(MemberList.Destination)
                 .ForMember(dest => dest.SongCount, opt => opt.MapFrom(ps => ps.Songs.Count))
                 .ForMember(dest => dest.Users, opt => opt.MapFrom(ps => ps.Users));
 
-            this.CreateMap<PlaylistUser, UserDto>(MemberList.Destination);
+            this.CreateMap<PlaylistUser, UserDto>(MemberList.Destination)
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.User.Id))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(ps => ps.User.UserName));
 
             this.CreateMap<PlaylistSong, SongDto>(MemberList.Destination)
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Playlist.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Playlist.Name))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Song.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Song.Name))
                 .ForMember(dest => dest.Length, opt => opt.MapFrom(ps => ps.Song.Length))
                 .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.Song.Album))
                 .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Song.Artists))
