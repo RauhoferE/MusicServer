@@ -10,6 +10,11 @@
 
         public static class User
         {
+
+        }
+
+        public static class Authentication
+        {
             public const string Login = "login";
             public const string Logout = "logout";
             public const string Register = "register";

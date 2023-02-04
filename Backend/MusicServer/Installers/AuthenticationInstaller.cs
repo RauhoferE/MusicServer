@@ -43,8 +43,8 @@ namespace MusicServer.Installers
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
                 options.SlidingExpiration = true;
 
-                options.LogoutPath = $"/{ApiRoutes.Base}/{ApiRoutes.User.Logout}";
-                options.LoginPath = $"/{ApiRoutes.Base}/{ApiRoutes.User.Login}";
+                options.LogoutPath = $"/{ApiRoutes.Base}/{ApiRoutes.Authentication.Logout}";
+                options.LoginPath = $"/{ApiRoutes.Base}/{ApiRoutes.Authentication.Login}";
                 // options.AccessDeniedPath = "/HelloWOrld";
 
                 options.Events = new CookieAuthenticationEvents
@@ -52,7 +52,7 @@ namespace MusicServer.Installers
                     OnRedirectToLogin = redirectContext =>
                     {
                         redirectContext.HttpContext.Response.StatusCode = 401;
-                        redirectContext.Properties.RedirectUri = $"/{ApiRoutes.Base}/{ApiRoutes.User.Login}";
+                        redirectContext.Properties.RedirectUri = $"/{ApiRoutes.Base}/{ApiRoutes.Authentication.Login}";
                         return Task.CompletedTask;
                     },
                     OnRedirectToAccessDenied = redirectContext =>
