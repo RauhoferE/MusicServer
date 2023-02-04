@@ -15,5 +15,7 @@ namespace DataAccess.Entities
         public bool IsModifieable { get; set; } = true;
 
         public bool IsCreator { get; set; } = false;
+
+        //TODO: Add boolean for receiving email notifications
     }
 }

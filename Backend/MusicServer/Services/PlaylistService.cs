@@ -52,6 +52,36 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
+        public async Task AddPlaylistToLibraryAsync(Guid playlistId)
+        {
+            var user = this.dBContext.Users
+                .Include(x => x.Playlists)
+                .ThenInclude(x => x.Playlist)
+                .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
+            var playlist = this.dBContext.Playlists.FirstOrDefault(x => x.Id == playlistId) ?? throw new PlaylistNotFoundException();
+
+            if (user.Playlists.FirstOrDefault(x => x.Playlist.Id == playlistId) != null)
+            {
+                throw new AlreadyAssignedException();
+            }
+
+            if (!playlist.IsPublic)
+            {
+                throw new NotAllowedException();
+            }
+
+            user.Playlists.Add(new PlaylistUser()
+            {
+                IsCreator = false,
+                IsModifieable = false,
+                Playlist = playlist,
+                User = user
+            });
+
+            await this.dBContext.SaveChangesAsync();
+        }
+
         public async Task AddPlaylistToPlaylistAsync(Guid sourcePlaylistId, Guid targetPlaylistId)
         {
             var user = this.dBContext.Users
@@ -167,7 +197,15 @@ namespace MusicServer.Services
 
             if (!playlist.IsModifieable)
             {
-                throw new NotAllowedException();
+                var userPlaylist = this.dBContext.PlaylistUsers
+                    .Include(x => x.User)
+                    .Include(x => x.Playlist)
+                    .FirstOrDefault(x => x.User.Id == this.activeUserService.Id && x.Playlist.Id == playlistId)
+                    ?? throw new NotAllowedException();
+
+                this.dBContext.PlaylistUsers.Remove(userPlaylist);
+                await this.dBContext.SaveChangesAsync();
+                return;
             }
 
             this.dBContext.Remove(playlist.Playlist);

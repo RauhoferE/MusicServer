@@ -12,5 +12,13 @@ namespace MusicServer.Interfaces
         public Task ConfirmRegistrationAsync(string email, string token);
 
         public Task<ICollection<Claim>> RefreshCookieAsync(Guid userId);
+
+        public Task SubscribeToUser(Guid userId);
+
+        public Task SuscribeToArtist(Guid artistId);
+
+        public Task UnsubscribeFromUser(Guid userId);
+
+        public Task UnsubscribeFromArtist(Guid artistId);
     }
 }
