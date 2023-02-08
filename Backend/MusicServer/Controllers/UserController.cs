@@ -61,5 +61,19 @@ namespace MusicServer.Controllers
             await this.userService.UnsubscribeFromArtist(artistId);
             return NoContent();
         }
+
+        [HttpGet]
+        [Route(ApiRoutes.User.GetFollowedArtists)]
+        public async Task<IActionResult> GetSubscribedArtists([FromQuery, Required] int page, [FromQuery, Required] int take)
+        {
+            return Ok(await this.userService.GetFollowedArtists(page, take));
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.User.GetFollowedUsers)]
+        public async Task<IActionResult> GetSubscribedUsers([FromQuery, Required] int page, [FromQuery, Required] int take)
+        {
+            return Ok(await this.userService.GetFollowedUsers(page, take));
+        }
     }
 }

@@ -1,7 +1,9 @@
-﻿using DataAccess;
+﻿using AutoMapper;
+using DataAccess;
 using DataAccess.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MusicServer.Entities.DTOs;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
 using Serilog;
@@ -13,12 +15,35 @@ namespace MusicServer.Services
     {
         private readonly MusicServerDBContext dBContext;
         private readonly IActiveUserService activeUserService;
+        private readonly IMapper mapper;
 
         public UserService(MusicServerDBContext dbContext,
-            IActiveUserService activeUserService)
+            IActiveUserService activeUserService,
+            IMapper mapper)
         {
             this.dBContext= dbContext;
             this.activeUserService = activeUserService;
+            this.mapper = mapper;
+        }
+
+        public async Task<GuidNameDto[]> GetFollowedArtists(int page, int take)
+        {
+            var targetUser = this.dBContext.Users
+                .Include(x => x.FollowedArtists)
+                .ThenInclude(x => x.Artist)
+                .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
+            return this.mapper.Map<GuidNameDto[]>(targetUser.FollowedArtists.Skip((page - 1) * take).Take(take).ToArray());
+        }
+
+        public async Task<GuidNameDto[]> GetFollowedUsers(int page, int take)
+        {
+            var targetUser = this.dBContext.Users
+                .Include(x => x.FollowedUsers)
+                .ThenInclude(x => x.FollowedUser)
+                .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
+            return this.mapper.Map<GuidNameDto[]>(targetUser.FollowedUsers.Skip((page - 1) * take).Take(take).ToArray());
         }
 
         public async Task SubscribeToUser(Guid userId)

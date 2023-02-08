@@ -12,6 +12,8 @@
         {
             public const string SubscribeUser = "subscribe/user/{userId}";
             public const string SubscribeArtist = "subscribe/artist/{artistId}";
+            public const string GetFollowedArtists = "followed/artists";
+            public const string GetFollowedUsers = "followed/users";
         }
 
         public static class Authentication

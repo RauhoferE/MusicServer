@@ -1,4 +1,5 @@
 ﻿using DataAccess.Entities;
+using MusicServer.Entities.DTOs;
 using System.Security.Claims;
 
 namespace MusicServer.Interfaces
@@ -12,5 +13,9 @@ namespace MusicServer.Interfaces
         public Task UnsubscribeFromUser(Guid userId);
 
         public Task UnsubscribeFromArtist(Guid artistId);
+
+        public Task<GuidNameDto[]> GetFollowedArtists(int page, int take);
+
+        public Task<GuidNameDto[]> GetFollowedUsers(int page, int take);
     }
 }
