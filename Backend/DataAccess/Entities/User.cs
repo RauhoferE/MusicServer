@@ -23,11 +23,11 @@ namespace DataAccess.Entities
 
         public bool DemandPasswordChange { get; set; } = false;
 
-        public ICollection<Artist> FollowedArtists { get; set; } = new List<Artist>();
+        public ICollection<UserArtist> FollowedArtists { get; set; } = new List<UserArtist>();
 
         public ICollection<Song> Favorites { get; set; } = new List<Song>();
 
-        public ICollection<User> FollowedUsers { get; set; } = new List<User>();
+        public ICollection<UserUser> FollowedUsers { get; set; } = new List<UserUser>();
 
         public ICollection<PlaylistUser> Playlists { get; set; } = new List<PlaylistUser>();
 

@@ -16,6 +16,6 @@ namespace DataAccess.Entities
 
         public bool IsCreator { get; set; } = false;
 
-        //TODO: Add boolean for receiving email notifications
+        public bool ReceiveNotifications { get; set; } = true;
     }
 }

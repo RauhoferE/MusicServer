@@ -10,7 +10,8 @@
 
         public static class User
         {
-
+            public const string SubscribeUser = "subscribe/user/{userId}";
+            public const string SubscribeArtist = "subscribe/artist/{artistId}";
         }
 
         public static class Authentication
@@ -37,6 +38,7 @@
             public const string PlaylistAlbum = "album/{playlistId}";
             public const string PlaylistShare = "share/{playlistId}";
             public const string PlaylistCopy = "copy/{playlistId}";
+            public const string PlaylistAddToLibrary = "add/{playlistId}";
         }
 
         public static class Song

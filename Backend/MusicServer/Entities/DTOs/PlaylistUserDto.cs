@@ -9,5 +9,7 @@
         public bool IsModifieable { get; set; }
 
         public bool IsCreator { get; set; }
+
+        public bool ReceiveNotifications { get; set; }
     }
 }

@@ -7,5 +7,7 @@
         public string Description { get; set; }
 
         public bool IsPublic { get; set; }
+
+        public bool ReceiveNotifications { get; set; }
     }
 }

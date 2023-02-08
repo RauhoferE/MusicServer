@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(MusicServerDBContext))]
-    partial class MusicServerDBContextModelSnapshot : ModelSnapshot
+    [Migration("20230208181216_ChangedPlaylistColumn")]
+    partial class ChangedPlaylistColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,7 +71,12 @@ namespace DataAccess.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Artists");
                 });
@@ -258,27 +265,27 @@ namespace DataAccess.Migrations
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
-                            ConcurrencyStamp = "6eb72c4b-d8c6-40fc-8395-cc1bda75bc34",
-                            Created = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5006),
-                            Modified = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5017),
+                            ConcurrencyStamp = "5bdfa173-bccf-46f8-8357-b74bfe3e48a3",
+                            Created = new DateTime(2023, 2, 8, 19, 12, 15, 742, DateTimeKind.Local).AddTicks(8984),
+                            Modified = new DateTime(2023, 2, 8, 19, 12, 15, 742, DateTimeKind.Local).AddTicks(9015),
                             Name = "Root",
                             NormalizedName = "ROOT"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000002"),
-                            ConcurrencyStamp = "a9200d6f-4726-4d28-a362-e8a1b80db78d",
-                            Created = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5077),
-                            Modified = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5078),
+                            ConcurrencyStamp = "4ab66979-eb9e-4186-aa90-bbea8b5fb3f2",
+                            Created = new DateTime(2023, 2, 8, 19, 12, 15, 742, DateTimeKind.Local).AddTicks(9074),
+                            Modified = new DateTime(2023, 2, 8, 19, 12, 15, 742, DateTimeKind.Local).AddTicks(9076),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000003"),
-                            ConcurrencyStamp = "9f1e422a-3a32-4958-b6c7-8433e6eb4657",
-                            Created = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5097),
-                            Modified = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5098),
+                            ConcurrencyStamp = "c4d471a9-bd4e-4449-a49a-2b9eca78850d",
+                            Created = new DateTime(2023, 2, 8, 19, 12, 15, 742, DateTimeKind.Local).AddTicks(9082),
+                            Modified = new DateTime(2023, 2, 8, 19, 12, 15, 742, DateTimeKind.Local).AddTicks(9083),
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -411,6 +418,9 @@ namespace DataAccess.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -425,39 +435,9 @@ namespace DataAccess.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.UserArtist", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<Guid?>("ArtistId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Modified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ArtistId");
-
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserArtists");
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Entities.UserRole", b =>
@@ -476,38 +456,6 @@ namespace DataAccess.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.UserUser", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("FollowedUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Modified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FollowedUserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -572,6 +520,13 @@ namespace DataAccess.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Artist", b =>
+                {
+                    b.HasOne("DataAccess.Entities.User", null)
+                        .WithMany("FollowedArtists")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.ArtistAlbum", b =>
@@ -676,20 +631,11 @@ namespace DataAccess.Migrations
                     b.Navigation("Album");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.UserArtist", b =>
+            modelBuilder.Entity("DataAccess.Entities.User", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Artist", "Artist")
-                        .WithMany()
-                        .HasForeignKey("ArtistId");
-
-                    b.HasOne("DataAccess.Entities.User", "User")
-                        .WithMany("FollowedArtists")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Artist");
-
-                    b.Navigation("User");
+                    b.HasOne("DataAccess.Entities.User", null)
+                        .WithMany("FollowedUsers")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.UserRole", b =>
@@ -707,22 +653,6 @@ namespace DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.UserUser", b =>
-                {
-                    b.HasOne("DataAccess.Entities.User", "FollowedUser")
-                        .WithMany()
-                        .HasForeignKey("FollowedUserId");
-
-                    b.HasOne("DataAccess.Entities.User", "User")
-                        .WithMany("FollowedUsers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("FollowedUser");
 
                     b.Navigation("User");
                 });

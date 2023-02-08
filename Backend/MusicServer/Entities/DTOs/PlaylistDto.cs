@@ -18,6 +18,6 @@
 
         public PlaylistUserDto[] Users { get; set; } 
 
-        public int SongCount { get; set; }
+        public int SongCount { get; set; }        
     }
 }

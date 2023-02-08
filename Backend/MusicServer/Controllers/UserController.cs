@@ -29,5 +29,37 @@ namespace MusicServer.Controllers
             this.mapper = mapper;
             this.userService = userService;
         }
+
+        [HttpGet]
+        [Route(ApiRoutes.User.SubscribeUser)]
+        public async Task<IActionResult> SubscribeToUser([FromRoute, Required] Guid userId)
+        {
+            await this.userService.SubscribeToUser(userId);
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route(ApiRoutes.User.SubscribeUser)]
+        public async Task<IActionResult> UnSubscribeFromUser([FromRoute, Required] Guid userId)
+        {
+            await this.userService.UnsubscribeFromUser(userId);
+            return NoContent();
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.User.SubscribeArtist)]
+        public async Task<IActionResult> SubscribeToArtist([FromRoute, Required] Guid artistId)
+        {
+            await this.userService.SuscribeToArtist(artistId);
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route(ApiRoutes.User.SubscribeArtist)]
+        public async Task<IActionResult> UnSubscribeFromArtist([FromRoute, Required] Guid artistId)
+        {
+            await this.userService.UnsubscribeFromArtist(artistId);
+            return NoContent();
+        }
     }
 }

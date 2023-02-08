@@ -5,9 +5,9 @@ namespace MusicServer.Interfaces
 {
     public interface IPlaylistService
     {
-        public Task<Guid> CreatePlaylistAsync(string name, string description, bool isPublic);
+        public Task<Guid> CreatePlaylistAsync(string name, string description, bool isPublic, bool receiveNotifications);
 
-        public Task UpdatePlaylistAsync(Guid playlistId, string name, string description, bool isPublic);
+        public Task UpdatePlaylistAsync(Guid playlistId, string name, string description, bool isPublic, bool receiveNotifications);
 
         public Task DeletePlaylistAsync(Guid playlistId);
 

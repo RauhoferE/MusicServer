@@ -33,6 +33,10 @@ namespace DataAccess
 
         public DbSet<PlaylistUser> PlaylistUsers { get; set; }
 
+        public DbSet<UserArtist> UserArtists { get; set; }
+
+        public DbSet<UserUser> UserUsers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -55,6 +59,14 @@ namespace DataAccess
                 .HasForeignKey(ur => ur.UserId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
+
+                u.HasMany(e => e.FollowedUsers)
+                .WithOne(e => e.User)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                u.HasMany(e => e.FollowedArtists)
+                            .WithOne(e => e.User)
+                            .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Artist>(entity =>
@@ -204,6 +216,26 @@ namespace DataAccess
                 entity.Property(n => n.Id).ValueGeneratedOnAdd();
 
                 entity.HasOne(e => e.Playlist);
+
+                entity.HasOne(e => e.User);
+            });
+
+            builder.Entity<UserArtist>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(e => e.User);
+
+                entity.HasOne(e => e.Artist);
+            });
+
+            builder.Entity<UserUser>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(e => e.User);
 
                 entity.HasOne(e => e.User);
             });

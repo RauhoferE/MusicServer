@@ -158,12 +158,12 @@ namespace MusicServer.Services
                 throw new NotAllowedException();
             }
 
-            var guid = await this.CreatePlaylistAsync(playlist.Name, playlist.Description, playlist.IsPublic);
+            var guid = await this.CreatePlaylistAsync(playlist.Name, playlist.Description, playlist.IsPublic, true);
 
             await this.AddSongsToPlaylistAsync(guid, playlist.Songs.Select(x => x.Song.Id).ToList());
         }
 
-        public async Task<Guid> CreatePlaylistAsync(string name, string description, bool isPublic)
+        public async Task<Guid> CreatePlaylistAsync(string name, string description, bool isPublic, bool receiveNotifications)
         {
             var user = this.dBContext.Users
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
@@ -173,6 +173,7 @@ namespace MusicServer.Services
                 IsModifieable= true,
                 User = user,
                 IsCreator=true,
+                ReceiveNotifications =receiveNotifications,
                 Playlist = new Playlist()
                 {
                     Description= description,
@@ -389,7 +390,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task UpdatePlaylistAsync(Guid playlistId, string name, string description, bool isPublic)
+        public async Task UpdatePlaylistAsync(Guid playlistId, string name, string description, bool isPublic, bool receiveNotifications)
         {
             var user = this.dBContext.Users
     .Include(x => x.Playlists)
@@ -406,6 +407,7 @@ namespace MusicServer.Services
             playlist.Playlist.Name = name;
             playlist.Playlist.Description= description;
             playlist.Playlist.IsPublic = isPublic;
+            playlist.ReceiveNotifications = receiveNotifications;
             await this.dBContext.SaveChangesAsync();
         }
 

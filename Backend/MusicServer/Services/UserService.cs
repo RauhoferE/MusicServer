@@ -28,14 +28,23 @@ namespace MusicServer.Services
 
             var sourceUser = this.dBContext.Users
                 .Include(x => x.FollowedUsers)
+                .ThenInclude(x => x.FollowedUser)
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            if (sourceUser.FollowedUsers.FirstOrDefault(x => x.Id == userId) != null)
+            if (sourceUser.Id == userId)
+            {
+                throw new NotAllowedException();
+            }
+
+            if (sourceUser.FollowedUsers.FirstOrDefault(x => x.FollowedUser.Id == userId) != null)
             {
                 throw new AlreadyAssignedException();
             }
 
-            sourceUser.FollowedUsers.Add(targetUser);
+            sourceUser.FollowedUsers.Add(new UserUser()
+            {
+                FollowedUser = targetUser
+            });
             await this.dBContext.SaveChangesAsync();
         }
 
@@ -43,26 +52,31 @@ namespace MusicServer.Services
         {
             var sourceUser = this.dBContext.Users
                 .Include(x => x.FollowedArtists)
+                .ThenInclude(x => x.Artist)
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
             var artist = this.dBContext.Artists.FirstOrDefault(x => x.Id == artistId) ?? throw new ArtistNotFoundException();
 
-            if (sourceUser.FollowedArtists.FirstOrDefault(x => x.Id == artistId) != null)
+            if (sourceUser.FollowedArtists.FirstOrDefault(x => x.Artist.Id == artistId) != null)
             {
                 throw new AlreadyAssignedException();
             }
 
-            sourceUser.FollowedArtists.Add(artist);
+            sourceUser.FollowedArtists.Add(new UserArtist()
+            {
+                Artist = artist
+            });
             await this.dBContext.SaveChangesAsync();
         }
 
         public async Task UnsubscribeFromArtist(Guid artistId)
         {
             var sourceUser = this.dBContext.Users
-    .Include(x => x.FollowedArtists)
-    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+                .Include(x => x.FollowedArtists)
+                .ThenInclude(x => x.Artist)
+                .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            var followedArtist = sourceUser.FollowedArtists.FirstOrDefault(x => x.Id == artistId) ?? throw new ArtistNotFoundException();
+            var followedArtist = sourceUser.FollowedArtists.FirstOrDefault(x => x.Artist.Id == artistId) ?? throw new ArtistNotFoundException();
 
             sourceUser.FollowedArtists.Remove(followedArtist);
             await this.dBContext.SaveChangesAsync();
@@ -71,10 +85,11 @@ namespace MusicServer.Services
         public async Task UnsubscribeFromUser(Guid userId)
         {
             var sourceUser = this.dBContext.Users
-.Include(x => x.FollowedUsers)
-.FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+                .Include(x => x.FollowedUsers)
+                .ThenInclude(x => x.FollowedUser)
+                .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            var followedUser = sourceUser.FollowedUsers.FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
+            var followedUser = sourceUser.FollowedUsers.FirstOrDefault(x => x.FollowedUser.Id == userId) ?? throw new UserNotFoundException();
 
             sourceUser.FollowedUsers.Remove(followedUser);
             await this.dBContext.SaveChangesAsync();

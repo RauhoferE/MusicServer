@@ -24,7 +24,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.Default)]
         public async Task<IActionResult> CreatePlaylist([FromBody, Required] UpdatePlaylist request)
         {
-            return Ok(await this.playlistService.CreatePlaylistAsync(request.Name, request.Description, request.IsPublic));
+            return Ok(await this.playlistService.CreatePlaylistAsync(request.Name, request.Description, request.IsPublic, request.ReceiveNotifications));
         }
 
         [HttpDelete]
@@ -39,7 +39,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.Default)]
         public async Task<IActionResult> UpadatePlaylist([FromQuery, Required] Guid playlistId, [FromBody, Required] UpdatePlaylist request)
         {
-            await this.playlistService.UpdatePlaylistAsync(playlistId, request.Name, request.Description, request.IsPublic);
+            await this.playlistService.UpdatePlaylistAsync(playlistId, request.Name, request.Description, request.IsPublic, request.ReceiveNotifications);
             return NoContent();
         }
 
@@ -137,6 +137,14 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> CopyPlaylistToLibrary([FromRoute, Required] Guid playlistId)
         {
             await this.playlistService.CopyPlaylistToLibraryAsync(playlistId);
+            return NoContent();
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.Playlist.PlaylistAddToLibrary)]
+        public async Task<IActionResult> AddPlaylistToLibrary([FromRoute, Required] Guid playlistId)
+        {
+            await this.playlistService.AddPlaylistToLibraryAsync(playlistId);
             return NoContent();
         }
 
