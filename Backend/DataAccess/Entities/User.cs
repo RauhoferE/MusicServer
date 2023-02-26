@@ -23,6 +23,8 @@ namespace DataAccess.Entities
 
         public bool DemandPasswordChange { get; set; } = false;
 
+        public string TemporarayEmail { get; set; } = null;
+
         public ICollection<UserArtist> FollowedArtists { get; set; } = new List<UserArtist>();
 
         public ICollection<Song> Favorites { get; set; } = new List<Song>();

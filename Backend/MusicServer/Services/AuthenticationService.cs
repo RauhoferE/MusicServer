@@ -5,6 +5,7 @@ using MusicServer.Exceptions;
 using MusicServer.Interfaces;
 using Serilog;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace MusicServer.Services
 {
@@ -26,6 +27,22 @@ namespace MusicServer.Services
             this.dBContext = dbContext;
         }
 
+        public async Task ChangeEmailAsync(Guid userId, string token)
+        {
+            var user = this.dBContext.Users.FirstOrDefault(x => x.Id == userId)
+                    ?? throw new UserNotFoundException("User not found.");
+
+            if (user.TemporarayEmail == null)
+            {
+                throw new MusicserverServiceException("Error when changing email.");
+            }
+
+            if (!(await this._userManager.ChangeEmailAsync(user, user.TemporarayEmail, token)).Succeeded)
+            {
+                throw new MusicserverServiceException("Error when changing email.");
+            }
+        }
+
         public async Task ConfirmRegistrationAsync(string email, string token)
         {
             var user = await this._userManager.FindByEmailAsync(email) ?? throw new UserNotFoundException();
@@ -38,6 +55,29 @@ namespace MusicServer.Services
             }
 
             Log.Information($"User Email confirmed: {email}");
+        }
+
+        public async Task DeleteAccountAsync(Guid userId, string currentPassword)
+        {
+            var user = this.dBContext.Users.Include(x => x.FollowedArtists)
+                .Include(x => x.FollowedUsers)
+                .Include(x => x.UserRoles)
+                .FirstOrDefault(x => x.Id == userId)
+                ?? throw new UserNotFoundException("User not found.");
+
+            var playlists = this.dBContext.PlaylistUsers
+                .Include(x => x.User)
+                .Include(x => x.Playlist)
+                .Where(x => x.User.Id == userId && x.IsCreator)
+                .DistinctBy(x => x.Playlist.Id)
+                .ToList()
+                .Select(x => x.Playlist);
+
+            this.dBContext.RemoveRange(playlists);
+
+            await this._userManager.DeleteAsync(user);
+
+            // Send Email that Account has been deleted
         }
 
         public async Task<ICollection<Claim>> LoginUserAsync(string username, string password)
@@ -119,6 +159,55 @@ namespace MusicServer.Services
             Log.Information($"Created email token for new user: {userdata.Email}");
 
             // Send token per email
+        }
+
+        public async Task RequestEmailResetAsync(Guid userId, string newEmail)
+        {
+            var user = this.dBContext.Users.FirstOrDefault(x => x.Id == userId)
+                    ?? throw new UserNotFoundException("User not found.");
+
+            var token = await this._userManager.GenerateChangeEmailTokenAsync(user, newEmail);
+
+            user.TemporarayEmail = newEmail;
+            await this.dBContext.SaveChangesAsync();
+            // Send token per Email
+        }
+
+        public async Task ResetPasswordAsync(Guid userId, string newPassword, string token)
+        {
+            var user = this.dBContext.Users.FirstOrDefault(x => x.Id == userId)
+    ?? throw new UserNotFoundException("User not found.");
+
+            if (!(await this._userManager.ResetPasswordAsync(user, token, newPassword)).Succeeded)
+            {
+                throw new MusicserverServiceException("Error when reseting the password.");
+            }
+
+            //TODO: Send mail that password has been reset
+        }
+
+        public async Task<ICollection<Claim>> ChangePasswordAsync(Guid activeUserId, string currentPassword, string newPassword)
+        {
+            var user = this.dBContext.Users.FirstOrDefault(x => x.Id == activeUserId) 
+                ?? throw new UserNotFoundException("User not found.");
+
+            if (!(await this._userManager.ChangePasswordAsync(user, currentPassword, newPassword)).Succeeded)
+            {
+                throw new MusicserverServiceException("Error when changing the password.");
+            }
+
+            // Send Email that Password has been changed successfully.
+
+            return await this.LoginUserAsync(user.Email, newPassword);
+        }
+
+        public async Task ResetPasswordRequestAsync(string email)
+        {
+            var user = this.dBContext.Users.FirstOrDefault(x => x.Email == email)
+    ?? throw new UserNotFoundException("User not found.");
+
+            var token = await this._userManager.GeneratePasswordResetTokenAsync(user);
+            // TODO: Send new token per email 
         }
     }
 }

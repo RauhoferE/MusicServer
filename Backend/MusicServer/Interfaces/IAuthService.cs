@@ -13,6 +13,16 @@ namespace MusicServer.Interfaces
 
         public Task<ICollection<Claim>> RefreshCookieAsync(Guid userId);
 
-        // TODO Put in here: Add lock user, delete, add roles, add claims
+        public Task<ICollection<Claim>> ChangePasswordAsync(Guid activeUserId, string currentPassword, string newPassword);
+
+        public Task RequestEmailResetAsync(Guid userId, string newEmail);
+
+        public Task ChangeEmailAsync(Guid userId, string token);
+
+        public Task DeleteAccountAsync(Guid userId, string currentPassword);
+
+        public Task ResetPasswordRequestAsync(string email);
+
+        public Task ResetPasswordAsync(Guid userId, string newPassword, string token);
     }
 }

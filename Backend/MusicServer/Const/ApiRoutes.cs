@@ -22,6 +22,12 @@
             public const string Logout = "logout";
             public const string Register = "register";
             public const string ConfirmMail = "confirm/email/{email}/{token}";
+            public const string ChangePassword = "change/password";
+            public const string ForgetPassword = "forget/password";
+            public const string ResetPassword = "reset/password/{userId}/{token}";
+            public const string RequestEmailReset = "reset/email";
+            public const string ChangeEmail = "change/email/{userId}/{token}";
+            public const string DeleteAccount = "delete/account";
         }
 
         public static class Development

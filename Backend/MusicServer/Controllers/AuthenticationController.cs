@@ -51,20 +51,7 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> Login([FromBody, Required] Login login)
         {
             var claims = await this.authService.LoginUserAsync(login.Email, login.Password);
-            var claimsIdentity = new ClaimsIdentity(claims,
-                CookieAuthenticationDefaults.AuthenticationScheme);
-
-            var principal = new ClaimsPrincipal(claimsIdentity);
-            await this.HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            principal,
-                    new AuthenticationProperties
-                    {
-                        IsPersistent =
-                        false, // When not persistent == SessionCookie (If browser gets closed the user has to login again)
-                        AllowRefresh = true,
-                        ExpiresUtc = DateTime.Now.AddHours(this.appSettings.CookieExpirationTimeInMinutes)
-                    });
+            await this.AddClaimsCookie(claims);
 
             return NoContent();
         }
@@ -74,7 +61,7 @@ namespace MusicServer.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            await this.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await this.RemoveClaimsCookie();
 
             return NoContent();
         }
@@ -87,6 +74,109 @@ namespace MusicServer.Controllers
             await this.authService.ConfirmRegistrationAsync(email, token);
 
             return NoContent();
+        }
+
+        [HttpPost]
+        [Route(ApiRoutes.Authentication.ChangePassword)]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody, Required] ChangePassword request)
+        {
+            var userIdClaim = this.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier); 
+
+            if (userIdClaim == null)
+            {
+                return BadRequest();
+            }
+
+            var claims = await this.authService.ChangePasswordAsync(Guid.Parse(userIdClaim.Value), request.CurrentPassword, request.NewPassword);
+            await this.RemoveClaimsCookie();
+            await this.AddClaimsCookie(claims);
+
+            return NoContent();
+        }
+
+        [HttpPost]
+        [Route(ApiRoutes.Authentication.ForgetPassword)]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgetPassword([FromBody, Required] ChangeEmail request)
+        {
+            await this.authService.ResetPasswordRequestAsync(request.Email);
+            return NoContent();
+        }
+
+        [HttpPost]
+        [Route(ApiRoutes.Authentication.ResetPassword)]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword([FromRoute, Required] Guid userId, [FromRoute, Required] string token, [FromBody, Required] ChangePassword request)
+        {
+            await this.authService.ResetPasswordAsync(userId, request.NewPassword, token);
+            return NoContent();
+        }
+
+        [HttpPost]
+        [Route(ApiRoutes.Authentication.RequestEmailReset)]
+        [Authorize]
+        public async Task<IActionResult> RequestEmailReset([FromBody, Required] string newEmail)
+        {
+            var userIdClaim = this.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return BadRequest();
+            }
+
+            await this.authService.RequestEmailResetAsync(Guid.Parse(userIdClaim.Value), newEmail);
+            return NoContent();
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.Authentication.ChangeEmail)]
+        [AllowAnonymous]
+        public async Task<IActionResult> ChangeEmail([FromRoute, Required] Guid userId, [FromRoute, Required] string token)
+        {
+            await this.authService.ChangeEmailAsync(userId, token);
+            await this.RemoveClaimsCookie();
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route(ApiRoutes.Authentication.DeleteAccount)]
+        [Authorize]
+        public async Task<IActionResult> DeleteAccount([FromBody, Required] DeleteAccount request)
+        {
+            var userIdClaim = this.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return BadRequest();
+            }
+
+            await this.authService.DeleteAccountAsync(Guid.Parse(userIdClaim.Value), request.Password);
+            await this.RemoveClaimsCookie();
+            return NoContent();
+        }
+
+        private async Task RemoveClaimsCookie()
+        {
+            await this.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+
+        private async Task AddClaimsCookie(IEnumerable<Claim> claims)
+        {
+            var claimsIdentity = new ClaimsIdentity(claims,
+    CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var principal = new ClaimsPrincipal(claimsIdentity);
+            await this.HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+                    new AuthenticationProperties
+                    {
+                        IsPersistent =
+                        false, // When not persistent == SessionCookie (If browser gets closed the user has to login again)
+                        AllowRefresh = true,
+                        ExpiresUtc = DateTime.Now.AddHours(this.appSettings.CookieExpirationTimeInMinutes)
+                    });
         }
     }
 }
