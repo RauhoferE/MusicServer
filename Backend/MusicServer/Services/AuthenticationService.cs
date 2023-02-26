@@ -69,8 +69,8 @@ namespace MusicServer.Services
                 .Include(x => x.User)
                 .Include(x => x.Playlist)
                 .Where(x => x.User.Id == userId && x.IsCreator)
-                .DistinctBy(x => x.Playlist.Id)
                 .ToList()
+                .DistinctBy(x => x.Playlist.Id)
                 .Select(x => x.Playlist);
 
             this.dBContext.RemoveRange(playlists);

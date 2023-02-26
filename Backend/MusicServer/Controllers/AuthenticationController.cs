@@ -107,16 +107,16 @@ namespace MusicServer.Controllers
         [HttpPost]
         [Route(ApiRoutes.Authentication.ResetPassword)]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPassword([FromRoute, Required] Guid userId, [FromRoute, Required] string token, [FromBody, Required] ChangePassword request)
+        public async Task<IActionResult> ResetPassword([FromRoute, Required] Guid userId, [FromRoute, Required] string token, [FromBody, Required] ResetPassword request)
         {
-            await this.authService.ResetPasswordAsync(userId, request.NewPassword, token);
+            await this.authService.ResetPasswordAsync(userId, request.Password, token);
             return NoContent();
         }
 
         [HttpPost]
         [Route(ApiRoutes.Authentication.RequestEmailReset)]
         [Authorize]
-        public async Task<IActionResult> RequestEmailReset([FromBody, Required] string newEmail)
+        public async Task<IActionResult> RequestEmailReset([FromBody, Required] ChangeEmail request)
         {
             var userIdClaim = this.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
 
@@ -125,7 +125,7 @@ namespace MusicServer.Controllers
                 return BadRequest();
             }
 
-            await this.authService.RequestEmailResetAsync(Guid.Parse(userIdClaim.Value), newEmail);
+            await this.authService.RequestEmailResetAsync(Guid.Parse(userIdClaim.Value), request.Email);
             return NoContent();
         }
 
