@@ -3,7 +3,9 @@ using DataAccess;
 using DataAccess.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MusicServer.Core.Const;
 using MusicServer.Entities.DTOs;
+using MusicServer.Entities.Requests.User;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
 using Serilog;
@@ -44,6 +46,39 @@ namespace MusicServer.Services
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
             return this.mapper.Map<LongNameDto[]>(targetUser.FollowedUsers.Skip((page - 1) * take).Take(take).ToArray());
+        }
+
+        public async Task<UserDetailsDto> GetUserAsync(long userId)
+        {
+            var user = this.dBContext.Users
+                .Include(x => x.UserRoles)
+                .ThenInclude(x => x.Role)
+                .Include(x => x.FollowedUsers)
+                .Include(x => x.Playlists)
+                .ThenInclude(x => x.Playlist)
+                .Include(x => x.FollowedArtists)
+                .ThenInclude(x => x.Artist)
+                .FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
+
+            return this.mapper.Map<UserDetailsDto>(user);
+        }
+
+        public async Task<FullUserDto[]> GetUsersAsync(int page, int take, string searchTerm)
+        {
+            var users = this.dBContext.Users.Where(x => x.Email.Contains(searchTerm) || x.UserName.Contains(searchTerm));
+
+            return this.mapper.Map<FullUserDto[]>(users.Skip((page * take)).Take(take).ToArray());
+        }
+
+        public async Task ModifyUserAsync(long userId, EditUser userRequest)
+        {
+            var user = this.dBContext.Users.FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
+
+            user.LockoutEnd = userRequest.LockoutEnd;
+            user.DemandPasswordChange = userRequest.DemandPasswordChange;
+            user.IsDeleted = userRequest.IsDeleted;
+            user.EmailConfirmed = userRequest.EmailConfirmed;
+            await this.dBContext.SaveChangesAsync();
         }
 
         public async Task SubscribeToUser(long userId)
@@ -118,6 +153,72 @@ namespace MusicServer.Services
 
             sourceUser.FollowedUsers.Remove(followedUser);
             await this.dBContext.SaveChangesAsync();
+        }
+
+        public async Task AddRoleToUserAsync(long userId, long roleId)
+        {
+            var user = this.dBContext.Users
+                .Include(x => x.UserRoles)
+                .ThenInclude(x => x.Role)
+                .FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
+
+            var role = this.dBContext.Roles.FirstOrDefault(x => x.Id == roleId) ?? throw new MusicserverServiceException("Role not found");
+
+            if (role.Id == (long)Roles.Root)
+            {
+                throw new MusicserverServiceException("Cannot add Root Role to User");
+            }
+
+            if (user.UserRoles.FirstOrDefault(x => x.Role.Id == role.Id) != null)
+            {
+                throw new MusicserverServiceException("Role already assigned to User");
+            }
+
+            user.UserRoles.Add(new UserRole()
+            {
+                Role = role,
+                RoleId = roleId
+            });
+
+            await this.dBContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveRoleFromUserAsync(long userId, long roleId)
+        {
+            var user = this.dBContext.Users
+    .Include(x => x.UserRoles)
+    .ThenInclude(x => x.Role)
+    .FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
+
+            var role = this.dBContext.Roles.FirstOrDefault(x => x.Id == roleId) ?? throw new MusicserverServiceException("Role not found");
+            var userRole = user.UserRoles.FirstOrDefault(x => x.Role.Id == roleId);
+
+            if (userRole == null)
+            {
+                throw new MusicserverServiceException("Role is not assigned to User");
+            }
+
+            user.UserRoles.Remove(userRole);
+
+            await this.dBContext.SaveChangesAsync();
+        }
+
+        public async Task<LongNameDto[]> GetRoles()
+        {
+            List<LongNameDto> roles = new List<LongNameDto>();
+            int i = 1;
+            foreach (string name in Enum.GetNames(typeof(Roles)))
+            {
+                roles.Add(new LongNameDto()
+                {
+                    Id = i,
+                    Name = name
+                });
+
+                i = i + 1;
+            }
+
+            return roles.ToArray();
         }
     }
 }

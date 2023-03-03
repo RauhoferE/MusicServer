@@ -7,7 +7,7 @@ namespace MusicServer.Interfaces
     {
         public Task<ICollection<Claim>> LoginUserAsync(string username, string password);
 
-        public Task RegisterUserAsync(User userdata, string password);
+        public Task RegisterUserAsync(User userdata, string password, Guid registrationCode);
 
         public Task ConfirmRegistrationAsync(string email, string token);
 
@@ -24,5 +24,8 @@ namespace MusicServer.Interfaces
         public Task ResetPasswordRequestAsync(string email);
 
         public Task ResetPasswordAsync(long userId, string newPassword, string token);
+
+        public Task<Guid[]> GenerateRegistrationCodesAsync(int amount);
+
     }
 }

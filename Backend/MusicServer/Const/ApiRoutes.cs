@@ -14,6 +14,10 @@
             public const string SubscribeArtist = "subscribe/artist/{artistId}";
             public const string GetFollowedArtists = "followed/artists";
             public const string GetFollowedUsers = "followed/users";
+            public const string GetUsers = "all/users";
+            public const string GetUser = "{userId}";
+            public const string RoleUser = "role/{roleId}/{userId}";
+            public const string Roles = "roles";
         }
 
         public static class Authentication
@@ -28,6 +32,7 @@
             public const string RequestEmailReset = "reset/email";
             public const string ChangeEmail = "change/email/{userId}/{token}";
             public const string DeleteAccount = "delete/account";
+            public const string GenerateRegistrationCodes = "generate/code/{amount}";
         }
 
         public static class Development

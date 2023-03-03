@@ -8,7 +8,7 @@ namespace MusicServer.Core.Const
 {
     public enum Roles
     {
-        Root,
+        Root = 1,
         Admin,
         User
     }

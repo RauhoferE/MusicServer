@@ -41,7 +41,7 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> Register([FromBody, Required] Register register)
         {
             var userdata = this.mapper.Map<Register, User>(register);
-            await this.authService.RegisterUserAsync(userdata, register.Password);
+            await this.authService.RegisterUserAsync(userdata, register.Password, register.RegistrationCode);
             return NoContent();
         }
 
@@ -154,6 +154,19 @@ namespace MusicServer.Controllers
             await this.authService.DeleteAccountAsync(long.Parse(userIdClaim.Value), request.Password);
             await this.RemoveClaimsCookie();
             return NoContent();
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.Authentication.GenerateRegistrationCodes)]
+        [Authorize(Roles = "Root")]
+        public async Task<IActionResult> GenerateRegistrationCodes([FromRoute, Required] int amount)
+        {
+            if (amount <= 0 || amount > 100)
+            {
+                return BadRequest("Amount has to be between 0 and 101.");
+            }
+
+            return Ok(await this.authService.GenerateRegistrationCodesAsync(amount));
         }
 
         private async Task RemoveClaimsCookie()

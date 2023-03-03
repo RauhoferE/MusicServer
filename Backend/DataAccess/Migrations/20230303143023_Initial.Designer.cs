@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(MusicServerDBContext))]
-    [Migration("20230208193643_AddNewTables")]
-    partial class AddNewTables
+    [Migration("20230303143023_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -206,8 +206,8 @@ namespace DataAccess.Migrations
                     b.Property<bool>("ReceiveNotifications")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -218,11 +218,40 @@ namespace DataAccess.Migrations
                     b.ToTable("PlaylistUsers");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Role", b =>
+            modelBuilder.Entity("DataAccess.Entities.RegistrationCode", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UsedByEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UsedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RegistrationCodes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("3cc85e41-e0b3-4dcf-9cb6-8b143bf432d3"),
+                            CreatedDate = new DateTime(2023, 3, 3, 15, 30, 23, 337, DateTimeKind.Local).AddTicks(2673)
+                        });
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Role", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -234,8 +263,8 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ModifiedbyId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long?>("ModifiedbyId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
@@ -259,30 +288,21 @@ namespace DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
-                            ConcurrencyStamp = "6eb72c4b-d8c6-40fc-8395-cc1bda75bc34",
-                            Created = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5006),
-                            Modified = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5017),
+                            Id = 1L,
+                            ConcurrencyStamp = "b42f80bf-7460-44ef-888e-151cf34e0429",
+                            Created = new DateTime(2023, 3, 3, 15, 30, 23, 336, DateTimeKind.Local).AddTicks(40),
+                            Modified = new DateTime(2023, 3, 3, 15, 30, 23, 336, DateTimeKind.Local).AddTicks(51),
                             Name = "Root",
                             NormalizedName = "ROOT"
                         },
                         new
                         {
-                            Id = new Guid("00000000-0000-0000-0000-000000000002"),
-                            ConcurrencyStamp = "a9200d6f-4726-4d28-a362-e8a1b80db78d",
-                            Created = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5077),
-                            Modified = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5078),
+                            Id = 2L,
+                            ConcurrencyStamp = "e2b0126d-5664-463c-bfb6-7a18a35cc542",
+                            Created = new DateTime(2023, 3, 3, 15, 30, 23, 336, DateTimeKind.Local).AddTicks(125),
+                            Modified = new DateTime(2023, 3, 3, 15, 30, 23, 336, DateTimeKind.Local).AddTicks(126),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000003"),
-                            ConcurrencyStamp = "9f1e422a-3a32-4958-b6c7-8433e6eb4657",
-                            Created = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5097),
-                            Modified = new DateTime(2023, 2, 8, 20, 36, 41, 571, DateTimeKind.Local).AddTicks(5098),
-                            Name = "User",
-                            NormalizedName = "USER"
                         });
                 });
 
@@ -300,8 +320,8 @@ namespace DataAccess.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("RoleId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -331,8 +351,8 @@ namespace DataAccess.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -345,9 +365,11 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entities.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -410,6 +432,9 @@ namespace DataAccess.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("TemporarayEmail")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -450,8 +475,8 @@ namespace DataAccess.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -459,16 +484,16 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserArtists");
+                    b.ToTable("FollowedArtists");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.UserRole", b =>
                 {
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("RoleId")
+                        .HasColumnType("bigint");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -491,8 +516,8 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("FollowedUserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long?>("FollowedUserId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
@@ -500,8 +525,8 @@ namespace DataAccess.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -509,10 +534,10 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserUsers");
+                    b.ToTable("FollowedUsers");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<long>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -526,8 +551,8 @@ namespace DataAccess.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -536,7 +561,7 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<long>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -547,8 +572,8 @@ namespace DataAccess.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -557,10 +582,10 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<long>", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -729,7 +754,7 @@ namespace DataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<long>", b =>
                 {
                     b.HasOne("DataAccess.Entities.User", null)
                         .WithMany()
@@ -738,7 +763,7 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<long>", b =>
                 {
                     b.HasOne("DataAccess.Entities.User", null)
                         .WithMany()
@@ -747,7 +772,7 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<long>", b =>
                 {
                     b.HasOne("DataAccess.Entities.User", null)
                         .WithMany()

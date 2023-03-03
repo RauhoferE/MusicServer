@@ -75,5 +75,50 @@ namespace MusicServer.Controllers
         {
             return Ok(await this.userService.GetFollowedUsers(page, take));
         }
+
+        [HttpGet]
+        [Route(ApiRoutes.User.GetUsers)]
+        public async Task<IActionResult> GetUserList([FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] string search = "")
+        {
+            return Ok(await this.userService.GetUsersAsync(page, take, search));
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.User.GetUser)]
+        public async Task<IActionResult> GetUser([FromRoute, Required] long userId)
+        {
+            return Ok(await this.userService.GetUserAsync(userId));
+        }
+
+        [HttpPost]
+        [Route(ApiRoutes.User.GetUser)]
+        public async Task<IActionResult> EditUser([FromRoute, Required] long userId, [FromBody, Required] EditUser request)
+        {
+            await this.userService.ModifyUserAsync(userId, request);
+            return NoContent();
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.User.RoleUser)]
+        public async Task<IActionResult> AddRoleToUser([FromRoute, Required] long userId, [FromRoute, Required] long roleId)
+        {
+            await this.userService.AddRoleToUserAsync(userId, roleId);
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route(ApiRoutes.User.RoleUser)]
+        public async Task<IActionResult> RemoveRoleFromUser([FromRoute, Required] long userId, [FromRoute, Required] long roleId)
+        {
+            await this.userService.RemoveRoleFromUserAsync(userId, roleId);
+            return NoContent();
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.User.Roles)]
+        public async Task<IActionResult> GetRoles()
+        {
+            return Ok(await this.userService.GetRoles());
+        }
     }
 }

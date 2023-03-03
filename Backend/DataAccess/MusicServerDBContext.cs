@@ -37,6 +37,8 @@ namespace DataAccess
 
         public DbSet<UserUser> FollowedUsers { get; set; }
 
+        public DbSet<RegistrationCode> RegistrationCodes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -238,6 +240,18 @@ namespace DataAccess
                 entity.HasOne(e => e.User);
 
                 entity.HasOne(e => e.User);
+            });
+
+            builder.Entity<RegistrationCode>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasData(new RegistrationCode()
+                {
+                    Id = Guid.NewGuid()
+                }
+                );
             });
         }
     }

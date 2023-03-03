@@ -11,6 +11,7 @@ namespace MusicServer.Validation
             RuleFor(x => x.Birth).Must(x => x <= DateTime.Now);
             RuleFor(x => x.Email).NotEmpty().EmailAddress();
             RuleFor(x => x.Password).NotEmpty().Matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$");
+            RuleFor(x => x.RegistrationCode).NotEmpty();
         }
     }
 }

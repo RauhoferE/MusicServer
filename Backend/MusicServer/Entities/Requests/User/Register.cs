@@ -9,5 +9,7 @@
         public string UserName { get; set; }
 
         public DateTime Birth { get; set; }
+
+        public Guid RegistrationCode { get; set; }
     }
 }

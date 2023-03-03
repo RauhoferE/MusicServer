@@ -137,13 +137,21 @@ namespace MusicServer.Services
             return claims;
         }
 
-        public async Task RegisterUserAsync(User userdata, string password)
+        public async Task RegisterUserAsync(User userdata, string password, Guid registrationCode)
         {
             var user = await this._userManager.FindByEmailAsync(userdata.Email);
             if (user != null)
             {
                 throw new MusicserverServiceException("User already exists");
             }
+
+            var registrationCodeEntity = this.dBContext.RegistrationCodes
+                .FirstOrDefault(x => x.Id == registrationCode && 
+                x.UsedDate == null &&
+                x.UsedByEmail == null) ?? throw new MusicserverServiceException("RegistrationCode is invalid");
+
+            registrationCodeEntity.UsedDate = DateTime.Now;
+            registrationCodeEntity.UsedByEmail = userdata.Email;
 
             var result = await this._userManager.CreateAsync(userdata, password);
 
@@ -158,6 +166,7 @@ namespace MusicServer.Services
 
             Log.Information($"Created email token for new user: {userdata.Email}");
 
+            await this.dBContext.SaveChangesAsync();
             // Send token per email
         }
 
@@ -209,5 +218,19 @@ namespace MusicServer.Services
             var token = await this._userManager.GeneratePasswordResetTokenAsync(user);
             // TODO: Send new token per email 
         }
+
+        public async Task<Guid[]> GenerateRegistrationCodesAsync(int amount)
+        {
+            List<Guid> registrationCodes = new List<Guid>();
+            for (int i = 0; i < amount; i++)
+            {
+                registrationCodes.Add(this.dBContext.RegistrationCodes.Add(new RegistrationCode()).Entity.Id);
+            }
+
+            await this.dBContext.SaveChangesAsync();
+            return registrationCodes.ToArray();
+        }
+
+
     }
 }
