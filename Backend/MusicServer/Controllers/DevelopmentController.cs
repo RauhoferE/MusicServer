@@ -9,7 +9,7 @@ namespace MusicServer.Controllers
 {
     [ApiController]
     [Route(ApiRoutes.Base)]
-    [Authorize(Roles = Roles.Root)]
+    [Authorize(Roles = "Root")]
     public class DevelopmentController : Controller
     {
         private readonly IDevService devService;

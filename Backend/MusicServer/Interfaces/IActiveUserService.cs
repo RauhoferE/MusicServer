@@ -5,7 +5,7 @@ namespace MusicServer.Interfaces
     public interface IActiveUserService
     {
         string Email { get; }
-        Guid Id { get; }
+        long Id { get; }
         bool IsNull { get; }
         List<string> Roles { get; }
     }

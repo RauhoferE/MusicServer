@@ -36,17 +36,17 @@ namespace MusicServer.Services
             return this.mapper.Map<GuidNameDto[]>(targetUser.FollowedArtists.Skip((page - 1) * take).Take(take).ToArray());
         }
 
-        public async Task<GuidNameDto[]> GetFollowedUsers(int page, int take)
+        public async Task<LongNameDto[]> GetFollowedUsers(int page, int take)
         {
             var targetUser = this.dBContext.Users
                 .Include(x => x.FollowedUsers)
                 .ThenInclude(x => x.FollowedUser)
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            return this.mapper.Map<GuidNameDto[]>(targetUser.FollowedUsers.Skip((page - 1) * take).Take(take).ToArray());
+            return this.mapper.Map<LongNameDto[]>(targetUser.FollowedUsers.Skip((page - 1) * take).Take(take).ToArray());
         }
 
-        public async Task SubscribeToUser(Guid userId)
+        public async Task SubscribeToUser(long userId)
         {
             var targetUser = this.dBContext.Users
                 .FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
@@ -107,7 +107,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task UnsubscribeFromUser(Guid userId)
+        public async Task UnsubscribeFromUser(long userId)
         {
             var sourceUser = this.dBContext.Users
                 .Include(x => x.FollowedUsers)

@@ -2,6 +2,6 @@
 {
     public class UserIds
     {
-        public Guid[] UserIdArray { get; set; }
+        public long[] UserIdArray { get; set; }
     }
 }

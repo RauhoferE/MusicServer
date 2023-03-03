@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace MusicServer.Core.Const
 {
-    public static class Roles
+    public enum Roles
     {
-        public const string Root = "Root";
-        public const string Admin = "Admin";
-        public const string User = "User";
+        Root,
+        Admin,
+        User
     }
 }

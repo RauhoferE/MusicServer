@@ -2,7 +2,7 @@
 {
     public class UserPlaylistModifieable
     {
-        public Guid UserId { get; set; }
+        public long UserId { get; set; }
 
         public bool CanModify { get; set; }
     }

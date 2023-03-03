@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Entities
 {
-    public class User : IdentityUser<Guid>
+    public class User : IdentityUser<long>
     {
         public string? Description { get; set; }
 

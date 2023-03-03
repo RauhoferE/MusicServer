@@ -77,7 +77,7 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.UserPlaylists)]
-        public async Task<IActionResult> GetUserPlaylists([FromRoute, Required] Guid userId, [FromQuery, Required] int page, [FromQuery, Required] int take)
+        public async Task<IActionResult> GetUserPlaylists([FromRoute, Required] long userId, [FromQuery, Required] int page, [FromQuery, Required] int take)
         {
             var t = await this.playlistService.GetUserPlaylists(userId, page, take);
             return Ok(t);

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Entities
 {
-    public class Role : IdentityRole<Guid>
+    public class Role : IdentityRole<long>
     {
         public DateTime Created { get; set; } = DateTime.Now;
 

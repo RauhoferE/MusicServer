@@ -303,7 +303,7 @@ namespace MusicServer.Services
             return this.mapper.Map<PlaylistSong[], SongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray());
         }
 
-        public async Task<PlaylistShortDto[]> GetUserPlaylists(Guid userId, int page, int take)
+        public async Task<PlaylistShortDto[]> GetUserPlaylists(long userId, int page, int take)
         {
             var user = this.dBContext.Users
                 .Include(x => x.Playlists)
@@ -354,7 +354,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task RemoveUsersFromPlaylist(Guid playlistId, List<Guid> userIds)
+        public async Task RemoveUsersFromPlaylist(Guid playlistId, List<long> userIds)
         {
             var user = this.dBContext.Users
                 .Include(x => x.Playlists)

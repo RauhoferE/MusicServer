@@ -32,7 +32,7 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.User.SubscribeUser)]
-        public async Task<IActionResult> SubscribeToUser([FromRoute, Required] Guid userId)
+        public async Task<IActionResult> SubscribeToUser([FromRoute, Required] long userId)
         {
             await this.userService.SubscribeToUser(userId);
             return NoContent();
@@ -40,7 +40,7 @@ namespace MusicServer.Controllers
 
         [HttpDelete]
         [Route(ApiRoutes.User.SubscribeUser)]
-        public async Task<IActionResult> UnSubscribeFromUser([FromRoute, Required] Guid userId)
+        public async Task<IActionResult> UnSubscribeFromUser([FromRoute, Required] long userId)
         {
             await this.userService.UnsubscribeFromUser(userId);
             return NoContent();

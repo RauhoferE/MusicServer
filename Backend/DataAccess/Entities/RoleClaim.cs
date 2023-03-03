@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Entities
 {
-    public class RoleClaim : IdentityRoleClaim<Guid>
+    public class RoleClaim : IdentityRoleClaim<long>
     { 
         public Role Role { get; set; }
     }

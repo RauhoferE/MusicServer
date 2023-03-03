@@ -88,7 +88,7 @@ namespace MusicServer.Controllers
                 return BadRequest();
             }
 
-            var claims = await this.authService.ChangePasswordAsync(Guid.Parse(userIdClaim.Value), request.CurrentPassword, request.NewPassword);
+            var claims = await this.authService.ChangePasswordAsync(long.Parse(userIdClaim.Value), request.CurrentPassword, request.NewPassword);
             await this.RemoveClaimsCookie();
             await this.AddClaimsCookie(claims);
 
@@ -107,7 +107,7 @@ namespace MusicServer.Controllers
         [HttpPost]
         [Route(ApiRoutes.Authentication.ResetPassword)]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPassword([FromRoute, Required] Guid userId, [FromRoute, Required] string token, [FromBody, Required] ResetPassword request)
+        public async Task<IActionResult> ResetPassword([FromRoute, Required] long userId, [FromRoute, Required] string token, [FromBody, Required] ResetPassword request)
         {
             await this.authService.ResetPasswordAsync(userId, request.Password, token);
             return NoContent();
@@ -125,14 +125,14 @@ namespace MusicServer.Controllers
                 return BadRequest();
             }
 
-            await this.authService.RequestEmailResetAsync(Guid.Parse(userIdClaim.Value), request.Email);
+            await this.authService.RequestEmailResetAsync(long.Parse(userIdClaim.Value), request.Email);
             return NoContent();
         }
 
         [HttpGet]
         [Route(ApiRoutes.Authentication.ChangeEmail)]
         [AllowAnonymous]
-        public async Task<IActionResult> ChangeEmail([FromRoute, Required] Guid userId, [FromRoute, Required] string token)
+        public async Task<IActionResult> ChangeEmail([FromRoute, Required] long userId, [FromRoute, Required] string token)
         {
             await this.authService.ChangeEmailAsync(userId, token);
             await this.RemoveClaimsCookie();
@@ -151,7 +151,7 @@ namespace MusicServer.Controllers
                 return BadRequest();
             }
 
-            await this.authService.DeleteAccountAsync(Guid.Parse(userIdClaim.Value), request.Password);
+            await this.authService.DeleteAccountAsync(long.Parse(userIdClaim.Value), request.Password);
             await this.RemoveClaimsCookie();
             return NoContent();
         }

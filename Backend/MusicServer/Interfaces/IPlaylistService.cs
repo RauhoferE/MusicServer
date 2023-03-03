@@ -21,7 +21,7 @@ namespace MusicServer.Interfaces
 
         public Task UpdatePlaylistShareListAsync(Guid playlistId, List<UserPlaylistModifieable> dtos);
 
-        public Task RemoveUsersFromPlaylist(Guid playlistId, List<Guid> userIds);
+        public Task RemoveUsersFromPlaylist(Guid playlistId, List<long> userIds);
 
         public Task CopyPlaylistToLibraryAsync(Guid playlistId);
 
@@ -29,7 +29,7 @@ namespace MusicServer.Interfaces
 
         public Task<PlaylistShortDto[]> GetPlaylistsAsync(int page, int take);
 
-        public Task<PlaylistShortDto[]> GetUserPlaylists(Guid userId, int page, int take);
+        public Task<PlaylistShortDto[]> GetUserPlaylists(long userId, int page, int take);
 
         public Task<PlaylistShortDto[]> GetPublicPlaylists(int page, int take);
 

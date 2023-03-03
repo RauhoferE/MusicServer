@@ -11,7 +11,7 @@ using MusicServer.Core.Const;
 
 namespace DataAccess
 {
-    public class MusicServerDBContext : IdentityDbContext<User, Role, Guid, IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, RoleClaim, IdentityUserToken<Guid>>
+    public class MusicServerDBContext : IdentityDbContext<User, Role, long, IdentityUserClaim<long>, UserRole, IdentityUserLogin<long>, RoleClaim, IdentityUserToken<long>>
     {
         public MusicServerDBContext(DbContextOptions<MusicServerDBContext> options) : base(options)
         {
@@ -33,9 +33,9 @@ namespace DataAccess
 
         public DbSet<PlaylistUser> PlaylistUsers { get; set; }
 
-        public DbSet<UserArtist> UserArtists { get; set; }
+        public DbSet<UserArtist> FollowedArtists { get; set; }
 
-        public DbSet<UserUser> UserUsers { get; set; }
+        public DbSet<UserUser> FollowedUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -141,22 +141,22 @@ namespace DataAccess
                 entity.HasData(
                     new Role()
                     {
-                        Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                        Name = MusicServer.Core.Const.Roles.Root,
-                        NormalizedName = MusicServer.Core.Const.Roles.Root.ToUpper(),
+                        Id = (long)MusicServer.Core.Const.Roles.Root,
+                        Name = MusicServer.Core.Const.Roles.Root.ToString(),
+                        NormalizedName = MusicServer.Core.Const.Roles.Root.ToString().ToUpper(),
                     },
                     new Role()
                     {
-                        Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
-                        Name = MusicServer.Core.Const.Roles.Admin,
-                        NormalizedName = MusicServer.Core.Const.Roles.Admin.ToUpper(),
-                    },
-                    new Role()
-                    {
-                        Id = Guid.Parse("00000000-0000-0000-0000-000000000003"),
-                        Name = MusicServer.Core.Const.Roles.User,
-                        NormalizedName = MusicServer.Core.Const.Roles.User.ToUpper(),
-                    }
+                        Id = (long)MusicServer.Core.Const.Roles.Admin,
+                        Name = MusicServer.Core.Const.Roles.Admin.ToString(),
+                        NormalizedName = MusicServer.Core.Const.Roles.Admin.ToString().ToUpper(),
+                    }//,
+                    //new Role()
+                    //{
+                    //    Id = (long)MusicServer.Core.Const.Roles.User,
+                    //    Name = MusicServer.Core.Const.Roles.User.ToString(),
+                    //    NormalizedName = MusicServer.Core.Const.Roles.User.ToString().ToUpper(),
+                    //}
                     );
             });
 

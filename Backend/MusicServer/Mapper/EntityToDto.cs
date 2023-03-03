@@ -72,7 +72,7 @@ namespace MusicServer.Mapper
 
             this.CreateMap<User, UserDto>(MemberList.Destination);
 
-            this.CreateMap<UserUser, GuidNameDto>(MemberList.Destination)
+            this.CreateMap<UserUser, LongNameDto>(MemberList.Destination)
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.FollowedUser.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.FollowedUser.UserName));
 

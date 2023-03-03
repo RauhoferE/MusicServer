@@ -11,18 +11,18 @@ namespace MusicServer.Interfaces
 
         public Task ConfirmRegistrationAsync(string email, string token);
 
-        public Task<ICollection<Claim>> RefreshCookieAsync(Guid userId);
+        public Task<ICollection<Claim>> RefreshCookieAsync(long userId);
 
-        public Task<ICollection<Claim>> ChangePasswordAsync(Guid activeUserId, string currentPassword, string newPassword);
+        public Task<ICollection<Claim>> ChangePasswordAsync(long activeUserId, string currentPassword, string newPassword);
 
-        public Task RequestEmailResetAsync(Guid userId, string newEmail);
+        public Task RequestEmailResetAsync(long userId, string newEmail);
 
-        public Task ChangeEmailAsync(Guid userId, string token);
+        public Task ChangeEmailAsync(long userId, string token);
 
-        public Task DeleteAccountAsync(Guid userId, string currentPassword);
+        public Task DeleteAccountAsync(long userId, string currentPassword);
 
         public Task ResetPasswordRequestAsync(string email);
 
-        public Task ResetPasswordAsync(Guid userId, string newPassword, string token);
+        public Task ResetPasswordAsync(long userId, string newPassword, string token);
     }
 }
