@@ -27,7 +27,7 @@ namespace DataAccess.Entities
 
         public ICollection<UserArtist> FollowedArtists { get; set; } = new List<UserArtist>();
 
-        public ICollection<Song> Favorites { get; set; } = new List<Song>();
+        public ICollection<UserSong> Favorites { get; set; } = new List<UserSong>();
 
         public ICollection<UserUser> FollowedUsers { get; set; } = new List<UserUser>();
 

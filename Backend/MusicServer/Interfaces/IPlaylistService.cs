@@ -37,6 +37,11 @@ namespace MusicServer.Interfaces
 
         public Task<SongDto[]> GetSongsInPlaylist(Guid playlistId, int page, int take);
 
+        public Task<FavoriteDto> GetFavorites(int page, int take);
+
+        public Task AddSongsToFavorite(List<Guid> songIds, bool addClones);
+
+        public Task RemoveSongsFromFavorite(List<Guid> songIds);
 
     }
 }

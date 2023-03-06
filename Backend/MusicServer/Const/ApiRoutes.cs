@@ -52,6 +52,7 @@
             public const string PlaylistShare = "share/{playlistId}";
             public const string PlaylistCopy = "copy/{playlistId}";
             public const string PlaylistAddToLibrary = "add/{playlistId}";
+            public const string Favorite = "favorites";
         }
 
         public static class Song

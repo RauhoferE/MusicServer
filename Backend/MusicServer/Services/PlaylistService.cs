@@ -114,6 +114,38 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
+        public async Task AddSongsToFavorite(List<Guid> songIds, bool addClones)
+        {
+            var user = this.dBContext.Users.Include(x => x.Favorites)
+                .ThenInclude(x => x.FavoriteSong).FirstOrDefault(x => x.Id == this.activeUserService.Id) 
+                ?? throw new UserNotFoundException();
+
+            var doubleSongs = new List<Song>();
+
+            foreach (var songId in songIds)
+            {
+                var song = this.dBContext.Songs.FirstOrDefault(x => x.Id == songId) ?? throw new SongNotFoundException();
+
+                if (!addClones && user.Favorites.FirstOrDefault(x=> x.FavoriteSong.Id == song.Id) != null)
+                {
+                    doubleSongs.Add(song);
+                    continue;
+                }
+
+                user.Favorites.Add(new UserSong()
+                {
+                    FavoriteSong = song
+                });
+            }
+
+            if (doubleSongs.Any())
+            {
+                throw new AlreadyAssignedException(string.Join(",", doubleSongs.Select(x => x.Name)));
+            }
+
+            await this.dBContext.SaveChangesAsync();
+        }
+
         public async Task AddSongsToPlaylistAsync(Guid playlistId, List<Guid> songIds)
         {
             var user = this.dBContext.Users
@@ -212,6 +244,29 @@ namespace MusicServer.Services
             this.dBContext.Remove(playlist.Playlist);
 
             await this.dBContext.SaveChangesAsync();
+        }
+
+        public async Task<FavoriteDto> GetFavorites(int page, int take)
+        {
+            var user = this.dBContext.Users.Include(x => x.Favorites)
+            .ThenInclude(x => x.FavoriteSong)
+            .ThenInclude(x => x.Album)
+            .Include(x => x.Favorites)
+            .ThenInclude(x => x.FavoriteSong)
+                            .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+            .FirstOrDefault(x => x.Id == this.activeUserService.Id)
+            ?? throw new UserNotFoundException();
+
+            var songEntities = user.Favorites.Skip((page - 1) * take).Take(take).ToArray().Select(x => x.FavoriteSong).ToArray();
+
+            var songs = this.mapper.Map<SongDto[]>(songEntities);
+
+            return new FavoriteDto()
+            {
+                Songs = songs,
+                SongCount = user.Favorites.Count()
+            };
         }
 
         public async Task<PlaylistDto> GetPlaylistInfo(Guid playlistId)
@@ -326,6 +381,22 @@ namespace MusicServer.Services
             return this.mapper.Map<Playlist[], PlaylistShortDto[]>(
                 user.Playlists.Where(x => x.Playlist.IsPublic)
                 .Skip((page - 1) * take).Take(take).Select(x => x.Playlist).ToArray());
+        }
+
+        public async Task RemoveSongsFromFavorite(List<Guid> songIds)
+        {
+            var user = this.dBContext.Users.Include(x => x.Favorites)
+    .ThenInclude(x => x.FavoriteSong).FirstOrDefault(x => x.Id == this.activeUserService.Id)
+    ?? throw new UserNotFoundException();
+
+            foreach (var songId in songIds)
+            {
+                var favoriteSong = user.Favorites.FirstOrDefault(x => x.FavoriteSong.Id == songId) ?? throw new SongNotFoundException();
+
+                user.Favorites.Remove(favoriteSong);
+            }
+
+            await this.dBContext.SaveChangesAsync();
         }
 
         public async Task RemoveSongsFromPlaylistAsync(Guid playlistId, List<Guid> songIds)

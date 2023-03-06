@@ -39,6 +39,8 @@ namespace DataAccess
 
         public DbSet<RegistrationCode> RegistrationCodes { get; set; }
 
+        public DbSet<UserSong> FavoriteSongs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -69,6 +71,10 @@ namespace DataAccess
                 u.HasMany(e => e.FollowedArtists)
                             .WithOne(e => e.User)
                             .OnDelete(DeleteBehavior.Cascade);
+
+                u.HasMany(e => e.Favorites)
+                .WithOne(e => e.User)
+                .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Artist>(entity =>
@@ -252,6 +258,16 @@ namespace DataAccess
                     Id = Guid.NewGuid()
                 }
                 );
+            });
+
+            builder.Entity<UserSong>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(e => e.User);
+
+                entity.HasOne(e => e.FavoriteSong);
             });
         }
     }

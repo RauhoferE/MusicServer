@@ -148,7 +148,28 @@ namespace MusicServer.Controllers
             return NoContent();
         }
 
+        [HttpPost]
+        [Route(ApiRoutes.Playlist.Favorite)]
+        public async Task<IActionResult> AddSongToFavorites([FromBody, Required] SongsToPlaylist songs, [FromQuery, Required] bool addClones)
+        {
+            await this.playlistService.AddSongsToFavorite(songs.SongIds.ToList(), addClones);
+            return NoContent();
+        }
 
+        [HttpDelete]
+        [Route(ApiRoutes.Playlist.Favorite)]
+        public async Task<IActionResult> RemoveSongsFromFavorites([FromBody, Required] SongsToPlaylist songs)
+        {
+            await this.playlistService.RemoveSongsFromFavorite(songs.SongIds.ToList());
+            return NoContent();
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.Playlist.Favorite)]
+        public async Task<IActionResult> GetFavorites([FromQuery, Required] int page, [FromQuery, Required] int take)
+        {
+            return Ok(await this.playlistService.GetFavorites(page, take));
+        }
 
 
     }
