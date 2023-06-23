@@ -12,6 +12,8 @@ using AutoMapper;
 using MusicServer.Services;
 using Microsoft.Extensions.Options;
 using DataAccess.Entities;
+using MusicServer.Entities.DTOs;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace MusicServer.Controllers
 {
@@ -51,7 +53,7 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> Login([FromBody, Required] Login login)
         {
             var claims = await this.authService.LoginUserAsync(login.Email, login.Password);
-            await this.AddClaimsCookie(claims);
+            await this.AddClaimsCookies(claims);
 
             return NoContent();
         }
@@ -90,7 +92,7 @@ namespace MusicServer.Controllers
 
             var claims = await this.authService.ChangePasswordAsync(long.Parse(userIdClaim.Value), request.CurrentPassword, request.NewPassword);
             await this.RemoveClaimsCookie();
-            await this.AddClaimsCookie(claims);
+            await this.AddAuthenticationCookie(claims);
 
             return NoContent();
         }
@@ -174,7 +176,38 @@ namespace MusicServer.Controllers
             await this.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
-        private async Task AddClaimsCookie(IEnumerable<Claim> claims)
+        private async Task AddClaimsCookies(LoginUserClaimsResult result)
+        {
+            //TODO: Change for production
+            var token = new JwtSecurityToken(
+              issuer: "localhost",
+              audience: "localhost",
+              claims: result.FrontendClaims);
+
+            // Attach JWT token to the response
+            this.HttpContext.Response.Cookies.Append("user", new JwtSecurityTokenHandler().WriteToken(token), new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.Now.AddHours(this.appSettings.CookieExpirationTimeInMinutes)
+            });
+            
+            var claimsIdentity = new ClaimsIdentity(result.AuthenticationClaims,
+    CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var principal = new ClaimsPrincipal(claimsIdentity);
+            await this.HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+                    new AuthenticationProperties
+                    {
+                        IsPersistent =
+                        false, // When not persistent == SessionCookie (If browser gets closed the user has to login again)
+                        AllowRefresh = true,
+                        ExpiresUtc = DateTime.Now.AddHours(this.appSettings.CookieExpirationTimeInMinutes)
+                    });
+        }
+
+        private async Task AddAuthenticationCookie(ICollection<Claim> claims)
         {
             var claimsIdentity = new ClaimsIdentity(claims,
     CookieAuthenticationDefaults.AuthenticationScheme);

@@ -6,6 +6,7 @@ using MusicServer.Interfaces;
 using Serilog;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using MusicServer.Entities.DTOs;
 
 namespace MusicServer.Services
 {
@@ -80,7 +81,7 @@ namespace MusicServer.Services
             // Send Email that Account has been deleted
         }
 
-        public async Task<ICollection<Claim>> LoginUserAsync(string username, string password)
+        public async Task<LoginUserClaimsResult> LoginUserAsync(string username, string password)
         {
             // Get user
             var user = await this._userManager.FindByEmailAsync(username) ?? throw new UserNotFoundException();
@@ -106,14 +107,24 @@ namespace MusicServer.Services
                 new(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
+            var frontendClaims = new List<Claim>
+            {
+                new("name", user.Email),
+            };
+
             // Create rolesList
             var roles = await this._userManager.GetRolesAsync(user);
             roles.ToList().ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role)));
+            roles.ToList().ForEach(role => frontendClaims.Add(new Claim("roles", role)));
             var u = this.dBContext.Users.FirstOrDefault(x => x.Id == user.Id) ?? throw new UserNotFoundException();
             u.LastLogin = DateTime.Now;
             await this.dBContext.SaveChangesAsync();
 
-            return claims;
+            return new LoginUserClaimsResult
+            {
+                AuthenticationClaims = claims,
+                FrontendClaims = frontendClaims
+            };
         }
 
         public async Task<ICollection<Claim>> RefreshCookieAsync(long userId)
@@ -207,7 +218,7 @@ namespace MusicServer.Services
 
             // Send Email that Password has been changed successfully.
 
-            return await this.LoginUserAsync(user.Email, newPassword);
+            return (await this.LoginUserAsync(user.Email, newPassword)).AuthenticationClaims;
         }
 
         public async Task ResetPasswordRequestAsync(string email)
