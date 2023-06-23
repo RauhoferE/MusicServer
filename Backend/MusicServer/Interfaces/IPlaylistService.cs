@@ -43,5 +43,9 @@ namespace MusicServer.Interfaces
 
         public Task RemoveSongsFromFavorite(List<Guid> songIds);
 
+        public Task<SongDto[]> SearchSongInPlaylist(Guid playlistId, string query, int page, int take);
+
+        public Task<FavoriteDto> SearchSongInFavorites(string query, int page, int take);
+
     }
 }

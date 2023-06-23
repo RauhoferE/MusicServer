@@ -85,6 +85,7 @@ namespace MusicServer.Services
 
         public async Task<SearchResultDto> Search(string filter, string searchTerm, int page, int take)
         {
+            //TODO: make searchterm and searched elements lowercase
             switch (filter)
             {
                 case SearchFilter.All:

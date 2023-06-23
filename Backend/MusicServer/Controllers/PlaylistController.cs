@@ -61,10 +61,14 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Songs)]
-        public async Task<IActionResult> GetSongsInPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] int page, [FromQuery, Required] int take)
+        public async Task<IActionResult> GetSongsInPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] string query)
         {
-            var t = await this.playlistService.GetSongsInPlaylist(playlistId, page, take);
-            return Ok(t);
+            if (string.IsNullOrEmpty(query))
+            {
+                return Ok(await this.playlistService.GetSongsInPlaylist(playlistId, page, take));
+            }
+            
+            return Ok(await this.playlistService.SearchSongInPlaylist(playlistId, query, page, take));
         }
 
         [HttpGet]
@@ -166,9 +170,14 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Favorite)]
-        public async Task<IActionResult> GetFavorites([FromQuery, Required] int page, [FromQuery, Required] int take)
+        public async Task<IActionResult> GetFavorites([FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] string query)
         {
-            return Ok(await this.playlistService.GetFavorites(page, take));
+            if (string.IsNullOrEmpty(query))
+            {
+                return Ok(await this.playlistService.GetFavorites(page, take));
+            }
+            
+            return Ok(await this.playlistService.SearchSongInFavorites(query, page, take));
         }
 
 
