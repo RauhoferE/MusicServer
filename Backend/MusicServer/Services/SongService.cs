@@ -85,6 +85,7 @@ namespace MusicServer.Services
 
         public async Task<SearchResultDto> Search(string filter, string searchTerm, int page, int take)
         {
+            //TODO: Return all possible filters in controller action
             switch (filter)
             {
                 case SearchFilter.All:
