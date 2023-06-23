@@ -1,4 +1,5 @@
 ﻿using MusicServer.Entities.DTOs;
+using MusicServer.Entities.Responses;
 
 namespace MusicServer.Interfaces
 {
@@ -6,9 +7,9 @@ namespace MusicServer.Interfaces
     {
         public Task<ArtistDto> GetArtist(Guid artistId);
 
-        public Task<AlbumDto[]> GetAlbumsOfArtist(Guid artistId, int page, int take);
+        public Task<AlbumPaginationResponse> GetAlbumsOfArtist(Guid artistId, int page, int take);
 
-        public Task<SongDto[]> GetSongsInAlbum(Guid albumId, int page, int take);
+        public Task<SongPaginationResponse> GetSongsInAlbum(Guid albumId, int page, int take);
 
         public Task<SongDto> GetSongInformation(Guid songId);
 

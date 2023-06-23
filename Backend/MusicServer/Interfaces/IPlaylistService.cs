@@ -1,5 +1,6 @@
 ﻿using DataAccess.Entities;
 using MusicServer.Entities.DTOs;
+using MusicServer.Entities.Responses;
 
 namespace MusicServer.Interfaces
 {
@@ -27,25 +28,24 @@ namespace MusicServer.Interfaces
 
         public Task AddPlaylistToLibraryAsync(Guid playlistId);
 
-        public Task<PlaylistShortDto[]> GetPlaylistsAsync(int page, int take);
+        public Task<PlaylistPaginationResponse> GetPlaylistsAsync(long userId, int page, int take);
 
-        public Task<PlaylistShortDto[]> GetUserPlaylists(long userId, int page, int take);
+        public Task<PlaylistPaginationResponse> SearchUserPlaylist(long userId, string query, int page, int take);
 
-        public Task<PlaylistShortDto[]> GetPublicPlaylists(int page, int take);
+        public Task<PlaylistPaginationResponse> GetPublicPlaylists(int page, int take);
 
         public Task<PlaylistDto> GetPlaylistInfo(Guid playlistId);
 
-        public Task<SongDto[]> GetSongsInPlaylist(Guid playlistId, int page, int take);
+        public Task<SongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int page, int take);
 
-        public Task<FavoriteDto> GetFavorites(int page, int take);
+        public Task<SongPaginationResponse> GetFavorites(int page, int take);
 
         public Task AddSongsToFavorite(List<Guid> songIds, bool addClones);
 
         public Task RemoveSongsFromFavorite(List<Guid> songIds);
 
-        public Task<SongDto[]> SearchSongInPlaylist(Guid playlistId, string query, int page, int take);
+        public Task<SongPaginationResponse> SearchSongInPlaylist(Guid playlistId, string query, int page, int take);
 
-        public Task<FavoriteDto> SearchSongInFavorites(string query, int page, int take);
-
+        public Task<SongPaginationResponse> SearchSongInFavorites(string query, int page, int take);
     }
 }

@@ -61,7 +61,7 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Songs)]
-        public async Task<IActionResult> GetSongsInPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] string query)
+        public async Task<IActionResult> GetSongsInPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] string query = null)
         {
             if (string.IsNullOrEmpty(query))
             {
@@ -73,18 +73,14 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Playlists)]
-        public async Task<IActionResult> GetPlaylists([FromQuery, Required] int page, [FromQuery, Required] int take)
+        public async Task<IActionResult> GetPlaylists([FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] long userId = -1, [FromQuery] string query = null)
         {
-            var t = await this.playlistService.GetPlaylistsAsync(page, take);
-            return Ok(t);
-        }
-
-        [HttpGet]
-        [Route(ApiRoutes.Playlist.UserPlaylists)]
-        public async Task<IActionResult> GetUserPlaylists([FromRoute, Required] long userId, [FromQuery, Required] int page, [FromQuery, Required] int take)
-        {
-            var t = await this.playlistService.GetUserPlaylists(userId, page, take);
-            return Ok(t);
+            if (string.IsNullOrEmpty(query))
+            {
+                return Ok(await this.playlistService.GetPlaylistsAsync(userId, page, take));
+            }
+            
+            return Ok(await this.playlistService.SearchUserPlaylist(userId, query, page, take));
         }
 
         [HttpGet]
@@ -170,7 +166,7 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Favorite)]
-        public async Task<IActionResult> GetFavorites([FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] string query)
+        public async Task<IActionResult> GetFavorites([FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] string query = null)
         {
             if (string.IsNullOrEmpty(query))
             {

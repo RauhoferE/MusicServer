@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MusicServer.Core.Const;
 using MusicServer.Entities.DTOs;
 using MusicServer.Entities.Requests.User;
+using MusicServer.Entities.Responses;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
 using System.Diagnostics;
@@ -30,7 +31,7 @@ namespace MusicServer.Services
             this._mapper = mapper;
         }
 
-        public async Task<AlbumDto[]> GetAlbumsOfArtist(Guid artistId, int page, int take)
+        public async Task<AlbumPaginationResponse> GetAlbumsOfArtist(Guid artistId, int page, int take)
         {
             var artist = this._dbContext.Artists.FirstOrDefault(x => x.Id == artistId) ?? throw new ArtistNotFoundException();
 
@@ -43,7 +44,11 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Songs)
                 .Where(x => x.Artist.Id == artistId);
 
-            return this._mapper.Map<AlbumDto[]>(albums.Skip((page - 1) * take).Take(take).Select(x => x.Album).ToArray());
+            return new AlbumPaginationResponse()
+            {
+                Albums = this._mapper.Map<AlbumDto[]>(albums.Skip((page - 1) * take).Take(take).Select(x => x.Album).ToArray()),
+                TotalCount = albums.Count()
+            };
         }
 
         public async Task<ArtistDto> GetArtist(Guid artistId)
@@ -70,7 +75,7 @@ namespace MusicServer.Services
             return this._mapper.Map<SongDto>(song);
         }
 
-        public async Task<SongDto[]> GetSongsInAlbum(Guid albumId, int page, int take)
+        public async Task<SongPaginationResponse> GetSongsInAlbum(Guid albumId, int page, int take)
         {
             var album = this._dbContext.Albums.FirstOrDefault(x => x.Id == albumId) ?? throw new AlbumNotFoundException();
 
@@ -80,7 +85,11 @@ namespace MusicServer.Services
                 .Include(x => x.Album)
                 .Where(x => x.Album.Id == albumId);
 
-            return this._mapper.Map<SongDto[]>(songs.Skip((page - 1) * take).Take(take));
+            return new SongPaginationResponse()
+            {
+                Songs = this._mapper.Map<SongDto[]>(songs.Skip((page - 1) * take).Take(take)),
+                TotalCount = songs.Count()
+            };
         }
 
         public async Task<SearchResultDto> Search(string filter, string searchTerm, int page, int take)

@@ -25,11 +25,12 @@ namespace MusicServer.Core.Const
         public const string Name = "Name";
         public const string DateCreated = "DateCreated";
         public const string Creator = "Creator";
+        public const string NumberOfSongs = "NumberOfSongs";
 
         // Return all constants in a list
         public static List<string> SortingElements = new List<string>()
         {
-            Name, DateCreated, Creator
+            Name, DateCreated, Creator, NumberOfSongs
         };
     }
 

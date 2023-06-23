@@ -46,7 +46,6 @@
             public const string Default = "";
             public const string Songs = "songs/{playlistId}";
             public const string Playlists = "playlists";
-            public const string UserPlaylists = "user/{userId}";
             public const string PublicPlaylist = "public";
             public const string PlaylistAlbum = "album/{playlistId}";
             public const string PlaylistShare = "share/{playlistId}";
