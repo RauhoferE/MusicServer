@@ -1,11 +1,12 @@
 ﻿using DataAccess.Entities;
+using MusicServer.Entities.DTOs;
 using System.Security.Claims;
 
 namespace MusicServer.Interfaces
 {
     public interface IAuthService
     {
-        public Task<ICollection<Claim>> LoginUserAsync(string username, string password);
+        public Task<LoginUserClaimsResult> LoginUserAsync(string username, string password);
 
         public Task RegisterUserAsync(User userdata, string password, Guid registrationCode);
 
