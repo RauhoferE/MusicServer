@@ -468,7 +468,6 @@ namespace MusicServer.Services
 
         public async Task<FavoriteDto> SearchSongInFavorites(string query, int page, int take)
         {
-            query = query.ToLower();
             var user = this.dBContext.Users.Include(x => x.Favorites)
                 .ThenInclude(x => x.FavoriteSong)
                 .ThenInclude(x => x.Album)
@@ -480,8 +479,8 @@ namespace MusicServer.Services
                 ?? throw new UserNotFoundException();
 
             var allSongEntities = user.Favorites
-                .Where(x => x.FavoriteSong.Name.ToLower().Contains(query) ||
-                        x.FavoriteSong.Artists.Where(x => x.Artist.Name.ToLower().Contains(query)).Any());
+                .Where(x => x.FavoriteSong.Name.Contains(query) ||
+                        x.FavoriteSong.Artists.Where(x => x.Artist.Name.Contains(query)).Any());
 
             var songs = this.mapper.Map<SongDto[]>(allSongEntities.Skip((page - 1) * take).Take(take).ToArray().Select(x => x.FavoriteSong).ToArray());
 
@@ -494,7 +493,6 @@ namespace MusicServer.Services
 
         public async Task<SongDto[]> SearchSongInPlaylist(Guid playlistId, string query, int page, int take)
         {
-            query = query.ToLower();
             var playlist = this.dBContext.Playlists
                 .Include(x => x.Users)
                     .ThenInclude(x => x.User)
@@ -518,7 +516,7 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artist)
                 .Where(x => x.Playlist.Id == playlistId && 
                 (x.Song.Name.ToLower().Contains(query) || 
-                    x.Song.Artists.Where(x => x.Artist.Name.ToLower().Contains(query)).Any()));
+                    x.Song.Artists.Where(x => x.Artist.Name.Contains(query)).Any()));
 
 
             return this.mapper.Map<PlaylistSong[], SongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray());
