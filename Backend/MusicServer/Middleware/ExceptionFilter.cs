@@ -28,7 +28,11 @@ namespace MusicServer.Middleware
 
             // ** Default 
             var statusCode = (int)HttpStatusCode.BadRequest;
-            var responseMessage = exception.Message;
+            var responseMessage = "";
+
+            # if DEBUG
+            responseMessage = exception.Message;
+            #endif
 
             if (exception.GetType() == typeof(PlaylistNotFoundException))
             {

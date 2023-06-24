@@ -1,6 +1,7 @@
 ﻿using DataAccess.Entities;
 using MusicServer.Entities.DTOs;
 using MusicServer.Entities.Requests.User;
+using MusicServer.Entities.Responses;
 using System.Security.Claims;
 
 namespace MusicServer.Interfaces
@@ -15,11 +16,11 @@ namespace MusicServer.Interfaces
 
         public Task UnsubscribeFromArtist(Guid artistId);
 
-        public Task<GuidNameDto[]> GetFollowedArtists(int page, int take);
+        public Task<GuidNamePaginationResponse> GetFollowedArtists(int page, int take);
 
-        public Task<LongNameDto[]> GetFollowedUsers(int page, int take);
+        public Task<LongNamePaginationResponse> GetFollowedUsers(int page, int take);
 
-        public Task<FullUserDto[]> GetUsersAsync(int page, int take, string searchTerm);   
+        public Task<FullUserPaginationResponse> GetUsersAsync(int page, int take, string searchTerm);   
 
         public Task<UserDetailsDto> GetUserAsync(long userId);
 

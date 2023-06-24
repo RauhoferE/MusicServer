@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MusicServer.Const;
+using MusicServer.Entities.Requests.Multi;
 using MusicServer.Entities.Requests.User;
 using MusicServer.Interfaces;
 using MusicServer.Settings;
@@ -64,23 +65,23 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.User.GetFollowedArtists)]
-        public async Task<IActionResult> GetSubscribedArtists([FromQuery, Required] int page, [FromQuery, Required] int take)
+        public async Task<IActionResult> GetSubscribedArtists([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            return Ok(await this.userService.GetFollowedArtists(page, take));
+            return Ok(await this.userService.GetFollowedArtists(request.Page, request.Take));
         }
 
         [HttpGet]
         [Route(ApiRoutes.User.GetFollowedUsers)]
-        public async Task<IActionResult> GetSubscribedUsers([FromQuery, Required] int page, [FromQuery, Required] int take)
+        public async Task<IActionResult> GetSubscribedUsers([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            return Ok(await this.userService.GetFollowedUsers(page, take));
+            return Ok(await this.userService.GetFollowedUsers(request.Page, request.Take));
         }
 
         [HttpGet]
         [Route(ApiRoutes.User.GetUsers)]
-        public async Task<IActionResult> GetUserList([FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] string search = "")
+        public async Task<IActionResult> GetUserList([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            return Ok(await this.userService.GetUsersAsync(page, take, search));
+            return Ok(await this.userService.GetUsersAsync(request.Page, request.Take, request.Query));
         }
 
         [HttpGet]

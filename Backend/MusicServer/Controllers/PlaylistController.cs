@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicServer.Const;
+using MusicServer.Entities.Requests.Multi;
 using MusicServer.Entities.Requests.Song;
 using MusicServer.Entities.Requests.User;
 using MusicServer.Interfaces;
@@ -61,33 +62,33 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Songs)]
-        public async Task<IActionResult> GetSongsInPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] string query = null)
+        public async Task<IActionResult> GetSongsInPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            if (string.IsNullOrEmpty(query))
+            if (string.IsNullOrEmpty(request.Query))
             {
-                return Ok(await this.playlistService.GetSongsInPlaylist(playlistId, page, take));
+                return Ok(await this.playlistService.GetSongsInPlaylist(playlistId, request.Page, request.Take));
             }
             
-            return Ok(await this.playlistService.SearchSongInPlaylist(playlistId, query, page, take));
+            return Ok(await this.playlistService.SearchSongInPlaylist(playlistId, request.Query, request.Page, request.Take));
         }
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Playlists)]
-        public async Task<IActionResult> GetPlaylists([FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] long userId = -1, [FromQuery] string query = null)
+        public async Task<IActionResult> GetPlaylists([FromQuery, Required] QueryPaginationSearchRequest request, [FromQuery] long userId = -1)
         {
-            if (string.IsNullOrEmpty(query))
+            if (string.IsNullOrEmpty(request.Query))
             {
-                return Ok(await this.playlistService.GetPlaylistsAsync(userId, page, take));
+                return Ok(await this.playlistService.GetPlaylistsAsync(userId, request.Page, request.Take));
             }
             
-            return Ok(await this.playlistService.SearchUserPlaylist(userId, query, page, take));
+            return Ok(await this.playlistService.SearchUserPlaylist(userId, request.Query, request.Page, request.Take));
         }
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.PublicPlaylist)]
-        public async Task<IActionResult> GetPublicPlaylists([FromQuery, Required] int page, [FromQuery, Required] int take)
+        public async Task<IActionResult> GetPublicPlaylists([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            var t = await this.playlistService.GetPublicPlaylists(page, take);
+            var t = await this.playlistService.GetPublicPlaylists(request.Page, request.Take);
             return Ok(t);
         }
 
@@ -166,14 +167,14 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Favorite)]
-        public async Task<IActionResult> GetFavorites([FromQuery, Required] int page, [FromQuery, Required] int take, [FromQuery] string query = null)
+        public async Task<IActionResult> GetFavorites([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            if (string.IsNullOrEmpty(query))
+            if (string.IsNullOrEmpty(request.Query))
             {
-                return Ok(await this.playlistService.GetFavorites(page, take));
+                return Ok(await this.playlistService.GetFavorites(request.Page, request.Take));
             }
             
-            return Ok(await this.playlistService.SearchSongInFavorites(query, page, take));
+            return Ok(await this.playlistService.SearchSongInFavorites(request.Query, request.Page, request.Take));
         }
 
 

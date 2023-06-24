@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using MusicServer.Core.Const;
 using MusicServer.Entities.DTOs;
 using MusicServer.Entities.Requests.User;
+using MusicServer.Entities.Responses;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
 using Serilog;
@@ -28,24 +29,32 @@ namespace MusicServer.Services
             this.mapper = mapper;
         }
 
-        public async Task<GuidNameDto[]> GetFollowedArtists(int page, int take)
+        public async Task<GuidNamePaginationResponse> GetFollowedArtists(int page, int take)
         {
             var targetUser = this.dBContext.Users
                 .Include(x => x.FollowedArtists)
                 .ThenInclude(x => x.Artist)
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            return this.mapper.Map<GuidNameDto[]>(targetUser.FollowedArtists.Skip((page - 1) * take).Take(take).ToArray());
+            return new GuidNamePaginationResponse
+            {
+                Items = this.mapper.Map<GuidNameDto[]>(targetUser.FollowedArtists.Skip((page - 1) * take).Take(take).ToArray()),
+                TotalCount = targetUser.FollowedArtists.Count
+            };
         }
 
-        public async Task<LongNameDto[]> GetFollowedUsers(int page, int take)
+        public async Task<LongNamePaginationResponse> GetFollowedUsers(int page, int take)
         {
             var targetUser = this.dBContext.Users
                 .Include(x => x.FollowedUsers)
                 .ThenInclude(x => x.FollowedUser)
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            return this.mapper.Map<LongNameDto[]>(targetUser.FollowedUsers.Skip((page - 1) * take).Take(take).ToArray());
+            return new LongNamePaginationResponse
+            {
+                Items = this.mapper.Map<LongNameDto[]>(targetUser.FollowedUsers.Skip((page - 1) * take).Take(take).ToArray()),
+                TotalCount = targetUser.FollowedUsers.Count
+            };
         }
 
         public async Task<UserDetailsDto> GetUserAsync(long userId)
@@ -63,11 +72,20 @@ namespace MusicServer.Services
             return this.mapper.Map<UserDetailsDto>(user);
         }
 
-        public async Task<FullUserDto[]> GetUsersAsync(int page, int take, string searchTerm)
+        public async Task<FullUserPaginationResponse> GetUsersAsync(int page, int take, string searchTerm)
         {
-            var users = this.dBContext.Users.Where(x => x.Email.Contains(searchTerm) || x.UserName.Contains(searchTerm));
+            var users = this.dBContext.Users.Where(x => true);
 
-            return this.mapper.Map<FullUserDto[]>(users.Skip((page * take)).Take(take).ToArray());
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                users = this.dBContext.Users.Where(x => x.Email.Contains(searchTerm) || x.UserName.Contains(searchTerm));
+            }
+
+            return new FullUserPaginationResponse
+            {
+                Users = this.mapper.Map<FullUserDto[]>(users.Skip((page - 1) * take).Take(take).ToArray()),
+                TotalCount = users.Count()
+            };  
         }
 
         public async Task ModifyUserAsync(long userId, EditUser userRequest)

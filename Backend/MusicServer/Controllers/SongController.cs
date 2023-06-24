@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicServer.Const;
+using MusicServer.Entities.Requests.Multi;
 using MusicServer.Entities.Requests.Song;
 using MusicServer.Interfaces;
 using System.ComponentModel.DataAnnotations;
@@ -28,16 +29,16 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Song.ArtistAlbums)]
-        public async Task<IActionResult> GetAlbumsOfArtists([FromRoute, Required] Guid artistId, [FromQuery, Required] int page, [FromQuery, Required] int take)
+        public async Task<IActionResult> GetAlbumsOfArtists([FromRoute, Required] Guid artistId, [FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            return Ok(await this.songService.GetAlbumsOfArtist(artistId, page, take));
+            return Ok(await this.songService.GetAlbumsOfArtist(artistId, request.Page, request.Take));
         }
 
         [HttpGet]
         [Route(ApiRoutes.Song.SongsInAlbum)]
-        public async Task<IActionResult> GetSongsInAlbum([FromRoute, Required] Guid albumId, [FromQuery, Required] int page, [FromQuery, Required] int take)
+        public async Task<IActionResult> GetSongsInAlbum([FromRoute, Required] Guid albumId, [FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            return Ok(await this.songService.GetSongsInAlbum(albumId, page, take));
+            return Ok(await this.songService.GetSongsInAlbum(albumId, request.Page, request.Take));
         }
 
         [HttpGet]
@@ -49,9 +50,9 @@ namespace MusicServer.Controllers
 
         [HttpPost]
         [Route(ApiRoutes.Song.Search)]
-        public async Task<IActionResult> Search([FromQuery, Required] int page, [FromQuery, Required] int take, [FromBody, Required] Search request)
+        public async Task<IActionResult> Search([FromQuery, Required] QueryPaginationSearchRequest query, [FromBody, Required] Search request)
         {
-            return Ok(await this.songService.Search(request.Filter, request.SearchTerm, page, take));
+            return Ok(await this.songService.Search(request.Filter, request.SearchTerm, query.Page, query.Take));
         }
     }
 }
