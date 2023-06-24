@@ -36,16 +36,22 @@ namespace MusicServer.Interfaces
 
         public Task<PlaylistDto> GetPlaylistInfo(Guid playlistId);
 
-        public Task<SongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int page, int take);
+        public Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int page, int take);
 
-        public Task<SongPaginationResponse> GetFavorites(int page, int take);
+        public Task<PlaylistSongPaginationResponse> GetFavorites(int page, int take);
 
         public Task AddSongsToFavorite(List<Guid> songIds, bool addClones);
 
         public Task RemoveSongsFromFavorite(List<Guid> songIds);
 
-        public Task<SongPaginationResponse> SearchSongInPlaylist(Guid playlistId, string query, int page, int take);
+        public Task<PlaylistSongPaginationResponse> SearchSongInPlaylist(Guid playlistId, string query, int page, int take);
 
-        public Task<SongPaginationResponse> SearchSongInFavorites(string query, int page, int take);
+        public Task<PlaylistSongPaginationResponse> SearchSongInFavorites(string query, int page, int take);
+
+        public Task ChangeOrderSpotOfFavorit(Guid songId, int newSpot);
+
+        public Task ChangeOrderSpotOfSongInPlaylist(Guid playlistId, Guid songId, int newSpot);
+
+        public Task ChangeOrderOfPlaylist(Guid playlistId, int newSpot);
     }
 }

@@ -8,7 +8,9 @@ namespace DataAccess.Entities
 {
     public class PlaylistSong : CompositeBaseEntity
     {
-        //TODO: Add sorting id
+        // The first element is always 0
+        public int Order { get; set; }
+
         public Playlist Playlist { get; set; }
 
         public Song Song { get; set; }

@@ -10,6 +10,8 @@ namespace DataAccess.Entities
     {
         public long Id { get; set; }
 
+        public int Order { get; set; }  
+
         public User User { get; set; }
 
         public Song FavoriteSong { get; set; }

@@ -8,14 +8,25 @@ namespace MusicServer.Mapper
     {
         public EntityToDto()
         {
-            this.CreateMap<PlaylistSong, SongDto>(MemberList.Destination)
-                .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.Song.Album.Name))
+            this.CreateMap<PlaylistSong, PlaylistSongDto>(MemberList.Destination)
+                .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.Song.Album))
                 .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Song.Artists))
                 .ForMember(dest => dest.Length, opt => opt.MapFrom(ps => ps.Song.Length))
                 .ForMember(dest => dest.Modified, opt => opt.MapFrom(ps => ps.Song.Modified))
                 .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Song.Created))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Song.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Song.Name));
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Song.Name))
+                .ForMember(dest => dest.Order, opt => opt.MapFrom(ps => ps.Order));
+
+            this.CreateMap<UserSong, PlaylistSongDto>(MemberList.Destination)
+    .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.FavoriteSong.Album))
+    .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.FavoriteSong.Artists))
+    .ForMember(dest => dest.Length, opt => opt.MapFrom(ps => ps.FavoriteSong.Length))
+    .ForMember(dest => dest.Modified, opt => opt.MapFrom(ps => ps.FavoriteSong.Modified))
+    .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.FavoriteSong.Created))
+    .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.FavoriteSong.Id))
+    .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.FavoriteSong.Name))
+    .ForMember(dest => dest.Order, opt => opt.MapFrom(ps => ps.Order));
 
             this.CreateMap<Playlist, PlaylistDto>(MemberList.Destination)
                 .ForMember(dest => dest.Users, opt => opt.MapFrom(ps => ps.Users.ToArray()))
@@ -34,15 +45,6 @@ namespace MusicServer.Mapper
             this.CreateMap<PlaylistUser, UserDto>(MemberList.Destination)
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.User.Id))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(ps => ps.User.UserName));
-
-            this.CreateMap<PlaylistSong, SongDto>(MemberList.Destination)
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Song.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Song.Name))
-                .ForMember(dest => dest.Length, opt => opt.MapFrom(ps => ps.Song.Length))
-                .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.Song.Album))
-                .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Song.Artists))
-                .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Song.Created))
-                .ForMember(dest => dest.Modified, opt => opt.MapFrom(ps => ps.Song.Modified));
 
             this.CreateMap<Artist, GuidNameDto>(MemberList.Destination);
 

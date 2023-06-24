@@ -41,12 +41,16 @@ namespace MusicServer.Services
                 throw new NotAllowedException();
             }
 
+            var lastOrderNumber = await this.GetOrderNumberOfLastElementInPlaylist(playlist.Playlist);
+
             var album = this.dBContext.Albums.Include(x => x.Songs).FirstOrDefault(x => x.Id == albumId) ?? throw new AlbumNotFoundException();
 
             foreach (var song in album.Songs)
             {
+                lastOrderNumber = lastOrderNumber + 1;
                 playlist.Playlist.Songs.Add(new PlaylistSong()
                 {
+                    Order = lastOrderNumber,
                     Song= song
                 });
             }
@@ -105,10 +109,14 @@ namespace MusicServer.Services
                 throw new NotAllowedException();
             }
 
+            var lastOrderNumber = await this.GetOrderNumberOfLastElementInPlaylist(targetPlaylist.Playlist);
+
             foreach (var song in sourcePlayList.Songs)
             {
+                lastOrderNumber = lastOrderNumber + 1;
                 targetPlaylist.Playlist.Songs.Add(new PlaylistSong()
                 {
+                    Order = lastOrderNumber,
                     Song = song.Song
                 });
             }
@@ -124,6 +132,11 @@ namespace MusicServer.Services
 
             var doubleSongs = new List<Song>();
 
+
+            var lastSongInOrder = user.Favorites.OrderByDescending(x => x.Order).FirstOrDefault();
+
+            var lastOrderNumber = lastSongInOrder == null ? -1 : lastSongInOrder.Order;
+
             foreach (var songId in songIds)
             {
                 var song = this.dBContext.Songs.FirstOrDefault(x => x.Id == songId) ?? throw new SongNotFoundException();
@@ -133,9 +146,11 @@ namespace MusicServer.Services
                     doubleSongs.Add(song);
                     continue;
                 }
+                lastOrderNumber = lastOrderNumber + 1;
 
                 user.Favorites.Add(new UserSong()
                 {
+                    Order = lastOrderNumber,
                     FavoriteSong = song
                 });
             }
@@ -163,12 +178,16 @@ namespace MusicServer.Services
                 throw new NotAllowedException();
             }
 
+            var lastOrderNumber = await this.GetOrderNumberOfLastElementInPlaylist(playlist.Playlist);
+
             foreach (var songId in songIds)
             {
+                lastOrderNumber = lastOrderNumber + 1;
                 var song = this.dBContext.Songs.FirstOrDefault(x => x.Id == songId) ?? throw new SongNotFoundException();
 
                 playlist.Playlist.Songs.Add(new PlaylistSong()
                 {
+                    Order = lastOrderNumber,
                     Song= song
                 });
             }
@@ -248,7 +267,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task<SongPaginationResponse> GetFavorites(int page, int take)
+        public async Task<PlaylistSongPaginationResponse> GetFavorites(int page, int take)
         {
             var user = this.dBContext.Users.Include(x => x.Favorites)
             .ThenInclude(x => x.FavoriteSong)
@@ -260,11 +279,11 @@ namespace MusicServer.Services
             .FirstOrDefault(x => x.Id == this.activeUserService.Id)
             ?? throw new UserNotFoundException();
 
-            var songEntities = user.Favorites.Skip((page - 1) * take).Take(take).ToArray().Select(x => x.FavoriteSong).ToArray();
+            var songEntities = user.Favorites.Skip((page - 1) * take).Take(take).ToArray();
 
-            var songs = this.mapper.Map<SongDto[]>(songEntities);
+            var songs = this.mapper.Map<PlaylistSongDto[]>(songEntities);
 
-            return new SongPaginationResponse()
+            return new PlaylistSongPaginationResponse()
             {
                 Songs = songs,
                 TotalCount = user.Favorites.Count()
@@ -352,7 +371,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<SongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int page, int take)
+        public async Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int page, int take)
         {
             var playlist = this.dBContext.Playlists
                                 .Include(x => x.Users)
@@ -377,15 +396,17 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artist)
                 .Where(x => x.Playlist.Id == playlistId);
 
-            return new SongPaginationResponse()
+            return new PlaylistSongPaginationResponse()
             {
-                Songs = this.mapper.Map<PlaylistSong[], SongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray()),
+                Songs = this.mapper.Map<PlaylistSong[], PlaylistSongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray()),
                 TotalCount = songs.Count()
             };
         }
 
+
         public async Task RemoveSongsFromFavorite(List<Guid> songIds)
         {
+            //TODO: Remove songs from favorite not with the songid but with the order id, because of duplicates
             var user = this.dBContext.Users.Include(x => x.Favorites)
     .ThenInclude(x => x.FavoriteSong).FirstOrDefault(x => x.Id == this.activeUserService.Id)
     ?? throw new UserNotFoundException();
@@ -395,6 +416,24 @@ namespace MusicServer.Services
                 var favoriteSong = user.Favorites.FirstOrDefault(x => x.FavoriteSong.Id == songId) ?? throw new SongNotFoundException();
 
                 user.Favorites.Remove(favoriteSong);
+            }
+
+            // Fix the order of the songs
+            foreach (var item in user.Favorites)
+            {
+                if (item.Order == 0)
+                {
+                    continue;
+                }
+
+                var itemWhereOrderIsSmaller = user.Favorites.OrderBy(x => x.Order).LastOrDefault(x => x.Order < item.Order);
+
+                if (itemWhereOrderIsSmaller != null && itemWhereOrderIsSmaller.Order == item.Order - 1)
+                {
+                    continue;
+                }
+
+                item.Order = itemWhereOrderIsSmaller == null ? 0 : itemWhereOrderIsSmaller.Order + 1;
             }
 
             await this.dBContext.SaveChangesAsync();
@@ -421,6 +460,24 @@ namespace MusicServer.Services
                 var song = playlist.Playlist.Songs.FirstOrDefault(x => x.Song.Id == songId) ?? throw new SongNotFoundException();
 
                 playlist.Playlist.Songs.Remove(song);
+            }
+
+            // Fix the order of the songs
+            foreach (var item in playlist.Playlist.Songs)
+            {
+                if (item.Order == 0)
+                {
+                    continue;
+                }
+
+                var itemWhereOrderIsSmaller = playlist.Playlist.Songs.OrderBy(x => x.Order).LastOrDefault(x => x.Order < item.Order);
+
+                if (itemWhereOrderIsSmaller != null && itemWhereOrderIsSmaller.Order == item.Order - 1)
+                {
+                    continue;
+                }
+
+                item.Order = itemWhereOrderIsSmaller == null ? 0 : itemWhereOrderIsSmaller.Order + 1;
             }
 
             await this.dBContext.SaveChangesAsync();
@@ -462,7 +519,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task<SongPaginationResponse> SearchSongInFavorites(string query, int page, int take)
+        public async Task<PlaylistSongPaginationResponse> SearchSongInFavorites(string query, int page, int take)
         {
             var user = this.dBContext.Users.Include(x => x.Favorites)
                 .ThenInclude(x => x.FavoriteSong)
@@ -478,16 +535,16 @@ namespace MusicServer.Services
                 .Where(x => x.FavoriteSong.Name.Contains(query) ||
                         x.FavoriteSong.Artists.Where(x => x.Artist.Name.Contains(query)).Any());
 
-            var songs = this.mapper.Map<SongDto[]>(allSongEntities.Skip((page - 1) * take).Take(take).ToArray().Select(x => x.FavoriteSong).ToArray());
+            var songs = this.mapper.Map<PlaylistSongDto[]>(allSongEntities.Skip((page - 1) * take).Take(take).ToArray());
 
-            return new SongPaginationResponse()
+            return new PlaylistSongPaginationResponse()
             {
                 Songs = songs,
                 TotalCount = allSongEntities.Count()
             };
         }
 
-        public async Task<SongPaginationResponse> SearchSongInPlaylist(Guid playlistId, string query, int page, int take)
+        public async Task<PlaylistSongPaginationResponse> SearchSongInPlaylist(Guid playlistId, string query, int page, int take)
         {
             var playlist = this.dBContext.Playlists
                 .Include(x => x.Users)
@@ -514,9 +571,9 @@ namespace MusicServer.Services
                 (x.Song.Name.ToLower().Contains(query) || 
                     x.Song.Artists.Where(x => x.Artist.Name.Contains(query)).Any()));
 
-            return new SongPaginationResponse()
+            return new PlaylistSongPaginationResponse()
             {
-                Songs = this.mapper.Map<PlaylistSong[], SongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray()),
+                Songs = this.mapper.Map<PlaylistSong[], PlaylistSongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray()),
                 TotalCount = songs.Count()
             };
         }
@@ -622,6 +679,33 @@ namespace MusicServer.Services
             }
 
             await this.dBContext.SaveChangesAsync();
+        }
+
+        public Task ChangeOrderSpotOfFavorit(Guid songId, int newSpot)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ChangeOrderSpotOfSongInPlaylist(Guid playlistId, Guid songId, int newSpot)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ChangeOrderOfPlaylist(Guid playlistId, int newSpot)
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task<int> GetOrderNumberOfLastElementInPlaylist(Playlist playlist)
+        {
+            var lastSongInOrder = playlist.Songs.OrderByDescending(x => x.Order).FirstOrDefault();
+
+            if (lastSongInOrder == null)
+            {
+                return -1;
+            }
+
+            return lastSongInOrder.Order;
         }
     }
 }

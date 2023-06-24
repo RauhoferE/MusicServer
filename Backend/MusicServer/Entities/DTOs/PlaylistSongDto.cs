@@ -1,0 +1,21 @@
+﻿namespace MusicServer.Entities.DTOs
+{
+    public class PlaylistSongDto
+    {
+        public Guid Id { get; set; }
+
+        public string Name { get; set; }
+
+        public double Length { get; set; }
+
+        public AlbumArtistDto Album { get; set; }
+
+        public GuidNameDto[] Artists { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public DateTime Modified { get; set; }
+
+        public int Order { get; set; }
+    }
+}
