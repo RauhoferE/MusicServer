@@ -17,5 +17,7 @@ namespace DataAccess.Entities
         public bool IsCreator { get; set; } = false;
 
         public bool ReceiveNotifications { get; set; } = true;
+
+        public int Order { get; set; }
     }
 }

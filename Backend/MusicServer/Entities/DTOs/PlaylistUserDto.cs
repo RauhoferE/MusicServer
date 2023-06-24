@@ -11,5 +11,7 @@
         public bool IsCreator { get; set; }
 
         public bool ReceiveNotifications { get; set; }
+
+        public int Order { get; set; }
     }
 }
