@@ -77,12 +77,15 @@ namespace MusicServer.Services
                 throw new NotAllowedException();
             }
 
+            var lastOrderNumber = await this.GetOrderNumberOfLastPlaylist(user);   
+
             user.Playlists.Add(new PlaylistUser()
             {
                 IsCreator = false,
                 IsModifieable = false,
                 Playlist = playlist,
-                User = user
+                User = user,
+                Order = lastOrderNumber + 1
             });
 
             await this.dBContext.SaveChangesAsync();
@@ -221,12 +224,15 @@ namespace MusicServer.Services
             var user = this.dBContext.Users
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
+            var lastOrderNumber = await this.GetOrderNumberOfLastPlaylist(user);
+
             var entity = this.dBContext.PlaylistUsers.Add(new PlaylistUser()
             {
                 IsModifieable= true,
                 User = user,
                 IsCreator=true,
                 ReceiveNotifications =receiveNotifications,
+                Order = lastOrderNumber + 1,
                 Playlist = new Playlist()
                 {
                     Description= description,
@@ -332,17 +338,46 @@ namespace MusicServer.Services
 
             IEnumerable<PlaylistUser> playlists = user.Playlists;
 
-            if (userIdToSearch > -1)
+            List<PlaylistUserShortDto> userPlaylists = new List<PlaylistUserShortDto>();
+            if (userId > -1)
             {
+                var activeUser = this.dBContext.Users
+                    .Include(x => x.Playlists)
+                    .ThenInclude(x => x.Playlist)
+                    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
                 playlists = playlists.Where(x => x.Playlist.IsPublic);
+                foreach (var playlist in playlists.Skip((page - 1) * take)
+                                              .Take(take))
+                {
+                    var activeUserPlaylist = activeUser.Playlists.FirstOrDefault(x => x.Playlist.Id == playlist.Playlist.Id);
+                    if (activeUserPlaylist != null)
+                    {
+                        var mappedPlaylist = this.mapper.Map<PlaylistUserShortDto>(activeUserPlaylist);
+                        userPlaylists.Add(mappedPlaylist);
+                        continue;
+                    }
+
+                    var mappedPlaylist2 = this.mapper.Map<PlaylistUserShortDto>(playlist);
+                    mappedPlaylist2.IsModifieable = false;
+                    mappedPlaylist2.ReceiveNotifications = false;
+                    userPlaylists.Add(mappedPlaylist2);
+                }
+
+                return new PlaylistPaginationResponse()
+                {
+                    Playlists = userPlaylists.ToArray(),
+                    TotalCount = playlists.Count()
+                };
             }
+
+
 
             return new PlaylistPaginationResponse()
             {
-                Playlists = this.mapper.Map<Playlist[], PlaylistShortDto[]>(user.Playlists
+                Playlists = this.mapper.Map<PlaylistUser[], PlaylistUserShortDto[]>(playlists
                                .Skip((page - 1) * take)
-                                              .Take(take)
-                                                             .Select(x => x.Playlist).ToArray()),
+                                              .Take(take).ToArray()),
                 TotalCount = playlists.Count()
             };  
         }
@@ -363,10 +398,35 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artist)
                 .Where(x => x.IsPublic);
 
+            List<PlaylistUserShortDto> userPlaylists = new List<PlaylistUserShortDto>();
+
+            var activeUser = this.dBContext.Users
+    .Include(x => x.Playlists)
+    .ThenInclude(x => x.Playlist)
+    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
+            foreach (var playlist in playlists.Skip((page - 1) * take)
+                              .Take(take))
+            {
+                var activeUserPlaylist = activeUser.Playlists.FirstOrDefault(x => x.Playlist.Id == playlist.Id);
+                if (activeUserPlaylist != null)
+                {
+                    var mappedPlaylist = this.mapper.Map<PlaylistUserShortDto>(activeUserPlaylist);
+                    userPlaylists.Add(mappedPlaylist);
+                    continue;
+                }
+
+                var mappedPlaylist2 = this.mapper.Map<PlaylistUserShortDto>(playlist);
+                mappedPlaylist2.IsModifieable = false;
+                mappedPlaylist2.ReceiveNotifications = false;
+                mappedPlaylist2.IsPublic = true;
+                userPlaylists.Add(mappedPlaylist2);
+            }
+
             return new PlaylistPaginationResponse()
             {
 
-                Playlists = this.mapper.Map<Playlist[], PlaylistShortDto[]>(playlists.Skip((page - 1) * take).Take(take).ToArray()),
+                Playlists = userPlaylists.ToArray(),
                 TotalCount = playlists.Count()
             };
         }
@@ -581,7 +641,7 @@ namespace MusicServer.Services
         public async Task<PlaylistPaginationResponse> SearchUserPlaylist(long userId, string query, int page, int take)
         {
             var userIdToSearch = userId == -1 ? this.activeUserService.Id : userId;
-            User user = user = this.dBContext.Users
+            User user = this.dBContext.Users
                     .Include(x => x.Playlists)
                     .ThenInclude(x => x.Playlist)
                     .ThenInclude(x => x.Users)
@@ -600,20 +660,48 @@ namespace MusicServer.Services
                 .FirstOrDefault(x => x.Id == userIdToSearch) ?? throw new UserNotFoundException(); 
 
             IEnumerable<PlaylistUser> playlists = user.Playlists;
-            
+            List<PlaylistUserShortDto> userPlaylists = new List<PlaylistUserShortDto>();
+
             if (userId > -1)
             {
-                playlists = user.Playlists.Where(x => x.Playlist.IsPublic);
+                var activeUser = this.dBContext.Users
+    .Include(x => x.Playlists)
+    .ThenInclude(x => x.Playlist)
+    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
+                playlists = playlists.Where(x => x.Playlist.IsPublic);
+                foreach (var playlist in playlists.Where(x => x.Playlist.Name.ToLower().Contains(query.ToLower()))
+                                                .Skip((page - 1) * take)
+                                              .Take(take))
+                {
+                    var activeUserPlaylist = activeUser.Playlists.FirstOrDefault(x => x.Playlist.Id == playlist.Playlist.Id);
+                    if (activeUserPlaylist != null)
+                    {
+                        var mappedPlaylist = this.mapper.Map<PlaylistUserShortDto>(activeUserPlaylist);
+                        userPlaylists.Add(mappedPlaylist);
+                        continue;
+                    }
+
+                    var mappedPlaylist2 = this.mapper.Map<PlaylistUserShortDto>(playlist);
+                    mappedPlaylist2.IsModifieable = false;
+                    mappedPlaylist2.ReceiveNotifications = false;
+                    userPlaylists.Add(mappedPlaylist2);
+                }
+
+                return new PlaylistPaginationResponse()
+                {
+                    Playlists = userPlaylists.ToArray(),
+                    TotalCount = playlists.Count()
+                };
             }
 
             playlists = playlists.Where(x => x.Playlist.Name.ToLower().Contains(query.ToLower()));
 
             return new PlaylistPaginationResponse()
             {
-                Playlists = this.mapper.Map<Playlist[], PlaylistShortDto[]>(playlists
+                Playlists = this.mapper.Map<PlaylistUser[], PlaylistUserShortDto[]>(playlists
                .Skip((page - 1) * take)
-                              .Take(take)
-                                             .Select(x => x.Playlist).ToArray()),
+                              .Take(take).ToArray()),
                 TotalCount = playlists.Count()
             };
         }
@@ -656,7 +744,8 @@ namespace MusicServer.Services
             foreach (var dto in dtos)
             {
                 var p = this.dBContext.PlaylistUsers.FirstOrDefault(x => x.Playlist.Id == playlistId && x.User.Id == dto.UserId);
-                var targetUser = this.dBContext.Users.FirstOrDefault(x => x.Id == dto.UserId) ?? throw new UserNotFoundException();
+                var targetUser = this.dBContext.Users.Include(x => x.Playlists).ThenInclude(x => x.Playlist)
+                    .FirstOrDefault(x => x.Id == dto.UserId) ?? throw new UserNotFoundException();
 
                 if (p.IsCreator)
                 {
@@ -669,12 +758,15 @@ namespace MusicServer.Services
                     continue;
                 }
 
+                var lastOrderNumber = await this.GetOrderNumberOfLastPlaylist(targetUser);
+
                 this.dBContext.PlaylistUsers.Add(new PlaylistUser()
                 {
                     IsModifieable = dto.CanModify,
                     IsCreator = false,
                     User = targetUser,
-                    Playlist = playlist.Playlist
+                    Playlist = playlist.Playlist,
+                    Order = lastOrderNumber + 1
                 });
             }
 
@@ -699,6 +791,18 @@ namespace MusicServer.Services
         private async Task<int> GetOrderNumberOfLastElementInPlaylist(Playlist playlist)
         {
             var lastSongInOrder = playlist.Songs.OrderByDescending(x => x.Order).FirstOrDefault();
+
+            if (lastSongInOrder == null)
+            {
+                return -1;
+            }
+
+            return lastSongInOrder.Order;
+        }
+
+        private async Task<int> GetOrderNumberOfLastPlaylist(User user)
+        {
+            var lastSongInOrder = user.Playlists.OrderByDescending(x => x.Order).FirstOrDefault();
 
             if (lastSongInOrder == null)
             {

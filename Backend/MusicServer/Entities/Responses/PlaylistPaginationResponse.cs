@@ -6,6 +6,6 @@ namespace MusicServer.Entities.Responses
     {
         public int TotalCount { get; set; }
 
-        public PlaylistShortDto[] Playlists { get; set; } = new PlaylistShortDto[0];
+        public PlaylistUserShortDto[] Playlists { get; set; } = new PlaylistUserShortDto[0];
     }
 }
