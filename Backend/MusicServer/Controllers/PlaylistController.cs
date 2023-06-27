@@ -177,6 +177,30 @@ namespace MusicServer.Controllers
             return Ok(await this.playlistService.SearchSongInFavorites(request.Query, request.Page, request.Take));
         }
 
+        [HttpGet]
+        [Route(ApiRoutes.Playlist.OrderFavorites)]
+        public async Task<IActionResult> ChangeOrderOfFavorit([FromQuery, Required] Guid songId, [FromQuery, Required] int order)
+        {
+            await this.playlistService.ChangeOrderOfFavorit(songId, order);
+            return NoContent();
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.Playlist.OrderSongs)]
+        public async Task<IActionResult> ChangeOrderOfSongInPlaylist([FromQuery, Required] Guid playlistId, [FromQuery, Required] Guid songId, [FromQuery, Required] int order)
+        {
+            await this.playlistService.ChangeOrderOfSongInPlaylist(playlistId, songId, order);
+            return NoContent();
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.Playlist.OrderPlaylists)]
+        public async Task<IActionResult> ChangeOrderOfPlaylist([FromQuery, Required] Guid playlistId, [FromQuery, Required] int order)
+        {
+            await this.playlistService.ChangeOrderOfPlaylist(playlistId, order);
+            return NoContent();
+        }
+
 
     }
 }

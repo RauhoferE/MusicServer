@@ -48,9 +48,9 @@ namespace MusicServer.Interfaces
 
         public Task<PlaylistSongPaginationResponse> SearchSongInFavorites(string query, int page, int take);
 
-        public Task ChangeOrderSpotOfFavorit(Guid songId, int newSpot);
+        public Task ChangeOrderOfFavorit(Guid songId, int newSpot);
 
-        public Task ChangeOrderSpotOfSongInPlaylist(Guid playlistId, Guid songId, int newSpot);
+        public Task ChangeOrderOfSongInPlaylist(Guid playlistId, Guid songId, int newSpot);
 
         public Task ChangeOrderOfPlaylist(Guid playlistId, int newSpot);
     }

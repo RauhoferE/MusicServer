@@ -747,7 +747,7 @@ namespace MusicServer.Services
                 var targetUser = this.dBContext.Users.Include(x => x.Playlists).ThenInclude(x => x.Playlist)
                     .FirstOrDefault(x => x.Id == dto.UserId) ?? throw new UserNotFoundException();
 
-                if (p.IsCreator)
+                if (p != null && p.IsCreator)
                 {
                     throw new NotAllowedException();
                 }
@@ -773,19 +773,127 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public Task ChangeOrderSpotOfFavorit(Guid songId, int newSpot)
+        public async Task ChangeOrderOfFavorit(Guid songId, int newSpot)
         {
-            throw new NotImplementedException();
+            var favorites = this.dBContext.Users
+                .Include(x => x.Favorites)
+                .ThenInclude(x => x.FavoriteSong)
+                .FirstOrDefault(x => x.Id == this.activeUserService.Id)?
+                .Favorites
+                ?? throw new UserNotFoundException();
+
+            var songToMove = favorites.FirstOrDefault(x => x.FavoriteSong.Id == songId)
+                ?? throw new SongNotFoundException();
+
+            var targetPlace = favorites.FirstOrDefault(x => x.Order == newSpot) 
+                ?? throw new SongNotFoundException();
+
+            var oldSongOrder = songToMove.Order;    
+            songToMove.Order = newSpot;
+
+            var favoritesToTraverse = favorites.Where(x => x.Order <= newSpot && x.FavoriteSong.Id != songId);
+
+            if (oldSongOrder > newSpot)
+            {
+                favoritesToTraverse = favorites.Where(x => x.Order >= newSpot && x.FavoriteSong.Id != songId);
+            }
+
+            foreach (var songBefore in favoritesToTraverse)
+            {
+                if (oldSongOrder >= newSpot)
+                {
+                    songBefore.Order++;
+                    continue;
+                }
+
+                songBefore.Order--;
+            }
+
+            await this.dBContext.SaveChangesAsync();
         }
 
-        public Task ChangeOrderSpotOfSongInPlaylist(Guid playlistId, Guid songId, int newSpot)
+        public async Task ChangeOrderOfSongInPlaylist(Guid playlistId, Guid songId, int newSpot)
         {
-            throw new NotImplementedException();
+            var playlist = this.dBContext.PlaylistUsers
+                .Include(x => x.Playlist)
+                .ThenInclude(x => x.Songs)
+                .ThenInclude(x => x.Song)
+                .Include(x => x.User)
+                .FirstOrDefault(x => x.Playlist.Id == playlistId && x.User.Id == this.activeUserService.Id)
+                ?? throw new PlaylistNotFoundException();
+
+            var songToMove = playlist.Playlist.Songs
+                .FirstOrDefault(x => x.Song.Id == songId)
+                ?? throw new SongNotFoundException();
+
+            var targetPlace = playlist.Playlist.Songs
+                .FirstOrDefault(x => x.Order == newSpot)
+                ?? throw new SongNotFoundException();
+
+            var oldSongOrder = songToMove.Order;
+            songToMove.Order = newSpot;
+
+            // TODO:  This config should work overwrite other methods
+            var songsToTraverse = playlist.Playlist.Songs.Where(x => x.Order <= newSpot && x.Song.Id != songId && x.Order > oldSongOrder);
+
+            if (oldSongOrder > newSpot)
+            {
+                songsToTraverse = playlist.Playlist.Songs.Where(x => x.Order >= newSpot && x.Song.Id != songId && x.Order < oldSongOrder);
+            }
+
+            foreach (var songBefore in songsToTraverse)
+            {
+                if (oldSongOrder >= newSpot)
+                {
+                    songBefore.Order++;
+                    continue;
+                }
+
+                songBefore.Order--;
+            }
+
+            await this.dBContext.SaveChangesAsync();
         }
 
-        public Task ChangeOrderOfPlaylist(Guid playlistId, int newSpot)
+        public async Task ChangeOrderOfPlaylist(Guid playlistId, int newSpot)
         {
-            throw new NotImplementedException();
+            var playlists = this.dBContext.PlaylistUsers
+    .Include(x => x.Playlist)
+    .Include(x => x.User)
+    .Where(x => x.User.Id == this.activeUserService.Id)
+    ?? throw new PlaylistNotFoundException();
+
+            var playlistToMove = playlists
+                .FirstOrDefault(x => x.Playlist.Id == playlistId)
+                ?? throw new SongNotFoundException();
+
+            var targetPlace = playlists
+                .FirstOrDefault(x => x.Order == newSpot)
+                ?? throw new SongNotFoundException();
+
+
+            var oldPlaylistOrder = playlistToMove.Order;
+            playlistToMove.Order = newSpot;
+
+            var playlistsToTraverse = playlists.Where(x => x.Order <= newSpot && x.Playlist.Id != playlistId);
+
+            if (oldPlaylistOrder > newSpot)
+            {
+                playlistsToTraverse = playlists.Where(x => x.Order >= newSpot && x.Playlist.Id != playlistId);
+            }
+
+            foreach (var playlistBefore in playlistsToTraverse)
+            {
+                if (oldPlaylistOrder >= newSpot)
+                {
+                    playlistBefore.Order++;
+                    continue;
+                }
+
+                playlistBefore.Order--;
+            }
+
+            await this.dBContext.SaveChangesAsync();
         }
 
         private async Task<int> GetOrderNumberOfLastElementInPlaylist(Playlist playlist)

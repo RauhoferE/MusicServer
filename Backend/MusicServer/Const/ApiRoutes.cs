@@ -52,6 +52,9 @@
             public const string PlaylistCopy = "copy/{playlistId}";
             public const string PlaylistAddToLibrary = "add/{playlistId}";
             public const string Favorite = "favorites";
+            public const string OrderSongs = "order/song";
+            public const string OrderFavorites = "order/favorite";
+            public const string OrderPlaylists = "order/playlist";
         }
 
         public static class Song
