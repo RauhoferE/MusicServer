@@ -32,7 +32,7 @@ namespace MusicServer.Interfaces
 
         public Task<PlaylistPaginationResponse> SearchUserPlaylist(long userId, string query, int page, int take);
 
-        public Task<PlaylistPaginationResponse> GetPublicPlaylists(int page, int take);
+        public Task<PlaylistPaginationResponse> GetPublicPlaylists(int page, int take, string sortAfter, bool asc);
 
         public Task<PlaylistDto> GetPlaylistInfo(Guid playlistId);
 

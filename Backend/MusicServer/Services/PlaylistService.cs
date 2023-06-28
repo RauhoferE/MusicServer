@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MusicServer.Entities.DTOs;
 using MusicServer.Entities.Responses;
 using MusicServer.Exceptions;
+using MusicServer.Helpers;
 using MusicServer.Interfaces;
 
 namespace MusicServer.Services
@@ -394,8 +395,9 @@ namespace MusicServer.Services
             };  
         }
 
-        public async Task<PlaylistPaginationResponse> GetPublicPlaylists(int page, int take)
+        public async Task<PlaylistPaginationResponse> GetPublicPlaylists(int page, int take, string sortAfter, bool asc)
         {
+            // TOOD: Add search
             var playlists = this.dBContext.Playlists
                 .Include(x => x.Songs)
                 .ThenInclude(x => x.Song)
@@ -409,6 +411,8 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artists)
                 .ThenInclude(x => x.Artist)
                 .Where(x => x.IsPublic);
+
+            playlists = SortingHelpers.SortSearchPublicPlaylists(sortAfter, playlists, asc);
 
             List<PlaylistUserShortDto> userPlaylists = new List<PlaylistUserShortDto>();
 

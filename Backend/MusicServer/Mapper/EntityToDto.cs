@@ -43,6 +43,7 @@ namespace MusicServer.Mapper
                     .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Playlist.Id))
                     .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Playlist.Name))
                     .ForMember(dest => dest.Users, opt => opt.MapFrom(ps => ps.Playlist.Users))
+                    .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Playlist.Created))
                     .ForMember(dest => dest.SongCount, opt => opt.MapFrom(ps => ps.Playlist.Songs.Count))
     .ForMember(dest => dest.IsPublic, opt => opt.MapFrom(ps => ps.Playlist.IsPublic))
     .ForMember(dest => dest.IsModifieable, opt => opt.MapFrom(ps => ps.IsModifieable))
@@ -57,7 +58,8 @@ namespace MusicServer.Mapper
 .ForMember(dest => dest.IsPublic, opt => opt.MapFrom(ps => false))
 .ForMember(dest => dest.IsModifieable, opt => opt.MapFrom(ps => false))
 .ForMember(dest => dest.ReceiveNotifications, opt => opt.MapFrom(ps => false))
-.ForMember(dest => dest.Order, opt => opt.MapFrom(ps => 0));
+.ForMember(dest => dest.Order, opt => opt.MapFrom(ps => 0))
+.ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Created));
 
             this.CreateMap<Playlist, PlaylistShortDto>(MemberList.Destination)
                 .ForMember(dest => dest.SongCount, opt => opt.MapFrom(ps => ps.Songs.Count))

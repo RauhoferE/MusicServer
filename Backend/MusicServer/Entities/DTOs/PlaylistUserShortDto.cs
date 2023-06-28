@@ -16,6 +16,8 @@
 
         public int Order { get; set; }
 
-        public bool IsPublic { get; set; }  
+        public bool IsPublic { get; set; }
+        
+        public DateTime Created { get; set; }
     }
 }
