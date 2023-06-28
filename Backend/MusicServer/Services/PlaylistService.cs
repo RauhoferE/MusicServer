@@ -403,12 +403,6 @@ namespace MusicServer.Services
                 .Include(x => x.Users)
                 .ThenInclude(x => x.User)
                 .Include(x => x.Songs)
-                .ThenInclude(x => x.Song)
-                .ThenInclude(x => x.Album)
-                .Include(x => x.Songs)
-                .ThenInclude(x => x.Song)
-                .ThenInclude(x => x.Artists)
-                .ThenInclude(x => x.Artist)
                 .Where(x => x.IsPublic);
 
             playlists = SortingHelpers.SortSearchPublicPlaylists(playlists, asc, sortAfter, query);
