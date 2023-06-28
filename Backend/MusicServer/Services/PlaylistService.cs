@@ -99,7 +99,8 @@ namespace MusicServer.Services
 .ThenInclude(x => x.Songs)
 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            var targetPlaylist = user.Playlists.FirstOrDefault(x => x.Playlist.Id == targetPlaylistId) ?? throw new PlaylistNotFoundException();
+            var targetPlaylist = user.Playlists
+                .FirstOrDefault(x => x.Playlist.Id == targetPlaylistId) ?? throw new PlaylistNotFoundException();
             var sourcePlayList = this.dBContext.Playlists
                 .Include(x => x.Songs).ThenInclude(x => x.Song)
                 .FirstOrDefault(x => x.Id == sourcePlaylistId) ?? throw new PlaylistNotFoundException();
@@ -222,6 +223,7 @@ namespace MusicServer.Services
         public async Task<Guid> CreatePlaylistAsync(string name, string description, bool isPublic, bool receiveNotifications)
         {
             var user = this.dBContext.Users
+                .Include(x => x.Playlists)
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
             var lastOrderNumber = await this.GetOrderNumberOfLastPlaylist(user);
@@ -254,6 +256,16 @@ namespace MusicServer.Services
     .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
             var playlist = user.Playlists.FirstOrDefault(x => x.Playlist.Id == playlistId) ?? throw new PlaylistNotFoundException();
+
+            var allUserPlaylists = this.dBContext.PlaylistUsers
+                .Include(x => x.Playlist)
+                .Include(x => x.User)
+                .Where(x => x.User.Id == this.activeUserService.Id && x.Order > playlist.Order);
+
+            foreach (var pl in allUserPlaylists)
+            {
+                pl.Order--;
+            }
 
             if (!playlist.IsModifieable)
             {
@@ -573,6 +585,16 @@ namespace MusicServer.Services
 
                 var entityToRemove = playlistEntity.FirstOrDefault(x => x.User.Id == userId) ?? throw new UserNotFoundException();
 
+                var allUserPlaylists = this.dBContext.PlaylistUsers
+                    .Include(x => x.Playlist)
+                    .Include(x => x.User)
+                    .Where(x => x.User.Id == userId && x.Order > entityToRemove.Order);
+
+                foreach (var pl in allUserPlaylists)
+                {
+                    pl.Order--;
+                }
+
                 this.dBContext.Remove(entityToRemove);
             }
 
@@ -791,11 +813,11 @@ namespace MusicServer.Services
             var oldSongOrder = songToMove.Order;    
             songToMove.Order = newSpot;
 
-            var favoritesToTraverse = favorites.Where(x => x.Order <= newSpot && x.FavoriteSong.Id != songId);
+            var favoritesToTraverse = favorites.Where(x => x.Order <= newSpot && x.FavoriteSong.Id != songId && x.Order > oldSongOrder);
 
             if (oldSongOrder > newSpot)
             {
-                favoritesToTraverse = favorites.Where(x => x.Order >= newSpot && x.FavoriteSong.Id != songId);
+                favoritesToTraverse = favorites.Where(x => x.Order >= newSpot && x.FavoriteSong.Id != songId && x.Order < oldSongOrder);
             }
 
             foreach (var songBefore in favoritesToTraverse)
@@ -875,11 +897,11 @@ namespace MusicServer.Services
             var oldPlaylistOrder = playlistToMove.Order;
             playlistToMove.Order = newSpot;
 
-            var playlistsToTraverse = playlists.Where(x => x.Order <= newSpot && x.Playlist.Id != playlistId);
+            var playlistsToTraverse = playlists.Where(x => x.Order <= newSpot && x.Playlist.Id != playlistId && x.Order > oldPlaylistOrder);
 
             if (oldPlaylistOrder > newSpot)
             {
-                playlistsToTraverse = playlists.Where(x => x.Order >= newSpot && x.Playlist.Id != playlistId);
+                playlistsToTraverse = playlists.Where(x => x.Order >= newSpot && x.Playlist.Id != playlistId && x.Order < oldPlaylistOrder);
             }
 
             foreach (var playlistBefore in playlistsToTraverse)
