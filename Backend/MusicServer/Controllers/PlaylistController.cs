@@ -88,7 +88,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.PublicPlaylist)]
         public async Task<IActionResult> GetPublicPlaylists([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            var t = await this.playlistService.GetPublicPlaylists(request.Page, request.Take, request.SortAfter, request.Asc);
+            var t = await this.playlistService.GetPublicPlaylists(request.Page, request.Take, request.SortAfter, request.Asc, request.Query);
             return Ok(t);
         }
 

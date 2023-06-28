@@ -5,8 +5,14 @@ namespace MusicServer.Helpers
 {
     public static class SortingHelpers
     {
-        public static IQueryable<Playlist> SortSearchPublicPlaylists(string sortAfter, IQueryable<Playlist> playlists, bool asc)
+        public static IQueryable<Playlist> SortSearchPublicPlaylists(IQueryable<Playlist> playlists, bool asc, string sortAfter, string query)
         {
+            if(query != null)
+            {
+                  playlists = playlists
+                    .Where(x => x.Name.Contains(query.ToLower()));
+            }
+
             if (asc)
             {
                 switch (sortAfter)

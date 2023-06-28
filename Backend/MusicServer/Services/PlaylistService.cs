@@ -395,9 +395,8 @@ namespace MusicServer.Services
             };  
         }
 
-        public async Task<PlaylistPaginationResponse> GetPublicPlaylists(int page, int take, string sortAfter, bool asc)
+        public async Task<PlaylistPaginationResponse> GetPublicPlaylists(int page, int take, string sortAfter, bool asc, string query)
         {
-            // TOOD: Add search
             var playlists = this.dBContext.Playlists
                 .Include(x => x.Songs)
                 .ThenInclude(x => x.Song)
@@ -412,7 +411,7 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artist)
                 .Where(x => x.IsPublic);
 
-            playlists = SortingHelpers.SortSearchPublicPlaylists(sortAfter, playlists, asc);
+            playlists = SortingHelpers.SortSearchPublicPlaylists(playlists, asc, sortAfter, query);
 
             List<PlaylistUserShortDto> userPlaylists = new List<PlaylistUserShortDto>();
 
