@@ -65,15 +65,14 @@ namespace MusicServer.Core.Const
         };
     }
 
-    public static class SortingElementsAllArtists
+    public static class SortingElementsAllArtistsAndUsers
     {
         public const string Name = "Name";
-        public const string NumberOfSongs = "NumberOfSongs";
 
         // Return all constants in a list
         public static List<string> SortingElements = new List<string>()
         {
-            Name, NumberOfSongs
+            Name
         };
     }
 

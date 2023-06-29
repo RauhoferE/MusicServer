@@ -203,6 +203,38 @@ namespace MusicServer.Helpers
             }
         }
 
+        public static IQueryable<Artist> SortSearchArtists(IQueryable<Artist> artists, bool asc, string query)
+        {
+            if (query != null)
+            {
+                artists = artists
+                  .Where(x => x.Name.Contains(query));
+            }
+
+            if (asc)
+            {
+                return artists.OrderBy(x => x.Name);
+            }
+
+            return artists.OrderByDescending(x => x.Name);
+        }
+
+        public static IQueryable<User> SortSearchUsers(IQueryable<User> users, bool asc, string query)
+        {
+            if (query != null)
+            {
+                users = users
+                  .Where(x => x.UserName.Contains(query) || x.Email.Contains(query));
+            }
+
+            if (asc)
+            {
+                return users.OrderBy(x => x.UserName);
+            }
+
+            return users.OrderByDescending(x => x.UserName);
+        }
+
 
     }
 }

@@ -96,6 +96,7 @@ namespace MusicServer.Services
         public async Task<SearchResultDto> Search(string filter, string searchTerm, int page, int take, string sortAfter, bool asc)
         {
             //TODO: Return all possible filters in controller action
+            // TODO: Return DTO that shows if user follows artist, user, playlist, songs 
             switch (filter)
             {
                 case SearchFilter.All:
@@ -103,13 +104,13 @@ namespace MusicServer.Services
                 case SearchFilter.Albums:
                     return await this.FilterAllAlbums(searchTerm, page, take, sortAfter, asc);
                 case SearchFilter.Artists:
-                    return await this.FilterAllArtists(searchTerm, page, take);
+                    return await this.FilterAllArtists(searchTerm, page, take, asc);
                 case SearchFilter.Songs:
                     return await this.FilterAllSongs(searchTerm, page, take);
                 case SearchFilter.Playlists:
                     return await this.FilterAllPlaylists(searchTerm, page, take);
                 case SearchFilter.Users:
-                    return await this.FilterAllUsers(searchTerm, page, take);
+                    return await this.FilterAllUsers(searchTerm, page, take, asc);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -171,11 +172,6 @@ namespace MusicServer.Services
                 .Include(x => x.Songs)
                 .Where(x => true);
 
-            //if (searchTerm != string.Empty)
-            //{
-            //    albums = albums.Where(x => x.Name.Contains(searchTerm));
-            //}
-
             albums = SortingHelpers.SortSearchAlbums(albums, asc, sortAfter, searchTerm);
 
             return new SearchResultDto()
@@ -184,14 +180,12 @@ namespace MusicServer.Services
             };
         }
 
-        private async Task<SearchResultDto> FilterAllArtists(string searchTerm, int page, int take)
+        private async Task<SearchResultDto> FilterAllArtists(string searchTerm, int page, int take, bool asc)
         {
-            var artists = this._dbContext.Artists.Where(x => true);
+            var artists = this._dbContext.Artists
+                .Where(x => true);
 
-            if (searchTerm != string.Empty)
-            {
-                artists = artists.Where(x => x.Name.Contains(searchTerm));
-            }
+            artists = SortingHelpers.SortSearchArtists(artists, asc, searchTerm);
 
             return new SearchResultDto()
             {
@@ -246,14 +240,11 @@ namespace MusicServer.Services
             };
         }
 
-        private async Task<SearchResultDto> FilterAllUsers(string searchTerm, int page, int take)
+        private async Task<SearchResultDto> FilterAllUsers(string searchTerm, int page, int take, bool asc)
         {
-            var users = this._dbContext.Users.Where(x => true);
+            var users = this._dbContext.Users.Where(x => x.Id != this._activeUserService.Id);
 
-            if (searchTerm != string.Empty)
-            {
-                users = users.Where(x => x.UserName.Contains(searchTerm) || x.Email.Contains(searchTerm));
-            }
+            users = SortingHelpers.SortSearchUsers(users, asc, searchTerm);
             
             return new SearchResultDto()
             {
