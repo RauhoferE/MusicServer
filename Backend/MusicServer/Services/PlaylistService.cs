@@ -286,7 +286,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task<PlaylistSongPaginationResponse> GetFavorites(int page, int take)
+        public async Task<PlaylistSongPaginationResponse> GetFavorites(int page, int take, string sortAfter, bool asc, string query)
         {
             var user = this.dBContext.Users.Include(x => x.Favorites)
             .ThenInclude(x => x.FavoriteSong)
@@ -294,18 +294,18 @@ namespace MusicServer.Services
             .Include(x => x.Favorites)
             .ThenInclude(x => x.FavoriteSong)
                             .ThenInclude(x => x.Artists)
-                .ThenInclude(x => x.Artist)
+                                .ThenInclude(x => x.Artist)
             .FirstOrDefault(x => x.Id == this.activeUserService.Id)
             ?? throw new UserNotFoundException();
 
-            var songEntities = user.Favorites.Skip((page - 1) * take).Take(take).ToArray();
+            var songentities = SortingHelpers.SortSearchFavorites(user.Favorites.AsQueryable(), asc, sortAfter, query);
 
-            var songs = this.mapper.Map<PlaylistSongDto[]>(songEntities);
+            var songs = this.mapper.Map<PlaylistSongDto[]>(songentities.Skip((page - 1) * take).Take(take).ToArray());
 
             return new PlaylistSongPaginationResponse()
             {
                 Songs = songs,
-                TotalCount = user.Favorites.Count()
+                TotalCount = songentities.Count()
             };
         }
 
@@ -328,7 +328,7 @@ namespace MusicServer.Services
             return this.mapper.Map<PlaylistDto>(playlist);
         }
 
-        public async Task<PlaylistPaginationResponse> GetPlaylistsAsync(long userId, int page, int take)
+        public async Task<PlaylistPaginationResponse> GetPlaylistsAsync(long userId, int page, int take, string sortAfter, bool asc, string query)
         {
             var userIdToSearch = userId == -1 ? this.activeUserService.Id : userId;
             var user = this.dBContext.Users
@@ -349,7 +349,9 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artist)
             .FirstOrDefault(x => x.Id == userIdToSearch) ?? throw new UserNotFoundException();
 
-            IEnumerable<PlaylistUser> playlists = user.Playlists;
+            // add sorting here
+            IEnumerable<PlaylistUser> playlists = SortingHelpers.SortSearchUserPlaylists(user.Playlists.AsQueryable(), asc, sortAfter, query);
+            //IEnumerable<PlaylistUser> playlists = user.Playlists;
 
             List<PlaylistUserShortDto> userPlaylists = new List<PlaylistUserShortDto>();
             if (userId > -1)
@@ -360,6 +362,11 @@ namespace MusicServer.Services
                     .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
                 playlists = playlists.Where(x => x.Playlist.IsPublic);
+
+                playlists = SortingHelpers.SortSearchUserPlaylists(user.Playlists.AsQueryable(), asc, sortAfter, query);
+
+                // Add sorting here
+
                 foreach (var playlist in playlists.Skip((page - 1) * take)
                                               .Take(take))
                 {
@@ -440,7 +447,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int page, int take)
+        public async Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int page, int take, string sortAfter, bool asc, string query)
         {
             var playlist = this.dBContext.Playlists
                                 .Include(x => x.Users)
@@ -465,13 +472,14 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artist)
                 .Where(x => x.Playlist.Id == playlistId);
 
+            songs = SortingHelpers.SortSearchSongsInPlaylist(songs, asc, sortAfter, query);
+
             return new PlaylistSongPaginationResponse()
             {
                 Songs = this.mapper.Map<PlaylistSong[], PlaylistSongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray()),
                 TotalCount = songs.Count()
             };
         }
-
 
         public async Task RemoveSongsFromFavorite(List<Guid> songIds)
         {
@@ -596,133 +604,6 @@ namespace MusicServer.Services
             }
 
             await this.dBContext.SaveChangesAsync();
-        }
-
-        public async Task<PlaylistSongPaginationResponse> SearchSongInFavorites(string query, int page, int take)
-        {
-            var user = this.dBContext.Users.Include(x => x.Favorites)
-                .ThenInclude(x => x.FavoriteSong)
-                .ThenInclude(x => x.Album)
-                .Include(x => x.Favorites)
-                .ThenInclude(x => x.FavoriteSong)
-                                .ThenInclude(x => x.Artists)
-                    .ThenInclude(x => x.Artist)
-                .FirstOrDefault(x => x.Id == this.activeUserService.Id)
-                ?? throw new UserNotFoundException();
-
-            var allSongEntities = user.Favorites
-                .Where(x => x.FavoriteSong.Name.Contains(query) ||
-                        x.FavoriteSong.Artists.Where(x => x.Artist.Name.Contains(query)).Any());
-
-            var songs = this.mapper.Map<PlaylistSongDto[]>(allSongEntities.Skip((page - 1) * take).Take(take).ToArray());
-
-            return new PlaylistSongPaginationResponse()
-            {
-                Songs = songs,
-                TotalCount = allSongEntities.Count()
-            };
-        }
-
-        public async Task<PlaylistSongPaginationResponse> SearchSongInPlaylist(Guid playlistId, string query, int page, int take)
-        {
-            var playlist = this.dBContext.Playlists
-                .Include(x => x.Users)
-                    .ThenInclude(x => x.User)
-                .FirstOrDefault(x => x.Id == playlistId) ?? throw new PlaylistNotFoundException();
-
-            var user = playlist.Users.FirstOrDefault(x => x.User.Id == this.activeUserService.Id);
-
-            if ((!playlist.IsPublic && user == null))
-            {
-                throw new NotAllowedException();
-            }
-
-            var songs = this.dBContext.PlaylistSongs
-                .Include(x => x.Playlist)
-                .ThenInclude(x => x.Users)
-                .ThenInclude(x => x.User)
-                .Include(x => x.Song)
-                .ThenInclude(x => x.Album)
-                .Include(x => x.Song)
-                .ThenInclude(x => x.Artists)
-                .ThenInclude(x => x.Artist)
-                .Where(x => x.Playlist.Id == playlistId && 
-                (x.Song.Name.ToLower().Contains(query) || 
-                    x.Song.Artists.Where(x => x.Artist.Name.Contains(query)).Any()));
-
-            return new PlaylistSongPaginationResponse()
-            {
-                Songs = this.mapper.Map<PlaylistSong[], PlaylistSongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray()),
-                TotalCount = songs.Count()
-            };
-        }
-
-        public async Task<PlaylistPaginationResponse> SearchUserPlaylist(long userId, string query, int page, int take)
-        {
-            var userIdToSearch = userId == -1 ? this.activeUserService.Id : userId;
-            User user = this.dBContext.Users
-                    .Include(x => x.Playlists)
-                    .ThenInclude(x => x.Playlist)
-                    .ThenInclude(x => x.Users)
-                    .ThenInclude(x => x.User)
-                    .Include(x => x.Playlists)
-                    .ThenInclude(x => x.Playlist)
-                    .ThenInclude(x => x.Songs)
-                    .ThenInclude(x => x.Song)
-                    .ThenInclude(x => x.Album)
-                    .Include(x => x.Playlists)
-                    .ThenInclude(x => x.Playlist)
-                    .ThenInclude(x => x.Songs)
-                    .ThenInclude(x => x.Song)
-                    .ThenInclude(x => x.Artists)
-                    .ThenInclude(x => x.Artist)
-                .FirstOrDefault(x => x.Id == userIdToSearch) ?? throw new UserNotFoundException(); 
-
-            IEnumerable<PlaylistUser> playlists = user.Playlists;
-            List<PlaylistUserShortDto> userPlaylists = new List<PlaylistUserShortDto>();
-
-            if (userId > -1)
-            {
-                var activeUser = this.dBContext.Users
-    .Include(x => x.Playlists)
-    .ThenInclude(x => x.Playlist)
-    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
-
-                playlists = playlists.Where(x => x.Playlist.IsPublic);
-                foreach (var playlist in playlists.Where(x => x.Playlist.Name.ToLower().Contains(query.ToLower()))
-                                                .Skip((page - 1) * take)
-                                              .Take(take))
-                {
-                    var activeUserPlaylist = activeUser.Playlists.FirstOrDefault(x => x.Playlist.Id == playlist.Playlist.Id);
-                    if (activeUserPlaylist != null)
-                    {
-                        var mappedPlaylist = this.mapper.Map<PlaylistUserShortDto>(activeUserPlaylist);
-                        userPlaylists.Add(mappedPlaylist);
-                        continue;
-                    }
-
-                    var mappedPlaylist2 = this.mapper.Map<PlaylistUserShortDto>(playlist);
-                    mappedPlaylist2.IsModifieable = false;
-                    mappedPlaylist2.ReceiveNotifications = false;
-                    userPlaylists.Add(mappedPlaylist2);
-                }
-
-                return new PlaylistPaginationResponse()
-                {
-                    Playlists = userPlaylists.ToArray(),
-                    TotalCount = playlists.Count()
-                };
-            }
-
-            playlists = playlists.Where(x => x.Playlist.Name.ToLower().Contains(query.ToLower()));
-
-            return new PlaylistPaginationResponse()
-            {
-                Playlists = this.mapper.Map<PlaylistUser[], PlaylistUserShortDto[]>(playlists
-               .Skip((page - 1) * take)
-                              .Take(take).ToArray()),
-                TotalCount = playlists.Count()
-            };
         }
 
         public async Task UpdatePlaylistAsync(Guid playlistId, string name, string description, bool isPublic, bool receiveNotifications)

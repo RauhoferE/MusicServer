@@ -64,21 +64,17 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.Songs)]
         public async Task<IActionResult> GetSongsInPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            if (string.IsNullOrEmpty(request.Query))
-            {
-                return Ok(await this.playlistService.GetSongsInPlaylist(playlistId, request.Page, request.Take));
-            }
-            
-            return Ok(await this.playlistService.SearchSongInPlaylist(playlistId, request.Query, request.Page, request.Take));
+            return Ok(await this.playlistService.GetSongsInPlaylist(playlistId, request.Page, request.Take, request.SortAfter, request.Asc, request.Query));
         }
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Playlists)]
         public async Task<IActionResult> GetPlaylists([FromQuery, Required] QueryPaginationSearchRequest request, [FromQuery] long userId = -1)
         {
+            return Ok(await this.playlistService.GetPlaylistsAsync(userId, request.Page, request.Take, request.SortAfter, request.Asc, request.Query));
             if (string.IsNullOrEmpty(request.Query))
             {
-                return Ok(await this.playlistService.GetPlaylistsAsync(userId, request.Page, request.Take));
+                
             }
             
             return Ok(await this.playlistService.SearchUserPlaylist(userId, request.Query, request.Page, request.Take));
@@ -169,12 +165,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.Favorite)]
         public async Task<IActionResult> GetFavorites([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            if (string.IsNullOrEmpty(request.Query))
-            {
-                return Ok(await this.playlistService.GetFavorites(request.Page, request.Take));
-            }
-            
-            return Ok(await this.playlistService.SearchSongInFavorites(request.Query, request.Page, request.Take));
+            return Ok(await this.playlistService.GetFavorites(request.Page, request.Take, request.SortAfter, request.Asc, request.Query));
         }
 
         [HttpGet]

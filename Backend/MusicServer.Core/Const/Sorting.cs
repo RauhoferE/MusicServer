@@ -6,35 +6,18 @@ using System.Threading.Tasks;
 
 namespace MusicServer.Core.Const
 {
-    public static class SortingElementsFavorites
-    {
-        public const string Name = "Name";
-        public const string Duration = "Duration";
-        public const string DateAdded = "DateAdded";
-        public const string Artist = "Artist";
-        private const string Custom = "Custom";
-
-
-        // Return all constants in a list
-        public static List<string> SortingElements = new List<string>()
-        {
-            Name, Duration, DateAdded, Artist, Custom
-        };
-    }
-
     public static class SortingElementsOwnPlaylists
     {
         public const string Name = "Name";
         public const string DateCreated = "DateCreated";
-        public const string Creator = "Creator";
         public const string NumberOfSongs = "NumberOfSongs";
-        private const string Custom = "Custom";
+        public const string Custom = "Custom";
 
 
         // Return all constants in a list
         public static List<string> SortingElements = new List<string>()
         {
-            Name, DateCreated, Creator, NumberOfSongs, Custom
+            Name, DateCreated, NumberOfSongs, Custom
         };
     }
 
@@ -99,7 +82,7 @@ namespace MusicServer.Core.Const
         public const string Name = "Name";
         public const string NumberOfSongs = "NumberOfSongs";
         public const string Artist = "Artist";
-        private const string DateAdded = "DateAdded";
+        public const string DateAdded = "DateAdded";
 
         // Return all constants in a list
         public static List<string> SortingElements = new List<string>()

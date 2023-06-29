@@ -28,25 +28,19 @@ namespace MusicServer.Interfaces
 
         public Task AddPlaylistToLibraryAsync(Guid playlistId);
 
-        public Task<PlaylistPaginationResponse> GetPlaylistsAsync(long userId, int page, int take);
-
-        public Task<PlaylistPaginationResponse> SearchUserPlaylist(long userId, string query, int page, int take);
+        public Task<PlaylistPaginationResponse> GetPlaylistsAsync(long userId, int page, int take, string sortAfter, bool asc, string query);
 
         public Task<PlaylistPaginationResponse> GetPublicPlaylists(int page, int take, string sortAfter, bool asc, string query);
 
         public Task<PlaylistDto> GetPlaylistInfo(Guid playlistId);
 
-        public Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int page, int take);
+        public Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int page, int take, string sortAfter, bool asc, string query);
 
-        public Task<PlaylistSongPaginationResponse> GetFavorites(int page, int take);
+        public Task<PlaylistSongPaginationResponse> GetFavorites(int page, int take, string sortAfter, bool asc, string query);
 
         public Task AddSongsToFavorite(List<Guid> songIds, bool addClones);
 
         public Task RemoveSongsFromFavorite(List<Guid> songIds);
-
-        public Task<PlaylistSongPaginationResponse> SearchSongInPlaylist(Guid playlistId, string query, int page, int take);
-
-        public Task<PlaylistSongPaginationResponse> SearchSongInFavorites(string query, int page, int take);
 
         public Task ChangeOrderOfFavorit(Guid songId, int newSpot);
 
