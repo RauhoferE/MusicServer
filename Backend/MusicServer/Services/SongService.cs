@@ -7,6 +7,7 @@ using MusicServer.Entities.DTOs;
 using MusicServer.Entities.Requests.User;
 using MusicServer.Entities.Responses;
 using MusicServer.Exceptions;
+using MusicServer.Helpers;
 using MusicServer.Interfaces;
 using System.Diagnostics;
 using System.Linq;
@@ -92,7 +93,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<SearchResultDto> Search(string filter, string searchTerm, int page, int take)
+        public async Task<SearchResultDto> Search(string filter, string searchTerm, int page, int take, string sortAfter, bool asc)
         {
             //TODO: Return all possible filters in controller action
             switch (filter)
@@ -100,7 +101,7 @@ namespace MusicServer.Services
                 case SearchFilter.All:
                     return await this.FilterAll(searchTerm, page, take);
                 case SearchFilter.Albums:
-                    return await this.FilterAllAlbums(searchTerm, page, take);
+                    return await this.FilterAllAlbums(searchTerm, page, take, sortAfter, asc);
                 case SearchFilter.Artists:
                     return await this.FilterAllArtists(searchTerm, page, take);
                 case SearchFilter.Songs:
@@ -162,7 +163,7 @@ namespace MusicServer.Services
             };
         }
 
-        private async Task<SearchResultDto> FilterAllAlbums(string searchTerm, int page, int take)
+        private async Task<SearchResultDto> FilterAllAlbums(string searchTerm, int page, int take, string sortAfter, bool asc)
         {
             var albums = this._dbContext.Albums
                 .Include(x => x.Artists)
@@ -170,10 +171,12 @@ namespace MusicServer.Services
                 .Include(x => x.Songs)
                 .Where(x => true);
 
-            if (searchTerm != string.Empty)
-            {
-                albums = albums.Where(x => x.Name.Contains(searchTerm));
-            }
+            //if (searchTerm != string.Empty)
+            //{
+            //    albums = albums.Where(x => x.Name.Contains(searchTerm));
+            //}
+
+            albums = SortingHelpers.SortSearchAlbums(albums, asc, sortAfter, searchTerm);
 
             return new SearchResultDto()
             {

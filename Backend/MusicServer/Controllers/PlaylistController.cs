@@ -72,12 +72,6 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> GetPlaylists([FromQuery, Required] QueryPaginationSearchRequest request, [FromQuery] long userId = -1)
         {
             return Ok(await this.playlistService.GetPlaylistsAsync(userId, request.Page, request.Take, request.SortAfter, request.Asc, request.Query));
-            if (string.IsNullOrEmpty(request.Query))
-            {
-                
-            }
-            
-            return Ok(await this.playlistService.SearchUserPlaylist(userId, request.Query, request.Page, request.Take));
         }
 
         [HttpGet]

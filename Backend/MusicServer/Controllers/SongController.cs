@@ -48,11 +48,11 @@ namespace MusicServer.Controllers
             return Ok(await this.songService.GetSongInformation(songId));
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route(ApiRoutes.Song.Search)]
-        public async Task<IActionResult> Search([FromQuery, Required] QueryPaginationSearchRequest query, [FromBody, Required] Search request)
+        public async Task<IActionResult> Search([FromQuery, Required] Search request)
         {
-            return Ok(await this.songService.Search(request.Filter, request.SearchTerm, query.Page, query.Take));
+            return Ok(await this.songService.Search(request.Filter, request.SearchTerm, request.Page, request.Take, request.SortAfter, request.Asc));
         }
     }
 }

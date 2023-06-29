@@ -163,6 +163,46 @@ namespace MusicServer.Helpers
             }
         }
 
+        public static IQueryable<Album> SortSearchAlbums(IQueryable<Album> albums, bool asc, string sortAfter, string query)
+        {
+            if (query != null)
+            {
+                albums = albums
+                  .Where(x => x.Name.Contains(query));
+            }
+
+            if (asc)
+            {
+                switch (sortAfter)
+                {
+                    case SortingElementsAllAlbums.Name:
+                        return albums.OrderBy(x => x.Name);
+                    case SortingElementsAllAlbums.DateAdded:
+                        return albums.OrderBy(x => x.Created);
+                    case SortingElementsAllAlbums.NumberOfSongs:
+                        return albums.OrderBy(x => x.Songs.Count());
+                    case SortingElementsAllAlbums.Artist:
+                        return albums.OrderBy(x => x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                    default:
+                        return albums.OrderBy(x => x.Name);
+                }
+            }
+
+            switch (sortAfter)
+            {
+                case SortingElementsAllAlbums.Name:
+                    return albums.OrderByDescending(x => x.Name);
+                case SortingElementsAllAlbums.DateAdded:
+                    return albums.OrderByDescending(x => x.Created);
+                case SortingElementsAllAlbums.NumberOfSongs:
+                    return albums.OrderByDescending(x => x.Songs.Count());
+                case SortingElementsAllAlbums.Artist:
+                    return albums.OrderByDescending(x => x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                default:
+                    return albums.OrderByDescending(x => x.Name);
+            }
+        }
+
 
     }
 }

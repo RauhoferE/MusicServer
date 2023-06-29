@@ -1,6 +1,8 @@
-﻿namespace MusicServer.Entities.Requests.Song
+﻿using MusicServer.Entities.Requests.Multi;
+
+namespace MusicServer.Entities.Requests.Song
 {
-    public class Search
+    public class Search : QueryPaginationSearchRequest
     {
         public string Filter { get; set; }
 
