@@ -17,5 +17,7 @@
         public DateTime Modified { get; set; }
 
         public int Order { get; set; }
+
+        public bool IsInFavorites { get; set; } = false;
     }
 }

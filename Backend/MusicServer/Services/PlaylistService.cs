@@ -302,6 +302,11 @@ namespace MusicServer.Services
 
             var songs = this.mapper.Map<PlaylistSongDto[]>(songentities.Skip((page - 1) * take).Take(take).ToArray());
 
+            foreach (var song in songs)
+            {
+                song.IsInFavorites = true;
+            }
+
             return new PlaylistSongPaginationResponse()
             {
                 Songs = songs,
@@ -309,7 +314,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<PlaylistDto> GetPlaylistInfo(Guid playlistId)
+        public async Task<PlaylistUserShortDto> GetPlaylistInfo(Guid playlistId)
         {
             var playlist = this.dBContext.Playlists
                 .Include(x => x.Users)
@@ -320,12 +325,24 @@ namespace MusicServer.Services
 
             var user = playlist.Users.FirstOrDefault(x => x.User.Id == this.activeUserService.Id);
 
+
+
             if (user == null && !playlist.IsPublic)
             {
                 throw new NotAllowedException();
             }
 
-            return this.mapper.Map<PlaylistDto>(playlist);
+            var mappedPlaylist = this.mapper.Map<PlaylistUserShortDto>(playlist);
+
+            if (user != null)
+            {
+                mappedPlaylist.IsCreator = user.IsCreator;
+                mappedPlaylist.IsModifieable = user.IsModifieable;
+                mappedPlaylist.ReceiveNotifications = user.ReceiveNotifications;
+                mappedPlaylist.LastListened = user.LastListened;
+            }
+
+            return mappedPlaylist;
         }
 
         public async Task<PlaylistPaginationResponse> GetPlaylistsAsync(long userId, int page, int take, string sortAfter, bool asc, string query)
@@ -361,9 +378,10 @@ namespace MusicServer.Services
                     .ThenInclude(x => x.Playlist)
                     .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-                playlists = playlists.Where(x => x.Playlist.IsPublic);
+                playlists = playlists.Where(x => x.Playlist.IsPublic ||
+                x.Playlist.Users.FirstOrDefault(y => y.User.Id == this.activeUserService.Id) != null);
 
-                playlists = SortingHelpers.SortSearchUserPlaylists(user.Playlists.AsQueryable(), asc, sortAfter, query);
+                playlists = SortingHelpers.SortSearchUserPlaylists(playlists.AsQueryable(), asc, sortAfter, query);
 
                 // Add sorting here
 
@@ -381,6 +399,7 @@ namespace MusicServer.Services
                     var mappedPlaylist2 = this.mapper.Map<PlaylistUserShortDto>(playlist);
                     mappedPlaylist2.IsModifieable = false;
                     mappedPlaylist2.ReceiveNotifications = false;
+                    mappedPlaylist2.IsCreator = false;
                     userPlaylists.Add(mappedPlaylist2);
                 }
 
@@ -395,8 +414,7 @@ namespace MusicServer.Services
 
             return new PlaylistPaginationResponse()
             {
-                Playlists = this.mapper.Map<PlaylistUser[], PlaylistUserShortDto[]>(playlists
-                               .Skip((page - 1) * take)
+                Playlists = this.mapper.Map<PlaylistUserShortDto[]>(playlists.Skip((page - 1) * take)
                                               .Take(take).ToArray()),
                 TotalCount = playlists.Count()
             };  
@@ -436,6 +454,7 @@ namespace MusicServer.Services
                 mappedPlaylist2.IsModifieable = false;
                 mappedPlaylist2.ReceiveNotifications = false;
                 mappedPlaylist2.IsPublic = true;
+                mappedPlaylist2.IsCreator = false;
                 userPlaylists.Add(mappedPlaylist2);
             }
 
@@ -474,9 +493,24 @@ namespace MusicServer.Services
 
             songs = SortingHelpers.SortSearchSongsInPlaylist(songs, asc, sortAfter, query);
 
+            var mappedSongs = this.mapper.Map<PlaylistSong[], PlaylistSongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray());
+
+            foreach (var song in mappedSongs)
+            {
+                var followedSong = this.dBContext.FavoriteSongs.Include(x => x.User).Include(x => x.FavoriteSong)
+                    .FirstOrDefault(x => x.User.Id == this.activeUserService.Id && x.FavoriteSong.Id == song.Id);
+
+                if (followedSong == null)
+                {
+                    continue;
+                }
+
+                song.IsInFavorites = true;
+            }
+
             return new PlaylistSongPaginationResponse()
             {
-                Songs = this.mapper.Map<PlaylistSong[], PlaylistSongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray()),
+                Songs = mappedSongs,
                 TotalCount = songs.Count()
             };
         }
@@ -733,7 +767,6 @@ namespace MusicServer.Services
             var oldSongOrder = songToMove.Order;
             songToMove.Order = newSpot;
 
-            // TODO:  This config should work overwrite other methods
             var songsToTraverse = playlist.Playlist.Songs.Where(x => x.Order <= newSpot && x.Song.Id != songId && x.Order > oldSongOrder);
 
             if (oldSongOrder > newSpot)

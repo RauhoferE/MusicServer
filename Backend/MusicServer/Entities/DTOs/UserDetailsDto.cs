@@ -1,7 +1,7 @@
 ﻿namespace MusicServer.Entities.DTOs
 {
     public class UserDetailsDto
-    {
+    {// This probably needs changing 30.06.2023
         public long Id {get; set; }
 
         public string UserName { get; set; }
@@ -27,11 +27,11 @@
 
         public DateTime? LockoutEnd { get; set; }
 
-        public LongNameDto[] FollowedUsers { get; set; }
+        public UserDto[] FollowedUsers { get; set; }
 
         public GuidNameDto[] FollowedArtists { get; set; }
 
-        public PlaylistUserDto[] Playlists { get; set; }
+        public PlaylistUserShortDto[] Playlists { get; set; }
 
         public LongNameDto[] Roles { get; set; }
     }

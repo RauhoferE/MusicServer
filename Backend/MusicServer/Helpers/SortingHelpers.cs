@@ -219,6 +219,23 @@ namespace MusicServer.Helpers
             return artists.OrderByDescending(x => x.Name);
         }
 
+        public static IQueryable<UserArtist> SortSearchFollowedArtists(IQueryable<UserArtist> artists, bool asc, string query)
+        {
+            if (query != null)
+            {
+                query = query.ToLower();
+                artists = artists
+                  .Where(x => x.Artist.Name.ToLower().Contains(query));
+            }
+
+            if (asc)
+            {
+                return artists.OrderBy(x => x.Artist.Name);
+            }
+
+            return artists.OrderByDescending(x => x.Artist.Name);
+        }
+
         public static IQueryable<User> SortSearchUsers(IQueryable<User> users, bool asc, string query)
         {
             if (query != null)
@@ -233,6 +250,63 @@ namespace MusicServer.Helpers
             }
 
             return users.OrderByDescending(x => x.UserName);
+        }
+
+        public static IQueryable<UserUser> SortSearchFollowedUsers(IQueryable<UserUser> users, bool asc, string query)
+        {
+            if (query != null)
+            {
+                query = query.ToLower();
+                users = users
+                  .Where(x => x.FollowedUser.UserName.ToLower().Contains(query) || x.FollowedUser.Email.Contains(query));
+            }
+
+            if (asc)
+            {
+                return users.OrderBy(x => x.FollowedUser.UserName);
+            }
+
+            return users.OrderByDescending(x => x.FollowedUser.UserName);
+        }
+
+        public static IQueryable<Song> SortSearchAllSongs(IQueryable<Song> songs, bool asc, string query, string sortAfter)
+        {
+            if (query != null)
+            {
+                songs = songs
+                  .Where(x => x.Name.Contains(query));
+            }
+
+            if (asc)
+            {
+                switch (sortAfter)
+                {
+                    case SortingElementsAllSongs.Name:
+                        return songs.OrderBy(x => x.Name);
+                    case SortingElementsAllSongs.DateAdded:
+                        return songs.OrderBy(x => x.Created);
+                    case SortingElementsAllSongs.Duration:
+                        return songs.OrderBy(x => x.Length);
+                    case SortingElementsAllSongs.Artist:
+                        return songs.OrderBy(x => x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                    default:
+                        return songs.OrderBy(x => x.Name);
+                }
+            }
+
+            switch (sortAfter)
+            {
+                case SortingElementsAllSongs.Name:
+                    return songs.OrderByDescending(x => x.Name);
+                case SortingElementsAllSongs.DateAdded:
+                    return songs.OrderByDescending(x => x.Created);
+                case SortingElementsAllSongs.Duration:
+                    return songs.OrderByDescending(x => x.Length);
+                case SortingElementsAllSongs.Artist:
+                    return songs.OrderByDescending(x => x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                default:
+                    return songs.OrderByDescending(x => x.Name);
+            }
         }
 
 

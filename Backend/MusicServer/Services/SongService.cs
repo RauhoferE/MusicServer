@@ -61,8 +61,35 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Song)
                 .FirstOrDefault(x => x.Id == artistId) ?? throw new ArtistNotFoundException();
 
-            return this._mapper.Map<ArtistDto>(artist);
-            
+            var mappedArtists = this._mapper.Map<ArtistDto>(artist);
+
+            var followedArtist = this._dbContext.FollowedArtists
+                .Include(x => x.Artist)
+                .Include(x => x.User)
+                .FirstOrDefault(x => x.Artist.Id == artistId && x.User.Id == this._activeUserService.Id);
+
+            if (followedArtist != null)
+            {
+                mappedArtists.FollowedByUser = true;
+                mappedArtists.ReceiveNotifications = followedArtist.ReceiveNotifications;
+            }
+
+            foreach (var song in mappedArtists.Songs)
+            {
+                var favoriteSong = this._dbContext.FavoriteSongs
+                    .Include(x => x.FavoriteSong)
+                    .Include(x => x.User)
+                    .FirstOrDefault(x => x.FavoriteSong.Id == song.Id && x.User.Id == this._activeUserService.Id);  
+                
+                if (favoriteSong == null)
+                {
+                    continue;
+                }
+
+                song.IsInFavorites = true;
+            }
+
+            return mappedArtists;
         }
 
         public async Task<SongDto> GetSongInformation(Guid songId)
@@ -73,7 +100,19 @@ namespace MusicServer.Services
                 .Include(x => x.Album)
                 .FirstOrDefault(x => x.Id == songId) ?? throw new SongNotFoundException();
 
-            return this._mapper.Map<SongDto>(song);
+            var mappedSong = this._mapper.Map<SongDto>(song);
+
+            var favoriteSong = this._dbContext.FavoriteSongs
+                .Include(x => x.FavoriteSong)
+                .Include(x => x.User)
+                .FirstOrDefault(x => x.FavoriteSong.Id == songId && x.User.Id == this._activeUserService.Id);
+
+            if (favoriteSong != null)
+            {
+                mappedSong.IsInFavorites = true;
+            }
+
+            return mappedSong;
         }
 
         public async Task<SongPaginationResponse> GetSongsInAlbum(Guid albumId, int page, int take)
@@ -86,17 +125,32 @@ namespace MusicServer.Services
                 .Include(x => x.Album)
                 .Where(x => x.Album.Id == albumId);
 
+            var mappedSongs = this._mapper.Map<SongDto[]>(songs.Skip((page - 1) * take).Take(take));
+
+            foreach (var song in mappedSongs)
+            {
+                var favoriteSong = this._dbContext.FavoriteSongs
+                .Include(x => x.FavoriteSong)
+                .Include(x => x.User)
+                .FirstOrDefault(x => x.FavoriteSong.Id == song.Id && x.User.Id == this._activeUserService.Id);
+
+                if (favoriteSong == null)
+                {
+                    continue;
+                }
+
+                song.IsInFavorites = true;
+            }
+
             return new SongPaginationResponse()
             {
-                Songs = this._mapper.Map<SongDto[]>(songs.Skip((page - 1) * take).Take(take)),
+                Songs = mappedSongs,
                 TotalCount = songs.Count()
             };
         }
 
         public async Task<SearchResultDto> Search(string filter, string searchTerm, int page, int take, string sortAfter, bool asc)
         {
-            //TODO: Return all possible filters in controller action
-            // TODO: Return DTO that shows if user follows artist, user, playlist, songs 
             switch (filter)
             {
                 case SearchFilter.All:
@@ -106,9 +160,9 @@ namespace MusicServer.Services
                 case SearchFilter.Artists:
                     return await this.FilterAllArtists(searchTerm, page, take, asc);
                 case SearchFilter.Songs:
-                    return await this.FilterAllSongs(searchTerm, page, take);
+                    return await this.FilterAllSongs(searchTerm, page, take, asc, sortAfter);
                 case SearchFilter.Playlists:
-                    return await this.FilterAllPlaylists(searchTerm, page, take);
+                    return await this.FilterAllPlaylists(searchTerm, page, take, asc, sortAfter);
                 case SearchFilter.Users:
                     return await this.FilterAllUsers(searchTerm, page, take, asc);
                 default:
@@ -118,49 +172,13 @@ namespace MusicServer.Services
 
         private async Task<SearchResultDto> FilterAll(string searchTerm, int page, int take)
         {
-            var songs = this._dbContext.Songs
-                .Include(x => x.Artists)
-                .ThenInclude(x => x.Artist)
-                .Include(x => x.Album)
-                .Where(x => true);
-
-            var albums = this._dbContext.Albums
-                .Include(x => x.Artists)
-                .ThenInclude(x => x.Artist)
-                .Include(x => x.Songs)
-                .Where(x => true);
-
-            var artists = this._dbContext.Artists.Where(x => true);
-
-            var playlistUsers = this._dbContext.PlaylistUsers
-                .Include(x => x.User)
-                .Include(x => x.Playlist)
-                .ThenInclude(x => x.Songs).Where(x => true);
-
-            var users = this._dbContext.Users.Where(x => true);
-
-            if (searchTerm != string.Empty)
-            {
-                songs = songs.Where(x => x.Name.Contains(searchTerm));
-                albums = albums.Where(x => x.Name.Contains(searchTerm));
-                artists = artists.Where(x => x.Name.Contains(searchTerm));
-                playlistUsers = playlistUsers.Where(x => x.Playlist.Name.Contains(searchTerm) && (x.Playlist.IsPublic || x.User.Id == this._activeUserService.Id));
-                users = users.Where(x => x.UserName.Contains(searchTerm));
-            }
-
-            var playlists = this._dbContext.Playlists
-    .Include(x => x.Songs)
-    .Include(x => x.Users)
-    .ThenInclude(x => x.User)
-    .Where(x => playlistUsers.Select(x => x.Playlist.Id).Contains(x.Id));
-
             return new SearchResultDto()
             {
-                Songs = this._mapper.Map<SongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray()),
-                Albums = this._mapper.Map<AlbumDto[]>(albums.Skip((page - 1) * take).Take(take).ToArray()),
-                Artists = this._mapper.Map<GuidNameDto[]>(artists.Skip((page - 1) * take).Take(take).ToArray()),
-                Playlists = this._mapper.Map<PlaylistShortDto[]>(playlists.Skip((page - 1) * take).Take(take).ToArray()),
-                Users = this._mapper.Map<UserDto[]>(users.Skip((page - 1) * take).Take(take).ToArray())
+                Songs = (await this.FilterAllSongs(searchTerm, page, take, true, "")).Songs,
+                Albums = (await this.FilterAllAlbums(searchTerm, page, take, "", true)).Albums,
+                Artists = (await this.FilterAllArtists(searchTerm, page, take, true)).Artists,
+                Playlists = (await this.FilterAllPlaylists(searchTerm, page, take, true, "")).Playlists,
+                Users = (await this.FilterAllUsers(searchTerm, page, take, true)).Users
             };
         }
 
@@ -187,13 +205,29 @@ namespace MusicServer.Services
 
             artists = SortingHelpers.SortSearchArtists(artists, asc, searchTerm);
 
+            var mappedArtists = this._mapper.Map<GuidNameDto[]>(artists.Skip((page - 1) * take).Take(take).ToArray());
+
+            foreach (var item in mappedArtists)
+            {
+                var followedArtist = this._dbContext.FollowedArtists
+                    .FirstOrDefault(x => x.Artist.Id == item.Id && x.User.Id == this._activeUserService.Id);
+
+                if (followedArtist == null)
+                {
+                    continue;
+                }
+
+                item.ReceiveNotifications = followedArtist.ReceiveNotifications;
+                item.FollowedByUser = true;
+            }
+
             return new SearchResultDto()
             {
-                Artists = this._mapper.Map<GuidNameDto[]>(artists.Skip((page - 1) * take).Take(take).ToArray())
+                Artists = mappedArtists
             };
         }
 
-        private async Task<SearchResultDto> FilterAllSongs(string searchTerm, int page, int take)
+        private async Task<SearchResultDto> FilterAllSongs(string searchTerm, int page, int take, bool asc, string sortAfter)
         {
             var songs = this._dbContext.Songs
                                 .Include(x => x.Artists)
@@ -201,42 +235,65 @@ namespace MusicServer.Services
                 .Include(x => x.Album)
                 .Where(x => true);
 
-            if (searchTerm != string.Empty)
+            songs = SortingHelpers.SortSearchAllSongs(songs, asc, searchTerm, sortAfter);
+            var mappedSongs = this._mapper.Map<SongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray());
+
+            foreach (var song in mappedSongs)
             {
-                songs = songs.Where(x => x.Name.Contains(searchTerm));
+                var favorite = this._dbContext.FavoriteSongs
+                    .Include(x => x.User)
+                    .Include(x => x.FavoriteSong)
+                    .FirstOrDefault(x => x.FavoriteSong.Id == song.Id && x.User.Id == this._activeUserService.Id);
+
+                if (favorite == null)
+                {
+                    continue;
+                }
+
+                song.IsInFavorites = true;
             }
 
             
             return new SearchResultDto()
             {
-                Songs = this._mapper.Map<SongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray())
+                Songs = mappedSongs
             };
         }
 
-        private async Task<SearchResultDto> FilterAllPlaylists(string searchTerm, int page, int take)
+        private async Task<SearchResultDto> FilterAllPlaylists(string searchTerm, int page, int take, bool asc, string sortAfter)
         {
-            var playlistUsers = this._dbContext.PlaylistUsers
-                                .Include(x => x.User)
-                .Include(x => x.Playlist)
-                .ThenInclude(x => x.Songs)
-                .Where(x => true);
-
-            if (searchTerm != string.Empty)
-            {
-                playlistUsers = playlistUsers.Where(x => x.Playlist.Name.Contains(searchTerm));
-            }
-
-            playlistUsers = playlistUsers.Where(x => x.Playlist.IsPublic || x.User.Id == this._activeUserService.Id);
-
             var playlists = this._dbContext.Playlists
-                .Include(x => x.Songs)
                 .Include(x => x.Users)
                 .ThenInclude(x => x.User)
-                .Where(x => playlistUsers.Select(x => x.Playlist.Id).Contains(x.Id));
-            
+                .Include(x => x.Songs)
+                .Where(x => x.IsPublic || x.Users.FirstOrDefault(y => y.User.Id == this._activeUserService.Id) != null);
+
+            playlists = SortingHelpers.SortSearchPublicPlaylists(playlists, asc, sortAfter, searchTerm);
+
+            var mappedPlaylists = this._mapper.Map<PlaylistUserShortDto[]>(playlists.Skip((page - 1) * take).Take(take).ToArray());
+
+            foreach (var mappedPlaylist in mappedPlaylists)
+            {
+                var userPlaylist = this._dbContext.PlaylistUsers.Include(x => x.Playlist).Include(x => x.User)
+                    .FirstOrDefault(x => x.User.Id == this._activeUserService.Id && x.Playlist.Id == mappedPlaylist.Id);
+
+                if (userPlaylist == null)
+                {
+                    mappedPlaylist.IsPublic = true;
+                    continue;
+                }
+
+                mappedPlaylist.IsPublic = userPlaylist.Playlist.IsPublic;
+                mappedPlaylist.ReceiveNotifications = userPlaylist.ReceiveNotifications;
+                mappedPlaylist.IsModifieable = userPlaylist.IsModifieable;
+                mappedPlaylist.IsCreator = userPlaylist.IsCreator;
+                mappedPlaylist.LastListened = userPlaylist.LastListened;
+            }
+
+
             return new SearchResultDto()
             {
-                Playlists = this._mapper.Map<PlaylistShortDto[]>(playlists.Skip((page - 1) * take).Take(take).ToArray())
+                Playlists = mappedPlaylists
             };
         }
 
@@ -245,10 +302,27 @@ namespace MusicServer.Services
             var users = this._dbContext.Users.Where(x => x.Id != this._activeUserService.Id);
 
             users = SortingHelpers.SortSearchUsers(users, asc, searchTerm);
-            
+
+            var mappedUsers = this._mapper.Map<UserDto[]>(users.Skip((page - 1) * take).Take(take).ToArray());
+
+            foreach (var user in mappedUsers)
+            {
+                var followedUser = this._dbContext.FollowedUsers.Include(x => x.User).Include(x => x.FollowedUser)
+                    .FirstOrDefault(x => x.User.Id == this._activeUserService.Id && x.FollowedUser.Id == user.Id);
+
+                if (followedUser == null)
+                {
+                    continue;
+                }
+
+                user.IsFollowedByUser = true;
+                user.ReceiveNotifications = followedUser.ReceiveNotifications;
+            }
+
+
             return new SearchResultDto()
             {
-                Users = this._mapper.Map<UserDto[]>(users.Skip((page - 1) * take).Take(take).ToArray())
+                Users = mappedUsers
             };
         }
     }

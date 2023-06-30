@@ -18,6 +18,8 @@ namespace DataAccess.Entities
 
         public bool ReceiveNotifications { get; set; } = true;
 
+        public DateTime? LastListened { get; set; }
+
         public int Order { get; set; }
     }
 }

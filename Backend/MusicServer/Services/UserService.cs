@@ -8,6 +8,7 @@ using MusicServer.Entities.DTOs;
 using MusicServer.Entities.Requests.User;
 using MusicServer.Entities.Responses;
 using MusicServer.Exceptions;
+using MusicServer.Helpers;
 using MusicServer.Interfaces;
 using Serilog;
 using System.Security.Claims;
@@ -29,31 +30,44 @@ namespace MusicServer.Services
             this.mapper = mapper;
         }
 
-        public async Task<GuidNamePaginationResponse> GetFollowedArtists(int page, int take)
+        public async Task<GuidNamePaginationResponse> GetFollowedArtists(int page, int take, string query, bool asc)
         {
             var targetUser = this.dBContext.Users
                 .Include(x => x.FollowedArtists)
                 .ThenInclude(x => x.Artist)
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
+            var followedArtists = SortingHelpers.SortSearchFollowedArtists(targetUser.FollowedArtists.AsQueryable(), asc, query);
+
+            var mappedArtists = this.mapper.Map<GuidNameDto[]>(targetUser.FollowedArtists.Skip((page - 1) * take).Take(take).ToArray());
+
+            foreach (var artist in mappedArtists)
+            {
+                artist.FollowedByUser = true;
+            }
+
             return new GuidNamePaginationResponse
             {
-                Items = this.mapper.Map<GuidNameDto[]>(targetUser.FollowedArtists.Skip((page - 1) * take).Take(take).ToArray()),
-                TotalCount = targetUser.FollowedArtists.Count
+                Items = mappedArtists,
+                TotalCount = followedArtists.Count()
             };
         }
 
-        public async Task<LongNamePaginationResponse> GetFollowedUsers(int page, int take)
+        public async Task<UserDtoPaginationResponse> GetFollowedUsers(int page, int take, string query, bool asc)
         {
             var targetUser = this.dBContext.Users
                 .Include(x => x.FollowedUsers)
                 .ThenInclude(x => x.FollowedUser)
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            return new LongNamePaginationResponse
+            var followedUsers = SortingHelpers.SortSearchFollowedUsers(targetUser.FollowedUsers.AsQueryable(), asc, query);
+
+            var mappedUsers = this.mapper.Map<UserDto[]>(targetUser.FollowedUsers.Skip((page - 1) * take).Take(take).ToArray());
+
+            return new UserDtoPaginationResponse
             {
-                Items = this.mapper.Map<LongNameDto[]>(targetUser.FollowedUsers.Skip((page - 1) * take).Take(take).ToArray()),
-                TotalCount = targetUser.FollowedUsers.Count
+                Users = mappedUsers,
+                TotalCount = followedUsers.Count()
             };
         }
 
@@ -72,14 +86,11 @@ namespace MusicServer.Services
             return this.mapper.Map<UserDetailsDto>(user);
         }
 
-        public async Task<FullUserPaginationResponse> GetUsersAsync(int page, int take, string searchTerm)
+        public async Task<FullUserPaginationResponse> GetUsersAsync(int page, int take, string searchTerm, bool asc)
         {
             var users = this.dBContext.Users.Where(x => true);
 
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                users = this.dBContext.Users.Where(x => x.Email.Contains(searchTerm) || x.UserName.Contains(searchTerm));
-            }
+            users = SortingHelpers.SortSearchUsers(users, asc, searchTerm);
 
             return new FullUserPaginationResponse
             {

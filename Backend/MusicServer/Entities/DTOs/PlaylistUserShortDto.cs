@@ -17,7 +17,11 @@
         public int Order { get; set; }
 
         public bool IsPublic { get; set; }
+
+        public bool IsCreator { get; set; }
         
         public DateTime Created { get; set; }
+
+        public DateTime? LastListened { get; set; } = null;
     }
 }

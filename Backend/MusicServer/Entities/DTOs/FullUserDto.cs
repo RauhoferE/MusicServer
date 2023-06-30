@@ -2,6 +2,7 @@
 {
     public class FullUserDto
     {
+        // This probably needs changing 30.06.2023
         public long Id { get; set; }
 
         public string UserName { get; set; }

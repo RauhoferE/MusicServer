@@ -2,7 +2,7 @@
 {
     public class SearchResultDto
     {
-        public PlaylistShortDto[] Playlists { get; set; } = new PlaylistShortDto[0];
+        public PlaylistUserShortDto[] Playlists { get; set; } = new PlaylistUserShortDto[0];
 
         public GuidNameDto[] Artists { get; set; } = new GuidNameDto[0];
 

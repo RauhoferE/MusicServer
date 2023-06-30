@@ -67,21 +67,21 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.User.GetFollowedArtists)]
         public async Task<IActionResult> GetSubscribedArtists([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            return Ok(await this.userService.GetFollowedArtists(request.Page, request.Take));
+            return Ok(await this.userService.GetFollowedArtists(request.Page, request.Take, request.Query, request.Asc));
         }
 
         [HttpGet]
         [Route(ApiRoutes.User.GetFollowedUsers)]
         public async Task<IActionResult> GetSubscribedUsers([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            return Ok(await this.userService.GetFollowedUsers(request.Page, request.Take));
+            return Ok(await this.userService.GetFollowedUsers(request.Page, request.Take, request.Query, request.Asc));
         }
 
         [HttpGet]
         [Route(ApiRoutes.User.GetUsers)]
         public async Task<IActionResult> GetUserList([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            return Ok(await this.userService.GetUsersAsync(request.Page, request.Take, request.Query));
+            return Ok(await this.userService.GetUsersAsync(request.Page, request.Take, request.Query, request.Asc));
         }
 
         [HttpGet]

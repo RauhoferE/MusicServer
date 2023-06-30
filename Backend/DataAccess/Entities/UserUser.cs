@@ -8,11 +8,12 @@ namespace DataAccess.Entities
 {
     public class UserUser : BaseEntity
     {
-        //TODO: Add boolean receive notifications
         public long Id { get; set; }
 
         public User User { get; set; }
 
         public User FollowedUser { get; set; }
+
+        public bool ReceiveNotifications { get; set; } = false;
     }
 }

@@ -16,11 +16,11 @@ namespace MusicServer.Interfaces
 
         public Task UnsubscribeFromArtist(Guid artistId);
 
-        public Task<GuidNamePaginationResponse> GetFollowedArtists(int page, int take);
+        public Task<GuidNamePaginationResponse> GetFollowedArtists(int page, int take, string query, bool asc);
 
-        public Task<LongNamePaginationResponse> GetFollowedUsers(int page, int take);
+        public Task<UserDtoPaginationResponse> GetFollowedUsers(int page, int take, string query, bool asc);
 
-        public Task<FullUserPaginationResponse> GetUsersAsync(int page, int take, string searchTerm);   
+        public Task<FullUserPaginationResponse> GetUsersAsync(int page, int take, string searchTerm, bool asc);   
 
         public Task<UserDetailsDto> GetUserAsync(long userId);
 

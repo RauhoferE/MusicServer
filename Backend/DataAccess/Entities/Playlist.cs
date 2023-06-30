@@ -10,8 +10,6 @@ namespace DataAccess.Entities
     {
         public Guid Id { get; set; }
 
-        public DateTime? LastListened { get; set; }
-
         public bool IsPublic { get; set; } = false;
 
         public string? Description { get; set; }

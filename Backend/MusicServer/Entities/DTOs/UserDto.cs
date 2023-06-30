@@ -6,6 +6,8 @@
 
         public string UserName { get; set; }
 
-        //TODO: Add Boolean isFriend
+        public bool IsFollowedByUser { get; set; } = false; 
+
+        public bool ReceiveNotifications { get; set; } = false;
     }
 }
