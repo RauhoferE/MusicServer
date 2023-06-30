@@ -14,7 +14,7 @@ namespace MusicServer.Interfaces
 
         public Task AddSongsToPlaylistAsync(Guid playlistId, List<Guid> songIds);
 
-        public Task RemoveSongsFromPlaylistAsync(Guid playlistId, List<Guid> songIds);
+        public Task RemoveSongsFromPlaylistAsync(Guid playlistId, List<int> orderIds);
 
         public Task AddAlbumSongsToPlaylistAsync(Guid albumId, Guid playlistId);
 
@@ -40,7 +40,7 @@ namespace MusicServer.Interfaces
 
         public Task AddSongsToFavorite(List<Guid> songIds, bool addClones);
 
-        public Task RemoveSongsFromFavorite(List<Guid> songIds);
+        public Task RemoveSongsFromFavorite(List<int> orderIds);
 
         public Task ChangeOrderOfFavorit(Guid songId, int newSpot);
 

@@ -92,9 +92,9 @@ namespace MusicServer.Controllers
 
         [HttpDelete]
         [Route(ApiRoutes.Playlist.Songs)]
-        public async Task<IActionResult> RemoveSongsFromPlaylist([FromRoute, Required] Guid playlistId, [FromBody, Required] SongsToPlaylist request)
+        public async Task<IActionResult> RemoveSongsFromPlaylist([FromRoute, Required] Guid playlistId, [FromBody, Required] SongsToRemove request)
         {
-            await this.playlistService.RemoveSongsFromPlaylistAsync(playlistId, request.SongIds.ToList());
+            await this.playlistService.RemoveSongsFromPlaylistAsync(playlistId, request.OrderIds.ToList());
             return NoContent();
         }
 
@@ -149,9 +149,9 @@ namespace MusicServer.Controllers
 
         [HttpDelete]
         [Route(ApiRoutes.Playlist.Favorite)]
-        public async Task<IActionResult> RemoveSongsFromFavorites([FromBody, Required] SongsToPlaylist songs)
+        public async Task<IActionResult> RemoveSongsFromFavorites([FromBody, Required] SongsToRemove songs)
         {
-            await this.playlistService.RemoveSongsFromFavorite(songs.SongIds.ToList());
+            await this.playlistService.RemoveSongsFromFavorite(songs.OrderIds.ToList());
             return NoContent();
         }
 

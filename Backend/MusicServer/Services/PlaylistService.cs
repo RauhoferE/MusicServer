@@ -515,16 +515,15 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task RemoveSongsFromFavorite(List<Guid> songIds)
+        public async Task RemoveSongsFromFavorite(List<int> orderIds)
         {
-            //TODO: Remove songs from favorite not with the songid but with the order id, because of duplicates
             var user = this.dBContext.Users.Include(x => x.Favorites)
     .ThenInclude(x => x.FavoriteSong).FirstOrDefault(x => x.Id == this.activeUserService.Id)
     ?? throw new UserNotFoundException();
 
-            foreach (var songId in songIds)
+            foreach (var songId in orderIds)
             {
-                var favoriteSong = user.Favorites.FirstOrDefault(x => x.FavoriteSong.Id == songId) ?? throw new SongNotFoundException();
+                var favoriteSong = user.Favorites.FirstOrDefault(x => x.Order == songId) ?? throw new SongNotFoundException();
 
                 user.Favorites.Remove(favoriteSong);
             }
@@ -550,7 +549,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task RemoveSongsFromPlaylistAsync(Guid playlistId, List<Guid> songIds)
+        public async Task RemoveSongsFromPlaylistAsync(Guid playlistId, List<int> orderIds)
         {
             var user = this.dBContext.Users
 .Include(x => x.Playlists)
@@ -566,9 +565,9 @@ namespace MusicServer.Services
                 throw new NotAllowedException();
             }
 
-            foreach (var songId in songIds)
+            foreach (var songId in orderIds)
             {
-                var song = playlist.Playlist.Songs.FirstOrDefault(x => x.Song.Id == songId) ?? throw new SongNotFoundException();
+                var song = playlist.Playlist.Songs.FirstOrDefault(x => x.Order == songId) ?? throw new SongNotFoundException();
 
                 playlist.Playlist.Songs.Remove(song);
             }
