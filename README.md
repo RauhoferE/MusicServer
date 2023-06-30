@@ -30,9 +30,13 @@
     "CookieExpirationTimeInMinutes":  60
 
   },
-  "MailSettings": {
-
-  },
+    "MailSettings": {
+        "Host": "",
+        "Email": "",
+        "Password": "",
+        "Port": "",
+        "Sender": "Musicserver"
+    },
   "FileserverSettings": {
         "SongFolder": "/songs",
         "ProfileCoverFolder": "/profiles",

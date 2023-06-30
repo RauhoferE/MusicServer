@@ -24,11 +24,13 @@ namespace MusicServer.Extensions
         {
             // Add Settings
             builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+            builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
             // Add Services
             builder.Services.AddTransient<IDevService, DevService>();
             builder.Services.AddTransient<IActiveUserService, ActiveUserService>();
             builder.Services.AddTransient<IAuthService, AuthenticationService>();
+            builder.Services.AddTransient<IMusicMailService, MusicMailService>();
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IPlaylistService, PlaylistService>();
             builder.Services.AddTransient<ISongService, SongService>();

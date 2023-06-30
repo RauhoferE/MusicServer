@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MailKit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicServer.Const;
 using MusicServer.Core.Const;
@@ -13,16 +14,19 @@ namespace MusicServer.Controllers
     public class DevelopmentController : Controller
     {
         private readonly IDevService devService;
+        private readonly IMusicMailService mailService;
 
-        public DevelopmentController(IDevService devService)
+        public DevelopmentController(IDevService devService, IMusicMailService mailService)
         {
             this.devService = devService;
+            this.mailService = mailService; 
         }
 
         [HttpGet]
         [Route(ApiRoutes.Development.Test)]
         public async  Task<IActionResult> Test()
         {
+            await this.mailService.SendEmail(null, "Test", "Test");
             return Ok();
         }
 
