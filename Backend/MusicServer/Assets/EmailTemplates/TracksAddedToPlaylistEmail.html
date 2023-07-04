@@ -6,20 +6,22 @@
 </head>
 <body>
     <div class="main-container">
-        <h2>Welcome to Project Siren!</h2>
+        <h2>Playlist updated!</h2>
         <p>
-            Hello {username}, thank you for registering on Project Siren. We are happy to have you on board.
+            {user} added new tracks to the playlist {playlistname}.
         </p>
         <p style="margin-bottom: 3em;">
-            To activate your account, please click on the button or use the link below.
+            Some of the new tracks that were added:
+            <br />
+            {tracksAdded}
         </p>
         <p style="margin-bottom: 1em; margin-top: 1em;">
             <a href="" class="activate-button">
-                Activate account
+                {playlistname}
             </a>
         </p>
         <a href="" style="font-size: 13px;">
-            {activationlink}
+            {playlistlink}
         </a>
     </div>
     <p class="bottom-text">

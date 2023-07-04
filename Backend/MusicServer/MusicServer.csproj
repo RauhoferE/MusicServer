@@ -45,6 +45,27 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Assets\EmailTemplates\UserPlaylistRemoveUserEmail.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\EmailTemplates\UserPlaylistAddUserEmail.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\EmailTemplates\PlaylistAddedFromUserEmail.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\EmailTemplates\TracksAddedToPlaylistEmail.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\EmailTemplates\TracksAddedFromArtistEmail.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\EmailTemplates\EmailResetEmail.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\EmailTemplates\PasswordResetEmail.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\EmailTemplates\WelcomeConfirmEmail.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
