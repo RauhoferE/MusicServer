@@ -3,6 +3,33 @@
 <head>
     <meta charset="utf-8" />
     <title></title>
+    <style>
+        .activate-button {
+            background-color: cornflowerblue;
+            color: white;
+            padding: 10px;
+            border: 1px solid black;
+            border-radius: 2px;
+            margin-bottom: 1em;
+            margin-top: 1em;
+            text-decoration: none;
+        }
+
+        .main-container {
+            border: 1px solid lightgray;
+            border-radius: 2px;
+            text-align: center;
+            margin-left: 10vw;
+            padding: 10vh;
+        }
+
+        .bottom-text {
+            color: lightgray;
+            font-size: 10px;
+            text-decoration: none;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="main-container">
@@ -14,11 +41,11 @@
             To change the email for your account, please click on the button or use the link below.
         </p>
         <p style="margin-bottom: 1em; margin-top: 1em;">
-            <a href="" class="activate-button">
+            <a href="{activationlink}" class="activate-button">
                 Change email
             </a>
         </p>
-        <a href="" style="font-size: 13px;">
+        <a href="{activationlink}" style="font-size: 13px;">
             {activationlink}
         </a>
     </div>
@@ -28,29 +55,3 @@
 </body>
 
 </html>
-<style>
-    .activate-button{
-        background-color: cornflowerblue;
-        color: white;
-        padding: 10px;
-        border: 1px solid black;
-        border-radius: 2px;
-        margin-bottom: 1em;
-        margin-top:1em;
-        text-decoration: none;
-
-    }
-    .main-container{
-        border: 1px solid lightgray;
-        border-radius: 2px;
-        text-align: center;
-        margin-left: 10vw;
-        padding: 10vh;
-    }
-    .bottom-text {
-        color: lightgray;
-        font-size: 10px;
-        text-decoration: none;
-        text-align: center;
-    }
-</style>

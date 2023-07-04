@@ -22,13 +22,13 @@ namespace MusicServer.Controllers
             this.mailService = mailService; 
         }
 
-        [HttpGet]
-        [Route(ApiRoutes.Development.Test)]
-        public async  Task<IActionResult> Test()
-        {
-            await this.mailService.SendEmail(null, "Test", "Test");
-            return Ok();
-        }
+        //[HttpGet]
+        //[Route(ApiRoutes.Development.Test)]
+        //public async  Task<IActionResult> Test()
+        //{
+        //    await this.mailService.SendEmail(null, "Test", "Test");
+        //    return Ok();
+        //}
 
         [HttpGet]
         [Route(ApiRoutes.Development.CreateArtistsAndSongs)]

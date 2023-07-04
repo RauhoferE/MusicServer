@@ -16,16 +16,22 @@ namespace MusicServer.Services
         private readonly MusicServerDBContext dBContext;
         private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<Role> _roleManager;
+        private readonly IMusicMailService mailService;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         public AuthenticationService(UserManager<User> userManager,
     MusicServerDBContext dbContext,
     SignInManager<User> signInManager,
-    RoleManager<Role> roleManager)
+    RoleManager<Role> roleManager,
+    IMusicMailService mailService,
+    IHttpContextAccessor httpContextAccessor)
         {
             this._userManager = userManager;
             this._roleManager = roleManager;
             this._signInManager = signInManager;
             this.dBContext = dbContext;
+            this.mailService = mailService;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         public async Task ChangeEmailAsync(long userId, string token)
@@ -178,7 +184,10 @@ namespace MusicServer.Services
             Log.Information($"Created email token for new user: {userdata.Email}");
 
             await this.dBContext.SaveChangesAsync();
-            // Send token per email
+
+            //TOOD: Change address to frontend
+            await this.mailService.SendWelcomeEmail(user, 
+                $"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}/api/authentication/confirm/email/{user.Email}/{token}");
         }
 
         public async Task RequestEmailResetAsync(long userId, string newEmail)
@@ -190,7 +199,22 @@ namespace MusicServer.Services
 
             user.TemporarayEmail = newEmail;
             await this.dBContext.SaveChangesAsync();
-            // Send token per Email
+
+            //TOOD: Change address to frontend
+            await this.mailService.SendEmailChangeEmail(user,
+    $"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}/api/authentication/change/email/{user.Id}/{token}");
+        }
+
+        public async Task ResetPasswordRequestAsync(string email)
+        {
+            var user = this.dBContext.Users.FirstOrDefault(x => x.Email == email)
+    ?? throw new UserNotFoundException("User not found.");
+
+            var token = await this._userManager.GeneratePasswordResetTokenAsync(user);
+
+            //TOOD: Change address to frontend
+            await this.mailService.SendPasswordResetEmail(user,
+$"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}/api/authentication/reset/password/{user.Id}/{token}");
         }
 
         public async Task ResetPasswordAsync(long userId, string newPassword, string token)
@@ -202,8 +226,6 @@ namespace MusicServer.Services
             {
                 throw new MusicserverServiceException("Error when reseting the password.");
             }
-
-            //TODO: Send mail that password has been reset
         }
 
         public async Task<ICollection<Claim>> ChangePasswordAsync(long activeUserId, string currentPassword, string newPassword)
@@ -216,19 +238,10 @@ namespace MusicServer.Services
                 throw new MusicserverServiceException("Error when changing the password.");
             }
 
-            // Send Email that Password has been changed successfully.
-
             return (await this.LoginUserAsync(user.Email, newPassword)).AuthenticationClaims;
         }
 
-        public async Task ResetPasswordRequestAsync(string email)
-        {
-            var user = this.dBContext.Users.FirstOrDefault(x => x.Email == email)
-    ?? throw new UserNotFoundException("User not found.");
 
-            var token = await this._userManager.GeneratePasswordResetTokenAsync(user);
-            // TODO: Send new token per email 
-        }
 
         public async Task<Guid[]> GenerateRegistrationCodesAsync(int amount)
         {

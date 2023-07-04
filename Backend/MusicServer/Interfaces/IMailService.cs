@@ -4,13 +4,11 @@ namespace MusicServer.Interfaces
 {
     public interface IMusicMailService
     {
-        Task SendEmail(User user, string subject, string body);
-
         Task SendWelcomeEmail(User user, string activationlink);
 
         Task SendPasswordResetEmail(User user, string resetlink);
 
-        Task SendEmailChangeEmail(User user, string newMail, string changeMailLink);
+        Task SendEmailChangeEmail(User user, string changeMailLink);
 
         Task SendPlaylistAddedFromUserEmail(User user, Playlist playlist, User addedByUser);
 

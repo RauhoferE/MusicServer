@@ -6,6 +6,7 @@ using MimeKit;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
 using MusicServer.Settings;
+using Serilog;
 
 namespace MusicServer.Services
 {
@@ -18,43 +19,52 @@ namespace MusicServer.Services
             this._mailSettings = mailSettings.Value;
         }
 
-        public async Task SendEmail(User user, string subject, string body)
+        public async Task SendEmailChangeEmail(User user, string changeMailLink)
+        {
+            var message = new MimeMessage();
+
+            message.From.Add(new MailboxAddress(this._mailSettings.Sender, this._mailSettings.Email));
+            message.To.Add(new MailboxAddress(user.UserName, user.TemporarayEmail));
+            message.Subject = "Password Reset received";
+            message.Body = new TextPart("html")
+            {
+                Text = File.ReadAllText("Assets/EmailTemplates/EmailResetEmail.html").Replace("{activationlink}", changeMailLink),
+            };
+
+            await this.SendMessage(message);
+        }
+
+        public async Task SendPasswordResetEmail(User user, string resetlink)
         {
             var message = new MimeMessage();
 
             message.From.Add(new MailboxAddress(this._mailSettings.Sender, this._mailSettings.Email));
             message.To.Add(new MailboxAddress(user.UserName, user.Email));
-            message.Subject = subject;
-            message.Body = new TextPart("plain")
+            message.Subject = "Change Email Request received";
+            message.Body = new TextPart("html")
             {
-                Text = body
+                Text = File.ReadAllText("Assets/EmailTemplates/PasswordResetEmail.html").Replace("{activationlink}", resetlink),
             };
 
-            try
-            {
-                using (var client = new SmtpClient())
-                {
-                    client.Connect(this._mailSettings.Host, this._mailSettings.Port);
-                    client.Authenticate(this._mailSettings.Email, this._mailSettings.Password);
-                    client.Send(message);
-                    client.Disconnect(true);
-                }
-            }
-            catch (Exception e)
-            {
-                throw new MailSendException("Mail couldn't be sent.", e);
-            }
-
+            await this.SendMessage(message);
         }
 
-        public Task SendEmailChangeEmail(User user, string newMail, string changeMailLink)
+        public async Task SendWelcomeEmail(User user, string activationlink)
         {
-            throw new NotImplementedException();
-        }
+            var message = new MimeMessage();
 
-        public Task SendPasswordResetEmail(User user, string resetlink)
-        {
-            throw new NotImplementedException();
+            message.From.Add(new MailboxAddress(this._mailSettings.Sender, this._mailSettings.Email));
+            message.To.Add(new MailboxAddress(user.UserName, user.Email));
+            message.Subject = "Welcome to Project Siren";
+            Log.Information(File.ReadAllText("Assets/EmailTemplates/WelcomeConfirmEmail.html")
+                .Replace("{activationlink}", activationlink).Replace("{username}", user.UserName));
+            message.Body = new TextPart("html")
+            {
+                Text = File.ReadAllText("Assets/EmailTemplates/WelcomeConfirmEmail.html")
+                .Replace("{activationlink}", activationlink).Replace("{username}", user.UserName),
+            };
+
+            await this.SendMessage(message);
         }
 
         public Task SendPlaylistAddedFromUserEmail(User user, Playlist playlist, User addedByUser)
@@ -82,9 +92,22 @@ namespace MusicServer.Services
             throw new NotImplementedException();
         }
 
-        public Task SendWelcomeEmail(User user, string activationlink)
+        private async Task SendMessage(MimeMessage message)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (var client = new SmtpClient())
+                {
+                    client.Connect(this._mailSettings.Host, this._mailSettings.Port);
+                    client.Authenticate(this._mailSettings.Email, this._mailSettings.Password);
+                    client.Send(message);
+                    client.Disconnect(true);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new MailSendException("Mail couldn't be sent.", e);
+            }
         }
     }
 }
