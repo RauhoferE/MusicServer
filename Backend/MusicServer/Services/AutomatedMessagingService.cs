@@ -1,30 +1,99 @@
-﻿using MusicServer.Interfaces;
+﻿using DataAccess;
+using DataAccess.Entities;
+using MusicServer.Core.Const;
+using MusicServer.Exceptions;
+using MusicServer.Interfaces;
 
 namespace MusicServer.Services
 {
     public class AutomatedMessagingService : IAutomatedMessagingService
     {
-        public Task AddPlaylistMessage(long userId, Guid playlistId)
+        private readonly MusicServerDBContext dBContext;
+        private readonly IMusicMailService mailService;
+
+        public AutomatedMessagingService(MusicServerDBContext dBContext, IMusicMailService mailService)
         {
-            throw new NotImplementedException();
+            this.mailService = mailService;
+            this.dBContext = dBContext;
         }
 
-        public Task AddSongsToPlaylistMessage(long userId, Guid playlistId, List<Guid> songIds)
+        public async Task AddPlaylistMessage(long userId, Guid playlistId)
         {
-            throw new NotImplementedException();
+            var messageType = this.dBContext.LovMessageTypes
+                .FirstOrDefault(x => x.Id == (long)Core.Const.MessageType.PlaylistAdded) ??
+                throw new MessageTypeNotFoundException();
+
+            this.dBContext.MessageQueue.Add(new DataAccess.Entities.Message()
+            {
+                ArtistId = Guid.Empty,
+                PlaylistId = playlistId,
+                UserId = userId,
+                Type = messageType
+            });
+
+            await this.dBContext.SaveChangesAsync();
         }
 
-        public Task PlaylistRemoveMessage(long userId, Guid playlistId, long targetUserId)
+        public async Task AddSongsToPlaylistMessage(long userId, Guid playlistId, List<Guid> songIds)
         {
-            throw new NotImplementedException();
+            var messageType = this.dBContext.LovMessageTypes
+    .FirstOrDefault(x => x.Id == (long)Core.Const.MessageType.PlaylistSongsAdded) ??
+    throw new MessageTypeNotFoundException();
+
+            var messageSongIds = songIds.Select(x => new MessageSongId()
+            {
+                SongId = x
+            }).ToList();
+
+            this.dBContext.MessageQueue.Add(new DataAccess.Entities.Message()
+            {
+                ArtistId = Guid.Empty,
+                PlaylistId = playlistId,
+                UserId = userId,
+                Songs = messageSongIds,
+                Type = messageType
+            });
+
+            await this.dBContext.SaveChangesAsync();
         }
 
-        public Task PlaylistShareMessage(long userId, Guid playlistId, long targetUserId)
+        public async Task PlaylistRemoveMessage(long userId, Guid playlistId, long targetUserId)
         {
-            throw new NotImplementedException();
+            var messageType = this.dBContext.LovMessageTypes
+            .FirstOrDefault(x => x.Id == (long)Core.Const.MessageType.PlaylistShareRemoved) ??
+            throw new MessageTypeNotFoundException();
+
+            this.dBContext.MessageQueue.Add(new DataAccess.Entities.Message()
+            {
+                ArtistId = Guid.Empty,
+                PlaylistId = playlistId,
+                UserId = userId,
+                TargetUserId = targetUserId,
+                Type = messageType
+            });
+
+            await this.dBContext.SaveChangesAsync();
         }
 
-        public Task SendAutomatedMessages()
+        public async Task PlaylistShareMessage(long userId, Guid playlistId, long targetUserId)
+        {
+            var messageType = this.dBContext.LovMessageTypes
+.FirstOrDefault(x => x.Id == (long)Core.Const.MessageType.PlaylistShared) ??
+throw new MessageTypeNotFoundException();
+
+            this.dBContext.MessageQueue.Add(new DataAccess.Entities.Message()
+            {
+                ArtistId = Guid.Empty,
+                PlaylistId = playlistId,
+                UserId = userId,
+                TargetUserId = targetUserId,
+                Type = messageType
+            });
+
+            await this.dBContext.SaveChangesAsync();
+        }
+
+        public async Task SendAutomatedMessages()
         {
             throw new NotImplementedException();
         }

@@ -13,7 +13,7 @@ namespace MusicImporter.Interfaces
 
         public Task<ID3MetaData> GetMetaDataFromMp3(string file);
 
-        public Task<Guid> ImportMp3DataToDatabase(ID3MetaData metaData);
+        public Task<SongArtistsDto> ImportMp3DataToDatabase(ID3MetaData metaData);
 
         public Task CopyMp3ToFileServer(string file, Guid songId);
     }

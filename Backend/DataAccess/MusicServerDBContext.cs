@@ -41,6 +41,12 @@ namespace DataAccess
 
         public DbSet<UserSong> FavoriteSongs { get; set; }
 
+        public DbSet<Message> MessageQueue { get; set; }
+
+        public DbSet<Entities.MessageType> LovMessageTypes { get; set; }
+
+        public DbSet<MessageSongId> MessageSongIds { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -168,6 +174,45 @@ namespace DataAccess
                     );
             });
 
+            builder.Entity<Entities.MessageType>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasData(
+                        new Entities.MessageType()
+                        {
+                            Id = (long)MusicServer.Core.Const.MessageType.PlaylistAdded,
+                            Name = MusicServer.Core.Const.MessageType.PlaylistAdded.ToString(),
+                        },
+                        new Entities.MessageType()
+                        {
+                            Id = (long)MusicServer.Core.Const.MessageType.PlaylistSongsAdded,
+                            Name = MusicServer.Core.Const.MessageType.PlaylistSongsAdded.ToString(),
+                        },
+                         new Entities.MessageType()
+                         {
+                             Id = (long)MusicServer.Core.Const.MessageType.PlaylistShared,
+                             Name = MusicServer.Core.Const.MessageType.PlaylistShared.ToString(),
+                         },
+                         new Entities.MessageType()
+                         {
+                             Id = (long)MusicServer.Core.Const.MessageType.PlaylistShareRemoved,
+                             Name = MusicServer.Core.Const.MessageType.PlaylistShareRemoved.ToString(),
+                         },
+                         new Entities.MessageType()
+                         {
+                             Id = (long)MusicServer.Core.Const.MessageType.ArtistTracksAdded,
+                             Name = MusicServer.Core.Const.MessageType.ArtistTracksAdded.ToString(),
+                         },
+                         new Entities.MessageType()
+                         {
+                             Id = (long)MusicServer.Core.Const.MessageType.ArtistAdded,
+                             Name = MusicServer.Core.Const.MessageType.ArtistAdded.ToString(),
+                         }
+                        );
+            });
+
             builder.Entity<RoleClaim>(entity =>
             {
                 entity.HasKey(n => n.Id);
@@ -268,6 +313,24 @@ namespace DataAccess
                 entity.HasOne(e => e.User);
 
                 entity.HasOne(e => e.FavoriteSong);
+            });
+
+            builder.Entity<Message>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasMany(e => e.Songs)
+                    .WithOne(p => p.Message)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<MessageSongId>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(e => e.Message);
             });
         }
     }

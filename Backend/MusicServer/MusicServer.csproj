@@ -45,6 +45,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Assets\EmailTemplates\ArtistsAddedEmail.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\EmailTemplates\UserPlaylistRemoveUserEmail.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

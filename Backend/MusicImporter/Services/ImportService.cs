@@ -30,19 +30,23 @@ namespace MusicImporter.Services
 
         private readonly IFfmpegService ffmpegService;
 
+        private readonly IMessageService messageService;
+
         public ImportService(FileserverSettings fileserverSettings, 
             MusicDataSettings musicDataSettings,
             MusicServerDBContext dBContext,
             ISftpService sftpService,
             IMusicBrainzService musicBrainzService,
-            IFfmpegService ffmpegService)
+            IFfmpegService ffmpegService,
+            IMessageService messageService)
         {
             this.fileserverSettings = fileserverSettings;
-            this.musicDataSettings= musicDataSettings;
+            this.musicDataSettings = musicDataSettings;
             this.dBContext = dBContext;
             this.sftpService = sftpService;
             this.musicBrainzService = musicBrainzService;
             this.ffmpegService = ffmpegService;
+            this.messageService = messageService;
         }
 
         public async Task CopyMp3ToFileServer(string file, Guid songId)
@@ -74,7 +78,7 @@ namespace MusicImporter.Services
             };
         }
 
-        public async Task<Guid> ImportMp3DataToDatabase(ID3MetaData metaData)
+        public async Task<SongArtistsDto> ImportMp3DataToDatabase(ID3MetaData metaData)
         {
             var  album = this.dBContext.Albums.FirstOrDefault(x => x.Name == metaData.Album);
 
@@ -117,6 +121,8 @@ namespace MusicImporter.Services
                     {
                         Name = artist
                     }).Entity;
+
+                    await this.messageService.ArtistAddedMessage(artistEntity.Id);
                 }
 
                 var albumEntity = artistEntity.Albums.FirstOrDefault(x => x.Album.Name == album.Name);
@@ -132,6 +138,8 @@ namespace MusicImporter.Services
                 await this.dBContext.SaveChangesAsync();
             }
 
+            List<Guid> artistIds = new List<Guid>();
+
             foreach (var artist in metaData.SongArtists)
             {
                 var artistEntity = this.dBContext.Artists
@@ -144,7 +152,11 @@ namespace MusicImporter.Services
                     {
                         Name = artist
                     }).Entity;
+
+                    await this.messageService.ArtistAddedMessage(artistEntity.Id);
                 }
+
+                artistIds.Add(artistEntity.Id);
 
                 var songEntity = artistEntity.Songs.FirstOrDefault(x => x.Song.Name == song.Name);
 
@@ -160,7 +172,11 @@ namespace MusicImporter.Services
             }
 
             await this.dBContext.SaveChangesAsync();
-            return song.Id;
+            return new SongArtistsDto()
+            {
+                SongId = song.Id,
+                ArtistIds = artistIds
+            };
         }
 
         public async Task StartImportProcess()
@@ -170,6 +186,8 @@ namespace MusicImporter.Services
                 throw new DirectoryNotFoundException("Music Sourcefolder was not found");
             }
 
+            var artistSongsDtos = new List<ArtistSongsDto>();
+
             foreach (var song in Directory.GetFiles(this.musicDataSettings.SourceFolder, "*.mp3"))
             {
                 Log.Information($"Starting to import file: {song}");
@@ -177,8 +195,27 @@ namespace MusicImporter.Services
                 try
                 {
                     var data = await this.GetMetaDataFromMp3(song);
-                    var songId = await this.ImportMp3DataToDatabase(data);
-                    await this.CopyMp3ToFileServer(song, songId);
+                    var importResult = await this.ImportMp3DataToDatabase(data);
+
+                    //TODO: Test me
+                    foreach (var artist in importResult.ArtistIds)
+                    {
+                        var dto = artistSongsDtos.FirstOrDefault(x => x.ArtistId == artist);
+
+                        if (dto == null)
+                        {
+                            artistSongsDtos.Add(new ArtistSongsDto()
+                            {
+                                ArtistId = artist,
+                                SongIds = new List<Guid>() { importResult.SongId }
+                            });
+                            continue;
+                        }
+
+                        dto.SongIds.Add(importResult.SongId);
+                    }
+
+                    await this.CopyMp3ToFileServer(song, importResult.SongId);
                 }
                 catch (SongExistsException ex)
                 {

@@ -39,6 +39,7 @@ var host = Host.CreateDefaultBuilder()
                 services.AddSingleton(musicDataSettings);
                 services.AddSingleton(fileserverCredentials);
                 services.AddHttpClient();
+                services.AddTransient<IMessageService, MessageService>();
                 services.AddTransient<ISftpService, SftpService>();
                 services.AddTransient<IFfmpegService, FfmpegService>();
                 services.AddTransient<IMusicBrainzService, MusicBrainzService>();
