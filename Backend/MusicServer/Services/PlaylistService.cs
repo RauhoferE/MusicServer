@@ -18,12 +18,16 @@ namespace MusicServer.Services
 
         private readonly IMapper mapper;
 
+        private readonly IAutomatedMessagingService automatedMessagingService;
+
         public PlaylistService(IActiveUserService activeUserService,
             MusicServerDBContext dBContext,
+            IAutomatedMessagingService automatedMessagingService,
             IMapper mapper)
         {
             this.activeUserService = activeUserService;
             this.dBContext = dBContext;
+            this.automatedMessagingService = automatedMessagingService;
             this.mapper = mapper;
         }
 
@@ -197,6 +201,9 @@ namespace MusicServer.Services
                 });
             }
 
+            // TODO: TEST
+            await this.automatedMessagingService.AddSongsToPlaylistMessage(user.Id, playlist.Playlist.Id, songIds.Distinct().Take(10).ToList());
+
             await this.dBContext.SaveChangesAsync();
         }
 
@@ -245,7 +252,15 @@ namespace MusicServer.Services
                 }
             });
 
+
+
             await this.dBContext.SaveChangesAsync();
+
+            //TODO: Test
+            if (isPublic)
+            {
+                await this.automatedMessagingService.AddPlaylistMessage(this.activeUserService.Id, entity.Entity.Playlist.Id);
+            }
             return entity.Entity.Playlist.Id;
         }
 
@@ -634,6 +649,9 @@ namespace MusicServer.Services
                 }
 
                 this.dBContext.Remove(entityToRemove);
+
+                //TODO: Test 
+                await this.automatedMessagingService.PlaylistRemoveMessage(this.activeUserService.Id, playlist.Playlist.Id, entityToRemove.User.Id);
             }
 
             await this.dBContext.SaveChangesAsync();
@@ -701,6 +719,10 @@ namespace MusicServer.Services
                     Playlist = playlist.Playlist,
                     Order = lastOrderNumber + 1
                 });
+
+                // TODO: Test
+                await this.automatedMessagingService
+                    .PlaylistShareMessage(this.activeUserService.Id, playlist.Playlist.Id, targetUser.Id);
             }
 
             await this.dBContext.SaveChangesAsync();

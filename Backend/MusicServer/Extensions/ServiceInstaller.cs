@@ -31,6 +31,7 @@ namespace MusicServer.Extensions
             builder.Services.AddTransient<IActiveUserService, ActiveUserService>();
             builder.Services.AddTransient<IAuthService, AuthenticationService>();
             builder.Services.AddTransient<IMusicMailService, MusicMailService>();
+            builder.Services.AddTransient<IAutomatedMessagingService, AutomatedMessagingService>();
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IPlaylistService, PlaylistService>();
             builder.Services.AddTransient<ISongService, SongService>();
