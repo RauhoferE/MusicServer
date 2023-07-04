@@ -46,5 +46,45 @@ namespace MusicServer.Services
             }
 
         }
+
+        public Task SendEmailChangeEmail(User user, string newMail, string changeMailLink)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendPasswordResetEmail(User user, string resetlink)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendPlaylistAddedFromUserEmail(User user, Playlist playlist, User addedByUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendPlaylistRemovedFromUserEmail(User user, Playlist playlist, User removedByUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendPlaylistSharedWithUserEmail(User user, Playlist playlist, User sharedByUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendTracksAddedFromArtistEmail(User user, Artist artist, List<Song> songs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendTracksAddedToPlaylistEmail(User user, Playlist playlist, List<Song> songs, User addedByUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendWelcomeEmail(User user, string activationlink)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
