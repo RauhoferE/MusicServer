@@ -1,5 +1,6 @@
 ﻿using DataAccess;
 using DataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
 using MusicImporter.Exceptions;
 using MusicImporter.Interfaces;
 using System;
@@ -41,18 +42,28 @@ namespace MusicImporter.Services
 .FirstOrDefault(x => x.Id == (long)MusicServer.Core.Const.MessageType.ArtistTracksAdded) ??
 throw new NotFoundException();
 
+            var alreadyExistingMessage = this.dBContext.MessageQueue
+            .Include(x => x.Type)
+            .FirstOrDefault(x => x.ArtistId == artistId && x.Type.Id == messageType.Id);
+
             var messageSongIds = songIds.Select(x => new MessageSongId()
             {
                 SongId = x
             }).ToList();
 
-            this.dBContext.MessageQueue.Add(new DataAccess.Entities.Message()
+            if (alreadyExistingMessage == null)
             {
-                ArtistId = artistId,
-                Songs = messageSongIds,
-                Type = messageType
-            });
+                this.dBContext.MessageQueue.Add(new DataAccess.Entities.Message()
+                {
+                    ArtistId = artistId,
+                    Songs = messageSongIds,
+                    Type = messageType
+                });
 
+                await this.dBContext.SaveChangesAsync();
+            }
+
+            alreadyExistingMessage.Songs = alreadyExistingMessage.Songs.Concat(messageSongIds).ToList();
             await this.dBContext.SaveChangesAsync();
         }
     }

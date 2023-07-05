@@ -18,6 +18,8 @@ namespace MusicServer.Interfaces
 
         Task SendTracksAddedFromArtistEmail(User user, Artist artist, List<Song> songs);
 
+        Task SendNewArtistsAddedEmail(User user, List<Artist> artists);
+
         Task SendTracksAddedToPlaylistEmail(User user, Playlist playlist, List<Song> songs, User targetUser);
     }
 }

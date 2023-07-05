@@ -252,8 +252,6 @@ namespace MusicServer.Services
                 }
             });
 
-
-
             await this.dBContext.SaveChangesAsync();
 
             //TODO: Test
@@ -261,6 +259,7 @@ namespace MusicServer.Services
             {
                 await this.automatedMessagingService.AddPlaylistMessage(this.activeUserService.Id, entity.Entity.Playlist.Id);
             }
+
             return entity.Entity.Playlist.Id;
         }
 
@@ -339,8 +338,6 @@ namespace MusicServer.Services
                 .FirstOrDefault(x => x.Id == playlistId) ?? throw  new PlaylistNotFoundException();
 
             var user = playlist.Users.FirstOrDefault(x => x.User.Id == this.activeUserService.Id);
-
-
 
             if (user == null && !playlist.IsPublic)
             {

@@ -4,8 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using MusicServer.Core.Const;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
+using Org.BouncyCastle.Utilities;
 using Renci.SshNet.Messages;
-using static MusicServer.Const.ApiRoutes;
+using Serilog;
 
 namespace MusicServer.Services
 {
@@ -39,25 +40,35 @@ namespace MusicServer.Services
 
         public async Task AddSongsToPlaylistMessage(long userId, Guid playlistId, List<Guid> songIds)
         {
-            // TODO: Check if similar message already exists
-            var messageType = this.dBContext.LovMessageTypesand append
+            var messageType = this.dBContext.LovMessageTypes
     .FirstOrDefault(x => x.Id == (long)Core.Const.MessageType.PlaylistSongsAdded) ??
     throw new MessageTypeNotFoundException();
+
+            var alreadyExistingMessage = this.dBContext.MessageQueue
+                .Include(x => x.Type)
+                .FirstOrDefault(x => x.UserId == userId && x.Type.Id == messageType.Id && x.PlaylistId == playlistId); 
 
             var messageSongIds = songIds.Select(x => new MessageSongId()
             {
                 SongId = x
             }).ToList();
 
-            this.dBContext.MessageQueue.Add(new DataAccess.Entities.Message()
+            if (alreadyExistingMessage == null)
             {
-                ArtistId = Guid.Empty,
-                PlaylistId = playlistId,
-                UserId = userId,
-                Songs = messageSongIds,
-                Type = messageType
-            });
+                this.dBContext.MessageQueue.Add(new DataAccess.Entities.Message()
+                {
+                    ArtistId = Guid.Empty,
+                    PlaylistId = playlistId,
+                    UserId = userId,
+                    Songs = messageSongIds,
+                    Type = messageType
+                });
 
+                await this.dBContext.SaveChangesAsync();
+                return;
+            }
+
+            alreadyExistingMessage.Songs = alreadyExistingMessage.Songs.Concat(messageSongIds).ToList();
             await this.dBContext.SaveChangesAsync();
         }
 
@@ -100,9 +111,11 @@ throw new MessageTypeNotFoundException();
         public async Task SendAutomatedMessages()
         {
             var messages = this.dBContext.MessageQueue
-                .Include(x => x.Type).ToList().GroupBy(x => x.Type.Id, y => y);
+                .Include(x => x.Type).ToList();
+            
+            var messageGroups = messages.GroupBy(x => x.Type.Id, y => y);
 
-            foreach (var item in messages)
+            foreach (var item in messageGroups)
             {
                 switch ((Core.Const.MessageType)item.Key)
                 {
@@ -113,23 +126,94 @@ throw new MessageTypeNotFoundException();
                         await this.PreparePlaylistSongsAddedEmail(item);
                         break;
                     case Core.Const.MessageType.PlaylistShared:
-                        await this.PreparePlaylistSharedEmail(item);
+                        await this.PreparePlaylistSharedEmail(item, false);
                         break;
                     case Core.Const.MessageType.PlaylistShareRemoved:
+                        await this.PreparePlaylistSharedEmail(item, true);
                         break;
                     case Core.Const.MessageType.ArtistTracksAdded:
+                        await this.PrepareArtistTracksAddedEmail(item);
                         break;
                     case Core.Const.MessageType.ArtistAdded:
+                        await this.PrepareArtistAddedEmail(item);
                         break;
                     default:
                         break;
                 }
             }
+
+            this.dBContext.MessageQueue.RemoveRange(messages);
+            await this.dBContext.SaveChangesAsync();
         }
 
-        private async Task PreparePlaylistSharedEmail(IGrouping<long, DataAccess.Entities.Message> item)
+        private async Task PrepareArtistAddedEmail(IGrouping<long, DataAccess.Entities.Message> messages)
         {
-            throw new NotImplementedException();
+            var users = this.dBContext.Users.ToList();
+            var artistIds = messages.Select(x => x.ArtistId).ToList();
+            var artists = this.dBContext.Artists.Where(x => artistIds.Contains(x.Id)).Take(50).ToList();
+
+            if (users.Count() == 0 || artists.Count() == 0)
+            {
+                return;
+            }
+
+            foreach (var user in users)
+            {
+                await this.mailService.SendNewArtistsAddedEmail(user, artists);
+            }
+        }
+
+        private async Task PrepareArtistTracksAddedEmail(IGrouping<long, DataAccess.Entities.Message> messages)
+        {
+            foreach (var message in messages)
+            {
+                var followedUser = this.dBContext.FollowedArtists
+                    .Include(x => x.User)
+                    .Include(x => x.Artist)
+                    .Where(x => x.Artist.Id == message.ArtistId)
+                    .Select(x => x.User);
+
+                var artist = this.dBContext.Artists.FirstOrDefault(x => x.Id == message.ArtistId);
+
+                var songs = this.dBContext.Songs.Where(x =>
+                            message.Songs.Select(y => y.SongId).Contains(x.Id))
+                                .Take(10).ToList();
+
+                if (followedUser.Count() == 0 || artist == null || songs.Count() == 0)
+                {
+                    continue;
+                }
+
+                foreach (var user in followedUser)
+                {
+                    await this.mailService.SendTracksAddedFromArtistEmail(user, artist, songs);
+                }
+            }
+        }
+
+        private async Task PreparePlaylistSharedEmail(IGrouping<long, DataAccess.Entities.Message> messages, bool removeUser)
+        {
+            foreach (var message in messages)
+            {
+                var sharedUser = this.dBContext.Users.FirstOrDefault(x => x.Id == message.TargetUserId);
+
+                var playlist = this.dBContext.Playlists.FirstOrDefault(x => x.Id == message.PlaylistId);
+
+                var user = this.dBContext.Users.FirstOrDefault(x => x.Id == message.UserId);
+
+                if (sharedUser == null || playlist == null || user == null)
+                {
+                    continue;
+                }
+
+                if (removeUser)
+                {
+                    await this.mailService.SendPlaylistRemovedFromUserEmail(user, playlist, sharedUser);
+                    continue;
+                }
+
+                await this.mailService.SendPlaylistSharedWithUserEmail(user, playlist, sharedUser);
+            }
         }
 
         private async Task PreparePlaylistSongsAddedEmail(IGrouping<long, DataAccess.Entities.Message> messages)
