@@ -1,8 +1,11 @@
 ﻿using DataAccess;
 using DataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
 using MusicServer.Core.Const;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
+using Renci.SshNet.Messages;
+using static MusicServer.Const.ApiRoutes;
 
 namespace MusicServer.Services
 {
@@ -36,7 +39,8 @@ namespace MusicServer.Services
 
         public async Task AddSongsToPlaylistMessage(long userId, Guid playlistId, List<Guid> songIds)
         {
-            var messageType = this.dBContext.LovMessageTypes
+            // TODO: Check if similar message already exists
+            var messageType = this.dBContext.LovMessageTypesand append
     .FirstOrDefault(x => x.Id == (long)Core.Const.MessageType.PlaylistSongsAdded) ??
     throw new MessageTypeNotFoundException();
 
@@ -95,7 +99,94 @@ throw new MessageTypeNotFoundException();
 
         public async Task SendAutomatedMessages()
         {
+            var messages = this.dBContext.MessageQueue
+                .Include(x => x.Type).ToList().GroupBy(x => x.Type.Id, y => y);
+
+            foreach (var item in messages)
+            {
+                switch ((Core.Const.MessageType)item.Key)
+                {
+                    case Core.Const.MessageType.PlaylistAdded:
+                        await this.PrepareAddPlaylistEmail(item);
+                        break;
+                    case Core.Const.MessageType.PlaylistSongsAdded:
+                        await this.PreparePlaylistSongsAddedEmail(item);
+                        break;
+                    case Core.Const.MessageType.PlaylistShared:
+                        await this.PreparePlaylistSharedEmail(item);
+                        break;
+                    case Core.Const.MessageType.PlaylistShareRemoved:
+                        break;
+                    case Core.Const.MessageType.ArtistTracksAdded:
+                        break;
+                    case Core.Const.MessageType.ArtistAdded:
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private async Task PreparePlaylistSharedEmail(IGrouping<long, DataAccess.Entities.Message> item)
+        {
             throw new NotImplementedException();
+        }
+
+        private async Task PreparePlaylistSongsAddedEmail(IGrouping<long, DataAccess.Entities.Message> messages)
+        {
+            foreach (var message in messages)
+            {
+                var followedUsers = this.dBContext.PlaylistUsers
+                    .Include(x => x.User)
+                    .Include(x => x.Playlist)
+                    .Where(x => x.ReceiveNotifications && x.User.Id != message.UserId && 
+                    x.Playlist.Id == message.PlaylistId)
+                    .Select(x => x.User);
+
+                var playlist = this.dBContext.Playlists.FirstOrDefault(x => x.Id == message.PlaylistId);
+
+                var user = this.dBContext.Users.FirstOrDefault(x => x.Id == message.UserId);
+
+                var songs = this.dBContext.Songs.Where(x => 
+                message.Songs.Select(y => y.SongId).Contains(x.Id))
+                    .Take(10).ToList();
+
+                if (followedUsers.Count() == 0 || playlist == null || user == null || songs.Count() == 0)
+                {
+                    continue;
+                }
+
+                foreach (var followedUser in followedUsers)
+                {
+                    await this.mailService.SendTracksAddedToPlaylistEmail(user, playlist, songs, followedUser);
+                }
+            }
+        }
+
+        private async Task PrepareAddPlaylistEmail(IGrouping<long, DataAccess.Entities.Message> messages)
+        {
+            foreach (var message in messages)
+            {
+                var followedUsers = this.dBContext.FollowedUsers
+                    .Include(x => x.User)
+                    .Include(x => x.FollowedUser)
+                    .Where(x => x.ReceiveNotifications && x.FollowedUser.Id == message.UserId)
+                    .Select(x => x.User);
+
+                var playlist = this.dBContext.Playlists.FirstOrDefault(x => x.Id == message.PlaylistId);
+
+                var user = this.dBContext.Users.FirstOrDefault(x => x.Id == message.UserId);
+
+                if (followedUsers.Count() == 0 || playlist == null || user == null)
+                {
+                    continue;
+                }
+
+                foreach (var followedUser in followedUsers)
+                {
+                    await this.mailService.SendPlaylistAddedFromUserEmail(user, playlist, followedUser);
+                }
+            }
         }
     }
 }

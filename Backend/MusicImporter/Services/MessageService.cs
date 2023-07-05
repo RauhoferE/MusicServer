@@ -36,6 +36,7 @@ namespace MusicImporter.Services
 
         public async Task ArtistSongsAddedMessage(Guid artistId, List<Guid> songIds)
         {
+            // TODO: Check if similar message already exists and append
             var messageType = this.dBContext.LovMessageTypes
 .FirstOrDefault(x => x.Id == (long)MusicServer.Core.Const.MessageType.ArtistTracksAdded) ??
 throw new NotFoundException();

@@ -49,6 +49,31 @@ namespace MusicServer.Services
             await this.SendMessage(message);
         }
 
+        public Task SendPlaylistAddedFromUserEmail(User user, Playlist playlist, User addedUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendPlaylistRemovedFromUserEmail(User user, Playlist playlist, User removedUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendPlaylistSharedWithUserEmail(User user, Playlist playlist, User sharedUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendTracksAddedFromArtistEmail(User user, Artist artist, List<Song> songs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendTracksAddedToPlaylistEmail(User user, Playlist playlist, List<Song> songs, User targetUser)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task SendWelcomeEmail(User user, string activationlink)
         {
             var message = new MimeMessage();
@@ -65,31 +90,6 @@ namespace MusicServer.Services
             };
 
             await this.SendMessage(message);
-        }
-
-        public Task SendPlaylistAddedFromUserEmail(User user, Playlist playlist, User addedByUser)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SendPlaylistRemovedFromUserEmail(User user, Playlist playlist, User removedByUser)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SendPlaylistSharedWithUserEmail(User user, Playlist playlist, User sharedByUser)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SendTracksAddedFromArtistEmail(User user, Artist artist, List<Song> songs)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SendTracksAddedToPlaylistEmail(User user, Playlist playlist, List<Song> songs, User addedByUser)
-        {
-            throw new NotImplementedException();
         }
 
         private async Task SendMessage(MimeMessage message)

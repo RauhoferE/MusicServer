@@ -10,14 +10,14 @@ namespace MusicServer.Interfaces
 
         Task SendEmailChangeEmail(User user, string changeMailLink);
 
-        Task SendPlaylistAddedFromUserEmail(User user, Playlist playlist, User addedByUser);
+        Task SendPlaylistAddedFromUserEmail(User user, Playlist playlist, User addedUser);
 
-        Task SendPlaylistSharedWithUserEmail(User user, Playlist playlist, User sharedByUser);
+        Task SendPlaylistSharedWithUserEmail(User user, Playlist playlist, User sharedUser);
 
-        Task SendPlaylistRemovedFromUserEmail(User user, Playlist playlist, User removedByUser);
+        Task SendPlaylistRemovedFromUserEmail(User user, Playlist playlist, User removedUser);
 
         Task SendTracksAddedFromArtistEmail(User user, Artist artist, List<Song> songs);
 
-        Task SendTracksAddedToPlaylistEmail(User user, Playlist playlist, List<Song> songs, User addedByUser);
+        Task SendTracksAddedToPlaylistEmail(User user, Playlist playlist, List<Song> songs, User targetUser);
     }
 }
