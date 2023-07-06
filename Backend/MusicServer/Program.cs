@@ -3,12 +3,19 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using MusicServer.Entities.Requests.User;
 using MusicServer.Extensions;
+using MusicServer.Interfaces;
 using MusicServer.Middleware;
 using MusicServer.Validation;
 using Serilog;
+using System.Runtime.CompilerServices;
+using System.Timers;
 
 internal class Program
 {
+    private static WebApplication APP;
+
+    private static readonly TaskFactory TASK_FACTORY = new TaskFactory();
+
     private static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +25,17 @@ internal class Program
         ServiceInstaller.InstallServices(builder);
 
         var app = builder.Build();
+
+        APP = app;
+#if !DEBUG
+        var messagingTimer = new System.Timers.Timer(86400000);
+        messagingTimer.Elapsed += SendAutomatedEmails;
+        messagingTimer.AutoReset = true;
+#endif
+        //TODO: TEST ME
+        //var messagingTimer = new System.Timers.Timer(1000);
+        //messagingTimer.Elapsed += SendAutomatedEmails;
+        //messagingTimer.AutoReset = true;
 
         // Configure the HTTP request pipeline.
         app.UseCors("MusicServerCorsPolicy");
@@ -32,4 +50,15 @@ internal class Program
 
         app.Run();
     }
+
+    private static async void SendAutomatedEmails(object source, ElapsedEventArgs e)
+    {
+        await TASK_FACTORY.StartNew(async () =>
+        {
+            using var scope = APP.Services.CreateScope();
+            await scope.ServiceProvider.GetRequiredService<IAutomatedMessagingService>().SendAutomatedMessages();
+        });
+    }
+
+
 }

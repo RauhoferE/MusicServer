@@ -7,6 +7,7 @@ using Serilog;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using MusicServer.Entities.DTOs;
+using MusicServer.Const;
 
 namespace MusicServer.Services
 {
@@ -187,7 +188,7 @@ namespace MusicServer.Services
 
             //TOOD: Change address to frontend
             await this.mailService.SendWelcomeEmail(user, 
-                $"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}/api/authentication/confirm/email/{user.Email}/{token}");
+                $"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}{ApiRoutes.Authentication.ConfirmMail.Replace("{email}", user.Email).Replace("{token}", token)}");
         }
 
         public async Task RequestEmailResetAsync(long userId, string newEmail)
@@ -202,7 +203,7 @@ namespace MusicServer.Services
 
             //TOOD: Change address to frontend
             await this.mailService.SendEmailChangeEmail(user,
-    $"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}/api/authentication/change/email/{user.Id}/{token}");
+    $"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}{ApiRoutes.Authentication.ChangeEmail.Replace("{userId}", user.Id.ToString()).Replace("{token}", token)}");
         }
 
         public async Task ResetPasswordRequestAsync(string email)
@@ -214,7 +215,7 @@ namespace MusicServer.Services
 
             //TOOD: Change address to frontend
             await this.mailService.SendPasswordResetEmail(user,
-$"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}/api/authentication/reset/password/{user.Id}/{token}");
+$"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}{ApiRoutes.Authentication.ResetPassword.Replace("{userId}", user.Id.ToString()).Replace("{token}", token)}");
         }
 
         public async Task ResetPasswordAsync(long userId, string newPassword, string token)
