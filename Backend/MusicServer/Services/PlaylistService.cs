@@ -201,8 +201,7 @@ namespace MusicServer.Services
                 });
             }
 
-            // TODO: TEST
-            await this.automatedMessagingService.AddSongsToPlaylistMessage(user.Id, playlist.Playlist.Id, songIds.Distinct().Take(10).ToList());
+            await this.automatedMessagingService.AddSongsToPlaylistMessage(user.Id, playlist.Playlist.Id, songIds.Distinct().ToList());
 
             await this.dBContext.SaveChangesAsync();
         }
@@ -254,7 +253,6 @@ namespace MusicServer.Services
 
             await this.dBContext.SaveChangesAsync();
 
-            //TODO: Test
             if (isPublic)
             {
                 await this.automatedMessagingService.AddPlaylistMessage(this.activeUserService.Id, entity.Entity.Playlist.Id);
@@ -647,7 +645,6 @@ namespace MusicServer.Services
 
                 this.dBContext.Remove(entityToRemove);
 
-                //TODO: Test 
                 await this.automatedMessagingService.PlaylistRemoveMessage(this.activeUserService.Id, playlist.Playlist.Id, entityToRemove.User.Id);
             }
 
@@ -717,7 +714,6 @@ namespace MusicServer.Services
                     Order = lastOrderNumber + 1
                 });
 
-                // TODO: Test
                 await this.automatedMessagingService
                     .PlaylistShareMessage(this.activeUserService.Id, playlist.Playlist.Id, targetUser.Id);
             }

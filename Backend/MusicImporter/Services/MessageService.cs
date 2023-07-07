@@ -37,13 +37,13 @@ namespace MusicImporter.Services
 
         public async Task ArtistSongsAddedMessage(Guid artistId, List<Guid> songIds)
         {
-            // TODO: Check if similar message already exists and append
             var messageType = this.dBContext.LovMessageTypes
 .FirstOrDefault(x => x.Id == (long)MusicServer.Core.Const.MessageType.ArtistTracksAdded) ??
 throw new NotFoundException();
 
             var alreadyExistingMessage = this.dBContext.MessageQueue
             .Include(x => x.Type)
+            .Include(x => x.Songs)
             .FirstOrDefault(x => x.ArtistId == artistId && x.Type.Id == messageType.Id);
 
             var messageSongIds = songIds.Select(x => new MessageSongId()
@@ -61,6 +61,7 @@ throw new NotFoundException();
                 });
 
                 await this.dBContext.SaveChangesAsync();
+                return;
             }
 
             alreadyExistingMessage.Songs = alreadyExistingMessage.Songs.Concat(messageSongIds).ToList();

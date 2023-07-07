@@ -39,7 +39,7 @@ namespace MusicImporter.Services
 
             // Get MBID
             //https://musicbrainz.org/ws/2/release?query=No%20grave%20But%20the%20Sea%20(deluxe%20edition)&limit=1&fmt=json
-            var mbidResp = await client.GetAsync($"https://musicbrainz.org/ws/2/release?query={WebUtility.UrlEncode(albumName)}&limit=1&fmt=json");
+            var mbidResp = await client.GetAsync($"https://musicbrainz.org/ws/2/release?query={WebUtility.UrlEncode(albumName)}&limit=10&fmt=json");
 
             if (mbidResp.StatusCode != HttpStatusCode.OK)
             {
@@ -53,17 +53,25 @@ namespace MusicImporter.Services
                 throw new MusicSearchException("No results found.");
             }
 
-            // Get Cover Art xml
-            // https://coverartarchive.org/release/21234ce3-9283-4eeb-9df7-0e938b1f46af
+            // We want the album MBID for the cover
+            var mbidId = mbidRespAsJson.Releases.FirstOrDefault(x => x.ReleaseGroup.PrimaryType == "Album");
 
-            var coverArtInfoResp = await client.GetAsync($"https://coverartarchive.org/release/{mbidRespAsJson.Releases[0].Id}");
-
-            if (mbidResp.StatusCode == HttpStatusCode.NotFound)
+            if (mbidId == null)
             {
                 return;
             }
 
-            if (mbidResp.StatusCode != HttpStatusCode.OK)
+            // Get Cover Art xml
+            // https://coverartarchive.org/release/21234ce3-9283-4eeb-9df7-0e938b1f46af
+
+            var coverArtInfoResp = await client.GetAsync($"https://coverartarchive.org/release/{mbidId.Id}");
+
+            if (coverArtInfoResp.StatusCode == HttpStatusCode.NotFound)
+            {
+                return;
+            }
+
+            if (coverArtInfoResp.StatusCode != HttpStatusCode.OK)
             {
                 throw new HttpRequestException("Http Error when trying to reach coverartarchive.org");
             }

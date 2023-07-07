@@ -11,5 +11,7 @@
         public int Port { get; set; }
 
         public string Sender { get; set; }
+
+        public bool SendMails { get; set; }
     }
 }

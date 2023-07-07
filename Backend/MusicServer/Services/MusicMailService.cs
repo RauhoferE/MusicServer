@@ -40,7 +40,7 @@ namespace MusicServer.Services
             var message = new MimeMessage();
 
             message.From.Add(new MailboxAddress(this._mailSettings.Sender, this._mailSettings.Email));
-            message.To.Add(new MailboxAddress(user.UserName, user.TemporarayEmail));
+            message.To.Add(new MailboxAddress(user.UserName, user.Email));
             message.Subject = "New Artists on Project Siren";
 
             var htmlText = File.ReadAllText("Assets/EmailTemplates/ArtistsAddedEmail.html");
@@ -138,7 +138,7 @@ namespace MusicServer.Services
             var message = new MimeMessage();
 
             message.From.Add(new MailboxAddress(this._mailSettings.Sender, this._mailSettings.Email));
-            message.To.Add(new MailboxAddress(user.UserName, user.TemporarayEmail));
+            message.To.Add(new MailboxAddress(user.UserName, user.Email));
             message.Subject = "New Releases for your followed artist";
 
             var htmlText = File.ReadAllText("Assets/EmailTemplates/TracksAddedFromArtistEmail.html")
@@ -166,7 +166,7 @@ namespace MusicServer.Services
             var message = new MimeMessage();
 
             message.From.Add(new MailboxAddress(this._mailSettings.Sender, this._mailSettings.Email));
-            message.To.Add(new MailboxAddress(targetUser.UserName, targetUser.TemporarayEmail));
+            message.To.Add(new MailboxAddress(targetUser.UserName, targetUser.Email));
             message.Subject = "New Songs added to a playlist you follow";
 
             var htmlText = File.ReadAllText("Assets/EmailTemplates/TracksAddedToPlaylistEmail.html")
@@ -211,6 +211,11 @@ namespace MusicServer.Services
 
         private async Task SendMessage(MimeMessage message)
         {
+            if (!this._mailSettings.SendMails)
+            {
+                return;
+            }
+
             try
             {
                 using (var client = new SmtpClient())

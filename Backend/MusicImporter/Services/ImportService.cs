@@ -186,8 +186,6 @@ namespace MusicImporter.Services
                 throw new DirectoryNotFoundException("Music Sourcefolder was not found");
             }
 
-            var artistSongsDtos = new List<ArtistSongsDto>();
-
             foreach (var song in Directory.GetFiles(this.musicDataSettings.SourceFolder, "*.mp3"))
             {
                 Log.Information($"Starting to import file: {song}");
@@ -197,22 +195,9 @@ namespace MusicImporter.Services
                     var data = await this.GetMetaDataFromMp3(song);
                     var importResult = await this.ImportMp3DataToDatabase(data);
 
-                    //TODO: Test me
                     foreach (var artist in importResult.ArtistIds)
                     {
-                        var dto = artistSongsDtos.FirstOrDefault(x => x.ArtistId == artist);
-
-                        if (dto == null)
-                        {
-                            artistSongsDtos.Add(new ArtistSongsDto()
-                            {
-                                ArtistId = artist,
-                                SongIds = new List<Guid>() { importResult.SongId }
-                            });
-                            continue;
-                        }
-
-                        dto.SongIds.Add(importResult.SongId);
+                        await this.messageService.ArtistSongsAddedMessage(artist, new List<Guid>() { importResult.SongId });
                     }
 
                     await this.CopyMp3ToFileServer(song, importResult.SongId);
@@ -225,8 +210,6 @@ namespace MusicImporter.Services
                 {
                     Log.Information($"{ex.Message}");
                 }
-
-
             }
         }
     }

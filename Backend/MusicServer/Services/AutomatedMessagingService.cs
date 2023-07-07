@@ -46,9 +46,10 @@ namespace MusicServer.Services
 
             var alreadyExistingMessage = this.dBContext.MessageQueue
                 .Include(x => x.Type)
+                .Include(x => x.Songs)
                 .FirstOrDefault(x => x.UserId == userId && x.Type.Id == messageType.Id && x.PlaylistId == playlistId); 
 
-            var messageSongIds = songIds.Select(x => new MessageSongId()
+            var messageSongIds = songIds.Take(10).Select(x => new MessageSongId()
             {
                 SongId = x
             }).ToList();
@@ -111,6 +112,7 @@ throw new MessageTypeNotFoundException();
         public async Task SendAutomatedMessages()
         {
             var messages = this.dBContext.MessageQueue
+                .Include(x => x.Songs)
                 .Include(x => x.Type).ToList();
             
             var messageGroups = messages.GroupBy(x => x.Type.Id, y => y);

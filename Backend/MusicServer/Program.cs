@@ -28,14 +28,11 @@ internal class Program
 
         APP = app;
 #if !DEBUG
-        var messagingTimer = new System.Timers.Timer(86400000);
+        var messagingTimer = new System.Timers.Timer(100);
         messagingTimer.Elapsed += SendAutomatedEmails;
-        messagingTimer.AutoReset = true;
+        messagingTimer.AutoReset = false;
+        messagingTimer.Start();
 #endif
-        //TODO: TEST ME
-        //var messagingTimer = new System.Timers.Timer(1000);
-        //messagingTimer.Elapsed += SendAutomatedEmails;
-        //messagingTimer.AutoReset = true;
 
         // Configure the HTTP request pipeline.
         app.UseCors("MusicServerCorsPolicy");

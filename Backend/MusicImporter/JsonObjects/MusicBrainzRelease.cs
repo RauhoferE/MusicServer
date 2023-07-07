@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MusicImporter.JsonObjects
@@ -11,5 +12,8 @@ namespace MusicImporter.JsonObjects
         public string Id { get; set; }
 
         public DateTime Date { get; set; }
+
+        [JsonPropertyName("release-group")]
+        public ReleaseGroup ReleaseGroup {get; set;} 
     }
 }
