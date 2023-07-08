@@ -7,6 +7,7 @@ using MusicServer.Core.Settings;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
 using MusicServer.Settings;
+using System.Collections;
 using static MusicServer.Const.ApiRoutes;
 
 namespace MusicServer.Services
@@ -32,11 +33,10 @@ namespace MusicServer.Services
             var album = this.dBContext.Albums.FirstOrDefault(x => x.Id == albumId)
                 ?? throw new AlbumNotFoundException();
 
-            var path = Path.Combine(this.fileserverSettings.AlbumCoverFolder,
-                $"{albumId}.jpg");
+            var path = $"{this.fileserverSettings.AlbumCoverFolder}/{albumId}.jpg";
             if (!(await this.sftpService.FileExists(path)))
             {
-                throw new FileNotFoundException();
+                return await this.GetLocalFile(Path.Combine("Assets\\Images\\No-Album-Cover.png"));
             }
 
 
@@ -67,10 +67,10 @@ namespace MusicServer.Services
                 x.Playlist.IsPublic && x.Playlist.Id == playlistId)
                 ?? throw new NotAllowedException();
 
-            var path = Path.Combine(this.fileserverSettings.PlaylistCoverFolder, $"{playlistId}.png");
+            var path = $"{this.fileserverSettings.PlaylistCoverFolder}/{playlistId}.png";
             if (!(await this.sftpService.FileExists(path)))
             {
-                throw new FileNotFoundException();
+                return await this.GetLocalFile(Path.Combine("Assets\\Images\\No-Playlist-Cover.png"));
             }
 
             return await this.sftpService.DownloadFile(path);
@@ -81,7 +81,7 @@ namespace MusicServer.Services
             var song = this.dBContext.Songs.FirstOrDefault(x => x.Id == songId)
                 ?? throw new SongNotFoundException();
 
-            var path = Path.Combine(this.fileserverSettings.SongFolder, $"{songId}.mp3");
+            var path = $"{this.fileserverSettings.SongFolder}/{songId}.mp3";// Path.Combine(this.fileserverSettings.SongFolder, $"{songId}.mp3");
             if (!( await this.sftpService.FileExists(path)))
             {
                 throw new FileNotFoundException();
@@ -95,10 +95,10 @@ namespace MusicServer.Services
             var user = this.dBContext.Users.FirstOrDefault(x => x.Id == userId)
                 ?? throw new UserNotFoundException();
 
-            var path = Path.Combine(this.fileserverSettings.ProfileCoverFolder, $"{userId}.png");
+            var path = $"{this.fileserverSettings.ProfileCoverFolder}/{userId}.png";
             if (!(await this.sftpService.FileExists(path)))
             {
-                throw new FileNotFoundException();
+                return await this.GetLocalFile(Path.Combine("Assets\\Images\\No-Profile-Cover.png"));
             }
 
             return await this.sftpService.DownloadFile(path);
@@ -112,7 +112,7 @@ namespace MusicServer.Services
                 .FirstOrDefault(x => x.User.Id == this.activeUserService.Id && x.Playlist.Id == playlistId)
                 ?? throw new NotAllowedException();
 
-            var path = Path.Combine(this.fileserverSettings.PlaylistCoverFolder, $"{playlistId}{extension}");
+            var path = $"{this.fileserverSettings.PlaylistCoverFolder}/{playlistId}{extension}";
 
             using (var stream = image.OpenReadStream())
             {
@@ -127,8 +127,8 @@ namespace MusicServer.Services
 
         public async Task UploadUserAvatar(IFormFile image, string extension)
         {
-            var path = Path.Combine(this.fileserverSettings.ProfileCoverFolder,
-                $"{this.activeUserService.Id}{extension}");
+            var path = $"{this.fileserverSettings.ProfileCoverFolder}/{this.activeUserService.Id}{extension}";
+
             using (var stream = image.OpenReadStream())
             {
                 if (await sftpService.FileExists(path))
@@ -138,6 +138,19 @@ namespace MusicServer.Services
 
                 await this.sftpService.UploadFile(stream, path);
             }
+        }
+
+        private async Task<byte[]> GetLocalFile(string path)
+        {
+            var byteArray = new byte[1024];
+
+            using (var stream = System.IO.File.OpenRead(path))
+            {
+                byteArray = new byte[stream.Length];
+                stream.Read(byteArray, 0, byteArray.Length);
+            }
+
+            return byteArray;
         }
     }
 }

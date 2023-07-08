@@ -29,7 +29,9 @@ namespace MusicServer.Extensions
             builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
             builder.Services.Configure<FileserverSettings>(builder.Configuration.GetSection("FileserverSettings"));
-            builder.Services.Configure<FileServerCredentials>(builder.Configuration.GetSection("FileServerCredentials"));
+            var fileserverCredentials = builder.Configuration.GetSection("FileServerCredentials").Get<FileServerCredentials>();
+
+            builder.Services.AddSingleton(fileserverCredentials);
 
             // Add Services
             builder.Services.AddTransient<ISftpService, SftpService>();

@@ -14,7 +14,8 @@
             public const string Album = "album/{albumId}";
             public const string Artist = "artist/{artistId}";
             public const string Playlist = "playlist/{playlistId}";
-            public const string User = "user/{userId}"; 
+            public const string User = "user/{userId}";
+            public const string OwnUser = "me";
         }
 
         public static class User

@@ -56,32 +56,32 @@ namespace MusicServer.Controllers
         }
 
         [HttpPost(ApiRoutes.File.Playlist)]
-        public async Task<IActionResult> PlaylistCoverUpload([FromRoute, Required] Guid playlistId, IFormFile formFile)
+        public async Task<IActionResult> PlaylistCoverUpload([FromRoute, Required] Guid playlistId, IFormFile file)
         {
-            if (formFile != null && formFile.Length > 0)
+            if (file != null && file.Length > 0 && file.Length <= 1000000)
             {
-                if (Path.GetExtension(formFile.FileName) != ".png")
+                if (Path.GetExtension(file.FileName) != ".png")
                 {
                     throw new UploadedFileNotSupportedException();
                 }
 
-                await this.fileService.UploadPlaylistCover(playlistId, formFile, Path.GetExtension(formFile.FileName));
+                await this.fileService.UploadPlaylistCover(playlistId, file, Path.GetExtension(file.FileName));
                 return Ok();
             }
 
             return BadRequest();
         }
 
-        [HttpPost(ApiRoutes.File.User)]
-        public async Task<IActionResult> UserCoverUpload(IFormFile formFile)
+        [HttpPost(ApiRoutes.File.OwnUser)]
+        public async Task<IActionResult> UserCoverUpload(IFormFile file)
         {
-            if (formFile != null && formFile.Length > 0)
+            if (file != null && file.Length > 0 && file.Length <= 1000000)
             {
-                if (Path.GetExtension(formFile.FileName) != ".png")
+                if (Path.GetExtension(file.FileName) != ".png")
                 {
                     throw new UploadedFileNotSupportedException();
                 }
-                await this.fileService.UploadUserAvatar(formFile, Path.GetExtension(formFile.FileName));
+                await this.fileService.UploadUserAvatar(file, Path.GetExtension(file.FileName));
                 return Ok();
             }
 
