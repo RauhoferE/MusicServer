@@ -8,7 +8,7 @@ namespace MusicImporter.Interfaces
 {
     public interface IMusicBrainzService
     {
-        public Task DownloadAlbumCover(string albumName, Guid albumId);
+        public Task DownloadAlbumCover(string albumName, Guid albumId, string artistName);
 
         public Task<DateTime> GetAlbumReleaseDate(string albumName);
     }

@@ -31,7 +31,7 @@ namespace MusicImporter.Services
             this.sftpService = sftpService;
         }
 
-        public async Task DownloadAlbumCover(string albumName, Guid albumId)
+        public async Task DownloadAlbumCover(string albumName, Guid albumId, string artistName)
         {
             var client = this.httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.UserAgent
@@ -54,7 +54,8 @@ namespace MusicImporter.Services
             }
 
             // We want the album MBID for the cover
-            var mbidId = mbidRespAsJson.Releases.FirstOrDefault(x => x.ReleaseGroup.PrimaryType == "Album");
+            var mbidId = mbidRespAsJson.Releases.FirstOrDefault(x => x.ReleaseGroup.PrimaryType == "Album" 
+            && x.ArtistCredits.Any(y => y.Name.ToLower() == artistName.ToLower()));
 
             if (mbidId == null)
             {

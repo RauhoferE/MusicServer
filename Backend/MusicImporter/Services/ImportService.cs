@@ -92,7 +92,7 @@ namespace MusicImporter.Services
                 }).Entity;
 
                 // Download Album Cover and Save it 
-                await this.musicBrainzService.DownloadAlbumCover(metaData.Album, album.Id);
+                await this.musicBrainzService.DownloadAlbumCover(metaData.Album, album.Id, metaData.AlbumArtists.First());
             }
 
             var song = this.dBContext.Songs.FirstOrDefault(x => x.Name == metaData.Name && x.Length == metaData.Length && x.Album == album);

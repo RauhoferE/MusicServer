@@ -14,6 +14,9 @@ namespace MusicImporter.JsonObjects
         public DateTime Date { get; set; }
 
         [JsonPropertyName("release-group")]
-        public ReleaseGroup ReleaseGroup {get; set;} 
+        public ReleaseGroup ReleaseGroup {get; set;}
+
+        [JsonPropertyName("artist-credit")]
+        public ArtistCredit[] ArtistCredits { get; set; }
     }
 }
