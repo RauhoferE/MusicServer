@@ -1,4 +1,7 @@
-﻿using MusicServer.Interfaces;
+﻿using MusicServer.Core.Interfaces;
+using MusicServer.Core.Services;
+using MusicServer.Core.Settings;
+using MusicServer.Interfaces;
 using MusicServer.Services;
 using MusicServer.Settings;
 
@@ -25,8 +28,11 @@ namespace MusicServer.Extensions
             // Add Settings
             builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+            builder.Services.Configure<FileserverSettings>(builder.Configuration.GetSection("FileserverSettings"));
+            builder.Services.Configure<FileServerCredentials>(builder.Configuration.GetSection("FileServerCredentials"));
 
             // Add Services
+            builder.Services.AddTransient<ISftpService, SftpService>();
             builder.Services.AddTransient<IDevService, DevService>();
             builder.Services.AddTransient<IActiveUserService, ActiveUserService>();
             builder.Services.AddTransient<IAuthService, AuthenticationService>();
@@ -35,6 +41,7 @@ namespace MusicServer.Extensions
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IPlaylistService, PlaylistService>();
             builder.Services.AddTransient<ISongService, SongService>();
+            builder.Services.AddTransient<IFileService, FileService>();
         }
 
 

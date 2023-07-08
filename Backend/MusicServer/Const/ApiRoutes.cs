@@ -8,6 +8,15 @@
 
         public const string Base = Root + "/" + Controller;
 
+        public static class File
+        {
+            public const string Song = "song/{songId}"; 
+            public const string Album = "album/{albumId}";
+            public const string Artist = "artist/{artistId}";
+            public const string Playlist = "playlist/{playlistId}";
+            public const string User = "user/{userId}"; 
+        }
+
         public static class User
         {
             public const string SubscribeUser = "subscribe/user/{userId}";

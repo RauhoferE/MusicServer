@@ -3,6 +3,7 @@ using MusicServer.Core.Settings;
 using Renci.SshNet;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,16 @@ namespace MusicServer.Core.Services
         public SftpService(FileServerCredentials serverCredentials)
         {
             this.credentials = serverCredentials;
+        }
+
+        public async Task DeleteFile(string path)
+        {
+            using (var client = new SftpClient(this.credentials.Host, this.credentials.Port, this.credentials.UserName, this.credentials.Password))
+            {
+                client.Connect();
+
+                client.DeleteFile(path);
+            }
         }
 
         public async Task<byte[]> DownloadFile(string path)
@@ -32,6 +43,16 @@ namespace MusicServer.Core.Services
                 }
 
                 return byteArray;
+            }
+        }
+
+        public async Task<bool> FileExists(string path)
+        {
+            using (var client = new SftpClient(this.credentials.Host, this.credentials.Port, this.credentials.UserName, this.credentials.Password))
+            {
+                client.Connect();
+                
+                return client.Exists(path);
             }
         }
 
@@ -62,6 +83,17 @@ namespace MusicServer.Core.Services
                 {
                     await stream.CopyToAsync(ws);
                 }
+            }
+        }
+
+        public async Task<string> GetFileExtension(string path)
+        {
+            using (var client = new SftpClient(this.credentials.Host, this.credentials.Port, this.credentials.UserName, this.credentials.Password))
+            {
+                client.Connect();
+
+                var file = client.Get(path);
+                return file.Name.Substring(file.Name.LastIndexOf('.'), file.Name.Length - file.Name.LastIndexOf('.'));
             }
         }
     }
