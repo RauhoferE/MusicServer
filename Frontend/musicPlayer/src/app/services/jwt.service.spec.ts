@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { CookieService } from './cookie.service';
+import { JwtService } from './jwt.service';
 
-describe('CookieService', () => {
-  let service: CookieService;
+describe('JwtService', () => {
+  let service: JwtService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(CookieService);
+    service = TestBed.inject(JwtService);
   });
 
   it('should be created', () => {

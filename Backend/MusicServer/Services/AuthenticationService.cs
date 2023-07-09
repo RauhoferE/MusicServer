@@ -116,7 +116,8 @@ namespace MusicServer.Services
 
             var frontendClaims = new List<Claim>
             {
-                new("name", user.Email),
+                new("email", user.Email),
+                new("name", user.UserName),
             };
 
             // Create rolesList
