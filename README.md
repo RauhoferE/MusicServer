@@ -35,7 +35,8 @@
         "Email": "",
         "Password": "",
         "Port": "",
-        "Sender": "Musicserver"
+        "Sender": "Musicserver",
+        "SendMails":  false
     },
   "FileserverSettings": {
         "SongFolder": "/songs",
