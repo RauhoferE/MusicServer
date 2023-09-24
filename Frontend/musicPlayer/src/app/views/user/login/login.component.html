@@ -1,1 +1,55 @@
-<p>login works!</p>
+<div class="centered ">
+    <div class="form-background  p-4">
+        <h2>
+            Login
+        </h2>
+        <form nz-form [formGroup]="loginForm" class="login-form" (ngSubmit)="submit()">
+            <nz-form-item>
+              <nz-form-control nzHasFeedback [nzErrorTip]="emailErrorTpl">
+                <nz-input-group nzPrefixIcon="user" [nzSize]="'large'">
+                  <input type="text" nz-input formControlName="email" placeholder="Email" (input)="this.removeRejectErrorFromControls()"/>
+                  <ng-template #emailErrorTpl let-control>
+                    <ng-container *ngIf="control.hasError('required')" > 
+                        <div class="my-1">
+                                Please input your username!
+                        </div>
+                    </ng-container>
+                  </ng-template>
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-control nzHasFeedback [nzErrorTip]="passwordErrorTpl">
+                <nz-input-group nzPrefixIcon="lock" [nzSize]="'large'">
+                  <input type="password" nz-input formControlName="password" placeholder="Password" (input)="removeRejectErrorFromControls()"/>
+                  <ng-template #passwordErrorTpl let-control>
+                    <ng-container *ngIf="control.hasError('required')">
+                        <div class="my-1">
+                            Please input your password!
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="control.hasError('reject')">
+                        <div class="my-1">
+                            Username or password is incorrect!
+                        </div>
+                    </ng-container>
+                  </ng-template>
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+            <button nz-button class="login-form-button login-form-margin" style="width: 100%;" [nzType]="'primary'">Log in</button>
+            
+            <div nz-row class="mt-1">
+                <div nz-col [nzSpan]="12">
+                    Or <a href="/register">Register</a>
+                  </div>
+                <div nz-col [nzSpan]="12" class="text-end">
+                    <a href="/reset/password">Reset password</a>
+                  </div>
+            </div>
+    
+          </form>
+    </div>
+
+
+</div>

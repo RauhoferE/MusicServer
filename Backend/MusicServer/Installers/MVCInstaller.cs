@@ -23,8 +23,13 @@ namespace MusicServer.Installers
                     //TODO: Put exposed headers here
                     policy.WithOrigins(builder.Configuration.GetSection("AppSettings:AllowedCorsHosts").Get<string[]>())
                     .AllowAnyHeader()
+                    .WithExposedHeaders(new string[1]
+                    {
+                        "set-cookie"
+                    })
                     .AllowAnyMethod()
-                    .AllowCredentials();
+                    .AllowCredentials()
+                    .SetIsOriginAllowed((host) => true);
                 });
             });
 

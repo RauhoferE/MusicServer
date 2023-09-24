@@ -36,8 +36,12 @@ namespace MusicServer.Installers
                 options.Cookie.Name = "musicServer_Auth";
                 options.Cookie.SameSite = SameSiteMode.Strict;
 #if DEBUG
+                // TODO: Change for prod
                 options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                options.Cookie.Path = "/";
 #endif
+
 
                 options.Cookie.HttpOnly = true;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(30);

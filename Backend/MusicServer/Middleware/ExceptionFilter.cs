@@ -82,6 +82,18 @@ namespace MusicServer.Middleware
                 responseMessage = "Album was not found.";
             }
 
+            if (exception.GetType() == typeof(AuthenticationServiceException))
+            {
+                statusCode = (int)HttpStatusCode.BadRequest;
+                responseMessage = exception.Message;
+            }
+
+            if (exception.GetType() == typeof(UnauthenticatedException))
+            {
+                statusCode = (int)HttpStatusCode.Unauthorized;
+                responseMessage = exception.Message;
+            }
+
             // Maybe, logging the exception
             _logger.LogError(context.Exception, errorMessage);
             context.Result = new ContentResult

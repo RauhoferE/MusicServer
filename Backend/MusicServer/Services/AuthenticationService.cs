@@ -42,12 +42,12 @@ namespace MusicServer.Services
 
             if (user.TemporarayEmail == null)
             {
-                throw new MusicserverServiceException("Error when changing email.");
+                throw new AuthenticationServiceException("Error when changing email.");
             }
 
             if (!(await this._userManager.ChangeEmailAsync(user, user.TemporarayEmail, token)).Succeeded)
             {
-                throw new MusicserverServiceException("Error when changing email.");
+                throw new AuthenticationServiceException("Error when changing email.");
             }
         }
 
@@ -91,19 +91,19 @@ namespace MusicServer.Services
         public async Task<LoginUserClaimsResult> LoginUserAsync(string username, string password)
         {
             // Get user
-            var user = await this._userManager.FindByEmailAsync(username) ?? throw new UserNotFoundException();
+            var user = await this._userManager.FindByEmailAsync(username) ?? throw new UnauthenticatedException("Login failed. Check username and password.");
 
             // Check Mail confirmed
             if (!user.EmailConfirmed)
             {
-                throw new MusicserverServiceException("Please confirm your registration.");
+                throw new AuthenticationServiceException("Please confirm your registration.");
             }
 
             // Check login
             var loginCheck = await this._signInManager.CheckPasswordSignInAsync(user, password, false);
             if (!loginCheck.Succeeded)
             {
-                throw new MusicserverServiceException("Login failed. Check username and password.");
+                throw new UnauthenticatedException("Login failed. Check username and password.");
             }
 
             // Create claimsList
@@ -161,13 +161,13 @@ namespace MusicServer.Services
             var user = await this._userManager.FindByEmailAsync(userdata.Email);
             if (user != null)
             {
-                throw new MusicserverServiceException("User already exists");
+                throw new AuthenticationServiceException("User with that email already exists");
             }
 
             var registrationCodeEntity = this.dBContext.RegistrationCodes
                 .FirstOrDefault(x => x.Id == registrationCode && 
                 x.UsedDate == null &&
-                x.UsedByEmail == null) ?? throw new MusicserverServiceException("RegistrationCode is invalid");
+                x.UsedByEmail == null) ?? throw new AuthenticationServiceException("Registration code is invalid");
 
             registrationCodeEntity.UsedDate = DateTime.Now;
             registrationCodeEntity.UsedByEmail = userdata.Email;
@@ -226,7 +226,7 @@ $"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}{ApiRoutes.Au
 
             if (!(await this._userManager.ResetPasswordAsync(user, token, newPassword)).Succeeded)
             {
-                throw new MusicserverServiceException("Error when reseting the password.");
+                throw new AuthenticationServiceException("Error when reseting the password.");
             }
         }
 
@@ -237,7 +237,7 @@ $"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}{ApiRoutes.Au
 
             if (!(await this._userManager.ChangePasswordAsync(user, currentPassword, newPassword)).Succeeded)
             {
-                throw new MusicserverServiceException("Error when changing the password.");
+                throw new AuthenticationServiceException("Error when changing the password.");
             }
 
             return (await this.LoginUserAsync(user.Email, newPassword)).AuthenticationClaims;

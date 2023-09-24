@@ -1,1 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
+
+.centered{
+    position:absolute;
+    width:250px;
+    height:250px;
+    left:50%;
+    top:50%;
+    margin-left:-50px;
+    margin-top:-50px;
+}
+
+.form-background{
+    border-radius: 25px;
+    border: 1px grey;
+    background-color: lightgrey;
+}
