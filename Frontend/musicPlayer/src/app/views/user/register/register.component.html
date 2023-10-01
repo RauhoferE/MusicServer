@@ -1,1 +1,138 @@
-<p>register works!</p>
+<div class="centered ">
+    <div class="form-background  p-4" *ngIf="showForm">
+        <h2>
+            Create a new Account
+        </h2>
+        <form nz-form [formGroup]="registerForm" class="register-form" (ngSubmit)="submit()">
+            <nz-form-item>
+                <nz-form-label [nzSpan]="10" nzRequired nzLabelAlign="left">Username</nz-form-label>
+                <nz-form-control nzHasFeedback [nzErrorTip]="usernameErrorTpl">
+                    <nz-input-group nzPrefixIcon="user" [nzSize]="'large'">
+                        <input type="text" nz-input formControlName="username" placeholder="Username" />
+                        <ng-template #usernameErrorTpl let-control>
+                            <ng-container *ngIf="control.hasError('required')">
+                                <div class="my-1">
+                                    Please input your username!
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="control.hasError('minlength')">
+                                <div class="my-1">
+                                    Username has to be at least 3 characters long!
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="control.hasError('maxlength')">
+                                <div class="my-1">
+                                    Username can't be over 255 characters!
+                                </div>
+                            </ng-container>
+                        </ng-template>
+                    </nz-input-group>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label [nzSpan]="10" nzRequired nzLabelAlign="left">Email</nz-form-label>
+                <nz-form-control nzHasFeedback [nzErrorTip]="emailErrorTpl">
+                    <nz-input-group nzPrefixIcon="mail" [nzSize]="'large'">
+                        <input type="text" nz-input formControlName="email" placeholder="Email" />
+                        <ng-template #emailErrorTpl let-control>
+                            <ng-container *ngIf="control.hasError('required')">
+                                <div class="my-1">
+                                    Please input your email!
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="control.hasError('email')" > 
+                                <div class="my-1">
+                                        Please input a valid email!
+                                </div>
+                            </ng-container>
+                        </ng-template>
+                    </nz-input-group>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label [nzSpan]="10" nzRequired nzLabelAlign="left">Birtdate</nz-form-label>
+                <nz-form-control nzHasFeedback [nzErrorTip]="birtdateErrorTpl">
+                        <nz-date-picker formControlName="birthdate" [nzSize]="'large'" style="display: block;"></nz-date-picker>
+                        <ng-template #birtdateErrorTpl let-control>
+                            <ng-container *ngIf="control.hasError('required')">
+                                <div class="my-1">
+                                    Please input your birtdate!
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="control.hasError('birthdateValid')">
+                                <div class="my-1">
+                                    Birthdate has to be smaller than the current date!
+                                </div>
+                            </ng-container>
+                        </ng-template>
+                   
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label [nzSpan]="10" nzRequired nzLabelAlign="left">Password</nz-form-label>
+                <nz-form-control nzHasFeedback>
+                    <nz-input-group nzPrefixIcon="lock" [nzSize]="'large'">
+                        <input type="password" nz-input formControlName="password" placeholder="Password" />
+                    </nz-input-group>
+                    <div style="mt-2; color: #ff4d4f;">
+                        * Atleast 8 characters<br>
+                        * Atleast 1 uppercase character<br>
+                        * Atleast 1 digit<br>
+                        * Atleast 1 special character
+                    </div>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label [nzSpan]="10" nzRequired nzLabelAlign="left">Repeat Password</nz-form-label>
+                <nz-form-control nzHasFeedback [nzErrorTip]="passwordConfirmErrorTpl">
+                    <nz-input-group nzPrefixIcon="lock" [nzSize]="'large'">
+                        <input type="password" nz-input formControlName="passwordConfirm" placeholder="Password" />
+                        <ng-template #passwordConfirmErrorTpl let-control>
+                            <ng-container *ngIf="control.hasError('required')">
+                                <div class="my-1">
+                                    Please input your password!
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="control.hasError('confirmedValidator')">
+                                <div class="my-1">
+                                    Passwords have to match!
+                                </div>
+                            </ng-container>
+                        </ng-template>
+                    </nz-input-group>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label [nzSpan]="10" nzRequired nzLabelAlign="left">Registration code</nz-form-label>
+                <nz-form-control nzHasFeedback [nzErrorTip]="registrationCodeErrorTpl">
+                    <nz-input-group nzPrefixIcon="key" [nzSize]="'large'">
+                        <input type="text" nz-input formControlName="registrationCode" placeholder="Registration code" />
+                        <ng-template #registrationCodeErrorTpl let-control>
+                            <ng-container *ngIf="control.hasError('required')">
+                                <div class="my-1">
+                                    Please input your registration code!
+                                </div>
+                            </ng-container>
+                        </ng-template>
+                    </nz-input-group>
+                </nz-form-control>
+            </nz-form-item>
+            <button nz-button class="login-form-button login-form-margin" style="width: 100%;"
+                [nzType]="'primary'">Register</button>
+
+        </form>
+    </div>
+    <div class="form-background p-4" *ngIf="!showForm">
+        <h2 style="color: #52c41a;">
+            Registration successful!
+        </h2>
+        <div>
+            Thank you for registering!
+            Please check your inbox to activate your email.<br>
+            Go to <a href="/login"> Login </a>
+        </div>
+
+    </div>
+
+
+</div>

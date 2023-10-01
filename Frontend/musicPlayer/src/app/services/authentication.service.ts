@@ -31,5 +31,21 @@ export class AuthenticationService {
     return this.httpClient.post(`${environment.apiUrl}/${APIROUTES.authentication}/register`, register);
   }
 
+  confirmEmail(email: string, token: string): Observable<Object>{
+    return this.httpClient.get(`${environment.apiUrl}/${APIROUTES.authentication}/confirm/email/${email}/${token}`);
+  }
+
+  forgetPassword(email: string): Observable<Object>{
+    return this.httpClient.post(`${environment.apiUrl}/${APIROUTES.authentication}/forget/password`,{
+      email: email
+    });
+  }
+
+  resetPassword(userId: number, token: string, password: string): Observable<Object>{
+    return this.httpClient.post(`${environment.apiUrl}/${APIROUTES.authentication}/reset/password/${userId}/${token}`,{
+      password: password
+    });
+  }
+
 
 }

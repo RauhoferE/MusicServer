@@ -187,7 +187,7 @@ namespace MusicServer.Controllers
             // Attach JWT token to the response
             this.HttpContext.Response.Cookies.Append("user", new JwtSecurityTokenHandler().WriteToken(token), new CookieOptions
             {
-                Secure = false,
+                Secure = true,
                 SameSite = SameSiteMode.None,
                 HttpOnly = false,
                 Path = "/",

@@ -11,9 +11,14 @@
                   <ng-template #emailErrorTpl let-control>
                     <ng-container *ngIf="control.hasError('required')" > 
                         <div class="my-1">
-                                Please input your username!
+                                Please input your email!
                         </div>
                     </ng-container>
+                    <ng-container *ngIf="control.hasError('email')" > 
+                      <div class="my-1">
+                              Please input a valid email!
+                      </div>
+                  </ng-container>
                   </ng-template>
                 </nz-input-group>
               </nz-form-control>
@@ -44,7 +49,7 @@
                     Or <a href="/register">Register</a>
                   </div>
                 <div nz-col [nzSpan]="12" class="text-end">
-                    <a href="/reset/password">Reset password</a>
+                    <a href="/forget/password">Reset password</a>
                   </div>
             </div>
     

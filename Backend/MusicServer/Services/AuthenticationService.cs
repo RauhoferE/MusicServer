@@ -8,6 +8,8 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using MusicServer.Entities.DTOs;
 using MusicServer.Const;
+using Microsoft.Extensions.Options;
+using MusicServer.Settings;
 
 namespace MusicServer.Services
 {
@@ -19,13 +21,15 @@ namespace MusicServer.Services
         private readonly RoleManager<Role> _roleManager;
         private readonly IMusicMailService mailService;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly AppSettings _appSettings;
 
         public AuthenticationService(UserManager<User> userManager,
     MusicServerDBContext dbContext,
     SignInManager<User> signInManager,
     RoleManager<Role> roleManager,
     IMusicMailService mailService,
-    IHttpContextAccessor httpContextAccessor)
+    IHttpContextAccessor httpContextAccessor,
+    IOptions<AppSettings> appSettings)
         {
             this._userManager = userManager;
             this._roleManager = roleManager;
@@ -33,12 +37,13 @@ namespace MusicServer.Services
             this.dBContext = dbContext;
             this.mailService = mailService;
             this.httpContextAccessor = httpContextAccessor;
+            this._appSettings = appSettings.Value;
         }
 
         public async Task ChangeEmailAsync(long userId, string token)
         {
             var user = this.dBContext.Users.FirstOrDefault(x => x.Id == userId)
-                    ?? throw new UserNotFoundException("User not found.");
+                    ?? throw new MusicserverServiceException("User not found.");
 
             if (user.TemporarayEmail == null)
             {
@@ -53,7 +58,7 @@ namespace MusicServer.Services
 
         public async Task ConfirmRegistrationAsync(string email, string token)
         {
-            var user = await this._userManager.FindByEmailAsync(email) ?? throw new UserNotFoundException();
+            var user = await this._userManager.FindByEmailAsync(email) ?? throw new MusicserverServiceException("user not found");
 
             var res = await this._userManager.ConfirmEmailAsync(user, token);
 
@@ -85,7 +90,7 @@ namespace MusicServer.Services
 
             await this._userManager.DeleteAsync(user);
 
-            // Send Email that Account has been deleted
+            // TODO: Send Email that Account has been deleted
         }
 
         public async Task<LoginUserClaimsResult> LoginUserAsync(string username, string password)
@@ -187,9 +192,8 @@ namespace MusicServer.Services
 
             await this.dBContext.SaveChangesAsync();
 
-            //TOOD: Change address to frontend
             await this.mailService.SendWelcomeEmail(user, 
-                $"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}{ApiRoutes.Authentication.ConfirmMail.Replace("{email}", user.Email).Replace("{token}", token)}");
+                $"{this._appSettings.FrontendAddress}/{ApiRoutes.Authentication.ConfirmMail.Replace("{email}", user.Email).Replace("{token}", token)}");
         }
 
         public async Task RequestEmailResetAsync(long userId, string newEmail)
@@ -202,27 +206,25 @@ namespace MusicServer.Services
             user.TemporarayEmail = newEmail;
             await this.dBContext.SaveChangesAsync();
 
-            //TOOD: Change address to frontend
             await this.mailService.SendEmailChangeEmail(user,
-    $"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}{ApiRoutes.Authentication.ChangeEmail.Replace("{userId}", user.Id.ToString()).Replace("{token}", token)}");
+    $"{this._appSettings.FrontendAddress}/{ApiRoutes.Authentication.ChangeEmail.Replace("{userId}", user.Id.ToString()).Replace("{token}", token)}");
         }
 
         public async Task ResetPasswordRequestAsync(string email)
         {
             var user = this.dBContext.Users.FirstOrDefault(x => x.Email == email)
-    ?? throw new UserNotFoundException("User not found.");
+                ?? throw new MusicserverServiceException("User not found.");
 
             var token = await this._userManager.GeneratePasswordResetTokenAsync(user);
 
-            //TOOD: Change address to frontend
             await this.mailService.SendPasswordResetEmail(user,
-$"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}{ApiRoutes.Authentication.ResetPassword.Replace("{userId}", user.Id.ToString()).Replace("{token}", token)}");
+$"{this._appSettings.FrontendAddress}/{ApiRoutes.Authentication.ResetPassword.Replace("{userId}", user.Id.ToString()).Replace("{token}", token)}");
         }
 
         public async Task ResetPasswordAsync(long userId, string newPassword, string token)
         {
             var user = this.dBContext.Users.FirstOrDefault(x => x.Id == userId)
-    ?? throw new UserNotFoundException("User not found.");
+    ?? throw new MusicserverServiceException("User not found.");
 
             if (!(await this._userManager.ResetPasswordAsync(user, token, newPassword)).Succeeded)
             {
@@ -233,7 +235,7 @@ $"https://{this.httpContextAccessor.HttpContext.Request.Host.Value}{ApiRoutes.Au
         public async Task<ICollection<Claim>> ChangePasswordAsync(long activeUserId, string currentPassword, string newPassword)
         {
             var user = this.dBContext.Users.FirstOrDefault(x => x.Id == activeUserId) 
-                ?? throw new UserNotFoundException("User not found.");
+                ?? throw new MusicserverServiceException("User not found.");
 
             if (!(await this._userManager.ChangePasswordAsync(user, currentPassword, newPassword)).Succeeded)
             {

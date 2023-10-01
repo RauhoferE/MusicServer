@@ -13,7 +13,7 @@ export class LoginComponent {
 
   public loginForm: FormGroup;
 
-  /**
+  /** 
    *
    */
   constructor(private authservice: AuthenticationService,
@@ -21,7 +21,7 @@ export class LoginComponent {
     private message: NzMessageService,
     private router: Router) {
       this.loginForm = this.fb.group({
-        email: ['', [Validators.required]],
+        email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required]]
       })
     

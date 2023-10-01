@@ -2,7 +2,7 @@
 
 .centered{
     position:absolute;
-    width:250px;
+    width:500px;
     height:250px;
     left:50%;
     top:50%;
@@ -14,4 +14,17 @@
     border-radius: 25px;
     border: 1px grey;
     background-color: lightgrey;
+
+    &-success{
+        @extend .form-background;
+        color: #52c41a;
+    }
+}
+
+.error-color{
+    color: #ff4d4f;
+}
+
+.success-color{
+    color: #52c41a;
 }

@@ -7,6 +7,9 @@ import { PlaylistsComponent } from './views/playlist/playlists/playlists.compone
 import { isAuthenticatedGuard } from './route-guards/is-authenticated.guard';
 import { NotFoundComponent } from './views/common/not-found/not-found.component';
 import { isUnknownGuard } from './route-guards/is-unknown.guard';
+import { ConfirmMailComponent } from './views/user/confirm-mail/confirm-mail.component';
+import { ResetPasswordComponent } from './views/user/reset-password/reset-password.component';
+import { ForgetPasswordComponent } from './views/user/forget-password/forget-password.component';
 
 const routes: Routes = [
   { 
@@ -17,6 +20,21 @@ const routes: Routes = [
   { 
     path: 'register',
     component: RegisterComponent,
+    canActivate: [isUnknownGuard]
+  },
+  { 
+    path: 'confirm/email/:email/:token',
+    component: ConfirmMailComponent,
+    canActivate: [isUnknownGuard]
+  },
+  { 
+    path: 'reset/password/:userId/:token',
+    component: ResetPasswordComponent,
+    canActivate: [isUnknownGuard]
+  },
+  { 
+    path: 'forget/password',
+    component: ForgetPasswordComponent,
     canActivate: [isUnknownGuard]
   },
   { 
