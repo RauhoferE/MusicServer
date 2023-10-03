@@ -23,9 +23,14 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import {NzButtonModule} from 'ng-zorro-antd/button';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import {NzDatePickerModule} from 'ng-zorro-antd/date-picker';
+import {NzLayoutModule } from 'ng-zorro-antd/layout';
+
 import { ConfirmMailComponent } from './views/user/confirm-mail/confirm-mail.component';
 import { ResetPasswordComponent } from './views/user/reset-password/reset-password.component';
 import { ForgetPasswordComponent } from './views/user/forget-password/forget-password.component';
+import { BaseComponent } from './views/base/base.component';
+import { HomeComponent } from './views/home/home.component';
+import { NzMenuModule } from 'ng-zorro-antd/menu';
 
 registerLocaleData(en);
 
@@ -38,7 +43,9 @@ registerLocaleData(en);
     NotFoundComponent,
     ConfirmMailComponent,
     ResetPasswordComponent,
-    ForgetPasswordComponent
+    ForgetPasswordComponent,
+    BaseComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
@@ -57,7 +64,9 @@ registerLocaleData(en);
     NzIconModule,
     NzButtonModule,
     NzGridModule,
-    NzDatePickerModule 
+    NzDatePickerModule,
+    NzLayoutModule,
+    NzMenuModule 
   ],
   providers: [
     CookieService,

@@ -10,6 +10,8 @@ import { isUnknownGuard } from './route-guards/is-unknown.guard';
 import { ConfirmMailComponent } from './views/user/confirm-mail/confirm-mail.component';
 import { ResetPasswordComponent } from './views/user/reset-password/reset-password.component';
 import { ForgetPasswordComponent } from './views/user/forget-password/forget-password.component';
+import { HomeComponent } from './views/home/home.component';
+import { BaseComponent } from './views/base/base.component';
 
 const routes: Routes = [
   { 
@@ -38,14 +40,20 @@ const routes: Routes = [
     canActivate: [isUnknownGuard]
   },
   { 
-    path: 'playlists',
-    component: PlaylistsComponent,
-    canActivate: [isAuthenticatedGuard]
-  },
-  { 
     path: '',
-    redirectTo: '/playlists',
-    pathMatch: 'full'
+    component: BaseComponent,
+    canActivate: [isAuthenticatedGuard],
+    children:[
+      {
+        path: '',
+        component: HomeComponent
+      },
+      {
+        path: 'playlist',
+        component: PlaylistsComponent
+      }
+    ]
+    //pathMatch: 'full'
   },
   { 
     path: '**',
