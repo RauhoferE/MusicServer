@@ -31,6 +31,8 @@ import { ForgetPasswordComponent } from './views/user/forget-password/forget-pas
 import { BaseComponent } from './views/base/base.component';
 import { HomeComponent } from './views/home/home.component';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import {NzAvatarModule } from 'ng-zorro-antd/avatar';
 
 registerLocaleData(en);
 
@@ -66,7 +68,9 @@ registerLocaleData(en);
     NzGridModule,
     NzDatePickerModule,
     NzLayoutModule,
-    NzMenuModule 
+    NzMenuModule,
+    NzTagModule,
+    NzAvatarModule
   ],
   providers: [
     CookieService,

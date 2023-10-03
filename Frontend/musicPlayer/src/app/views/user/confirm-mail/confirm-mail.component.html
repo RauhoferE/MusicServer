@@ -1,19 +1,19 @@
 <div class="centered ">
     
-    <div class="form-background p-4" *ngIf="this.loading" style="text-align: center;">
+    <div class="form-background text-end" *ngIf="this.loading">
         <span nz-icon [nzType]="'loading'" style="font-size: 100px;"></span>
     </div>
-    <div class="form-background p-4" *ngIf="this.failed && !this.loading">
+    <div class="form-background" *ngIf="this.failed && !this.loading">
         <h2 class="error-color">
             Error when confirming the email of your account!
         </h2>
         <div>
             This is either because the link you were sent has expired or there was an error on our end.<br>
             <!-- TODO: Change mail adress -->
-            Please try again later or send us a <a href="mailto:test@test.at">Mail</a>
+            Please try again later or send us a <a href="mailto:emre.rauhofer@gmail.com">Mail</a>
         </div>
     </div>
-    <div class="form-background p-4" *ngIf="!this.failed && !this.loading">
+    <div class="form-background" *ngIf="!this.failed && !this.loading">
         <h2 class="success-color">
             Account activation successful!
         </h2>

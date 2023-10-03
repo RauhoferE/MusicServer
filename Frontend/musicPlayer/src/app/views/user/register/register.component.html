@@ -1,5 +1,5 @@
 <div class="centered ">
-    <div class="form-background  p-4" *ngIf="showForm">
+    <div class="form-background" *ngIf="showForm">
         <h2>
             Create a new Account
         </h2>
@@ -74,7 +74,7 @@
                     <nz-input-group nzPrefixIcon="lock" [nzSize]="'large'">
                         <input type="password" nz-input formControlName="password" placeholder="Password" />
                     </nz-input-group>
-                    <div style="mt-2; color: #ff4d4f;">
+                    <div style="margin-top: 0.5rem; color: #ff4d4f;">
                         * Atleast 8 characters<br>
                         * Atleast 1 uppercase character<br>
                         * Atleast 1 digit<br>

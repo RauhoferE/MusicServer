@@ -14,6 +14,7 @@
     border-radius: 25px;
     border: 1px grey;
     background-color: lightgrey;
+    padding: 1.5rem;
 
     &-success{
         @extend .form-background;
@@ -32,4 +33,19 @@
 .footer{
     background-color: #001529;
     color: #ffffff;
+}
+
+/*Bootstrap Shenanigans*/
+
+.mt-1{
+    margin-top: 0.25rem;
+}
+
+.my-1{
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.text-end{
+    text-align: end;
 }

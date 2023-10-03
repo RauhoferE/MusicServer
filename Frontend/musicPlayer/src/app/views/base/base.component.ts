@@ -6,5 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./base.component.scss']
 })
 export class BaseComponent {
-
+  test(): void{
+    console.log("Hello")
+  }
 }
