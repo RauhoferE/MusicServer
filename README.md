@@ -26,8 +26,9 @@
   },
 
   "AppSettings": {
-      "AllowedCorsHosts": [ "localhost" ],
-    "CookieExpirationTimeInMinutes":  60
+      "AllowedCorsHosts": [ "localhost:4200" ],
+    "CookieExpirationTimeInMinutes":  60,
+    "FrontendAddress": "http://localhost:4200"
 
   },
     "MailSettings": {
