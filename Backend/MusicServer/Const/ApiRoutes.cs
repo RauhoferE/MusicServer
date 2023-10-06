@@ -49,8 +49,8 @@
         public static class Development
         {
             public const string Test = "test";
-            public const string CreateArtistsAndSongs = "create/{artists}/{albums}/{songs}";
-            public const string CreateUsersAndPlaylists = "create/{users}/{playlists}";
+            public const string CreateArtistsAndSongs = "create/artists/{artists}/{albums}/{songs}";
+            public const string CreateUsersAndPlaylists = "create/users/{users}/{playlists}";
         }
 
         public static class Playlist
