@@ -93,6 +93,19 @@ namespace MusicServer.Mapper
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.FollowedUser.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.FollowedUser.UserName));
 
+            this.CreateMap<User, LongNameDto>(MemberList.Destination)
+    .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Id))
+    .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.UserName));
+
+            this.CreateMap<Playlist, FollowedPlaylistDto>(MemberList.Destination)
+.ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Id))
+.ForMember(dest => dest.CreatorName, opt => opt.MapFrom(ps => string.Empty))
+.ForMember(dest => dest.SongCount, opt => opt.MapFrom(ps => ps.Songs.Count));
+
+            this.CreateMap<Artist, LongNameDto>(MemberList.Destination)
+.ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Id))
+.ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Name));
+
             this.CreateMap<UserUser, UserDto>(MemberList.Destination)
     .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.FollowedUser.Id))
     .ForMember(dest => dest.UserName, opt => opt.MapFrom(ps => ps.FollowedUser.UserName))

@@ -20,7 +20,9 @@ namespace MusicServer.Interfaces
 
         public Task<UserDtoPaginationResponse> GetFollowedUsers(int page, int take, string query, bool asc);
 
-        public Task<FullUserPaginationResponse> GetUsersAsync(int page, int take, string searchTerm, bool asc);   
+        public Task<FullUserPaginationResponse> GetUsersAsync(int page, int take, string searchTerm, bool asc);
+
+        public Task<AllFollowedEntitiesResponse> GetAllFollowedUsersArtistsPlaylistsFavorites(string filter, string searchTerm);
 
         public Task<UserDetailsDto> GetUserAsync(long userId);
 

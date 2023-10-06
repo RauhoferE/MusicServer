@@ -28,6 +28,7 @@
             public const string GetUser = "{userId}";
             public const string RoleUser = "role/{roleId}/{userId}";
             public const string Roles = "roles";
+            public const string GetFollowedEntiies = "followed/all";
         }
 
         public static class Authentication
@@ -49,6 +50,7 @@
         {
             public const string Test = "test";
             public const string CreateArtistsAndSongs = "create/{artists}/{albums}/{songs}";
+            public const string CreateUsersAndPlaylists = "create/{artists}/{albums}/{songs}";
         }
 
         public static class Playlist

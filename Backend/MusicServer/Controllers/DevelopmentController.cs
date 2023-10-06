@@ -37,5 +37,13 @@ namespace MusicServer.Controllers
             await this.devService.AddMoqArtistsAlbumsSongsAsync(artists, albums, songs);
             return NoContent();
         }
+
+        [HttpGet]
+        [Route(ApiRoutes.Development.CreateUsersAndPlaylists)]
+        public async Task<IActionResult> CreateMoqUsersWithPlaylists([FromRoute, Required] int users, [FromRoute, Required] int playlists)
+        {
+            await this.devService.AddMoqUsersAndPlaylists(users, playlists);
+            return NoContent();
+        }
     }
 }

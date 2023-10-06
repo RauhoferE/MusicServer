@@ -249,5 +249,77 @@ namespace MusicServer.Services
 
             return roles.ToArray();
         }
+
+        // TODO: Test me
+        public async Task<AllFollowedEntitiesResponse> GetAllFollowedUsersArtistsPlaylistsFavorites(string filter, string searchTerm)
+        {
+            // TODO: Maybe useless with IActiveUser
+            var user = this.dBContext.Users
+                    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
+            var favoritesCount = this.dBContext.Users
+                .Include(x => x.Favorites)
+                .FirstOrDefault(x => x.Id == this.activeUserService.Id).Favorites.Count();
+
+            IEnumerable<Artist> followedArtists = new List<Artist>();
+
+            IEnumerable<Playlist> followedPlaylists = new List<Playlist>();
+
+            IEnumerable<User> followedUsers = new List<User>();
+
+            if (filter.ToLower() == "artists" || filter == string.Empty )
+            {
+                followedArtists = this.dBContext.Users
+    .Include(x => x.FollowedArtists)
+    .ThenInclude(x => x.Artist)
+    .FirstOrDefault(x => x.Id == this.activeUserService.Id).FollowedArtists
+    .Where(x => x.Artist.Name.Contains(searchTerm))
+    .Take(100)
+    .ToList().Select(x => x.Artist);
+            }
+
+            if (filter.ToLower() == "playlists" || filter == string.Empty)
+            {
+                followedPlaylists = this.dBContext.Users
+    .Include(x => x.Playlists)
+    .ThenInclude(x => x.Playlist)
+    .ThenInclude(x => x.Songs)
+    .FirstOrDefault(x => x.Id == this.activeUserService.Id).Playlists
+    .Where(x => x.Playlist.Name.Contains(searchTerm))
+    .Take(100)
+    .ToList().Select(x => x.Playlist);
+            }
+
+            if (filter.ToLower() == "users" || filter == string.Empty)
+            {
+                followedUsers = this.dBContext.Users
+    .Include(x => x.FollowedUsers)
+    .ThenInclude(x => x.FollowedUser)
+    .FirstOrDefault(x => x.Id == this.activeUserService.Id).FollowedUsers
+    .Where(x => x.Name.Contains(searchTerm))
+    .Take(100).ToList().Select(x => x.FollowedUser);
+            }
+
+            var mappedFollowedPlaylists = this.mapper.Map<FollowedPlaylistDto[]>(followedPlaylists);
+
+            foreach (var pl in mappedFollowedPlaylists)
+            {
+                var playlistEntity = this.dBContext
+                    .PlaylistUsers
+                    .Include(x => x.User)
+                    .FirstOrDefault(x => x.IsCreator == true && x.Playlist.Id == pl.Id)
+                    ?? throw new PlaylistNotFoundException("Can't get Creator of Playlist.");
+
+                pl.CreatorName = playlistEntity.User.UserName;
+            }
+
+            return new AllFollowedEntitiesResponse()
+            {
+                FavoritesSongCount = favoritesCount,
+                FollowedUsers = this.mapper.Map<LongNameDto[]>(followedUsers),
+                FollowedArtists = this.mapper.Map<LongNameDto[]>(followedArtists),
+                FollowedPlaylists = mappedFollowedPlaylists
+            };
+        }
     }
 }

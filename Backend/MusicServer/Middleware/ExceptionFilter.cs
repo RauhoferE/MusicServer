@@ -48,13 +48,6 @@ namespace MusicServer.Middleware
             }
 
 
-            if (exception.GetType() == typeof(PlaylistNotFoundException))
-            {
-                statusCode = (int)HttpStatusCode.BadRequest;
-                responseMessage = "Playlist was not found.";
-            }
-
-
             if (exception.GetType() == typeof(NotAllowedException))
             {
                 statusCode = (int)HttpStatusCode.BadRequest;

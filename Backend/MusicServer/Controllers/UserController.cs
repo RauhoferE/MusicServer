@@ -121,5 +121,12 @@ namespace MusicServer.Controllers
         {
             return Ok(await this.userService.GetRoles());
         }
+
+        [HttpGet]
+        [Route(ApiRoutes.User.GetFollowedEntiies)]
+        public async Task<IActionResult> GetFollowedEntities([FromQuery] string filter = "", [FromQuery] string searchTerm = "")
+        {
+            return Ok(await this.userService.GetAllFollowedUsersArtistsPlaylistsFavorites(filter, searchTerm));
+        }
     }
 }

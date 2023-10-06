@@ -1,5 +1,6 @@
 ﻿using DataAccess;
 using DataAccess.Entities;
+using Microsoft.AspNetCore.Identity;
 using MusicServer.Interfaces;
 
 namespace MusicServer.Services
@@ -7,10 +8,12 @@ namespace MusicServer.Services
     public class DevService : IDevService
     {
         private readonly MusicServerDBContext dBContext;
+        private readonly UserManager<User> userManager;
 
-        public DevService(MusicServerDBContext dBContext)
+        public DevService(MusicServerDBContext dBContext, UserManager<User> userManager)
         {
             this.dBContext = dBContext;
+            this.userManager = userManager;
         }
 
         public async Task AddMoqArtistsAlbumsSongsAsync(int numberOfArtists, int numberOfAlbums, int numberOfSongs)
@@ -68,6 +71,72 @@ namespace MusicServer.Services
             }
 
             await this.dBContext.AddRangeAsync(artists);
+            await this.dBContext.SaveChangesAsync();
+        }
+
+        // TODO: Test me
+        public async Task AddMoqUsersAndPlaylists(int numberOfUsers, int numberOfPlaylists)
+        {
+            var emailList = new List<string>();
+            var rnd = new Random();
+
+            // Create number of Users
+            for (int i = 0; i < numberOfUsers; i++)
+            {
+                var email = FakerDotNet.Faker.Internet.Email() + rnd.Next();
+                var succ = await this.userManager.CreateAsync(new User()
+                {
+                    UserName = FakerDotNet.Faker.Internet.Username(),
+                    Birth = FakerDotNet.Faker.Date.Birthday(),
+                    Email = email,
+                }, "KillMe123123!!");
+
+                if (succ.Succeeded)
+                {
+                    emailList.Add(email);
+                }
+            }
+
+            foreach (var e in emailList)
+            {
+                var user = this.dBContext.Users.FirstOrDefault(x => x.Email.ToLower() == e.ToLower());
+                user.EmailConfirmed = true;
+
+                // Create the Playlists for the User
+                for (int i = 0; i < numberOfPlaylists; i++)
+                {
+                    // Take random songs for the playlists
+                    var rndSongs = this.dBContext.Songs.Take(rnd.Next(1, 10)).ToList();
+                    var pl = new Playlist()
+                    {
+                        Name = FakerDotNet.Faker.Pokemon.Name(),
+                        Modified = DateTime.Now,
+                        Created= DateTime.Now,
+                        
+                    };
+
+                    for (int k = 0; k < rndSongs.Count; k++)
+                    {
+                        pl.Songs.Add(new PlaylistSong()
+                        {
+                            Added = DateTime.Now,
+                            Order = k,
+                            Song = rndSongs[k]
+                        });
+                    }
+
+                    user.Playlists.Add(new PlaylistUser()
+                    {
+                        User = user,
+                        Playlist = pl,
+                        Added= DateTime.Now,
+                        IsCreator= true,
+                        IsModifieable= true,
+                        Order = i,
+                    });
+                }
+            }
+
             await this.dBContext.SaveChangesAsync();
         }
     }
