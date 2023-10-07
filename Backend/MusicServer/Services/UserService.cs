@@ -39,7 +39,7 @@ namespace MusicServer.Services
 
             var followedArtists = SortingHelpers.SortSearchFollowedArtists(targetUser.FollowedArtists.AsQueryable(), asc, query);
 
-            var mappedArtists = this.mapper.Map<GuidNameDto[]>(targetUser.FollowedArtists.Skip((page - 1) * take).Take(take).ToArray());
+            var mappedArtists = this.mapper.Map<ArtistShortDto[]>(targetUser.FollowedArtists.Skip((page - 1) * take).Take(take).ToArray());
 
             foreach (var artist in mappedArtists)
             {
@@ -250,7 +250,7 @@ namespace MusicServer.Services
             return roles.ToArray();
         }
 
-        // TODO: Test me
+        
         public async Task<AllFollowedEntitiesResponse> GetAllFollowedUsersArtistsPlaylistsFavorites(string filter, string searchTerm)
         {
             // TODO: Maybe useless with IActiveUser
@@ -261,11 +261,11 @@ namespace MusicServer.Services
                 .Include(x => x.Favorites)
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id).Favorites.Count();
 
-            IEnumerable<Artist> followedArtists = new List<Artist>();
+            IEnumerable<UserArtist> followedArtists = new List<UserArtist>();
 
             IEnumerable<Playlist> followedPlaylists = new List<Playlist>();
 
-            IEnumerable<User> followedUsers = new List<User>();
+            IEnumerable<UserUser> followedUsers = new List<UserUser>();
 
             if (filter.ToLower() == "artists" || filter == string.Empty )
             {
@@ -275,7 +275,7 @@ namespace MusicServer.Services
     .FirstOrDefault(x => x.Id == this.activeUserService.Id).FollowedArtists
     .Where(x => x.Artist.Name.Contains(searchTerm))
     .Take(100)
-    .ToList().Select(x => x.Artist);
+    .ToList();
             }
 
             if (filter.ToLower() == "playlists" || filter == string.Empty)
@@ -296,8 +296,8 @@ namespace MusicServer.Services
     .Include(x => x.FollowedUsers)
     .ThenInclude(x => x.FollowedUser)
     .FirstOrDefault(x => x.Id == this.activeUserService.Id).FollowedUsers
-    .Where(x => x.Name.Contains(searchTerm))
-    .Take(100).ToList().Select(x => x.FollowedUser);
+    .Where(x => x.FollowedUser.UserName.Contains(searchTerm))
+    .Take(100).ToList();
             }
 
             var mappedFollowedPlaylists = this.mapper.Map<FollowedPlaylistDto[]>(followedPlaylists);
@@ -312,12 +312,12 @@ namespace MusicServer.Services
 
                 pl.CreatorName = playlistEntity.User.UserName;
             }
-
+            
             return new AllFollowedEntitiesResponse()
             {
                 FavoritesSongCount = favoritesCount,
-                FollowedUsers = this.mapper.Map<LongNameDto[]>(followedUsers),
-                FollowedArtists = this.mapper.Map<LongNameDto[]>(followedArtists),
+                FollowedUsers = this.mapper.Map<UserDto[]>(followedUsers),
+                FollowedArtists = this.mapper.Map<ArtistShortDto[]>(followedArtists),
                 FollowedPlaylists = mappedFollowedPlaylists
             };
         }

@@ -4,9 +4,9 @@ namespace MusicServer.Entities.Responses
 {
     public class AllFollowedEntitiesResponse
     {
-        public LongNameDto[] FollowedUsers { get; set; }
+        public UserDto[] FollowedUsers { get; set; }
 
-        public LongNameDto[] FollowedArtists { get; set; }
+        public ArtistShortDto[] FollowedArtists { get; set; }
 
         public FollowedPlaylistDto[] FollowedPlaylists { get; set; }
 

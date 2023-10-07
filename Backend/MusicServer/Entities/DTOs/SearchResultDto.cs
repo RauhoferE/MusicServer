@@ -4,7 +4,7 @@
     {
         public PlaylistUserShortDto[] Playlists { get; set; } = new PlaylistUserShortDto[0];
 
-        public GuidNameDto[] Artists { get; set; } = new GuidNameDto[0];
+        public ArtistShortDto[] Artists { get; set; } = new ArtistShortDto[0];
 
         public SongDto[] Songs { get; set; } = new SongDto[0];
 

@@ -74,7 +74,6 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        // TODO: Test me
         public async Task AddMoqUsersAndPlaylists(int numberOfUsers, int numberOfPlaylists)
         {
             var emailList = new List<string>();
@@ -83,7 +82,7 @@ namespace MusicServer.Services
             // Create number of Users
             for (int i = 0; i < numberOfUsers; i++)
             {
-                var email = FakerDotNet.Faker.Internet.Email() + rnd.Next();
+                var email = rnd.Next().ToString() + FakerDotNet.Faker.Internet.Email();
                 var succ = await this.userManager.CreateAsync(new User()
                 {
                     UserName = FakerDotNet.Faker.Internet.Username(),
@@ -112,7 +111,7 @@ namespace MusicServer.Services
                         Name = FakerDotNet.Faker.Pokemon.Name(),
                         Modified = DateTime.Now,
                         Created= DateTime.Now,
-                        
+                        Songs = new List<PlaylistSong>()
                     };
 
                     for (int k = 0; k < rndSongs.Count; k++)
