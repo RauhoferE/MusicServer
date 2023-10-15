@@ -49,7 +49,7 @@ const routes: Routes = [
         component: HomeComponent
       },
       {
-        path: 'playlist',
+        path: 'playlists',
         component: PlaylistsComponent
       }
     ]

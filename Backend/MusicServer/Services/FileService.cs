@@ -92,6 +92,11 @@ namespace MusicServer.Services
 
         public async Task<byte[]> GetUserAvatar(long userId)
         {
+            if (userId == -1)
+            {
+                userId = this.activeUserService.Id;
+            }
+
             var user = this.dBContext.Users.FirstOrDefault(x => x.Id == userId)
                 ?? throw new UserNotFoundException();
 

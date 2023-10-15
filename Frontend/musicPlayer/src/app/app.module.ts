@@ -33,6 +33,7 @@ import { HomeComponent } from './views/home/home.component';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import {NzAvatarModule } from 'ng-zorro-antd/avatar';
+import {NzListModule } from 'ng-zorro-antd/list';
 
 registerLocaleData(en);
 
@@ -70,7 +71,8 @@ registerLocaleData(en);
     NzLayoutModule,
     NzMenuModule,
     NzTagModule,
-    NzAvatarModule
+    NzAvatarModule,
+    NzListModule
   ],
   providers: [
     CookieService,

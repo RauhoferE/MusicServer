@@ -253,6 +253,9 @@ namespace MusicServer.Services
         
         public async Task<AllFollowedEntitiesResponse> GetAllFollowedUsersArtistsPlaylistsFavorites(string filter, string searchTerm)
         {
+            filter = filter ?? string.Empty;
+            searchTerm = searchTerm ?? string.Empty;
+
             // TODO: Maybe useless with IActiveUser
             var user = this.dBContext.Users
                     .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
