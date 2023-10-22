@@ -255,6 +255,9 @@ namespace MusicServer.Services
         {
             filter = filter ?? string.Empty;
             searchTerm = searchTerm ?? string.Empty;
+            searchTerm = searchTerm.ToLower();
+            filter = filter.ToLower();
+            
 
             // TODO: Maybe useless with IActiveUser
             var user = this.dBContext.Users
@@ -276,7 +279,7 @@ namespace MusicServer.Services
     .Include(x => x.FollowedArtists)
     .ThenInclude(x => x.Artist)
     .FirstOrDefault(x => x.Id == this.activeUserService.Id).FollowedArtists
-    .Where(x => x.Artist.Name.Contains(searchTerm))
+    .Where(x => x.Artist.Name.ToLower().Contains(searchTerm))
     .Take(100)
     .ToList();
             }
@@ -288,7 +291,7 @@ namespace MusicServer.Services
     .ThenInclude(x => x.Playlist)
     .ThenInclude(x => x.Songs)
     .FirstOrDefault(x => x.Id == this.activeUserService.Id).Playlists
-    .Where(x => x.Playlist.Name.Contains(searchTerm))
+    .Where(x => x.Playlist.Name.ToLower().Contains(searchTerm))
     .Take(100)
     .ToList().Select(x => x.Playlist);
             }
@@ -299,7 +302,7 @@ namespace MusicServer.Services
     .Include(x => x.FollowedUsers)
     .ThenInclude(x => x.FollowedUser)
     .FirstOrDefault(x => x.Id == this.activeUserService.Id).FollowedUsers
-    .Where(x => x.FollowedUser.UserName.Contains(searchTerm))
+    .Where(x => x.FollowedUser.UserName.ToLower().Contains(searchTerm))
     .Take(100).ToList();
             }
 

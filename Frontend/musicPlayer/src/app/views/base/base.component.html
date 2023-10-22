@@ -1,6 +1,8 @@
 <nz-layout style="height: 100%;">
     <nz-header>
-      <div class="logo"></div>
+      
+        <img src="assets/logo.png" class="logo"/>
+      
       <ul nz-menu nzTheme="dark" nzMode="horizontal" class="header-menu" [nzSelectable]="false">
         <li nz-menu-item> 
             <nz-avatar nzSize="large" nzIcon="user" [nzSrc]="getOwnAvatar()"></nz-avatar>
@@ -35,13 +37,13 @@
 
 
         <div>
-            <span nz-icon nzType="close-circle"></span>
-            <nz-tag nzMode="checkable" class="tag">Playlists</nz-tag>
-            <nz-tag nzMode="checkable" class="tag">Artists</nz-tag>
-            <nz-tag nzMode="checkable" class="tag">Users</nz-tag>
+            <span *ngIf="this.FilterName !== ''" nz-icon nzType="close-circle" (click)="setFilter(null, '')" style="cursor: pointer;"></span>
+            <nz-tag nzMode="checkable" class="tag" (nzCheckedChange)="setFilter($event, 'playlists')" [nzChecked]="this.FilterName == 'playlists'">Playlists</nz-tag>
+            <nz-tag nzMode="checkable" class="tag" (nzCheckedChange)="setFilter($event, 'artists')" [nzChecked]="this.FilterName == 'artists'">Artists</nz-tag>
+            <nz-tag nzMode="checkable" class="tag" (nzCheckedChange)="setFilter($event, 'users')" [nzChecked]="this.FilterName == 'users'">Users</nz-tag>
         </div>
         <nz-input-group nzPrefixIcon="search" [nzSize]="'large'">
-            <input type="text" nz-input  placeholder="Search"/>
+            <input type="text" nz-input  placeholder="Search" (input)="searchOnInput()" [(ngModel)]="search"/>
         </nz-input-group>
         <nz-list nzItemLayout="horizontal" > 
             <nz-list-item >

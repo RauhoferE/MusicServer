@@ -18,6 +18,10 @@ export class BaseComponent implements OnInit {
 
   private userName: string = '';
 
+  public search: string = '';
+
+  private filterName: string = '';
+
   /**
    *
    */
@@ -29,7 +33,11 @@ export class BaseComponent implements OnInit {
   ngOnInit(): void {
     this.userName = this.jwtService.getUserName();
 
-    this.userService.GetFollowedEntities("","").subscribe({
+    this.getFollowedEntities();
+  }
+
+  getFollowedEntities(): void{
+    this.userService.GetFollowedEntities(this.filterName,this.search).subscribe({
       next: (element: AllFollowedEntitiesModel)=> {
         this.followedEntities = element;
       },
@@ -37,6 +45,24 @@ export class BaseComponent implements OnInit {
         console.log(error);
       }
     })
+  }
+
+  searchOnInput(): void{
+
+    this.getFollowedEntities();
+  }
+
+  setFilter(event: any, filterName: string): void{
+    if (this.filterName == filterName) {
+      this.filterName = '';
+      this.getFollowedEntities();
+      return;
+    }
+
+    this.filterName = filterName;
+    
+
+    this.getFollowedEntities();
   }
 
   getArtistCoverSrc(id: string): string{
@@ -88,5 +114,9 @@ export class BaseComponent implements OnInit {
 
   public get UserName(){
     return this.userName;
+  }
+
+  public get FilterName(){
+    return this.filterName;
   }
 }
