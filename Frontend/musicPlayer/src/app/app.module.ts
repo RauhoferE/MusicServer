@@ -35,6 +35,8 @@ import {NzAvatarModule } from 'ng-zorro-antd/avatar';
 import {NzListModule } from 'ng-zorro-antd/list';
 import { PlaylistOverviewComponent } from './views/playlist/playlist-overview/playlist-overview.component';
 import { PlaylistDetailsComponent } from './views/playlist/playlist-details/playlist-details.component';
+import { SongTableComponent } from './components/songs/song-table/song-table.component';
+import { FavoritesComponent } from './views/favorites/favorites.component';
 
 registerLocaleData(en);
 
@@ -50,7 +52,9 @@ registerLocaleData(en);
     BaseComponent,
     HomeComponent,
     PlaylistOverviewComponent,
-    PlaylistDetailsComponent
+    PlaylistDetailsComponent,
+    SongTableComponent,
+    FavoritesComponent
   ],
   imports: [
     BrowserModule,

@@ -13,6 +13,7 @@ import { HomeComponent } from './views/home/home.component';
 import { BaseComponent } from './views/base/base.component';
 import { PlaylistOverviewComponent } from './views/playlist/playlist-overview/playlist-overview.component';
 import { PlaylistDetailsComponent } from './views/playlist/playlist-details/playlist-details.component';
+import { FavoritesComponent } from './views/favorites/favorites.component';
 
 const routes: Routes = [
   { 
@@ -48,6 +49,10 @@ const routes: Routes = [
       {
         path: '',
         component: HomeComponent
+      },
+      {
+        path: 'favorites',
+        component: FavoritesComponent
       },
       {
         path: 'playlists',
