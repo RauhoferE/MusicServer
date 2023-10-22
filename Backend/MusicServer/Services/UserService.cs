@@ -253,7 +253,6 @@ namespace MusicServer.Services
         
         public async Task<AllFollowedEntitiesResponse> GetAllFollowedUsersArtistsPlaylistsFavorites(string filter, string searchTerm)
         {
-            //test
             filter = filter ?? string.Empty;
             searchTerm = searchTerm ?? string.Empty;
             searchTerm = searchTerm.ToLower();
