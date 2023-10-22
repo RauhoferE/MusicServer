@@ -8,7 +8,6 @@ import { CommonModule, registerLocaleData } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
-import { PlaylistsComponent } from './views/playlist/playlists/playlists.component';
 import { NotFoundComponent } from './views/common/not-found/not-found.component';
 import { NZ_I18N } from 'ng-zorro-antd/i18n';
 import { en_US } from 'ng-zorro-antd/i18n';
@@ -34,6 +33,8 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import {NzAvatarModule } from 'ng-zorro-antd/avatar';
 import {NzListModule } from 'ng-zorro-antd/list';
+import { PlaylistOverviewComponent } from './views/playlist/playlist-overview/playlist-overview.component';
+import { PlaylistDetailsComponent } from './views/playlist/playlist-details/playlist-details.component';
 
 registerLocaleData(en);
 
@@ -42,13 +43,14 @@ registerLocaleData(en);
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    PlaylistsComponent,
     NotFoundComponent,
     ConfirmMailComponent,
     ResetPasswordComponent,
     ForgetPasswordComponent,
     BaseComponent,
-    HomeComponent
+    HomeComponent,
+    PlaylistOverviewComponent,
+    PlaylistDetailsComponent
   ],
   imports: [
     BrowserModule,
