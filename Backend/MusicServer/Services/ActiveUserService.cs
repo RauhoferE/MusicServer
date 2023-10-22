@@ -13,6 +13,7 @@ namespace MusicServer.Services
         public ActiveUserService(IHttpContextAccessor contextAccessor,
             UserManager<User> userManager)
         {
+            // test
             if (contextAccessor.HttpContext?.User.Identity == null)
             {
                 return;
