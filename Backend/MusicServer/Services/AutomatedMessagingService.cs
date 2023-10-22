@@ -152,7 +152,7 @@ throw new MessageTypeNotFoundException();
         {
             var users = this.dBContext.Users.ToList();
             var artistIds = messages.Select(x => x.ArtistId).ToList();
-            var artists = this.dBContext.Artists.Where(x => artistIds.Contains(x.Id)).Take(50).ToList();
+            var artists = this.dBContext.Artists.Where(x => artistIds.Contains(x.Id)).OrderBy(x=> x.Id).Take(50).ToList();
 
             if (users.Count() == 0 || artists.Count() == 0)
             {
@@ -178,7 +178,7 @@ throw new MessageTypeNotFoundException();
                 var artist = this.dBContext.Artists.FirstOrDefault(x => x.Id == message.ArtistId);
 
                 var songs = this.dBContext.Songs.Where(x =>
-                            message.Songs.Select(y => y.SongId).Contains(x.Id))
+                            message.Songs.Select(y => y.SongId).Contains(x.Id)).OrderBy(x => x.Id)
                                 .Take(10).ToList();
 
                 if (followedUser.Count() == 0 || artist == null || songs.Count() == 0)
@@ -235,6 +235,7 @@ throw new MessageTypeNotFoundException();
 
                 var songs = this.dBContext.Songs.Where(x => 
                 message.Songs.Select(y => y.SongId).Contains(x.Id))
+                    .OrderBy(x => x.Id)
                     .Take(10).ToList();
 
                 if (followedUsers.Count() == 0 || playlist == null || user == null || songs.Count() == 0)

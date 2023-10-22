@@ -105,7 +105,7 @@ namespace MusicServer.Services
                 for (int i = 0; i < numberOfPlaylists; i++)
                 {
                     // Take random songs for the playlists
-                    var rndSongs = this.dBContext.Songs.Take(rnd.Next(1, 10)).ToList();
+                    var rndSongs = this.dBContext.Songs.OrderBy(x => x.Id).Take(rnd.Next(1, 10)).ToList();
                     var pl = new Playlist()
                     {
                         Name = FakerDotNet.Faker.Pokemon.Name(),

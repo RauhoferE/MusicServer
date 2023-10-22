@@ -280,6 +280,7 @@ namespace MusicServer.Services
     .ThenInclude(x => x.Artist)
     .FirstOrDefault(x => x.Id == this.activeUserService.Id).FollowedArtists
     .Where(x => x.Artist.Name.ToLower().Contains(searchTerm))
+    .OrderBy(x => x.Id)
     .Take(100)
     .ToList();
             }
@@ -292,6 +293,7 @@ namespace MusicServer.Services
     .ThenInclude(x => x.Songs)
     .FirstOrDefault(x => x.Id == this.activeUserService.Id).Playlists
     .Where(x => x.Playlist.Name.ToLower().Contains(searchTerm))
+    .OrderBy(x => x.Id)
     .Take(100)
     .ToList().Select(x => x.Playlist);
             }
@@ -303,7 +305,9 @@ namespace MusicServer.Services
     .ThenInclude(x => x.FollowedUser)
     .FirstOrDefault(x => x.Id == this.activeUserService.Id).FollowedUsers
     .Where(x => x.FollowedUser.UserName.ToLower().Contains(searchTerm))
-    .Take(100).ToList();
+    .OrderBy(x => x.Id)
+    .Take(100)
+    .ToList();
             }
 
             var mappedFollowedPlaylists = this.mapper.Map<FollowedPlaylistDto[]>(followedPlaylists);

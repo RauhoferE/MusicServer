@@ -18,26 +18,26 @@ namespace MusicServer.Helpers
                 switch (sortAfter)
                 {
                     case SortingElementsPublicPlaylists.Name:
-                        return playlists.OrderBy(x => x.Name);
+                        return playlists.OrderBy(x => new { x.Name, x.Id });
                     case SortingElementsPublicPlaylists.DateCreated:
-                        return playlists.OrderBy(x => x.Created);
+                        return playlists.OrderBy(x => new { x.Created, x.Id });
                     case SortingElementsPublicPlaylists.NumberOfSongs:
-                        return playlists.OrderBy(x => x.Songs.Count());
+                        return playlists.OrderBy(x => new { x.Songs.Count, x.Id });
                     default:
-                        return playlists.OrderBy(x => x.Name);
+                        return playlists.OrderBy(x => new { x.Name, x.Id });
                 }
             }
 
             switch (sortAfter)
             {
                 case SortingElementsPublicPlaylists.Name:
-                    return playlists.OrderByDescending(x => x.Name);
+                    return playlists.OrderByDescending(x => new { x.Name, x.Id });
                 case SortingElementsPublicPlaylists.DateCreated:
-                    return playlists.OrderByDescending(x => x.Created);
+                    return playlists.OrderByDescending(x => new { x.Created, x.Id });
                 case SortingElementsPublicPlaylists.NumberOfSongs:
-                    return playlists.OrderByDescending(x => x.Songs.Count());
+                    return playlists.OrderByDescending(x => new { x.Songs.Count, x.Id });
                 default:
-                    return playlists.OrderByDescending(x => x.Name);
+                    return playlists.OrderByDescending(x => new { x.Name, x.Id });
             }
         }
 
@@ -55,30 +55,30 @@ namespace MusicServer.Helpers
                 switch (sortAfter)
                 {
                     case SortingElementsOwnPlaylistSongs.Name:
-                        return songs.OrderBy(x => x.Song.Name);
+                        return songs.OrderBy(x => new { x.Song.Name, x.Id });
                     case SortingElementsOwnPlaylistSongs.Artist:
-                        return songs.OrderBy(x => x.Song.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                        return songs.OrderBy(x => new { x.Song.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name, x.Id });
                     case SortingElementsOwnPlaylistSongs.Duration:
-                        return songs.OrderBy(x => x.Song.Length);
+                        return songs.OrderBy(x => new { x.Song.Length, x.Id });
                     case SortingElementsOwnPlaylistSongs.Custom:
-                        return songs.OrderBy(x => x.Order);
+                        return songs.OrderBy(x => new { x.Order, x.Id });
                     default:
-                        return songs.OrderBy(x => x.Song.Name);
+                        return songs.OrderBy(x => new { x.Song.Name, x.Id });
                 }
             }
 
             switch (sortAfter)
             {
                 case SortingElementsOwnPlaylistSongs.Name:
-                    return songs.OrderByDescending(x => x.Song.Name);
+                    return songs.OrderByDescending(x => new { x.Song.Name, x.Id });
                 case SortingElementsOwnPlaylistSongs.Artist:
-                    return songs.OrderByDescending(x => x.Song.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                    return songs.OrderByDescending(x => new { x.Song.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name, x.Id });
                 case SortingElementsOwnPlaylistSongs.Duration:
-                    return songs.OrderByDescending(x => x.Song.Length);
+                    return songs.OrderByDescending(x => new { x.Song.Length, x.Id });
                 case SortingElementsOwnPlaylistSongs.Custom:
-                    return songs.OrderByDescending(x => x.Order);
+                    return songs.OrderByDescending(x => new { x.Order, x.Id });
                 default:
-                    return songs.OrderByDescending(x => x.Song.Name);
+                    return songs.OrderByDescending(x => new { x.Song.Name, x.Id });
             }
         }
 
@@ -96,30 +96,30 @@ namespace MusicServer.Helpers
                 switch (sortAfter)
                 {
                     case SortingElementsOwnPlaylistSongs.Name:
-                        return songs.OrderBy(x => x.FavoriteSong.Name);
+                        return songs.OrderBy(x => new { x.FavoriteSong.Name, x.Id });
                     case SortingElementsOwnPlaylistSongs.Artist:
-                        return songs.OrderBy(x => x.FavoriteSong.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                        return songs.OrderBy(x => new { x.FavoriteSong.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name, x.Id });
                     case SortingElementsOwnPlaylistSongs.Duration:
-                        return songs.OrderBy(x => x.FavoriteSong.Length);
+                        return songs.OrderBy(x => new { x.FavoriteSong.Length, x.Id });
                     case SortingElementsOwnPlaylistSongs.Custom:
-                        return songs.OrderBy(x => x.Order);
+                        return songs.OrderBy(x => new { x.Order, x.Id });
                     default:
-                        return songs.OrderBy(x => x.FavoriteSong.Name);
+                        return songs.OrderBy(x => new { x.FavoriteSong.Name, x.Id });
                 }
             }
 
             switch (sortAfter)
             {
                 case SortingElementsOwnPlaylistSongs.Name:
-                    return songs.OrderByDescending(x => x.FavoriteSong.Name);
+                    return songs.OrderByDescending(x => new { x.FavoriteSong.Name, x.Id });
                 case SortingElementsOwnPlaylistSongs.Artist:
-                    return songs.OrderByDescending(x => x.FavoriteSong.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                    return songs.OrderByDescending(x => new { x.FavoriteSong.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name, x.Id });
                 case SortingElementsOwnPlaylistSongs.Duration:
-                    return songs.OrderByDescending(x => x.FavoriteSong.Length);
+                    return songs.OrderByDescending(x => new { x.FavoriteSong.Length, x.Id });
                 case SortingElementsOwnPlaylistSongs.Custom:
-                    return songs.OrderByDescending(x => x.Order);
+                    return songs.OrderByDescending(x => new { x.Order, x.Id });
                 default:
-                    return songs.OrderByDescending(x => x.FavoriteSong.Name);
+                    return songs.OrderByDescending(x => new { x.FavoriteSong.Name, x.Id });
             }
         }
 
@@ -136,30 +136,30 @@ namespace MusicServer.Helpers
                 switch (sortAfter)
                 {
                     case SortingElementsOwnPlaylists.Name:
-                        return playlists.OrderBy(x => x.Playlist.Name);
+                        return playlists.OrderBy(x => new { x.Playlist.Name, x.Id });
                     case SortingElementsOwnPlaylists.DateCreated:
-                        return playlists.OrderBy(x => x.Playlist.Created);
+                        return playlists.OrderBy(x => new { x.Playlist.Created, x.Id });
                     case SortingElementsOwnPlaylists.NumberOfSongs:
-                        return playlists.OrderBy(x => x.Playlist.Songs.Count());
+                        return playlists.OrderBy(x => new { x.Playlist.Songs.Count, x.Id });
                     case SortingElementsOwnPlaylists.Custom:
-                        return playlists.OrderBy(x => x.Order);
+                        return playlists.OrderBy(x => new { x.Order, x.Id });
                     default:
-                        return playlists.OrderBy(x => x.Playlist.Name);
+                        return playlists.OrderBy(x => new { x.Playlist.Name, x.Id });
                 }
             }
 
             switch (sortAfter)
             {
                 case SortingElementsOwnPlaylists.Name:
-                    return playlists.OrderByDescending(x => x.Playlist.Name);
+                    return playlists.OrderByDescending(x => new { x.Playlist.Name, x.Id });
                 case SortingElementsOwnPlaylists.DateCreated:
-                    return playlists.OrderByDescending(x => x.Playlist.Created);
+                    return playlists.OrderByDescending(x => new { x.Playlist.Created, x.Id });
                 case SortingElementsOwnPlaylists.NumberOfSongs:
-                    return playlists.OrderByDescending(x => x.Playlist.Songs.Count());
+                    return playlists.OrderByDescending(x => new { x.Playlist.Songs.Count, x.Id });
                 case SortingElementsOwnPlaylists.Custom:
-                    return playlists.OrderByDescending(x => x.Order);
+                    return playlists.OrderByDescending(x => new { x.Order, x.Id });
                 default:
-                    return playlists.OrderByDescending(x => x.Playlist.Name);
+                    return playlists.OrderByDescending(x => new { x.Playlist.Name, x.Id });
             }
         }
 
@@ -176,30 +176,30 @@ namespace MusicServer.Helpers
                 switch (sortAfter)
                 {
                     case SortingElementsAllAlbums.Name:
-                        return albums.OrderBy(x => x.Name);
+                        return albums.OrderBy(x => new { x.Name, x.Id });
                     case SortingElementsAllAlbums.DateAdded:
-                        return albums.OrderBy(x => x.Created);
+                        return albums.OrderBy(x => new { x.Created, x.Id });
                     case SortingElementsAllAlbums.NumberOfSongs:
-                        return albums.OrderBy(x => x.Songs.Count());
+                        return albums.OrderBy(x => new { x.Songs.Count, x.Id });
                     case SortingElementsAllAlbums.Artist:
-                        return albums.OrderBy(x => x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                        return albums.OrderBy(x => new { x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name, x.Id });
                     default:
-                        return albums.OrderBy(x => x.Name);
+                        return albums.OrderBy(x => new { x.Name, x.Id });
                 }
             }
 
             switch (sortAfter)
             {
                 case SortingElementsAllAlbums.Name:
-                    return albums.OrderByDescending(x => x.Name);
+                    return albums.OrderByDescending(x => new { x.Name, x.Id });
                 case SortingElementsAllAlbums.DateAdded:
-                    return albums.OrderByDescending(x => x.Created);
+                    return albums.OrderByDescending(x => new { x.Created, x.Id });
                 case SortingElementsAllAlbums.NumberOfSongs:
-                    return albums.OrderByDescending(x => x.Songs.Count());
+                    return albums.OrderByDescending(x => new { x.Songs.Count, x.Id });
                 case SortingElementsAllAlbums.Artist:
-                    return albums.OrderByDescending(x => x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                    return albums.OrderByDescending(x => new { x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name, x.Id });
                 default:
-                    return albums.OrderByDescending(x => x.Name);
+                    return albums.OrderByDescending(x => new { x.Name, x.Id });
             }
         }
 
@@ -213,10 +213,10 @@ namespace MusicServer.Helpers
 
             if (asc)
             {
-                return artists.OrderBy(x => x.Name);
+                return artists.OrderBy(x => new { x.Name, x.Id });
             }
 
-            return artists.OrderByDescending(x => x.Name);
+            return artists.OrderByDescending(x => new { x.Name, x.Id });
         }
 
         public static IQueryable<UserArtist> SortSearchFollowedArtists(IQueryable<UserArtist> artists, bool asc, string query)
@@ -230,10 +230,10 @@ namespace MusicServer.Helpers
 
             if (asc)
             {
-                return artists.OrderBy(x => x.Artist.Name);
+                return artists.OrderBy(x => new { x.Artist.Name, x.Id });
             }
 
-            return artists.OrderByDescending(x => x.Artist.Name);
+            return artists.OrderByDescending(x => new { x.Artist.Name, x.Id });
         }
 
         public static IQueryable<User> SortSearchUsers(IQueryable<User> users, bool asc, string query)
@@ -246,10 +246,10 @@ namespace MusicServer.Helpers
 
             if (asc)
             {
-                return users.OrderBy(x => x.UserName);
+                return users.OrderBy(x => new { x.UserName, x.Id });
             }
 
-            return users.OrderByDescending(x => x.UserName);
+            return users.OrderByDescending(x => new { x.UserName, x.Id });
         }
 
         public static IQueryable<UserUser> SortSearchFollowedUsers(IQueryable<UserUser> users, bool asc, string query)
@@ -263,10 +263,10 @@ namespace MusicServer.Helpers
 
             if (asc)
             {
-                return users.OrderBy(x => x.FollowedUser.UserName);
+                return users.OrderBy(x => new { x.FollowedUser.UserName, x.Id });
             }
 
-            return users.OrderByDescending(x => x.FollowedUser.UserName);
+            return users.OrderByDescending(x => new { x.FollowedUser.UserName, x.Id });
         }
 
         public static IQueryable<Song> SortSearchAllSongs(IQueryable<Song> songs, bool asc, string query, string sortAfter)
@@ -282,30 +282,30 @@ namespace MusicServer.Helpers
                 switch (sortAfter)
                 {
                     case SortingElementsAllSongs.Name:
-                        return songs.OrderBy(x => x.Name);
+                        return songs.OrderBy(x => new { x.Name, x.Id });
                     case SortingElementsAllSongs.DateAdded:
-                        return songs.OrderBy(x => x.Created);
+                        return songs.OrderBy(x => new { x.Created, x.Id });
                     case SortingElementsAllSongs.Duration:
-                        return songs.OrderBy(x => x.Length);
+                        return songs.OrderBy(x => new { x.Length, x.Id });
                     case SortingElementsAllSongs.Artist:
-                        return songs.OrderBy(x => x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                        return songs.OrderBy(x => new { x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name, x.Id });
                     default:
-                        return songs.OrderBy(x => x.Name);
+                        return songs.OrderBy(x => new { x.Name, x.Id });
                 }
             }
 
             switch (sortAfter)
             {
                 case SortingElementsAllSongs.Name:
-                    return songs.OrderByDescending(x => x.Name);
+                    return songs.OrderByDescending(x => new { x.Name, x.Id });
                 case SortingElementsAllSongs.DateAdded:
-                    return songs.OrderByDescending(x => x.Created);
+                    return songs.OrderByDescending(x => new { x.Created, x.Id });
                 case SortingElementsAllSongs.Duration:
-                    return songs.OrderByDescending(x => x.Length);
+                    return songs.OrderByDescending(x => new { x.Length, x.Id });
                 case SortingElementsAllSongs.Artist:
-                    return songs.OrderByDescending(x => x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name);
+                    return songs.OrderByDescending(x => new { x.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name, x.Id });
                 default:
-                    return songs.OrderByDescending(x => x.Name);
+                    return songs.OrderByDescending(x => new { x.Name, x.Id });
             }
         }
 

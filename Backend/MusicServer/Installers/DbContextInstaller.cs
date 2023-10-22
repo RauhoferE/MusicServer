@@ -9,7 +9,7 @@ namespace MusicServer.Installers
         public void InstallService(WebApplicationBuilder builder)
         {
             builder.Services.AddDbContext<MusicServerDBContext>(
-            options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDBConnection")));
+            options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDBConnection"), o=>o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
         }
     }
 }

@@ -47,7 +47,7 @@ namespace MusicServer.Services
 
             return new AlbumPaginationResponse()
             {
-                Albums = this._mapper.Map<AlbumDto[]>(albums.Skip((page - 1) * take).Take(take).Select(x => x.Album).ToArray()),
+                Albums = this._mapper.Map<AlbumDto[]>(albums.OrderBy(x => x.Id).Skip((page - 1) * take).Take(take).Select(x => x.Album).ToArray()),
                 TotalCount = albums.Count()
             };
         }
@@ -125,7 +125,7 @@ namespace MusicServer.Services
                 .Include(x => x.Album)
                 .Where(x => x.Album.Id == albumId);
 
-            var mappedSongs = this._mapper.Map<SongDto[]>(songs.Skip((page - 1) * take).Take(take));
+            var mappedSongs = this._mapper.Map<SongDto[]>(songs.OrderBy(x => x.Id).Skip((page - 1) * take).Take(take));
 
             foreach (var song in mappedSongs)
             {
