@@ -1,3 +1,13 @@
 <div>
-    <app-song-table [songs]="this.SongsModel"></app-song-table>
+    <div>
+
+        <h2>
+            Favorites
+        </h2>
+        <p>
+            Current User / Number Of Songs
+        </p>
+    </div>
+
+    <app-song-table [songs]="this.SongsModel" tableName="Favorites"></app-song-table>
 </div>

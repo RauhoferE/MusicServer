@@ -1,1 +1,18 @@
-<p>song-table works!</p>
+<div>
+    <nz-table
+    nzShowSizeChanger
+    [nzData]="songs.songs"
+    [nzFrontPagination]="false"
+    [nzLoading]="isLoading"
+    [nzTotal]="songs.totalCount"
+    [nzPageSize]="pageSize"
+    [nzPageIndex]="pageIndex"
+    (nzQueryParams)="onQueryParamsChange($event)"
+    >
+        <thead>
+
+        </thead>
+    </nz-table>
+
+
+</div>

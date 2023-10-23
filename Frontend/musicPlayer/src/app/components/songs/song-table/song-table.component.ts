@@ -10,6 +10,12 @@ export class SongTableComponent {
 
   @Input() songs!: PlaylistSongPaginationModel;
 
+  private pageSize: number = 10;
+
+  private pageIndex: number = 1;
+
+  private isLoading : boolean = true;
+
   /**
    *
    */
@@ -17,5 +23,16 @@ export class SongTableComponent {
 
     
   }
+
+  onQueryParamsChange(event: any): void{
+    // Throw event
+
+  }
+
+  public get PageSize(){
+    return this.pageSize;
+  }
+
+
 
 }
