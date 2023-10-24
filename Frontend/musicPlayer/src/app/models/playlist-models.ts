@@ -15,7 +15,7 @@ export interface PlaylistSongPaginationModel{
 export interface PlaylistSongModel{
     id: string;
     name: string;
-    length: number;
+    duration: number;
     album: AlbumArtistModel;
     artists: ArtistShortModel[];
     created: Date;

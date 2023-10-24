@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { APIROUTES } from 'src/app/constants/api-routes';
-import { AllFollowedEntitiesModel } from 'src/app/models/user-models';
+import { ArtistShortModel } from 'src/app/models/artist-models';
+import { FollowedPlaylistModel } from 'src/app/models/playlist-models';
+import { AllFollowedEntitiesModel, UserModel } from 'src/app/models/user-models';
 import { JwtService } from 'src/app/services/jwt.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
@@ -96,27 +98,27 @@ export class BaseComponent implements OnInit {
     return `${environment.apiUrl}/${APIROUTES.file}/user/-1`;
   }
 
-  public get FollowedUser(){
+  public get FollowedUser(): UserModel[]{
     return this.followedEntities.followedUsers;
   }
 
-  public get FollowedArtists(){
+  public get FollowedArtists(): ArtistShortModel[]{
     return this.followedEntities.followedArtists;
   }
 
-  public get FollowedPlaylists(){
+  public get FollowedPlaylists(): FollowedPlaylistModel[]{
     return this.followedEntities.followedPlaylists;
   }
 
-  public get FavoriteSongsCount(){
+  public get FavoriteSongsCount(): number{
     return this.followedEntities.favoritesSongCount;
   }
 
-  public get UserName(){
+  public get UserName(): string{
     return this.userName;
   }
 
-  public get FilterName(){
+  public get FilterName(): string{
     return this.filterName;
   }
 }

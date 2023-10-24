@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { passwordPattern } from 'src/app/constants/patterns';
@@ -74,11 +74,11 @@ export class ResetPasswordComponent {
 
   }
 
-  get password(){
+  get password(): AbstractControl<any, any> | null{
     return this.passwordForm.get('password');
   }
 
-  get passwordConfirm(){
+  get passwordConfirm(): AbstractControl<any, any> | null{
     return this.passwordForm.get('passwordConfirm');
   }
 }

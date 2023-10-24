@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { guidPattern, passwordPattern } from 'src/app/constants/patterns';
@@ -69,27 +69,27 @@ export class RegisterComponent {
 
   }
 
-  get email(){
+  get email(): AbstractControl<any, any> | null{
     return this.registerForm.get('email');
   }
 
-  get password(){
+  get password(): AbstractControl<any, any> | null{
     return this.registerForm.get('password');
   }
 
-  get birthdate(){
+  get birthdate(): AbstractControl<any, any> | null{
     return this.registerForm.get('birthdate');
   }
 
-  get username(){
+  get username(): AbstractControl<any, any> | null{
     return this.registerForm.get('username');
   }
 
-  get passwordConfirm(){
+  get passwordConfirm(): AbstractControl<any, any> | null{
     return this.registerForm.get('passwordConfirm');
   }
 
-  get registrationCode(){
+  get registrationCode(): AbstractControl<any, any> | null{
     return this.registerForm.get('registrationCode');
   }
 

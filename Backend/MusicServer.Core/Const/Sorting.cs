@@ -23,16 +23,17 @@ namespace MusicServer.Core.Const
 
     public static class SortingElementsOwnPlaylistSongs
     {
-        public const string Name = "Name";
-        public const string Duration = "Duration";
-        public const string DateAdded = "DateAdded";
-        public const string Custom = "Custom";
-        public const string Artist = "Artist";
+        public const string Name = "name";
+        public const string Duration = "duration";
+        public const string DateAdded = "dateadded";
+        public const string Order = "order";
+        public const string Artist = "artist";
+        public const string Album = "album";
 
         // Return all constants in a list
         public static List<string> SortingElements = new List<string>()
         {
-            Name, Duration, DateAdded, Custom, Artist
+            Name, Duration, DateAdded, Order, Artist, Album
         };
     }
 

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 
@@ -50,7 +50,7 @@ export class ForgetPasswordComponent {
 
   }
 
-  get email(){
+  get email(): AbstractControl<any,any> | null{
     return this.emailForm.get('email');
   }
 

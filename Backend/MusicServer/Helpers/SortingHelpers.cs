@@ -50,6 +50,11 @@ namespace MusicServer.Helpers
                     x.Song.Artists.Where(x => x.Artist.Name.Contains(query)).Any());
             }
 
+            if (sortAfter != null)
+            {
+                sortAfter = sortAfter.ToLower();
+            }
+
             if (asc)
             {
                 switch (sortAfter)
@@ -60,8 +65,10 @@ namespace MusicServer.Helpers
                         return songs.OrderBy(x => x.Song.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name).ThenBy(x => x.Id);
                     case SortingElementsOwnPlaylistSongs.Duration:
                         return songs.OrderBy(x => x.Song.Length).ThenBy(x => x.Id);
-                    case SortingElementsOwnPlaylistSongs.Custom:
+                    case SortingElementsOwnPlaylistSongs.Order:
                         return songs.OrderBy(x => x.Order).ThenBy(x => x.Id);
+                    case SortingElementsOwnPlaylistSongs.Album:
+                        return songs.OrderBy(x => x.Song.Album.Name).ThenBy(x => x.Id);
                     default:
                         return songs.OrderBy(x => x.Song.Name).ThenBy(x => x.Id);
                 }
@@ -75,8 +82,10 @@ namespace MusicServer.Helpers
                     return songs.OrderByDescending(x => x.Song.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name).ThenBy(x => x.Id);
                 case SortingElementsOwnPlaylistSongs.Duration:
                     return songs.OrderByDescending(x => x.Song.Length).ThenBy(x => x.Id);
-                case SortingElementsOwnPlaylistSongs.Custom:
+                case SortingElementsOwnPlaylistSongs.Order:
                     return songs.OrderByDescending(x => x.Order).ThenBy(x => x.Id);
+                case SortingElementsOwnPlaylistSongs.Album:
+                    return songs.OrderByDescending(x => x.Song.Album.Name).ThenBy(x => x.Id);
                 default:
                     return songs.OrderByDescending(x => x.Song.Name).ThenBy(x => x.Id);
             }
@@ -91,6 +100,11 @@ namespace MusicServer.Helpers
                         x.FavoriteSong.Artists.Where(x => x.Artist.Name.ToLower().Contains(query.ToLower())).Any());
             }
 
+            if (sortAfter != null)
+            {
+                sortAfter = sortAfter.ToLower();
+            }
+
             if (asc)
             {
                 switch (sortAfter)
@@ -101,8 +115,10 @@ namespace MusicServer.Helpers
                         return songs.OrderBy(x => x.FavoriteSong.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name).ThenBy(x => x.Id);
                     case SortingElementsOwnPlaylistSongs.Duration:
                         return songs.OrderBy(x => x.FavoriteSong.Length).ThenBy(x => x.Id);
-                    case SortingElementsOwnPlaylistSongs.Custom:
-                        return songs.OrderBy(x => x.Order).ThenBy(x => x.Id);
+                    case SortingElementsOwnPlaylistSongs.Order:
+                        return songs.OrderBy(x => x.Order);
+                    case SortingElementsOwnPlaylistSongs.Album:
+                        return songs.OrderBy(x => x.FavoriteSong.Album.Name).ThenBy(x => x.Id);
                     default:
                         return songs.OrderBy(x => x.FavoriteSong.Name).ThenBy(x => x.Id);
                 }
@@ -116,8 +132,10 @@ namespace MusicServer.Helpers
                     return songs.OrderByDescending(x => x.FavoriteSong.Artists.OrderBy(x => x.Artist.Name).First().Artist.Name).ThenBy(x => x.Id);
                 case SortingElementsOwnPlaylistSongs.Duration:
                     return songs.OrderByDescending(x => x.FavoriteSong.Length).ThenBy(x => x.Id);
-                case SortingElementsOwnPlaylistSongs.Custom:
-                    return songs.OrderByDescending(x => x.Order).ThenBy(x => x.Id);
+                case SortingElementsOwnPlaylistSongs.Order:
+                    return songs.OrderByDescending(x => x.Order);
+                case SortingElementsOwnPlaylistSongs.Album:
+                    return songs.OrderByDescending(x => x.FavoriteSong.Album.Name).ThenBy(x => x.Id);
                 default:
                     return songs.OrderByDescending(x => x.FavoriteSong.Name).ThenBy(x => x.Id);
             }

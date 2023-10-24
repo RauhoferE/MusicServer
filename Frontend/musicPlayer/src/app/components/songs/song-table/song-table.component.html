@@ -1,17 +1,50 @@
 <div>
+    <nz-input-group [nzPrefix]="prefixIconSearch" style="margin-bottom: 2em;">
+        <input type="text" nz-input placeholder="Search for song" [ngModel]="SearchString" />
+    </nz-input-group>
+    <ng-template #prefixIconSearch>
+    <span nz-icon nzType="search"></span>
+    </ng-template>
     <nz-table
     nzShowSizeChanger
     [nzData]="songs.songs"
     [nzFrontPagination]="false"
-    [nzLoading]="isLoading"
+    [nzLoading]="IsLoading"
     [nzTotal]="songs.totalCount"
-    [nzPageSize]="pageSize"
-    [nzPageIndex]="pageIndex"
+    [nzPageSize]="PageSize"
+    [nzPageIndex]="PageIndex"
     (nzQueryParams)="onQueryParamsChange($event)"
     >
         <thead>
+            <tr>
+                <th nzColumnKey="order" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
+                <th nzColumnKey="name" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
+                <th nzColumnKey="album" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('album')">Album</th>
+                <th nzColumnKey="created">Date added</th>
+                <th nzColumnKey="isInFavorites">Favorite</th>
+                <th nzColumnKey="duration" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('duration')">Duration</th>
+            </tr>
 
         </thead>
+        <tbody>
+            <tr *ngFor="let data of songs.songs">
+                <td>{{data.order}}</td>
+                <td>
+                    <img [src]="getAlbumCoverSrc(data.album.id)" style="width: 50px; height: 50px;"/>
+                    {{data.name}}
+                </td>
+                <td><a [href]="getAlbumLink(data.album)">{{data.album.name}}</a></td>
+                <td>{{data.created | date:'longDate' }}</td>
+                <td>
+                    <span *ngIf="data.isInFavorites" nz-icon nzType="heart" 
+                    nzTheme="fill" style="cursor: pointer;" (click)="removeSongFromFavorites(data.id)"></span>
+                    <span *ngIf="!data.isInFavorites" nz-icon nzType="heart" 
+                    nzTheme="outline" style="cursor: pointer;" (click)="addSongToFavorites(data.id)"></span>
+                </td>
+                <td>{{data.duration | secondsToMinute}}</td>
+
+            </tr>
+        </tbody>
     </nz-table>
 
 

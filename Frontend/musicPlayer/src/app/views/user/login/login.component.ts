@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthenticationService } from 'src/app/services/authentication.service';
@@ -67,11 +67,11 @@ export class LoginComponent {
   }
 
   
-  get email(){
+  get email(): AbstractControl<any, any> | null{
     return this.loginForm.get('email');
   }
 
-  get password(){
+  get password(): AbstractControl<any, any> | null{
     return this.loginForm.get('password');
   }
 }
