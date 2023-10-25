@@ -10,6 +10,6 @@
         </p>
     </div>
 
-    <app-song-table [songs]="this.SongsModel" [pagination]="this.PaginationModel" 
-    tableName="Favorites" (query)="onQueryReceived($event)"></app-song-table>
+    <app-song-table [songs]="this.SongsModel"
+    tableName="Favorites" (paginationUpdated)="onPaginationUpdated()"></app-song-table>
 </div>

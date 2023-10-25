@@ -6,6 +6,7 @@ import { PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
+import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SessionStorageService } from 'src/app/services/session-storage.service';
 
 @Component({
@@ -31,22 +32,24 @@ export class FavoritesComponent implements OnInit{
    *
    */
   constructor(private playlistService: PlaylistService, private message: NzMessageService, 
-    private sessionStorage: SessionStorageService, private jwtService: JwtService) {
+    private sessionStorage: SessionStorageService, private jwtService: JwtService,
+    private rxjsStorageService: RxjsStorageService) {
     
-    
+      this.userName = this.jwtService.getUserName();
+
+      let savedPagination = this.sessionStorage.GetLastPaginationOfFavorites();
+  
+      if (savedPagination) {
+        // Save pagination from session storage in rxjs storage
+        // This is done 
+        this.rxjsStorageService.setCurrentPaginationSongModel(savedPagination);
+      }
+  
+      this.rxjsStorageService.setCurrentPaginationSongModel(this.paginationModel);
   }
 
   ngOnInit(): void {
-    this.userName = this.jwtService.getUserName();
 
-    let savedPagination = this.sessionStorage.GetLastPaginationOfFavorites();
-
-    if (savedPagination) {
-      this.paginationModel = savedPagination;
-    }
-
-    // this.onGetFavorites(this.paginationModel.page, this.paginationModel.take, this.paginationModel.sortAfter, 
-    //   this.paginationModel.asc, this.paginationModel.query);
   }
 
   public onGetFavorites(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
@@ -60,43 +63,16 @@ export class FavoritesComponent implements OnInit{
     })
   }
 
-  public onQueryReceived(event: TableQuery){
-    // TODO: Find better way for pagination
+  public onPaginationUpdated(){
+    console.log("Get Elements")
 
-    var sortAfter = event.params.sort.find(x => x.value);
+    this.rxjsStorageService.currentPaginationSongModel$.subscribe((val) => {
+      const pModel = val as PaginationModel;
+      this.sessionStorage.SaveLastPaginationOfFavorites(pModel);
+      this.onGetFavorites(pModel.page, pModel.take, pModel.sortAfter, 
+        pModel.asc, pModel.query);
 
-    if (!sortAfter) {
-      sortAfter = {
-        key: '',
-        value: 'ascend'
-      }
-    }
-
-    let newPagModel: PaginationModel = {
-      query :event.query,
-      page : event.params.pageIndex,
-      take: event.params.pageSize,
-      sortAfter: sortAfter.key,
-      asc: sortAfter.value == 'ascend' ? true: false
-    }
-
-    console.log("received")
-    console.log(newPagModel)
-
-    console.log("Current")
-    console.log(this.paginationModel)
-
-    if (JSON.stringify(newPagModel) == JSON.stringify(this.PaginationModel)) {
-      console.log("Is Same pagination")
-      this.onGetFavorites(this.paginationModel.page, this.paginationModel.take, this.paginationModel.sortAfter, 
-        this.paginationModel.asc, this.paginationModel.query);
-
-        return;
-    }
-
-    this.paginationModel = newPagModel;
-
-    this.sessionStorage.SaveLastPaginationOfFavorites(newPagModel);
+    })
   }
 
   public get SongsModel(): PlaylistSongPaginationModel{
