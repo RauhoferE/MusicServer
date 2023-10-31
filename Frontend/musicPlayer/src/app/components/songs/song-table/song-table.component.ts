@@ -38,12 +38,14 @@ export class SongTableComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let pModel = {} as PaginationModel;
     this.rxjsStorageService.currentPaginationSongModel$.subscribe((val) => {
       
-      const pModel = val as PaginationModel;
-      console.log("Set pag")
-      this.pagination = pModel;
+      pModel = val as PaginationModel;
     });
+    
+    console.log("Set pag")
+    this.pagination = pModel;
   }
 
   onSearchQueryInput(): void{
@@ -155,6 +157,13 @@ export class SongTableComponent implements OnInit {
           this.message.success("Songs were successfully removed from favorites!");
         }
 
+        var currenState = false;
+        this.rxjsStorageService.currentSongInTableChanged$.subscribe((val) =>{
+          currenState = val;
+        })
+
+        // Update value in rxjs so the dashboard gets updated
+        this.rxjsStorageService.setSongInTableChangedState(!currenState);
         this.paginationUpdated.emit();
       }
     });

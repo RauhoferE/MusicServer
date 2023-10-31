@@ -12,6 +12,8 @@ export class RxjsStorageService {
   private songTableLoadingState$ = new BehaviorSubject<any>({});
   currentSongTableLoading$ = this.songTableLoadingState$.asObservable();
 
+  private songInTableChangedState$ = new BehaviorSubject<any>({});
+  currentSongInTableChanged$ = this.songInTableChangedState$.asObservable();
 
   constructor() { }
 
@@ -21,5 +23,9 @@ export class RxjsStorageService {
 
   setSongTableLoadingState(isLoading: boolean){
     this.songTableLoadingState$.next(isLoading);
+  }
+
+  setSongInTableChangedState(isLoading: boolean){
+    this.songInTableChangedState$.next(isLoading);
   }
 }

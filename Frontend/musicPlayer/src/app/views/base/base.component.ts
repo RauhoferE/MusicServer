@@ -4,6 +4,7 @@ import { ArtistShortModel } from 'src/app/models/artist-models';
 import { FollowedPlaylistModel } from 'src/app/models/playlist-models';
 import { AllFollowedEntitiesModel, UserModel } from 'src/app/models/user-models';
 import { JwtService } from 'src/app/services/jwt.service';
+import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
 
@@ -27,8 +28,8 @@ export class BaseComponent implements OnInit {
   /**
    *
    */
-  constructor(private userService: UserService, private jwtService: JwtService) {
-    
+  constructor(private userService: UserService, private jwtService: JwtService, private rxjsService: RxjsStorageService) {
+    this.rxjsService.currentSongInTableChanged$.subscribe((val) => this.getFollowedEntities());
     
   }
 

@@ -72,13 +72,15 @@ export class FavoritesComponent implements OnInit{
   public onPaginationUpdated(){
     console.log("Get Elements")
 
-    this.rxjsStorageService.currentPaginationSongModel$.subscribe((val) => {
-      const pModel = val as PaginationModel;
-      this.sessionStorage.SaveLastPaginationOfFavorites(pModel);
-      this.onGetFavorites(pModel.page, pModel.take, pModel.sortAfter, 
-        pModel.asc, pModel.query);
+    let pModel = {} as PaginationModel;
 
+    this.rxjsStorageService.currentPaginationSongModel$.subscribe((val) => {
+      pModel = val as PaginationModel;
     })
+
+    this.sessionStorage.SaveLastPaginationOfFavorites(pModel);
+    this.onGetFavorites(pModel.page, pModel.take, pModel.sortAfter, 
+      pModel.asc, pModel.query);
   }
 
   public get SongsModel(): PlaylistSongPaginationModel{
