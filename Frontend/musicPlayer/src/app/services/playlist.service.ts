@@ -18,5 +18,26 @@ export class PlaylistService {
     })
   }
 
+  public AddSongsToFavorites(songIds: string[]): Observable<Object>{
+    return this.httpClient.post(`${environment.apiUrl}/${APIROUTES.playlist}/favorites`,
+    {
+      "songIds":songIds
+    },
+    {
+      withCredentials: true
+    })
+  }
+
+  public RemoveSongsFromFavorites(songIds: string[]): Observable<Object>{
+    return this.httpClient.delete(`${environment.apiUrl}/${APIROUTES.playlist}/favorites`,
+    {
+      withCredentials: true,
+      body: {
+        "songIds":songIds
+      }
+    }
+    )
+  }
+
 
 }

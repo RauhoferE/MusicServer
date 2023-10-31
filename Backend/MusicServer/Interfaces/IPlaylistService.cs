@@ -38,9 +38,9 @@ namespace MusicServer.Interfaces
 
         public Task<PlaylistSongPaginationResponse> GetFavorites(int page, int take, string sortAfter, bool asc, string query);
 
-        public Task AddSongsToFavorite(List<Guid> songIds, bool addClones);
+        public Task AddSongsToFavorite(List<Guid> songIds);
 
-        public Task RemoveSongsFromFavorite(List<int> orderIds);
+        public Task RemoveSongsFromFavorite(List<Guid> songIds);
 
         public Task ChangeOrderOfFavorit(Guid songId, int newSpot);
 

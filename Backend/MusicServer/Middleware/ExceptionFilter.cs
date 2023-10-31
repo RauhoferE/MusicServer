@@ -32,7 +32,13 @@ namespace MusicServer.Middleware
 
             # if DEBUG
             responseMessage = exception.Message;
-            #endif
+#endif
+
+            if (exception.GetType() == typeof(AlreadyAssignedException))
+            {
+                statusCode = (int)HttpStatusCode.Conflict;
+                responseMessage = errorMessage;
+            }
 
             if (exception.GetType() == typeof(PlaylistNotFoundException))
             {

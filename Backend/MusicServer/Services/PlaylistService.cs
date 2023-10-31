@@ -133,14 +133,11 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task AddSongsToFavorite(List<Guid> songIds, bool addClones)
+        public async Task AddSongsToFavorite(List<Guid> songIds)
         {
             var user = this.dBContext.Users.Include(x => x.Favorites)
                 .ThenInclude(x => x.FavoriteSong).FirstOrDefault(x => x.Id == this.activeUserService.Id) 
                 ?? throw new UserNotFoundException();
-
-            var doubleSongs = new List<Song>();
-
 
             var lastSongInOrder = user.Favorites.OrderByDescending(x => x.Order).FirstOrDefault();
 
@@ -150,11 +147,12 @@ namespace MusicServer.Services
             {
                 var song = this.dBContext.Songs.FirstOrDefault(x => x.Id == songId) ?? throw new SongNotFoundException();
 
-                if (!addClones && user.Favorites.FirstOrDefault(x=> x.FavoriteSong.Id == song.Id) != null)
+                if (user.Favorites.FirstOrDefault(x=> x.FavoriteSong.Id == song.Id) != null)
                 {
-                    doubleSongs.Add(song);
+                    // Skip if song is already in favorites
                     continue;
                 }
+
                 lastOrderNumber = lastOrderNumber + 1;
 
                 user.Favorites.Add(new UserSong()
@@ -162,11 +160,6 @@ namespace MusicServer.Services
                     Order = lastOrderNumber,
                     FavoriteSong = song
                 });
-            }
-
-            if (doubleSongs.Any())
-            {
-                throw new AlreadyAssignedException(string.Join(",", doubleSongs.Select(x => x.Name)));
             }
 
             await this.dBContext.SaveChangesAsync();
@@ -525,15 +518,15 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task RemoveSongsFromFavorite(List<int> orderIds)
+        public async Task RemoveSongsFromFavorite(List<Guid> songIds)
         {
             var user = this.dBContext.Users.Include(x => x.Favorites)
     .ThenInclude(x => x.FavoriteSong).FirstOrDefault(x => x.Id == this.activeUserService.Id)
     ?? throw new UserNotFoundException();
 
-            foreach (var songId in orderIds)
+            foreach (var songId in songIds)
             {
-                var favoriteSong = user.Favorites.FirstOrDefault(x => x.Order == songId) ?? throw new SongNotFoundException();
+                var favoriteSong = user.Favorites.FirstOrDefault(x => x.FavoriteSong.Id == songId) ?? throw new SongNotFoundException();
 
                 user.Favorites.Remove(favoriteSong);
             }

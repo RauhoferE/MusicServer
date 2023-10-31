@@ -141,17 +141,17 @@ namespace MusicServer.Controllers
 
         [HttpPost]
         [Route(ApiRoutes.Playlist.Favorite)]
-        public async Task<IActionResult> AddSongToFavorites([FromBody, Required] SongsToPlaylist songs, [FromQuery, Required] bool addClones)
+        public async Task<IActionResult> AddSongToFavorites([FromBody, Required] SongsToPlaylist songs)
         {
-            await this.playlistService.AddSongsToFavorite(songs.SongIds.ToList(), addClones);
+            await this.playlistService.AddSongsToFavorite(songs.SongIds.ToList());
             return NoContent();
         }
 
         [HttpDelete]
         [Route(ApiRoutes.Playlist.Favorite)]
-        public async Task<IActionResult> RemoveSongsFromFavorites([FromBody, Required] SongsToRemove songs)
+        public async Task<IActionResult> RemoveSongsFromFavorites([FromBody, Required] SongsToPlaylist songs)
         {
-            await this.playlistService.RemoveSongsFromFavorite(songs.OrderIds.ToList());
+            await this.playlistService.RemoveSongsFromFavorite(songs.SongIds.ToList());
             return NoContent();
         }
 

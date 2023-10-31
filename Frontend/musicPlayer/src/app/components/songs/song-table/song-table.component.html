@@ -9,7 +9,7 @@
     nzShowSizeChanger
     [nzData]="songs.songs"
     [nzFrontPagination]="false"
-    [nzLoading]="IsLoading"
+    [nzLoading]="(IsLoading | async)"
     [nzTotal]="songs.totalCount"
     [nzPageSize]="PageSize"
     [nzPageIndex]="PageIndex"

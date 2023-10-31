@@ -1,10 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { Observable } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { AlbumArtistModel } from 'src/app/models/artist-models';
 import { TableQuery } from 'src/app/models/events';
 import { PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
+import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { environment } from 'src/environments/environment';
 
@@ -21,26 +25,25 @@ export class SongTableComponent implements OnInit {
 
   @Output() paginationUpdated: EventEmitter<void> = new EventEmitter<void>();
 
-  private isLoading : boolean = true;
+  public IsLoading: Observable<boolean> = new Observable();
 
 
   /**
    *
    */
-  constructor(private rxjsStorageService: RxjsStorageService) {
+  constructor(private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService,
+    private message: NzMessageService, private modal: NzModalService) {
     console.log("Construct")
-    this.isLoading= false;
-
-
-    
+    this.IsLoading = this.rxjsStorageService.currentSongTableLoading$;
   }
+
   ngOnInit(): void {
     this.rxjsStorageService.currentPaginationSongModel$.subscribe((val) => {
       
       const pModel = val as PaginationModel;
       console.log("Set pag")
       this.pagination = pModel;
-    })
+    });
   }
 
   onSearchQueryInput(): void{
@@ -52,7 +55,6 @@ export class SongTableComponent implements OnInit {
 
   onQueryParamsChange(event: any): void{
     console.log("Query Changed")
-    this.isLoading = false;
 
     var sortAfter = event.sort.find((x: any) => x.value);
 
@@ -101,15 +103,61 @@ export class SongTableComponent implements OnInit {
     return null;
   }
 
-  removeSongFromFavorites(id: string): void{
+  removeSongFromFavorites(songId: string): void{
     // Remove Song from Favorites
-    // Get new List
-
+    this.removeSongsFromFavorites([songId]);
   }
 
   addSongToFavorites(id: string): void{
     // Add Song to Favorites
-    // Get new List
+    this.playlistService.AddSongsToFavorites([id]);
+  }
+
+  addSongsToFavorite(ids: string[]): void{
+    this.playlistService.AddSongsToFavorites(ids).subscribe({
+      next: ()=>{
+        // Show Modal
+        if (ids.length == 1) {
+          this.message.success("Song was successfully added to favorites!");
+        }
+
+        if (ids.length > 1) {
+          this.message.success("Songs were successfully added to favorites!");
+        }
+        
+        this.paginationUpdated.emit();
+      }
+    })
+  }
+
+  showRemoveSongsFromFavoritesModal(songIds: string[]){
+    this.modal.confirm({
+      nzTitle: 'Delete Favorites?',
+      nzContent: '<b class="error-color">Are you sure you want to delete the songs from your favorites</b>',
+      nzOkText: 'Delete',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzOnOk: () => this.removeSongsFromFavorites(songIds),
+      nzCancelText: 'Cancel',
+      nzOnCancel: () => console.log('Cancel')
+    });
+  }
+  
+  removeSongsFromFavorites(songIds: string[]): void{
+    this.playlistService.RemoveSongsFromFavorites(songIds).subscribe({
+      next: ()=>{
+        // Show All good modal
+        if (songIds.length == 1) {
+          this.message.success("Song was successfully removed from favorites!");
+        }
+
+        if (songIds.length > 1) {
+          this.message.success("Songs were successfully removed from favorites!");
+        }
+
+        this.paginationUpdated.emit();
+      }
+    });
   }
 
   public get PageSize(): number{
@@ -120,17 +168,11 @@ export class SongTableComponent implements OnInit {
     return this.pagination.page;
   }
 
-  public get IsLoading(): boolean{
-    return this.isLoading;
-  }
-
   public get SearchString(): string {
     return this.pagination.query;
   }
   public set SearchString(value: string) {
     this.pagination.query = value;
   }
-
-
 
 }

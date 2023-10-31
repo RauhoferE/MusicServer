@@ -21,6 +21,7 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import {NzAvatarModule } from 'ng-zorro-antd/avatar';
 import {NzListModule } from 'ng-zorro-antd/list';
 import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 
 // Project Imports
 import { AppRoutingModule } from './app-routing.module';
@@ -86,7 +87,8 @@ registerLocaleData(en);
     NzTagModule,
     NzAvatarModule,
     NzListModule,
-    NzTableModule
+    NzTableModule,
+    NzModalModule
   ],
   providers: [
     CookieService,
