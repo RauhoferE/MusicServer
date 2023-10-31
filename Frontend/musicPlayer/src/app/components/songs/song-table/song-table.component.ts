@@ -27,6 +27,12 @@ export class SongTableComponent implements OnInit {
 
   public IsLoading: Observable<boolean> = new Observable();
 
+  private showCheckbox: boolean = false;
+
+  private allChecked: boolean = false;
+
+  private indeterminate: boolean = false;
+
 
   /**
    *
@@ -43,7 +49,7 @@ export class SongTableComponent implements OnInit {
       
       pModel = val as PaginationModel;
     });
-    
+
     console.log("Set pag")
     this.pagination = pModel;
   }
@@ -103,6 +109,21 @@ export class SongTableComponent implements OnInit {
     }
 
     return null;
+  }
+
+  checkAll(value: boolean): void {
+    this.songs.songs.forEach(data => {
+      data.checked = value;
+    });
+
+    this.refreshTableHeader();
+  }
+
+  refreshTableHeader(): void{
+    const allChecked = this.songs.songs.length > 0 && this.songs.songs.every(value => value.checked === true);
+    const allUnChecked = this.songs.songs.every(value => !value.checked);
+    this.AllChecked = allChecked;
+    this.Indeterminate = !allChecked && !allUnChecked;
   }
 
   removeSongFromFavorites(songId: string): void{
@@ -182,6 +203,30 @@ export class SongTableComponent implements OnInit {
   }
   public set SearchString(value: string) {
     this.pagination.query = value;
+  }
+
+  public get ShowCheckbox(): boolean{
+    return this.showCheckbox;
+  }
+
+  public set ShowCheckbox(val: boolean){
+    this.showCheckbox = val;
+  }
+
+  public get AllChecked(): boolean{
+    return this.allChecked;
+  }
+
+  public set AllChecked(val: boolean){
+    this.allChecked = val;
+  }
+
+  public get Indeterminate(): boolean{
+    return this.indeterminate;
+  }
+
+  public set Indeterminate(val: boolean){
+    this.indeterminate = val;
   }
 
 }

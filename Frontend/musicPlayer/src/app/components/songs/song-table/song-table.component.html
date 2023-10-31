@@ -5,6 +5,8 @@
     <ng-template #prefixIconSearch>
     <span nz-icon nzType="search"></span>
     </ng-template>
+    <button *ngIf="!ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Show Selector</button>
+    <button *ngIf="ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Hide Selector</button>
     <nz-table
     nzShowSizeChanger
     [nzData]="songs.songs"
@@ -17,6 +19,12 @@
     >
         <thead>
             <tr>
+                <th             
+                *ngIf="ShowCheckbox"
+                nzWidth="60px"
+                [(nzChecked)]="AllChecked"
+                [nzIndeterminate]="Indeterminate"
+                (nzCheckedChange)="checkAll($event)"></th>
                 <th nzColumnKey="order" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
                 <th nzColumnKey="name" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
                 <th nzColumnKey="album" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('album')">Album</th>
@@ -28,6 +36,11 @@
         </thead>
         <tbody>
             <tr *ngFor="let data of songs.songs">
+                <td
+                *ngIf="ShowCheckbox"
+                [(nzChecked)]="data.checked"
+                (nzCheckedChange)="refreshTableHeader()"
+              ></td>
                 <td>{{data.order}}</td>
                 <td>
                     <img [src]="getAlbumCoverSrc(data.album.id)" style="width: 50px; height: 50px;"/>

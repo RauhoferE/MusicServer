@@ -13,6 +13,7 @@ export interface PlaylistSongPaginationModel{
 }
 
 export interface PlaylistSongModel{
+    checked: boolean;
     id: string;
     name: string;
     duration: number;

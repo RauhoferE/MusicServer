@@ -58,6 +58,9 @@ export class FavoritesComponent implements OnInit{
     this.rxjsStorageService.setSongTableLoadingState(true);
     this.playlistService.GetFavorites(page, take, sortAfter, asc, query).subscribe({
       next:(songsModel: PlaylistSongPaginationModel)=>{
+        songsModel.songs.forEach(element => {
+          element.checked = false;
+        });
         this.songsModel = songsModel;
       },
       error:(error: any)=>{
