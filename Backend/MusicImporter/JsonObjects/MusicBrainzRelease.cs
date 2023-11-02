@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MusicImporter.JSONConverters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace MusicImporter.JsonObjects
     {
         public string Id { get; set; }
 
+        [JsonConverter(typeof(DatetimeConverter))]
         public DateTime Date { get; set; }
 
         [JsonPropertyName("release-group")]
