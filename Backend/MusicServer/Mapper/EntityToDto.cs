@@ -55,7 +55,8 @@ namespace MusicServer.Mapper
 
             this.CreateMap<PlaylistUser, UserDto>(MemberList.Destination)
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.User.Id))
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(ps => ps.User.UserName));
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(ps => ps.User.UserName))
+                .ForMember(dest => dest.IsCreator, opt => opt.MapFrom(ps => ps.IsCreator));
 
             this.CreateMap<Artist, GuidNameDto>(MemberList.Destination);
 

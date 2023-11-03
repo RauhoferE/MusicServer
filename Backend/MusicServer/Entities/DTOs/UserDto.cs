@@ -9,5 +9,7 @@
         public bool IsFollowedByUser { get; set; } = false; 
 
         public bool ReceiveNotifications { get; set; } = false;
+
+        public bool IsCreator { get; set; } = false;
     }
 }

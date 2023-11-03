@@ -86,6 +86,10 @@ export class FavoritesComponent implements OnInit{
       pModel.asc, pModel.query);
   }
 
+  public getUserHref(): string{
+    return `/user/-1`;
+  }
+
   public get SongsModel(): PlaylistSongPaginationModel{
     return this.songsModel;
   }

@@ -14,6 +14,7 @@ export interface UserModel{
     userName: string;
     isFollowedByUser: boolean;
     receiveNotifications: boolean;
+    isCreator: boolean;
 }
 
 export interface AllFollowedEntitiesModel{

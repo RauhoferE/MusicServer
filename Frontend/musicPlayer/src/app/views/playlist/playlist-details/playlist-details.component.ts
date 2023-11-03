@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
+import { PlaylistSongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
@@ -29,6 +29,10 @@ export class PlaylistDetailsComponent implements OnInit {
     take: 10
   } as PaginationModel;
 
+  private playlistModel: PlaylistUserShortModel = {
+
+  } as PlaylistUserShortModel;
+
   /**
    *
    */
@@ -52,6 +56,14 @@ export class PlaylistDetailsComponent implements OnInit {
     }
 
     this.playlistId = this.route.snapshot.paramMap.get('playlistId') as string;
+    this.playlistService.GetPlaylistInfo(this.playlistId).subscribe({
+      next:(playlistModel: PlaylistUserShortModel)=>{
+        this.playlistModel = playlistModel;
+      },
+      error:(error: any)=>{
+        this.message.error("Error when getting playlist.");
+      }
+    })
   }
 
   ngOnInit(): void {
@@ -93,6 +105,23 @@ export class PlaylistDetailsComponent implements OnInit {
       pModel.asc, pModel.query);
   }
 
+  public getCreatorName(): string{
+    if (this.playlistModel.users == undefined) {
+      return "";
+    }
+
+    return this.playlistModel.users.filter(x => x.isCreator)[0]!.userName;
+  }
+
+  public getUserHref(): string{
+    if (this.playlistModel.users == undefined) {
+      return "";
+    }
+
+    const creatorId = this.playlistModel.users.filter(x => x.isCreator)[0]!.id;
+    return `/user/${creatorId}`;
+  }
+
   public get SongsModel(): PlaylistSongPaginationModel{
     return this.songsModel;
   }
@@ -108,5 +137,11 @@ export class PlaylistDetailsComponent implements OnInit {
   public get UserName(): string{
     return this.userName;
   }
+
+  public get PlaylistModel(): PlaylistUserShortModel{
+    return this.playlistModel;
+  }
+
+
 
 }

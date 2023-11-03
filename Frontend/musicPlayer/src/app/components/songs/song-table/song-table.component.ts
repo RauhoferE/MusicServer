@@ -111,6 +111,10 @@ export class SongTableComponent implements OnInit {
     this.selectedTableItem = item;
     this.playlistService.GetModifieablePlaylists(-1).subscribe((val)=>{
       this.modifieablePlaylists = val.playlists;
+
+      if (this.playlistId != undefined) {
+        this.modifieablePlaylists = val.playlists.filter(x => x.id != this.playlistId);
+      }
     })
 
     this.nzContextMenuService.create($event, menu);
@@ -179,7 +183,7 @@ export class SongTableComponent implements OnInit {
   }
 
   removeSongFromPlaylist(): void{
-    if (this.playlistId != undefined) {
+    if (this.playlistId == undefined) {
       return;
     }
 
@@ -187,7 +191,7 @@ export class SongTableComponent implements OnInit {
   }
 
   removeSelectedSongsFromPlaylist(): void{
-    if (this.playlistId != undefined) {
+    if (this.playlistId == undefined) {
       return;
     }
 
@@ -196,7 +200,7 @@ export class SongTableComponent implements OnInit {
   }
 
   removeSongsFromPlaylist(orderIds: number[], playlistId: string): void{
-    this.playlistService.RemoveSongsFromPlaylist([this.selectedTableItem.order], playlistId).subscribe({
+    this.playlistService.RemoveSongsFromPlaylist(orderIds, playlistId).subscribe({
       next: ()=>{
         // Show All good modal
         if (orderIds.length == 1) {
@@ -206,6 +210,9 @@ export class SongTableComponent implements OnInit {
         if (orderIds.length > 1) {
           this.message.success("Songs were successfully removed from playlist!");
         }
+
+        this.AllChecked = false;
+        this.Indeterminate = false;
 
         this.updateDashBoard();
         this.paginationUpdated.emit();

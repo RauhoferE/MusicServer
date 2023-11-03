@@ -3,13 +3,13 @@
         <span nz-icon nzType="heart" nzTheme="outline" style="font-size: 50px;"></span>
 
         <h1>
-            Favorites
+            {{this.PlaylistModel.name}}
         </h1>
         <p>
-            <a>{{UserName}}</a> / {{this.TotalSongCount}} Songs
+            <a [href]="getUserHref()">{{getCreatorName()}}</a> / {{this.TotalSongCount}} Songs
         </p>
     </div>
 
-    <app-song-table [songs]="this.SongsModel"
-    tableName="Favorites" (paginationUpdated)="onPaginationUpdated()"></app-song-table>
+    <app-song-table [songs]="this.SongsModel" [playlistId]="this.PlaylistModel.id"
+     (paginationUpdated)="onPaginationUpdated()"></app-song-table>
 </div>
