@@ -21,4 +21,18 @@ export class SessionStorageService {
   public SaveLastPaginationOfFavorites(model: PaginationModel): void{
     sessionStorage.setItem('favorites_pagination', JSON.stringify(model));
   }
+
+  public GetLastPaginationOfPlaylist(): PaginationModel | null{
+    var val = sessionStorage.getItem('playlist_pagination');
+
+    if (val == null) {
+      return val;
+    }
+
+    return JSON.parse(val) as PaginationModel; 
+  }
+
+  public SaveLastPaginationOfPlaylist(model: PaginationModel): void{
+    sessionStorage.setItem('playlist_pagination', JSON.stringify(model));
+  }
 }

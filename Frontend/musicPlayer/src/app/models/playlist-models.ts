@@ -1,4 +1,5 @@
 import { AlbumArtistModel, ArtistShortModel } from "./artist-models";
+import { UserModel } from "./user-models";
 
 export interface FollowedPlaylistModel{
     id: string;
@@ -34,4 +35,20 @@ export interface GuidNameModel{
 
 export interface ModifieablePlaylistModel{
     playlists: GuidNameModel[];
+}
+
+export interface PlaylistUserShortModel{
+    id: string;
+    name: string;
+    songCount: number;
+    isModifieable: boolean;
+    receiveNotifications: boolean;
+    order: number;
+    isPublic: boolean;
+    isCreator: boolean;
+    created: Date;
+    LastListened: Date;
+    users: UserModel[];
+    
+
 }

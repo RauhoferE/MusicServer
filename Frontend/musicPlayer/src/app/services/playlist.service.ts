@@ -18,6 +18,12 @@ export class PlaylistService {
     })
   }
 
+  public GetSongsFromPlaylist(page: number, take: number, sortAfter: string, asc: boolean, query: string, playlistId: string): Observable<PlaylistSongPaginationModel>{
+    return this.httpClient.get<PlaylistSongPaginationModel>(`${environment.apiUrl}/${APIROUTES.playlist}/songs/${playlistId}?page=${page}&take=${take}&query=${query}&sortAfter=${sortAfter}&asc=${asc}`,{
+      withCredentials: true
+    })
+  }
+
   public AddSongsToFavorites(songIds: string[]): Observable<Object>{
     return this.httpClient.post(`${environment.apiUrl}/${APIROUTES.playlist}/favorites`,
     {
