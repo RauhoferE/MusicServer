@@ -205,7 +205,7 @@ namespace MusicServer.Services
 
             artists = SortingHelpers.SortSearchArtists(artists, asc, searchTerm);
 
-            var mappedArtists = this._mapper.Map<ArtistShortDto[]>(artists.Skip((page - 1) * take).Take(take).ToArray());
+            var mappedArtists = this._mapper.Map<GuidNameDto[]>(artists.Skip((page - 1) * take).Take(take).ToArray());
 
             foreach (var item in mappedArtists)
             {

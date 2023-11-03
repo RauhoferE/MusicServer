@@ -6,7 +6,7 @@ namespace MusicServer.Entities.Responses
     {
         public UserDto[] FollowedUsers { get; set; }
 
-        public ArtistShortDto[] FollowedArtists { get; set; }
+        public GuidNameDto[] FollowedArtists { get; set; }
 
         public FollowedPlaylistDto[] FollowedPlaylists { get; set; }
 

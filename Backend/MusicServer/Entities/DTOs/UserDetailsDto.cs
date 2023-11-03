@@ -29,7 +29,7 @@
 
         public UserDto[] FollowedUsers { get; set; }
 
-        public ArtistShortDto[] FollowedArtists { get; set; }
+        public GuidNameDto[] FollowedArtists { get; set; }
 
         public PlaylistUserShortDto[] Playlists { get; set; }
 

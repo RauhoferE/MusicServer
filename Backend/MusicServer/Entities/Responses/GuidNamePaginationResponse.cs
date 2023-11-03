@@ -9,6 +9,6 @@ namespace MusicServer.Entities.Responses
             get; set;
         }
 
-        public ArtistShortDto[] Items { get; set; } = new ArtistShortDto[0];
+        public GuidNameDto[] Items { get; set; } = new GuidNameDto[0];
     }
 }

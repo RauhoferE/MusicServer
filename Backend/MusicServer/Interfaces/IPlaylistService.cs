@@ -30,6 +30,8 @@ namespace MusicServer.Interfaces
 
         public Task<PlaylistPaginationResponse> GetPlaylistsAsync(long userId, int page, int take, string sortAfter, bool asc, string query);
 
+        public Task<ModifieablePlaylistsResponse> GetModifiablePlaylists(long userId);
+
         public Task<PlaylistPaginationResponse> GetPublicPlaylists(int page, int take, string sortAfter, bool asc, string query);
 
         public Task<PlaylistUserShortDto> GetPlaylistInfo(Guid playlistId);

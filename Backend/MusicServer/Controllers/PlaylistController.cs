@@ -75,6 +75,13 @@ namespace MusicServer.Controllers
         }
 
         [HttpGet]
+        [Route(ApiRoutes.Playlist.ModifieablePlaylists)]
+        public async Task<IActionResult> GetModifieablePlaylists([FromQuery] long userId = -1)
+        {
+            return Ok(await this.playlistService.GetModifiablePlaylists(userId));
+        }
+
+        [HttpGet]
         [Route(ApiRoutes.Playlist.PublicPlaylist)]
         public async Task<IActionResult> GetPublicPlaylists([FromQuery, Required] QueryPaginationSearchRequest request)
         {

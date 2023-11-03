@@ -57,9 +57,13 @@ namespace MusicServer.Mapper
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.User.Id))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(ps => ps.User.UserName));
 
-            this.CreateMap<Artist, ArtistShortDto>(MemberList.Destination);
+            this.CreateMap<Artist, GuidNameDto>(MemberList.Destination);
 
-            this.CreateMap<ArtistSong, ArtistShortDto>(MemberList.Destination)
+            this.CreateMap<PlaylistUser, GuidNameDto>(MemberList.Destination)
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Playlist.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Playlist.Name));
+
+            this.CreateMap<ArtistSong, GuidNameDto>(MemberList.Destination)
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Artist.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Artist.Name));
 
@@ -113,7 +117,7 @@ namespace MusicServer.Mapper
     .ForMember(dest => dest.ReceiveNotifications, opt => opt.MapFrom(ps => ps.ReceiveNotifications))
     .ForMember(dest => dest.IsFollowedByUser, opt => opt.MapFrom(ps => true));
 
-            this.CreateMap<UserArtist, ArtistShortDto>(MemberList.Destination)
+            this.CreateMap<UserArtist, GuidNameDto>(MemberList.Destination)
     .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Artist.Id))
     .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Artist.Name))
     .ForMember(dest => dest.ReceiveNotifications, opt => opt.MapFrom(ps => ps.ReceiveNotifications))
@@ -123,7 +127,7 @@ namespace MusicServer.Mapper
 
             this.CreateMap<User, UserDetailsDto>(MemberList.Destination)
                 .ForMember(dest => dest.FollowedArtists,
-                opt => opt.MapFrom((ps, o, d, t) => t.Mapper.Map<ArtistShortDto[]>(ps.FollowedArtists)))
+                opt => opt.MapFrom((ps, o, d, t) => t.Mapper.Map<GuidNameDto[]>(ps.FollowedArtists)))
                 .ForMember(dest => dest.FollowedUsers,
                 opt => opt.MapFrom((ps, o, d, t) => t.Mapper.Map<LongNameDto[]>(ps.FollowedUsers)))
                 .ForMember(dest => dest.Playlists,

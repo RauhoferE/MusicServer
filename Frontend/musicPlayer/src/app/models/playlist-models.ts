@@ -24,3 +24,14 @@ export interface PlaylistSongModel{
     order: number;
     isInFavorites: boolean;
 }
+
+export interface GuidNameModel{
+    id: string;
+    name: string;
+    followedByUser: boolean;
+    receiveNotifications: boolean;
+}
+
+export interface ModifieablePlaylistModel{
+    playlists: GuidNameModel[];
+}

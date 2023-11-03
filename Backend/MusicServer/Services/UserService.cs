@@ -39,7 +39,7 @@ namespace MusicServer.Services
 
             var followedArtists = SortingHelpers.SortSearchFollowedArtists(targetUser.FollowedArtists.AsQueryable(), asc, query);
 
-            var mappedArtists = this.mapper.Map<ArtistShortDto[]>(targetUser.FollowedArtists.Skip((page - 1) * take).Take(take).ToArray());
+            var mappedArtists = this.mapper.Map<GuidNameDto[]>(targetUser.FollowedArtists.Skip((page - 1) * take).Take(take).ToArray());
 
             foreach (var artist in mappedArtists)
             {
@@ -327,7 +327,7 @@ namespace MusicServer.Services
             {
                 FavoritesSongCount = favoritesCount,
                 FollowedUsers = this.mapper.Map<UserDto[]>(followedUsers),
-                FollowedArtists = this.mapper.Map<ArtistShortDto[]>(followedArtists),
+                FollowedArtists = this.mapper.Map<GuidNameDto[]>(followedArtists),
                 FollowedPlaylists = mappedFollowedPlaylists
             };
         }

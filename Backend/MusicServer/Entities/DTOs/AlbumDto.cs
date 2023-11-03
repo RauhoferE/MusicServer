@@ -6,7 +6,7 @@
 
         public string Name { get; set; }
 
-        public ArtistShortDto[] Artists { get; set; }
+        public GuidNameDto[] Artists { get; set; }
 
         public DateTime Release { get; set; }
 

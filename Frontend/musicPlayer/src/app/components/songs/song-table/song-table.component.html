@@ -35,7 +35,7 @@
 
         </thead>
         <tbody>
-            <tr *ngFor="let data of songs.songs">
+            <tr *ngFor="let data of songs.songs" (contextmenu)="contextMenu($event, menu, data)">
                 <td
                 *ngIf="ShowCheckbox"
                 [(nzChecked)]="data.checked"
@@ -59,6 +59,26 @@
             </tr>
         </tbody>
     </nz-table>
+    <nz-dropdown-menu #menu="nzDropdownMenu">
+        <ul nz-menu>
+            <li nz-menu-item id="add-fav" (click)="addSongToFavorites(this.SelectedTableItem.id)" *ngIf="!this.SelectedTableItem.isInFavorites">Add to favorites</li>
+            <li nz-menu-item id="rm-fav" (click)="removeSongFromFavorites(this.SelectedTableItem.id)" *ngIf="this.SelectedTableItem.isInFavorites">Remove from favorites</li>
+            <li nz-menu-item id="rm-pl" (click)="removeSongFromPlaylist()" *ngIf="this.playlistId != undefined">Remove from current playlist</li>
+            <li nz-menu-item id="add-all-fav" (click)="addSelectedSongsToFavorites()" *ngIf="this.Indeterminate || this.AllChecked">Add selected to favorites</li>
+            <li nz-menu-item id="rm-all-fav" (click)="removeSelectedSongsFromFavorites()" *ngIf="this.Indeterminate || this.AllChecked">Remove selected from favorites</li>
+            <li nz-menu-item id="rm-all-pl" (click)="removeSelectedSongsFromPlaylist()" *ngIf="this.playlistId != undefined && (this.Indeterminate || this.AllChecked)">Remove selected from current playlist</li>
+            <li nz-submenu nzTitle="Add to playlist" id="add-pl">
+                <ul>
+                    <li nz-menu-item *ngFor="let data of this.ModifieablePlaylists" (click)="addSongToPlaylist(data.id)">{{data.name}}</li>
+                </ul>
+              </li>
+              <li nz-submenu nzTitle="Add selected to playlist" id="add-all-pl" *ngIf="this.Indeterminate || this.AllChecked">
+                <ul>
+                    <li nz-menu-item *ngFor="let data of this.ModifieablePlaylists" (click)="addSelectedSongsToPlaylist(data.id)">{{data.name}}</li>
+                </ul>
+              </li>
+        </ul>
+    </nz-dropdown-menu>
 
 
 </div>

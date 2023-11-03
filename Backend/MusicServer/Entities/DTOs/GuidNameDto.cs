@@ -1,6 +1,6 @@
 ﻿namespace MusicServer.Entities.DTOs
 {
-    public class ArtistShortDto
+    public class GuidNameDto
     {
         public Guid Id { get; set; }
 

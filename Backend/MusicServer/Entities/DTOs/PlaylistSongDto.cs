@@ -10,7 +10,7 @@
 
         public AlbumArtistDto Album { get; set; }
 
-        public ArtistShortDto[] Artists { get; set; }
+        public GuidNameDto[] Artists { get; set; }
 
         public DateTime Created { get; set; }
 

@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using DataAccess;
 using DataAccess.Entities;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using MusicServer.Entities.DTOs;
 using MusicServer.Entities.Responses;
 using MusicServer.Exceptions;
 using MusicServer.Helpers;
 using MusicServer.Interfaces;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MusicServer.Services
 {
@@ -858,6 +860,20 @@ namespace MusicServer.Services
             }
 
             return lastSongInOrder.Order;
+        }
+
+        public async Task<ModifieablePlaylistsResponse> GetModifiablePlaylists(long userId)
+        {
+            var userIdToSearch = userId == -1 ? this.activeUserService.Id : userId;
+            var playlists = this.dBContext.PlaylistUsers
+                .Include(x => x.Playlist)
+                .Include(x => x.User)
+            .Where(x => x.User.Id == userIdToSearch && x.IsModifieable) ?? throw new UserNotFoundException();
+
+                return new ModifieablePlaylistsResponse()
+                {
+                    Playlists = this.mapper.Map<GuidNameDto[]>(playlists)
+                };
         }
     }
 }

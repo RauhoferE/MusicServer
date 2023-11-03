@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { PlaylistSongPaginationModel } from '../models/playlist-models';
+import { ModifieablePlaylistModel, PlaylistSongPaginationModel } from '../models/playlist-models';
 import { environment } from 'src/environments/environment';
 import { APIROUTES } from '../constants/api-routes';
 
@@ -37,6 +37,33 @@ export class PlaylistService {
       }
     }
     )
+  }
+
+  public RemoveSongsFromPlaylist(orderids: number[], playlistId: string): Observable<Object>{
+    return this.httpClient.delete(`${environment.apiUrl}/${APIROUTES.playlist}/song/${playlistId}`,
+    {
+      withCredentials: true,
+      body: {
+        "orderIds":orderids
+      }
+    }
+    )
+  }
+
+  public GetModifieablePlaylists(userId: number): Observable<ModifieablePlaylistModel>{
+    return this.httpClient.get<ModifieablePlaylistModel>(`${environment.apiUrl}/${APIROUTES.playlist}/playlists/modifieable?userId=${userId}`,{
+      withCredentials: true
+    })
+  }
+
+  public AddSongsToPlaylist(songIds: string[], playlistId: string): Observable<Object>{
+    return this.httpClient.post(`${environment.apiUrl}/${APIROUTES.playlist}/songs/${playlistId}`,
+    {
+      "songIds":songIds
+    },
+    {
+      withCredentials: true
+    })
   }
 
 

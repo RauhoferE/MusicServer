@@ -22,6 +22,7 @@ import {NzAvatarModule } from 'ng-zorro-antd/avatar';
 import {NzListModule } from 'ng-zorro-antd/list';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 
 // Project Imports
 import { AppRoutingModule } from './app-routing.module';
@@ -88,7 +89,8 @@ registerLocaleData(en);
     NzAvatarModule,
     NzListModule,
     NzTableModule,
-    NzModalModule
+    NzModalModule,
+    NzDropDownModule
   ],
   providers: [
     CookieService,
