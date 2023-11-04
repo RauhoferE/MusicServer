@@ -20,6 +20,8 @@ namespace MusicServer.Core.Interfaces
 
         Task<Stream> StreamFile(string path);
 
+        IAsyncEnumerable<byte> StreamFileAsEnumerable(string path);
+
         Task<byte[]> DownloadFile(string path);
     }
 }

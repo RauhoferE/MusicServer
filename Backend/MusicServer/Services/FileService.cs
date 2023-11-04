@@ -76,7 +76,7 @@ namespace MusicServer.Services
             return await this.sftpService.DownloadFile(path);
         }
 
-        public async Task<byte[]> GetSongStream(Guid songId)
+        public async IAsyncEnumerable<byte> GetSongStream(Guid songId)
         {
             var song = this.dBContext.Songs.FirstOrDefault(x => x.Id == songId)
                 ?? throw new SongNotFoundException();
@@ -87,7 +87,10 @@ namespace MusicServer.Services
                 throw new FileNotFoundException();
             }
 
-            return await this.sftpService.DownloadFile(path);
+            await foreach (var item in this.sftpService.StreamFileAsEnumerable(path))
+            {
+                yield return item;
+            }
         }
 
         public async Task<byte[]> GetUserAvatar(long userId)

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -94,6 +95,25 @@ namespace MusicServer.Core.Services
 
                 var file = client.Get(path);
                 return file.Name.Substring(file.Name.LastIndexOf('.'), file.Name.Length - file.Name.LastIndexOf('.'));
+            }
+        }
+
+        public async IAsyncEnumerable<byte> StreamFileAsEnumerable(string path)
+        {
+            using (var client = new SftpClient(this.credentials.Host, this.credentials.Port, this.credentials.UserName, this.credentials.Password))
+            {
+                client.Connect();
+                using (var stream = client.OpenRead(path))
+                {
+                    int b;
+                    while ((b = stream.ReadByte()) > -1)
+                    {
+                        yield return (byte)b;
+                    }
+                }
+
+                //yield return client.ReadAllBytes(path);
+
             }
         }
     }

@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using MusicServer.Entities.Requests.User;
 using MusicServer.Extensions;
+using MusicServer.Hubs;
 using MusicServer.Interfaces;
 using MusicServer.Middleware;
 using MusicServer.Validation;
@@ -44,6 +45,7 @@ internal class Program
         app.UseSession();
 
         app.MapControllers();
+        app.MapHub<StreamingHub>("/streaming");
 
         app.Run();
     }

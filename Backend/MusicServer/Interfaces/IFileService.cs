@@ -7,7 +7,7 @@
 
         public Task UploadUserAvatar(IFormFile image, string extension);
 
-        public Task<byte[]> GetSongStream(Guid songId);
+        public IAsyncEnumerable<byte> GetSongStream(Guid songId);
 
         public Task<byte[]> GetPlaylistCover(Guid playlistId);
 

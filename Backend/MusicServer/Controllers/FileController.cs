@@ -20,12 +20,12 @@ namespace MusicServer.Controllers
                 this.fileService = fileService;
         }
 
-        [HttpGet(ApiRoutes.File.Song)]
-        public async Task<IActionResult> Song([FromRoute, Required] Guid songId)
-        {
-            Response.ContentType = "audio/mp3"; 
-            return File(await this.fileService.GetSongStream(songId), "audio/mp3");
-        }
+        //[HttpGet(ApiRoutes.File.Song)]
+        //public async Task<IActionResult> Song([FromRoute, Required] Guid songId)
+        //{
+        //    Response.ContentType = "audio/mp3"; 
+        //    return File(await this.fileService.GetSongStream(songId), "audio/mp3");
+        //}
 
         [HttpGet(ApiRoutes.File.Album)]
         public async Task<IActionResult> Album([FromRoute, Required] Guid albumId)
