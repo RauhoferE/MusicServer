@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { APIROUTES } from 'src/app/constants/api-routes';
 import { PlaylistSongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SessionStorageService } from 'src/app/services/session-storage.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-playlist-details',
@@ -120,6 +122,10 @@ export class PlaylistDetailsComponent implements OnInit {
 
     const creatorId = this.playlistModel.users.filter(x => x.isCreator)[0]!.id;
     return `/user/${creatorId}`;
+  }
+
+  public getPlaylistCoverSrc(): string{
+    return `${environment.apiUrl}/${APIROUTES.file}/playlist/${this.playlistId}`
   }
 
   public get SongsModel(): PlaylistSongPaginationModel{

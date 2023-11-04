@@ -169,7 +169,7 @@ export class SongTableComponent implements OnInit {
 
   addSongToFavorites(id: string): void{
     // Add Song to Favorites
-    this.playlistService.AddSongsToFavorites([id]);
+    this.addSongsToFavorite([id]);
   }
 
   addSongToPlaylist(playlistId: string): void{
@@ -221,12 +221,22 @@ export class SongTableComponent implements OnInit {
   }
 
   addSelectedSongsToFavorites(): void{
-    var checkedSongIds = this.songs.songs.filter(x => x.checked).map(x => x.id);
+    var checkedSongIds = this.songs.songs.filter(x => x.checked && !x.isInFavorites).map(x => x.id);
+
+    if (checkedSongIds.length == 0) {
+      return;
+    }
+
     this.addSongsToFavorite(checkedSongIds);
   }
 
   removeSelectedSongsFromFavorites(): void{
-    var checkedSongIds = this.songs.songs.filter(x => x.checked).map(x => x.id);
+    var checkedSongIds = this.songs.songs.filter(x => x.checked && x.isInFavorites).map(x => x.id);
+
+    if (checkedSongIds.length == 0) {
+      return;
+    }
+
     this.removeSongsFromFavorites(checkedSongIds);
   }
 
@@ -241,7 +251,12 @@ export class SongTableComponent implements OnInit {
         if (ids.length > 1) {
           this.message.success("Songs were successfully added to favorites!");
         }
-        
+
+        this.indeterminate = false;
+        this.allChecked = false;
+
+        this.updateDashBoard();
+
         this.paginationUpdated.emit();
       }
     })
@@ -266,6 +281,8 @@ export class SongTableComponent implements OnInit {
         }
 
         if (this.playlistId == playlistId) {
+          this.indeterminate = false;
+          this.allChecked = false;
           this.paginationUpdated.emit();
         }
         
@@ -298,6 +315,9 @@ export class SongTableComponent implements OnInit {
         if (songIds.length > 1) {
           this.message.success("Songs were successfully removed from favorites!");
         }
+
+        this.indeterminate = false;
+        this.allChecked = false;
 
         this.updateDashBoard();
         this.paginationUpdated.emit();
