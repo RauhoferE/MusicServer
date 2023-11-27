@@ -44,6 +44,7 @@ import { PlaylistDetailsComponent } from './views/playlist/playlist-details/play
 import { SongTableComponent } from './components/songs/song-table/song-table.component';
 import { FavoritesComponent } from './views/favorites/favorites.component';
 import { SecondsToMinutePipe } from './pipes/seconds-to-minutes-pipe';
+import { MediaplayerComponent } from './components/songs/mediaplayer/mediaplayer.component';
 
 
 registerLocaleData(en);
@@ -63,7 +64,8 @@ registerLocaleData(en);
     PlaylistDetailsComponent,
     SongTableComponent,
     FavoritesComponent,
-    SecondsToMinutePipe
+    SecondsToMinutePipe,
+    MediaplayerComponent
   ],
   imports: [
     BrowserModule,

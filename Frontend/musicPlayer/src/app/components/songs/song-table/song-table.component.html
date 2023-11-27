@@ -1,10 +1,18 @@
 <div>
-    <nz-input-group [nzPrefix]="prefixIconSearch" style="margin-bottom: 2em;">
-        <input type="text" nz-input placeholder="Search for song" [(ngModel)]="SearchString" (keyup.enter)="onSearchQueryInput()"/>
-    </nz-input-group>
-    <ng-template #prefixIconSearch>
-    <span nz-icon nzType="search"></span>
-    </ng-template>
+    <div nz-row style="margin-bottom: 2em;">
+        <button nz-button nz-col nzSpan="3"  nzType="default" style="width: 160px; height: 160px;" [nzShape]="'circle'" (click)="playSongs()">
+            <span nz-icon nzType="play-circle" nzTheme="outline" style="font-size: 150px;"></span>
+        </button>
+        
+        <nz-input-group nz-col nzSpan="5" nzOffset = "1" [nzPrefix]="prefixIconSearch" style="align-self: center;">
+            <input type="text" nz-input placeholder="Search for song" [(ngModel)]="SearchString" (keyup.enter)="onSearchQueryInput()"/>
+        </nz-input-group>
+        <ng-template #prefixIconSearch>
+        <span nz-icon nzType="search"></span>
+        </ng-template>
+        
+    </div>
+
     <button *ngIf="!ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Show Selector</button>
     <button *ngIf="ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Hide Selector</button>
     <nz-table

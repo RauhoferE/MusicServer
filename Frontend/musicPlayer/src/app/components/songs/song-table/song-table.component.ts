@@ -325,6 +325,14 @@ export class SongTableComponent implements OnInit {
     });
   }
 
+  playSongs(): void{
+    // Creaste queue of songs on how they appear in the table
+    // And start the media player
+    // They player has the queue and also plays the music
+    // This should happen even when the user switches to another side so use the rxjs storage
+    // Later sync the current song and the playlist with the server 
+  }
+
   updateDashBoard(): void{
     var currenState = false;
     this.rxjsStorageService.currentSongInTableChanged$.subscribe((val) =>{
