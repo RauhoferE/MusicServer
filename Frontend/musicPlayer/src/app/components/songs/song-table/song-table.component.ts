@@ -331,6 +331,7 @@ export class SongTableComponent implements OnInit {
     // They player has the queue and also plays the music
     // This should happen even when the user switches to another side so use the rxjs storage
     // Later sync the current song and the playlist with the server 
+    
   }
 
   updateDashBoard(): void{
@@ -340,7 +341,7 @@ export class SongTableComponent implements OnInit {
     })
 
     // Update value in rxjs so the dashboard gets updated
-    this.rxjsStorageService.setSongInTableChangedState(!currenState);
+    this.rxjsStorageService.setSongTableLoadingState(!currenState);
   }
 
   public get PageSize(): number{
