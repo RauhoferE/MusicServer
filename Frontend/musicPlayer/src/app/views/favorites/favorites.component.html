@@ -11,5 +11,6 @@
     </div>
 
     <app-song-table [songs]="this.SongsModel"
-     (paginationUpdated)="onPaginationUpdated()"></app-song-table>
+     (paginationUpdated)="onPaginationUpdated()" (playSongsClicked)="onPlaySongsClicked()"
+     (playSongClicked)="onPlaySongClicked($event)"></app-song-table>
 </div>

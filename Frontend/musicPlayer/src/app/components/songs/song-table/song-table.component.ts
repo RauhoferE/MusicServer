@@ -26,6 +26,10 @@ export class SongTableComponent implements OnInit {
 
   @Output() paginationUpdated: EventEmitter<void> = new EventEmitter<void>();
 
+  @Output() playSongsClicked: EventEmitter<void> = new EventEmitter<void>();
+
+  @Output() playSongClicked: EventEmitter<PlaylistSongModel> = new EventEmitter<PlaylistSongModel>();
+
   public IsLoading: Observable<boolean> = new Observable();
 
   private showCheckbox: boolean = false;
@@ -332,6 +336,15 @@ export class SongTableComponent implements OnInit {
     // This should happen even when the user switches to another side so use the rxjs storage
     // Later sync the current song and the playlist with the server 
     
+    // this.rxjsStorageService.clearSongQueue();
+    // this.rxjsStorageService.addSongsToQueue(this.songs.songs);
+    // TODO: Send event to outside component
+    this.playSongsClicked.emit();
+  }
+
+  playSong(model: PlaylistSongModel): void{
+    // TODO: Send event to outside component
+    this.playSongClicked.emit(model);
   }
 
   updateDashBoard(): void{

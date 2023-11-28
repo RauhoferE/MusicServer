@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { TableQuery } from 'src/app/models/events';
-import { PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
+import { PlaylistSongModel, PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
@@ -84,6 +84,16 @@ export class FavoritesComponent implements OnInit{
     this.sessionStorage.SaveLastPaginationOfFavorites(pModel);
     this.onGetFavorites(pModel.page, pModel.take, pModel.sortAfter, 
       pModel.asc, pModel.query);
+  }
+
+  public onPlaySongsClicked(): void{
+    console.log("Play songs")
+
+  }
+
+  public onPlaySongClicked(songModel: PlaylistSongModel): void{
+    console.log(songModel);
+
   }
 
   public getUserHref(): string{
