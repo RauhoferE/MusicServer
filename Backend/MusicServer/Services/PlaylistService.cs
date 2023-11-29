@@ -293,7 +293,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task<PlaylistSongPaginationResponse> GetFavorites(int page, int take, string sortAfter, bool asc, string query)
+        public async Task<PlaylistSongPaginationResponse> GetFavorites(int skip, int take, string sortAfter, bool asc, string query)
         {
             var user = this.dBContext.Users.Include(x => x.Favorites)
             .ThenInclude(x => x.FavoriteSong)
@@ -307,7 +307,7 @@ namespace MusicServer.Services
 
             var songentities = SortingHelpers.SortSearchFavorites(user.Favorites.AsQueryable(), asc, sortAfter, query);
 
-            var songs = this.mapper.Map<PlaylistSongDto[]>(songentities.Skip((page - 1) * take).Take(take).ToArray());
+            var songs = this.mapper.Map<PlaylistSongDto[]>(songentities.Skip(skip).Take(take).ToArray());
 
             foreach (var song in songs)
             {
@@ -471,7 +471,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int page, int take, string sortAfter, bool asc, string query)
+        public async Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int skip, int take, string sortAfter, bool asc, string query)
         {
             var playlist = this.dBContext.Playlists
                                 .Include(x => x.Users)
@@ -498,7 +498,7 @@ namespace MusicServer.Services
 
             songs = SortingHelpers.SortSearchSongsInPlaylist(songs, asc, sortAfter, query);
 
-            var mappedSongs = this.mapper.Map<PlaylistSong[], PlaylistSongDto[]>(songs.Skip((page - 1) * take).Take(take).ToArray());
+            var mappedSongs = this.mapper.Map<PlaylistSong[], PlaylistSongDto[]>(songs.Skip(skip).Take(take).ToArray());
 
             foreach (var song in mappedSongs)
             {

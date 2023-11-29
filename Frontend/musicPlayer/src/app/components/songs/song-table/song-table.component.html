@@ -49,7 +49,7 @@
               ></td>
                 <td>
                     <span id="order-id">{{data.order}}</span>
-                    <button *ngIf="this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id" 
+                    <button *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || !this.IsSongPlaying" 
                     id="play-song-button" nz-button nzType="default" nzShape="circle" (click)="playSong(data)">
                         <span nz-icon nzType="play-circle" nzTheme="outline"></span>
                     </button>

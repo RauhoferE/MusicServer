@@ -72,17 +72,17 @@ export class SongTableComponent implements OnInit {
     });
 
     this.rxjsStorageService.isSongPlayingState.subscribe(x => {
-      isSongPlaying = x;
+      this.isSongPlaying = x;
     });
 
     this.rxjsStorageService.currentPlayingSong.subscribe(x => {
-      currentPlayingSong = x;
+      this.currentPlayingSong = x;
     });
 
     console.log("Set pag")
     this.pagination = pModel;
-    this.isSongPlaying = isSongPlaying;
-    this.currentPlayingSong = currentPlayingSong;
+    // this.isSongPlaying = isSongPlaying;
+    // this.currentPlayingSong = currentPlayingSong;
   }
 
   onSearchQueryInput(): void{

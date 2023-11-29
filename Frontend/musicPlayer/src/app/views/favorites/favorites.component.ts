@@ -32,6 +32,8 @@ export class FavoritesComponent implements OnInit{
 
   private queueModel: QueueModel = undefined as any;
 
+  private currentPlayingSong: PlaylistSongModel = undefined as any;
+
   /**
    *
    */
@@ -55,24 +57,30 @@ export class FavoritesComponent implements OnInit{
   ngOnInit(): void {
     let isSongPlaying = false;
     let queueModel = undefined as any;
+    let currentPlayingSong = undefined as any;
 
     this.rxjsStorageService.isSongPlayingState.subscribe(x => {
-      isSongPlaying = x;
+      this.isSongPlaying = x;
     });
 
     this.rxjsStorageService.currentQueueFilterAndPagination.subscribe(x => {
-      queueModel = x;
+      this.queueModel = x;
     });
 
-    this.isSongPlaying = isSongPlaying;
-    this.queueModel = queueModel;
+    this.rxjsStorageService.currentPlayingSong.subscribe(x => {
+      this.currentPlayingSong = x;
+    });
+
+    // this.isSongPlaying = isSongPlaying;
+    // this.queueModel = queueModel;
+    // this.currentPlayingSong = currentPlayingSong;
   }
 
   public onGetFavorites(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
     console.log("Get Favorites")
-    
+    const skipSongs = (page - 1) * take;
     this.rxjsStorageService.setSongTableLoadingState(true);
-    this.playlistService.GetFavorites(page, take, sortAfter, asc, query).subscribe({
+    this.playlistService.GetFavorites(skipSongs, take, sortAfter, asc, query).subscribe({
       next:(songsModel: PlaylistSongPaginationModel)=>{
         songsModel.songs.forEach(element => {
           element.checked = false;
@@ -105,15 +113,90 @@ export class FavoritesComponent implements OnInit{
   public playSongs(): void{
     console.log("Play songs")
 
+    // If the user previously clicked stop and wants to resume the playlist with the same queue
+    if (this.QueueModel &&
+      this.QueueModel.type == 'favorites' && 
+    this.QueueModel.asc == this.paginationModel.asc && 
+    this.QueueModel.query == this.paginationModel.query &&
+    this.QueueModel.sortAfter == this.paginationModel.sortAfter) {
+      this.rxjsStorageService.setIsSongPlaylingState(true);
+      return;
+    }
+    this.rxjsStorageService.setQueueFilterAndPagination({
+      asc : this.paginationModel.asc,
+      page : 0,
+      take : 31,
+      query : this.paginationModel.query,
+      sortAfter : this.paginationModel.sortAfter,
+      itemGuid : '-1',
+      type : 'favorites'
+    });
+
+    this.playlistService.GetFavorites(0, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query).subscribe({
+      next:(songsModel: PlaylistSongPaginationModel)=>{
+        console.log(songsModel.songs)
+        
+        this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
+        this.rxjsStorageService.setSongQueue(songsModel.songs);
+        this.rxjsStorageService.setIsSongPlaylingState(true);
+        this.rxjsStorageService.showMediaPlayer(true);
+        console.log(songsModel.songs)
+      },
+      error:(error: any)=>{
+        this.message.error("Error when getting queue.");
+      },
+      complete: () => {
+      }
+    });
   }
 
   public pauseSongs() {
-    throw new Error('Method not implemented.');
+    // Stop playing of song
+    this.rxjsStorageService.setIsSongPlaylingState(false);
   }
 
   public onPlaySongClicked(songModel: PlaylistSongModel): void{
     console.log(songModel);
+    const indexOfSong = this.songsModel.songs.findIndex(x => x.id == songModel.id);
 
+    if (indexOfSong < 0) {
+      return;
+    }
+
+    // IF the user wants to resume the same song
+    if (this.CurrentPlayingSong && 
+      this.CurrentPlayingSong.id == songModel.id) {
+      this.rxjsStorageService.setIsSongPlaylingState(true);
+      return;
+    }
+
+    const skipSongs = ((this.paginationModel.page - 1) * this.paginationModel.take) + indexOfSong;
+
+    this.rxjsStorageService.setQueueFilterAndPagination({
+      asc : this.paginationModel.asc,
+      page : skipSongs,
+      take : 31,
+      query : this.paginationModel.query,
+      sortAfter : this.paginationModel.sortAfter,
+      itemGuid : '-1',
+      type : 'favorites'
+    });
+
+    this.playlistService.GetFavorites(skipSongs, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query).subscribe({
+      next:(songsModel: PlaylistSongPaginationModel)=>{
+        console.log(songsModel)
+        this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
+        this.rxjsStorageService.setSongQueue(songsModel.songs);
+        this.rxjsStorageService.setIsSongPlaylingState(true);
+        this.rxjsStorageService.showMediaPlayer(true);
+        console.log(songsModel.songs)
+      },
+      error:(error: any)=>{
+        this.message.error("Error when getting queue.");
+      },
+      complete: () => {
+      }
+    });
   }
 
   public getUserHref(): string{
@@ -126,6 +209,10 @@ export class FavoritesComponent implements OnInit{
 
   public get QueueModel(): QueueModel{
     return this.queueModel;
+  }
+
+  public get CurrentPlayingSong(): PlaylistSongModel{
+    return this.currentPlayingSong;
   }
 
   public get SongsModel(): PlaylistSongPaginationModel{

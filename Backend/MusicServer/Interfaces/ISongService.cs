@@ -9,7 +9,7 @@ namespace MusicServer.Interfaces
 
         public Task<AlbumPaginationResponse> GetAlbumsOfArtist(Guid artistId, int page, int take);
 
-        public Task<SongPaginationResponse> GetSongsInAlbum(Guid albumId, int page, int take);
+        public Task<SongPaginationResponse> GetSongsInAlbum(Guid albumId, int skip, int take);
 
         public Task<SongDto> GetSongInformation(Guid songId);
 

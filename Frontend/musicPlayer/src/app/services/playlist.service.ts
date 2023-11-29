@@ -12,14 +12,14 @@ export class PlaylistService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public GetFavorites(page: number, take: number, sortAfter: string, asc: boolean, query: string): Observable<PlaylistSongPaginationModel>{
-    return this.httpClient.get<PlaylistSongPaginationModel>(`${environment.apiUrl}/${APIROUTES.playlist}/favorites?page=${page}&take=${take}&query=${query}&sortAfter=${sortAfter}&asc=${asc}`,{
+  public GetFavorites(skip: number, take: number, sortAfter: string, asc: boolean, query: string): Observable<PlaylistSongPaginationModel>{
+    return this.httpClient.get<PlaylistSongPaginationModel>(`${environment.apiUrl}/${APIROUTES.playlist}/favorites?skip=${skip}&take=${take}&query=${query}&sortAfter=${sortAfter}&asc=${asc}`,{
       withCredentials: true
     })
   }
 
-  public GetSongsFromPlaylist(page: number, take: number, sortAfter: string, asc: boolean, query: string, playlistId: string): Observable<PlaylistSongPaginationModel>{
-    return this.httpClient.get<PlaylistSongPaginationModel>(`${environment.apiUrl}/${APIROUTES.playlist}/songs/${playlistId}?page=${page}&take=${take}&query=${query}&sortAfter=${sortAfter}&asc=${asc}`,{
+  public GetSongsFromPlaylist(skip: number, take: number, sortAfter: string, asc: boolean, query: string, playlistId: string): Observable<PlaylistSongPaginationModel>{
+    return this.httpClient.get<PlaylistSongPaginationModel>(`${environment.apiUrl}/${APIROUTES.playlist}/songs/${playlistId}?skip=${skip}&take=${take}&query=${query}&sortAfter=${sortAfter}&asc=${asc}`,{
       withCredentials: true
     })
   }

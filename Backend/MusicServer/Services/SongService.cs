@@ -115,7 +115,7 @@ namespace MusicServer.Services
             return mappedSong;
         }
 
-        public async Task<SongPaginationResponse> GetSongsInAlbum(Guid albumId, int page, int take)
+        public async Task<SongPaginationResponse> GetSongsInAlbum(Guid albumId, int skip, int take)
         {
             var album = this._dbContext.Albums.FirstOrDefault(x => x.Id == albumId) ?? throw new AlbumNotFoundException();
 
@@ -125,7 +125,7 @@ namespace MusicServer.Services
                 .Include(x => x.Album)
                 .Where(x => x.Album.Id == albumId);
 
-            var mappedSongs = this._mapper.Map<SongDto[]>(songs.OrderBy(x => x.Id).Skip((page - 1) * take).Take(take));
+            var mappedSongs = this._mapper.Map<SongDto[]>(songs.OrderBy(x => x.Id).Skip(skip).Take(take));
 
             foreach (var song in mappedSongs)
             {

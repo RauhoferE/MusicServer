@@ -36,9 +36,9 @@ namespace MusicServer.Interfaces
 
         public Task<PlaylistUserShortDto> GetPlaylistInfo(Guid playlistId);
 
-        public Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int page, int take, string sortAfter, bool asc, string query);
+        public Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int skip, int take, string sortAfter, bool asc, string query);
 
-        public Task<PlaylistSongPaginationResponse> GetFavorites(int page, int take, string sortAfter, bool asc, string query);
+        public Task<PlaylistSongPaginationResponse> GetFavorites(int skip, int take, string sortAfter, bool asc, string query);
 
         public Task AddSongsToFavorite(List<Guid> songIds);
 

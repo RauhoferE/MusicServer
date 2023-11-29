@@ -36,9 +36,9 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Song.SongsInAlbum)]
-        public async Task<IActionResult> GetSongsInAlbum([FromRoute, Required] Guid albumId, [FromQuery, Required] QueryPaginationSearchRequest request)
+        public async Task<IActionResult> GetSongsInAlbum([FromRoute, Required] Guid albumId, [FromQuery, Required] SongPaginationSearchRequest request)
         {
-            return Ok(await this.songService.GetSongsInAlbum(albumId, request.Page, request.Take));
+            return Ok(await this.songService.GetSongsInAlbum(albumId, request.Skip, request.Take));
         }
 
         [HttpGet]

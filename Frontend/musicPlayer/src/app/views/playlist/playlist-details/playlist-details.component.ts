@@ -75,9 +75,9 @@ export class PlaylistDetailsComponent implements OnInit {
 
   public onGetSongs(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
     console.log("Get Songs")
-    
+    const skipSongs = (page - 1) * take;
     this.rxjsStorageService.setSongTableLoadingState(true);
-    this.playlistService.GetSongsFromPlaylist(page, take, sortAfter, asc, query, this.playlistId).subscribe({
+    this.playlistService.GetSongsFromPlaylist(skipSongs, take, sortAfter, asc, query, this.playlistId).subscribe({
       next:(songsModel: PlaylistSongPaginationModel)=>{
         songsModel.songs.forEach(element => {
           element.checked = false;

@@ -10,10 +10,10 @@
         </p>
     </div>
     <div>
-        <button *ngIf="this.IsSongPlaying  && this.QueueModel && this.QueueModel.itemGuid == '-1'" nz-button nz-col nzType="default" style="width: 160px; height: 160px;" [nzShape]="'circle'" (click)="playSongs()">
+        <button *ngIf="this.IsSongPlaying  && this.QueueModel && this.QueueModel.type == 'favorites'" nz-button nz-col nzType="default" style="width: 160px; height: 160px;" [nzShape]="'circle'" (click)="pauseSongs()">
             <span  nz-icon nzType="pause-circle" nzTheme="outline" style="font-size: 150px;"></span>
         </button>
-        <button *ngIf="!this.IsSongPlaying  && ((this.QueueModel && this.QueueModel.itemGuid != '-1') || !this.QueueModel)" nz-button nz-col nzType="default" style="width: 160px; height: 160px;" [nzShape]="'circle'" (click)="pauseSongs()">
+        <button *ngIf="!this.IsSongPlaying || !this.QueueModel || (this.QueueModel && this.QueueModel.type != 'favorites')" nz-button nz-col nzType="default" style="width: 160px; height: 160px;" [nzShape]="'circle'" (click)="playSongs()">
             <span  nz-icon nzType="play-circle" nzTheme="outline" style="font-size: 150px;"></span>
         </button>
     </div>

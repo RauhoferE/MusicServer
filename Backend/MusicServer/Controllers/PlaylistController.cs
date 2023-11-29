@@ -62,9 +62,9 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Songs)]
-        public async Task<IActionResult> GetSongsInPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] QueryPaginationSearchRequest request)
+        public async Task<IActionResult> GetSongsInPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] SongPaginationSearchRequest request)
         {
-            return Ok(await this.playlistService.GetSongsInPlaylist(playlistId, request.Page, request.Take, request.SortAfter, request.Asc, request.Query));
+            return Ok(await this.playlistService.GetSongsInPlaylist(playlistId, request.Skip, request.Take, request.SortAfter, request.Asc, request.Query));
         }
 
         [HttpGet]
@@ -164,9 +164,9 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.Favorite)]
-        public async Task<IActionResult> GetFavorites([FromQuery, Required] QueryPaginationSearchRequest request)
+        public async Task<IActionResult> GetFavorites([FromQuery, Required] SongPaginationSearchRequest request)
         {
-            return Ok(await this.playlistService.GetFavorites(request.Page, request.Take, request.SortAfter, request.Asc, request.Query));
+            return Ok(await this.playlistService.GetFavorites(request.Skip, request.Take, request.SortAfter, request.Asc, request.Query));
         }
 
         [HttpGet]
