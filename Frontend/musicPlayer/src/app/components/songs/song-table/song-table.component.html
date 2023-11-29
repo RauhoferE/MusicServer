@@ -1,10 +1,6 @@
 <div>
-    <div nz-row style="margin-bottom: 2em;">
-        <button nz-button nz-col nzSpan="3"  nzType="default" style="width: 160px; height: 160px;" [nzShape]="'circle'" (click)="playSongs()">
-            <span nz-icon nzType="play-circle" nzTheme="outline" style="font-size: 150px;"></span>
-        </button>
-        
-        <nz-input-group nz-col nzSpan="5" nzOffset = "1" [nzPrefix]="prefixIconSearch" style="align-self: center;">
+    <div nz-row style="margin-bottom: 2em;">        
+        <nz-input-group nz-col [nzPrefix]="prefixIconSearch" style="align-self: center;">
             <input type="text" nz-input placeholder="Search for song" [(ngModel)]="SearchString" (keyup.enter)="onSearchQueryInput()"/>
         </nz-input-group>
         <ng-template #prefixIconSearch>
@@ -43,13 +39,25 @@
 
         </thead>
         <tbody>
-            <tr *ngFor="let data of songs.songs" (contextmenu)="contextMenu($event, menu, data)">
+            <tr *ngFor="let data of songs.songs" (contextmenu)="contextMenu($event, menu, data)"
+            class="song-item"
+            >
                 <td
                 *ngIf="ShowCheckbox"
                 [(nzChecked)]="data.checked"
                 (nzCheckedChange)="refreshTableHeader()"
               ></td>
-                <td>{{data.order}}</td>
+                <td>
+                    <span id="order-id">{{data.order}}</span>
+                    <button *ngIf="this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id" 
+                    id="play-song-button" nz-button nzType="default" nzShape="circle" (click)="playSong(data)">
+                        <span nz-icon nzType="play-circle" nzTheme="outline"></span>
+                    </button>
+                    <button *ngIf="this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id" 
+                    nz-button nzType="default" nzShape="circle" (click)="pauseSong()">
+                        <span nz-icon nzType="pause-circle" nzTheme="outline"></span>
+                    </button>
+                </td>
                 <td>
                     <img [src]="getAlbumCoverSrc(data.album.id)" style="width: 50px; height: 50px;"/>
                     {{data.name}}

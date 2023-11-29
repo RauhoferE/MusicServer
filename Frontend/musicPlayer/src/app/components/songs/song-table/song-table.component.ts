@@ -26,8 +26,6 @@ export class SongTableComponent implements OnInit {
 
   @Output() paginationUpdated: EventEmitter<void> = new EventEmitter<void>();
 
-  @Output() playSongsClicked: EventEmitter<void> = new EventEmitter<void>();
-
   @Output() playSongClicked: EventEmitter<PlaylistSongModel> = new EventEmitter<PlaylistSongModel>();
 
   public IsLoading: Observable<boolean> = new Observable();
@@ -50,6 +48,10 @@ export class SongTableComponent implements OnInit {
 
   private modifieablePlaylists: GuidNameModel[] = [];
 
+  private isSongPlaying: boolean = false;
+
+  private currentPlayingSong: PlaylistSongModel = undefined as any;
+
 
   /**
    *
@@ -62,13 +64,25 @@ export class SongTableComponent implements OnInit {
 
   ngOnInit(): void {
     let pModel = {} as PaginationModel;
+    let isSongPlaying = false;
+    let currentPlayingSong: PlaylistSongModel = undefined as any;
     this.rxjsStorageService.currentPaginationSongModel$.subscribe((val) => {
       
       pModel = val as PaginationModel;
     });
 
+    this.rxjsStorageService.isSongPlayingState.subscribe(x => {
+      isSongPlaying = x;
+    });
+
+    this.rxjsStorageService.currentPlayingSong.subscribe(x => {
+      currentPlayingSong = x;
+    });
+
     console.log("Set pag")
     this.pagination = pModel;
+    this.isSongPlaying = isSongPlaying;
+    this.currentPlayingSong = currentPlayingSong;
   }
 
   onSearchQueryInput(): void{
@@ -329,8 +343,8 @@ export class SongTableComponent implements OnInit {
     });
   }
 
-  playSongs(): void{
-    // Creaste queue of songs on how they appear in the table
+  playSong(model: PlaylistSongModel): void{
+        // Creaste queue of songs on how they appear in the table
     // And start the media player
     // They player has the queue and also plays the music
     // This should happen even when the user switches to another side so use the rxjs storage
@@ -339,12 +353,11 @@ export class SongTableComponent implements OnInit {
     // this.rxjsStorageService.clearSongQueue();
     // this.rxjsStorageService.addSongsToQueue(this.songs.songs);
     // TODO: Send event to outside component
-    this.playSongsClicked.emit();
+    this.playSongClicked.emit(model);
   }
 
-  playSong(model: PlaylistSongModel): void{
-    // TODO: Send event to outside component
-    this.playSongClicked.emit(model);
+  pauseSong(): void{
+    this.rxjsStorageService.setIsSongPlaylingState(false);
   }
 
   updateDashBoard(): void{
@@ -355,6 +368,14 @@ export class SongTableComponent implements OnInit {
 
     // Update value in rxjs so the dashboard gets updated
     this.rxjsStorageService.setSongTableLoadingState(!currenState);
+  }
+
+  public get IsSongPlaying(): boolean{
+    return this.isSongPlaying;
+  }
+
+  public get CurrentPlayingSong(): PlaylistSongModel{
+    return this.currentPlayingSong;
   }
 
   public get PageSize(): number{

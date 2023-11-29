@@ -16,7 +16,7 @@ export class RxjsStorageService {
   private songInTableChangedState$ = new BehaviorSubject<any>({});
   currentSongInTableChanged$ = this.songInTableChangedState$.asObservable();
 
-  private isSongPlayingChangedState$ = new BehaviorSubject<any>({});
+  private isSongPlayingChangedState$ = new BehaviorSubject<any>(false);
   isSongPlayingState = this.isSongPlayingChangedState$.asObservable();
 
   private showMediaPlayerChangedState$ = new BehaviorSubject<any>({});

@@ -3,7 +3,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { TableQuery } from 'src/app/models/events';
 import { PlaylistSongModel, PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
-import { PaginationModel } from 'src/app/models/storage';
+import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
@@ -28,6 +28,10 @@ export class FavoritesComponent implements OnInit{
     take: 10
   } as PaginationModel;
 
+  private isSongPlaying: boolean = false;
+
+  private queueModel: QueueModel = undefined as any;
+
   /**
    *
    */
@@ -49,7 +53,19 @@ export class FavoritesComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    let isSongPlaying = false;
+    let queueModel = undefined as any;
 
+    this.rxjsStorageService.isSongPlayingState.subscribe(x => {
+      isSongPlaying = x;
+    });
+
+    this.rxjsStorageService.currentQueueFilterAndPagination.subscribe(x => {
+      queueModel = x;
+    });
+
+    this.isSongPlaying = isSongPlaying;
+    this.queueModel = queueModel;
   }
 
   public onGetFavorites(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
@@ -86,9 +102,13 @@ export class FavoritesComponent implements OnInit{
       pModel.asc, pModel.query);
   }
 
-  public onPlaySongsClicked(): void{
+  public playSongs(): void{
     console.log("Play songs")
 
+  }
+
+  public pauseSongs() {
+    throw new Error('Method not implemented.');
   }
 
   public onPlaySongClicked(songModel: PlaylistSongModel): void{
@@ -98,6 +118,14 @@ export class FavoritesComponent implements OnInit{
 
   public getUserHref(): string{
     return `/user/-1`;
+  }
+
+  public get IsSongPlaying(): boolean{
+    return this.isSongPlaying;
+  }
+
+  public get QueueModel(): QueueModel{
+    return this.queueModel;
   }
 
   public get SongsModel(): PlaylistSongPaginationModel{

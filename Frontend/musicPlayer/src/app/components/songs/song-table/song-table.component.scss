@@ -1,0 +1,15 @@
+.song-item:hover #order-id{
+    display: none;
+}
+
+.song-item #order-id{
+    display: block;
+}
+
+.song-item:hover #play-song-button{
+    display: block;
+}
+
+.song-item #play-song-button{
+    display: none;
+}
