@@ -48,15 +48,14 @@
                 (nzCheckedChange)="refreshTableHeader()"
               ></td>
                 <td>
-                    <span id="order-id">{{data.order}}</span>
-                    <button *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || !this.IsSongPlaying" 
-                    id="play-song-button" nz-button nzType="default" nzShape="circle" (click)="playSong(data)">
-                        <span nz-icon nzType="play-circle" nzTheme="outline"></span>
-                    </button>
-                    <button *ngIf="this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id" 
-                    nz-button nzType="default" nzShape="circle" (click)="pauseSong()">
-                        <span nz-icon nzType="pause-circle" nzTheme="outline"></span>
-                    </button>
+                    <span id="order-id" *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || 
+                    (!this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id)">{{data.order}}</span>
+
+                    <span *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || !this.IsSongPlaying"
+                    id="play-song-button" nz-icon nzType="play-circle" nzTheme="outline" style="cursor: pointer;" (click)="playSong(data)"></span>
+                    
+                    <span *ngIf="this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id"
+                     nz-icon nzType="pause-circle" nzTheme="outline" style="cursor: pointer;" (click)="pauseSong()"></span>
                 </td>
                 <td>
                     <img [src]="getAlbumCoverSrc(data.album.id)" style="width: 50px; height: 50px;"/>

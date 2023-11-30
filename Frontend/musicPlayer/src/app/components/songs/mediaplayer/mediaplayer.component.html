@@ -1,1 +1,38 @@
-<p>mediaplayer works!</p>
+<div nz-row style="height: 100%; background-color: white;">
+    <img nz-col nzSpan="2">
+    <div nz-col nzSpan="2">
+        <span>{{this.CurrentPlayingSong.name}}</span>
+        <span>{{this.ArtistsAsString}}</span>
+        <span nz-icon nzType="heart" nzTheme="outline"></span>
+    </div>
+    <div nz-col nzSpan="20">
+        <div nz-row>
+            <span nz-icon nzSpan="1" nzType="swap" nzTheme="outline"></span>
+            <span nz-icon nzSpan="1" nzType="step-backward" nzTheme="outline"></span>
+            <span nz-icon nzSpan="1" nzType="play-circle" nzTheme="outline"></span>
+            <span nz-icon nzSpan="1" nzType="step-forward" nzTheme="outline"></span>
+            <span nz-icon nzSpan="1" nzType="retweet" nzTheme="outline"></span>
+        </div>
+        <div nz-row>
+            <span nzSpan="1">{{this.CurrentSecondsPlayed | secondsToMinute}}</span>
+            <nz-slider
+            nzSpan="17"
+            [(ngModel)]="this.durationSlider"
+            (nzOnAfterChange)="onDurationChanged($event)"
+          ></nz-slider>
+            <span nzSpan="1">{{this.CurrentPlayingSong.duration | secondsToMinute}}</span>
+            <button nz-button nzSpan="1" nz-popover nzType="primary" nzPopoverTitle="Title" nzPopoverContent="Content">
+                <span nz-icon nzType="menu" nzTheme="outline"></span>
+            </button>
+            <span nzSpan="1" nz-icon nzType="customer-service" nzTheme="outline"></span>
+            <nz-slider
+            nzSpan="2"
+            [(ngModel)]="this.volumePercent"
+            (nzOnAfterChange)="onVolumeChanged($event)"
+          ></nz-slider>
+        </div>
+    </div>
+    <audio style="display: none;"></audio>
+
+
+</div>
