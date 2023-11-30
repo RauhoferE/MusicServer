@@ -116,6 +116,15 @@ export class RxjsStorageService {
 
   replaceSongInQueue(song: PlaylistSongModel){
     let queue = this.songqueue$.getValue()as PlaylistSongModel[];
+
+    if (!queue) {
+      return;
+    }
+
+    if (!Array.isArray(queue) || queue.length == 0) {
+      return;
+    }
+
     const indexOfElement = queue.findIndex(x => x.id == song.id);
 
     if (indexOfElement == -1) {
@@ -127,10 +136,37 @@ export class RxjsStorageService {
     this.songqueue$.next(queue);
   }
 
+  replaceSongsInQueue(songs: PlaylistSongModel[]){
+    let queue = this.songqueue$.getValue()as PlaylistSongModel[];
+
+    if (!queue) {
+      return;
+    }
+
+    if (!Array.isArray(queue) || queue.length == 0) {
+      return;
+    }
+
+    for (let index = 0; index < songs.length; index++) {
+      const indexOfElement = queue.findIndex(x => x.id == songs[index].id);
+
+      if (indexOfElement != -1) {
+        queue.splice(indexOfElement, 1, songs[index]);
+      }
+
+    }
+
+    this.songqueue$.next(queue);
+  }
+
   pushSongToPlaceInQueue(sourceIndex: number, targetIndex: number){
     let queue = this.songqueue$.getValue()as PlaylistSongModel[];
 
     if (!queue) {
+      return;
+    }
+
+    if (!Array.isArray(queue) ||queue.length == 0) {
       return;
     }
 
@@ -151,6 +187,21 @@ export class RxjsStorageService {
     this.currentPlaylingSongModel$.next(song);
   }
 
+  checkFoReplaceingCurrentPlayingSong(songs: PlaylistSongModel[]){
+
+    const currentPlayingSong = this.currentPlaylingSongModel$.getValue() as PlaylistSongModel;
+
+    if (!currentPlayingSong) {
+      return;
+    }
+
+    for (let index = 0; index < songs.length; index++) {
+      if (currentPlayingSong.id == songs[index].id) {
+        this.currentPlaylingSongModel$.next(songs[index]);
+      }
+    }
+  }
+
   clearSongQueue(){
     this.songqueue$.next([]);
   }
@@ -159,6 +210,10 @@ export class RxjsStorageService {
     let queue = this.songqueue$.getValue() as PlaylistSongPaginationModel[];
 
     if (!queue) {
+      return;
+    }
+
+    if (!Array.isArray(queue) ||queue.length == 0) {
       return;
     }
 

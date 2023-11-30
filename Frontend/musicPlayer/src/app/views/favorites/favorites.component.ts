@@ -90,6 +90,8 @@ export class FavoritesComponent implements OnInit{
           element.checked = false;
         });
         this.songsModel = songsModel;
+        // this.rxjsStorageService.replaceSongsInQueue(this.songsModel.songs);
+        // this.rxjsStorageService.checkFoReplaceingCurrentPlayingSong(this.songsModel.songs);
       },
       error:(error: any)=>{
         this.message.error("Error when getting favorites.");

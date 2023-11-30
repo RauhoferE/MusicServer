@@ -11,6 +11,7 @@ import { GuidNameModel, PlaylistSongModel, PlaylistSongPaginationModel } from 's
 import { PaginationModel } from 'src/app/models/storage';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
+import { SongService } from 'src/app/services/song.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -57,7 +58,7 @@ export class SongTableComponent implements OnInit {
    *
    */
   constructor(private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService,
-    private message: NzMessageService, private modal: NzModalService, private nzContextMenuService: NzContextMenuService) {
+    private message: NzMessageService, private modal: NzModalService, private nzContextMenuService: NzContextMenuService, private songService: SongService) {
     console.log("Construct")
     this.IsLoading = this.rxjsStorageService.currentSongTableLoading$;
   }
@@ -273,6 +274,8 @@ export class SongTableComponent implements OnInit {
         this.indeterminate = false;
         this.allChecked = false;
 
+        this.updateCurrentSong(ids);
+
         this.updateDashBoard();
 
         this.paginationUpdated.emit();
@@ -337,6 +340,8 @@ export class SongTableComponent implements OnInit {
         this.indeterminate = false;
         this.allChecked = false;
 
+        this.updateCurrentSong(songIds);
+
         this.updateDashBoard();
         this.paginationUpdated.emit();
       }
@@ -368,6 +373,29 @@ export class SongTableComponent implements OnInit {
 
     // Update value in rxjs so the dashboard gets updated
     this.rxjsStorageService.setUpdateDashboardBoolean(!currenState);
+  }
+
+  updateCurrentSong(idOfChangedSongs: string[]): void{
+    let currentSong = {} as PlaylistSongModel;
+    this.rxjsStorageService.currentPlayingSong.subscribe(x => {
+      currentSong = x;
+    })
+
+    if (!currentSong) {
+      return;
+    }
+
+    const index = idOfChangedSongs.indexOf(currentSong.id);
+
+    if (index == -1) {
+      return;
+    }
+
+    this.songService.GetSongDetails(idOfChangedSongs[index]).subscribe({
+      next: (x)=>{
+        this.rxjsStorageService.setCurrentPlayingSong(x);
+      }
+    })
   }
 
   public get IsSongPlaying(): boolean{
