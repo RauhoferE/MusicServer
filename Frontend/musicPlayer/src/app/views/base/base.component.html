@@ -28,7 +28,7 @@
         <hr>
         <ul nz-menu nzMode="inline" nzTheme="light" [nzSelectable]="false">
             <li nz-menu-item>
-                <h2 style="cursor: pointer;">
+                <h2 class="clickable">
                     <span nz-icon nzType="folder" style="font-size: 2rem;"></span>
                     Library
                 </h2>
@@ -37,7 +37,7 @@
 
 
         <div>
-            <span *ngIf="this.FilterName !== ''" nz-icon nzType="close-circle" (click)="setFilter(null, '')" style="cursor: pointer;"></span>
+            <span *ngIf="this.FilterName !== ''" nz-icon nzType="close-circle" (click)="setFilter(null, '')" class="clickable"></span>
             <nz-tag nzMode="checkable" class="tag" (nzCheckedChange)="setFilter($event, 'playlists')" [nzChecked]="this.FilterName == 'playlists'">Playlists</nz-tag>
             <nz-tag nzMode="checkable" class="tag" (nzCheckedChange)="setFilter($event, 'artists')" [nzChecked]="this.FilterName == 'artists'">Artists</nz-tag>
             <nz-tag nzMode="checkable" class="tag" (nzCheckedChange)="setFilter($event, 'users')" [nzChecked]="this.FilterName == 'users'">Users</nz-tag>

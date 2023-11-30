@@ -35,6 +35,15 @@
     color: #ffffff;
 }
 
+.clickable{
+    cursor: pointer;
+}
+
+.clickable:hover{
+    color: #52c41a;
+    cursor: pointer;
+}
+
 /*Bootstrap Shenanigans*/
 
 .mt-1{

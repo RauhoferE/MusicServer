@@ -31,6 +31,9 @@ export class RxjsStorageService {
   private queueFilterAndPagination$ = new BehaviorSubject<any>({});
   currentQueueFilterAndPagination = this.queueFilterAndPagination$.asObservable();
 
+  // private songsInTable$ = new BehaviorSubject<any>({});
+  // currentSongsInTable = this.songsInTable$.asObservable();
+
 
   constructor() { }
 
@@ -53,6 +56,24 @@ export class RxjsStorageService {
   setSongQueue(songs: PlaylistSongModel[]){
     this.songqueue$.next(songs);
   }
+
+  // setCurrentSongsInTable(songs: PlaylistSongPaginationModel){
+  //   this.songsInTable$.next(songs);
+  // }
+
+  // replaceCurrentSongInSongsTable(song: PlaylistSongModel){
+  //   let songsWithPag = this.songsInTable$.getValue() as PlaylistSongPaginationModel;
+  //   const indexOfElement = songsWithPag.songs.findIndex(x => x.id == song.id);
+  //   if (indexOfElement == -1) {
+  //     // Song is not in Table 
+  //     // No need to replace it
+  //     return;
+  //   }
+
+  //   // Replace element and save
+  //   songsWithPag.songs.splice(indexOfElement, 1, song);
+  //   this.songsInTable$.next(songsWithPag);
+  // }
 
   addSongToQueue(song: PlaylistSongModel){
     let currentQueue: PlaylistSongModel[] = [];
@@ -81,6 +102,19 @@ export class RxjsStorageService {
 
     this.songqueue$.next(songs);
   }
+
+  // replaceSongInQueue(song: PlaylistSongModel){
+  //   let queue = this.songqueue$.getValue()as PlaylistSongModel[];
+  //   const indexOfElement = queue.findIndex(x => x.id == song.id);
+
+  //   if (indexOfElement == -1) {
+  //     return;
+  //   }
+
+  //   queue.splice(indexOfElement, 1, song);
+
+  //   this.songqueue$.next(queue);
+  // }
 
   pushSongToPlaceInQueue(sourceIndex: number, targetIndex: number){
     let queue = this.songqueue$.getValue()as PlaylistSongModel[];

@@ -10,16 +10,15 @@
         </p>
     </div>
     <div>
-        <button *ngIf="this.IsSongPlaying  && this.QueueModel && this.QueueModel.type == 'favorites'" nz-button nz-col nzType="default" style="width: 160px; height: 160px;" [nzShape]="'circle'" (click)="pauseSongs()">
-            <span  nz-icon nzType="pause-circle" nzTheme="outline" style="font-size: 150px;"></span>
-        </button>
-        <button *ngIf="!this.IsSongPlaying || !this.QueueModel || (this.QueueModel && this.QueueModel.type != 'favorites')" nz-button nz-col nzType="default" style="width: 160px; height: 160px;" [nzShape]="'circle'" (click)="playSongs()">
-            <span  nz-icon nzType="play-circle" nzTheme="outline" style="font-size: 150px;"></span>
-        </button>
+        <span *ngIf="this.IsSongPlaying  && this.QueueModel && this.QueueModel.type == 'favorites'"
+        nz-col nz-icon nzType="pause-circle" nzTheme="outline" style="font-size: 150px;" class="clickable" (click)="pauseSongs()"></span>
+        <span *ngIf="!this.IsSongPlaying || !this.QueueModel || (this.QueueModel && this.QueueModel.type != 'favorites')" nz-col
+         nz-icon nzType="play-circle" nzTheme="outline" style="font-size: 150px;" class="clickable" (click)="playSongs()"></span>
     </div>
 
 
-    <app-song-table [songs]="this.SongsModel"
+    <app-song-table
+    [songs]="this.SongsModel"
      (paginationUpdated)="onPaginationUpdated()"
      (playSongClicked)="onPlaySongClicked($event)"></app-song-table>
 </div>

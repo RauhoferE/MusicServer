@@ -52,10 +52,10 @@
                     (!this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id)">{{data.order}}</span>
 
                     <span *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || !this.IsSongPlaying"
-                    id="play-song-button" nz-icon nzType="play-circle" nzTheme="outline" style="cursor: pointer;" (click)="playSong(data)"></span>
-                    
+                    id="play-song-button" nz-icon nzType="play-circle" nzTheme="outline" class="clickable" (click)="playSong(data)"></span>
+
                     <span *ngIf="this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id"
-                     nz-icon nzType="pause-circle" nzTheme="outline" style="cursor: pointer;" (click)="pauseSong()"></span>
+                     nz-icon nzType="pause-circle" nzTheme="outline" class="clickable" (click)="pauseSong()"></span>
                 </td>
                 <td>
                     <img [src]="getAlbumCoverSrc(data.album.id)" style="width: 50px; height: 50px;"/>
@@ -65,9 +65,9 @@
                 <td>{{data.created | date:'longDate' }}</td>
                 <td>
                     <span *ngIf="data.isInFavorites" nz-icon nzType="heart" 
-                    nzTheme="fill" style="cursor: pointer;" (click)="removeSongFromFavorites(data.id)"></span>
+                    nzTheme="fill" class="clickable" (click)="removeSongFromFavorites(data.id)"></span>
                     <span *ngIf="!data.isInFavorites" nz-icon nzType="heart" 
-                    nzTheme="outline" style="cursor: pointer;" (click)="addSongToFavorites(data.id)"></span>
+                    nzTheme="outline" class="clickable" (click)="addSongToFavorites(data.id)"></span>
                 </td>
                 <td>{{data.duration | secondsToMinute}}</td>
 
