@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { APIROUTES } from 'src/app/constants/api-routes';
-import { PlaylistSongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
-import { PaginationModel } from 'src/app/models/storage';
+import { PlaylistSongModel, PlaylistSongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
+import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
@@ -34,6 +34,12 @@ export class PlaylistDetailsComponent implements OnInit {
   private playlistModel: PlaylistUserShortModel = {
 
   } as PlaylistUserShortModel;
+
+  private isSongPlaying: boolean = false;
+
+  private queueModel: QueueModel = undefined as any;
+
+  private currentPlayingSong: PlaylistSongModel = undefined as any;
 
   /**
    *
@@ -69,6 +75,18 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.rxjsStorageService.isSongPlayingState.subscribe(x => {
+      this.isSongPlaying = x;
+    });
+
+    this.rxjsStorageService.currentQueueFilterAndPagination.subscribe(x => {
+      this.queueModel = x;
+    });
+
+    this.rxjsStorageService.currentPlayingSong.subscribe(x => {
+      this.currentPlayingSong = x;
+    });
+
     this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
       this.onPaginationUpdated();
     });
@@ -109,6 +127,96 @@ export class PlaylistDetailsComponent implements OnInit {
       pModel.asc, pModel.query);
   }
 
+  public playSongs(): void{
+    console.log("Play songs")
+
+    // If the user previously clicked stop and wants to resume the playlist with the same queue
+    if (this.QueueModel &&
+      this.QueueModel.type == 'playlist' && 
+    this.QueueModel.asc == this.paginationModel.asc && 
+    this.QueueModel.query == this.paginationModel.query &&
+    this.QueueModel.sortAfter == this.paginationModel.sortAfter) {
+      this.rxjsStorageService.setIsSongPlaylingState(true);
+      return;
+    }
+    this.rxjsStorageService.setQueueFilterAndPagination({
+      asc : this.paginationModel.asc,
+      page : 0,
+      take : 31,
+      query : this.paginationModel.query,
+      sortAfter : this.paginationModel.sortAfter,
+      itemGuid : this.playlistId,
+      // TOOD: Replace with interface
+      type : 'playlist'
+    });
+
+    this.playlistService.GetSongsFromPlaylist(0, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query, this.playlistId).subscribe({
+      next:(songsModel: PlaylistSongPaginationModel)=>{
+        console.log(songsModel.songs)
+        
+        this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
+        this.rxjsStorageService.setSongQueue(songsModel.songs);
+        this.rxjsStorageService.setIsSongPlaylingState(true);
+        this.rxjsStorageService.showMediaPlayer(true);
+        console.log(songsModel.songs)
+      },
+      error:(error: any)=>{
+        this.message.error("Error when getting queue.");
+      },
+      complete: () => {
+      }
+    });
+  }
+
+  public pauseSongs() {
+    // Stop playing of song
+    this.rxjsStorageService.setIsSongPlaylingState(false);
+  }
+
+  public onPlaySongClicked(songModel: PlaylistSongModel): void{
+    console.log(songModel);
+    const indexOfSong = this.songsModel.songs.findIndex(x => x.id == songModel.id);
+
+    if (indexOfSong < 0) {
+      return;
+    }
+
+    // IF the user wants to resume the same song
+    if (this.CurrentPlayingSong && 
+      this.CurrentPlayingSong.id == songModel.id) {
+      this.rxjsStorageService.setIsSongPlaylingState(true);
+      return;
+    }
+
+    const skipSongs = ((this.paginationModel.page - 1) * this.paginationModel.take) + indexOfSong;
+
+    this.rxjsStorageService.setQueueFilterAndPagination({
+      asc : this.paginationModel.asc,
+      page : skipSongs,
+      take : 31,
+      query : this.paginationModel.query,
+      sortAfter : this.paginationModel.sortAfter,
+      itemGuid : this.playlistId,
+      type : 'playlist'
+    });
+
+    this.playlistService.GetSongsFromPlaylist(skipSongs, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query, this.playlistId).subscribe({
+      next:(songsModel: PlaylistSongPaginationModel)=>{
+        console.log(songsModel)
+        this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
+        this.rxjsStorageService.setSongQueue(songsModel.songs);
+        this.rxjsStorageService.setIsSongPlaylingState(true);
+        this.rxjsStorageService.showMediaPlayer(true);
+        console.log(songsModel.songs)
+      },
+      error:(error: any)=>{
+        this.message.error("Error when getting queue.");
+      },
+      complete: () => {
+      }
+    });
+  }
+
   public getCreatorName(): string{
     if (this.playlistModel.users == undefined) {
       return "";
@@ -128,6 +236,18 @@ export class PlaylistDetailsComponent implements OnInit {
 
   public getPlaylistCoverSrc(): string{
     return `${environment.apiUrl}/${APIROUTES.file}/playlist/${this.playlistId}`
+  }
+
+  public get IsSongPlaying(): boolean{
+    return this.isSongPlaying;
+  }
+
+  public get QueueModel(): QueueModel{
+    return this.queueModel;
+  }
+
+  public get CurrentPlayingSong(): PlaylistSongModel{
+    return this.currentPlayingSong;
   }
 
   public get SongsModel(): PlaylistSongPaginationModel{
