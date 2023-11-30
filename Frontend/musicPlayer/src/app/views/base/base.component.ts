@@ -29,7 +29,7 @@ export class BaseComponent implements OnInit {
    *
    */
   constructor(private userService: UserService, private jwtService: JwtService, private rxjsService: RxjsStorageService) {
-    this.rxjsService.currentSongInTableChanged$.subscribe((val) => this.getFollowedEntities());
+    this.rxjsService.updateDashboardBoolean$.subscribe((val) => this.getFollowedEntities());
     
   }
 

@@ -362,12 +362,12 @@ export class SongTableComponent implements OnInit {
 
   updateDashBoard(): void{
     var currenState = false;
-    this.rxjsStorageService.currentSongInTableChanged$.subscribe((val) =>{
+    this.rxjsStorageService.updateDashboardBoolean$.subscribe((val) =>{
       currenState = val;
     })
 
     // Update value in rxjs so the dashboard gets updated
-    this.rxjsStorageService.setSongTableLoadingState(!currenState);
+    this.rxjsStorageService.setUpdateDashboardBoolean(!currenState);
   }
 
   public get IsSongPlaying(): boolean{

@@ -69,7 +69,9 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //TODO: Get Songs for song table here 
+    this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
+      this.onPaginationUpdated();
+    });
     return;
   }
 

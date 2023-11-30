@@ -71,6 +71,10 @@ export class FavoritesComponent implements OnInit{
       this.currentPlayingSong = x;
     });
 
+    this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
+      this.onPaginationUpdated();
+    });
+
     // this.isSongPlaying = isSongPlaying;
     // this.queueModel = queueModel;
     // this.currentPlayingSong = currentPlayingSong;

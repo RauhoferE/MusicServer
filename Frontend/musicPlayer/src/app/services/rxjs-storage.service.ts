@@ -13,8 +13,11 @@ export class RxjsStorageService {
   private songTableLoadingState$ = new BehaviorSubject<any>({});
   currentSongTableLoading$ = this.songTableLoadingState$.asObservable();
 
-  private songInTableChangedState$ = new BehaviorSubject<any>({});
-  currentSongInTableChanged$ = this.songInTableChangedState$.asObservable();
+  private updateDashboardState$ = new BehaviorSubject<any>({});
+  updateDashboardBoolean$ = this.updateDashboardState$.asObservable();
+
+  private updateCurrentTableState$ = new BehaviorSubject<any>({});
+  updateCurrentTableBoolean$ = this.updateCurrentTableState$.asObservable();
 
   private isSongPlayingChangedState$ = new BehaviorSubject<any>(false);
   isSongPlayingState = this.isSongPlayingChangedState$.asObservable();
@@ -43,6 +46,14 @@ export class RxjsStorageService {
 
   setSongTableLoadingState(isLoading: boolean){
     this.songTableLoadingState$.next(isLoading);
+  }
+
+  setUpdateDashboardBoolean(val: boolean){
+    this.updateDashboardState$.next(val);
+  }
+
+  setUpdateCurrentTableBoolean(val: boolean){
+    this.updateCurrentTableState$.next(val);
   }
 
   setIsSongPlaylingState(isPlayling: boolean){
@@ -103,18 +114,18 @@ export class RxjsStorageService {
     this.songqueue$.next(songs);
   }
 
-  // replaceSongInQueue(song: PlaylistSongModel){
-  //   let queue = this.songqueue$.getValue()as PlaylistSongModel[];
-  //   const indexOfElement = queue.findIndex(x => x.id == song.id);
+  replaceSongInQueue(song: PlaylistSongModel){
+    let queue = this.songqueue$.getValue()as PlaylistSongModel[];
+    const indexOfElement = queue.findIndex(x => x.id == song.id);
 
-  //   if (indexOfElement == -1) {
-  //     return;
-  //   }
+    if (indexOfElement == -1) {
+      return;
+    }
 
-  //   queue.splice(indexOfElement, 1, song);
+    queue.splice(indexOfElement, 1, song);
 
-  //   this.songqueue$.next(queue);
-  // }
+    this.songqueue$.next(queue);
+  }
 
   pushSongToPlaceInQueue(sourceIndex: number, targetIndex: number){
     let queue = this.songqueue$.getValue()as PlaylistSongModel[];

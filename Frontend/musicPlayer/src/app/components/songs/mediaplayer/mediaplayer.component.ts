@@ -68,6 +68,8 @@ export class MediaplayerComponent implements OnInit {
         let currentSong = JSON.parse(JSON.stringify(this.currentPlayingSong)) as PlaylistSongModel;
         currentSong.isInFavorites = false;
         this.rxjsService.setCurrentPlayingSong(currentSong);
+        this.rxjsService.replaceSongInQueue(currentSong);
+        this.updateDashBoardAndSongTable();
       }
     });
 
@@ -80,10 +82,28 @@ export class MediaplayerComponent implements OnInit {
         let currentSong = JSON.parse(JSON.stringify(this.currentPlayingSong)) as PlaylistSongModel;
         currentSong.isInFavorites = true;
         this.rxjsService.setCurrentPlayingSong(currentSong);
+        this.rxjsService.replaceSongInQueue(currentSong);
+        this.updateDashBoardAndSongTable();
       }
 
 
     });
+  }
+
+  public updateDashBoardAndSongTable(): void{
+    let dashboardBool = false;
+    let tableBool = false;
+
+    this.rxjsService.updateDashboardBoolean$.subscribe(x => {
+      dashboardBool = x;
+    });
+
+    this.rxjsService.updateCurrentTableBoolean$.subscribe(x => {
+      tableBool = x;
+    });
+
+    this.rxjsService.setUpdateDashboardBoolean(!dashboardBool);
+    this.rxjsService.setUpdateCurrentTableBoolean(!tableBool);
   }
 
   get getAlbumCoverSrc(): string{
