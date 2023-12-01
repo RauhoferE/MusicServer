@@ -1,42 +1,63 @@
 <div nz-row style="height: 100%; background-color: white;">
     <img [src]="this.getAlbumCoverSrc" nz-col nzSpan="2">
     <div nz-col nzSpan="2" style="align-self: center;">
-        <span nz-row style="justify-content: center;">{{this.CurrentPlayingSong.name}}</span>
-        <span nz-row style="justify-content: center;">{{this.ArtistsAsString}}</span>
+        <a nz-row style="justify-content: center;">{{this.CurrentPlayingSong.name}}</a>
+        <a nz-row style="justify-content: center;">{{this.ArtistsAsString}}</a>
         <span *ngIf="this.CurrentPlayingSong.isInFavorites" nz-row style="justify-content: center; font-size: 150%;" nz-icon nzType="heart" 
         nzTheme="fill" class="clickable" (click)="removeSongFromFavorites()"></span>
         <span *ngIf="!this.CurrentPlayingSong.isInFavorites" nz-row style="justify-content: center; font-size: 150%;" nz-icon nzType="heart" 
         nzTheme="outline" class="clickable" (click)="addSongToFavorites()"></span>
     </div>
-    <div nz-col nzSpan="20">
-        <div nz-row>
-            <span nz-col nz-icon nzSpan="4" nzType="swap" nzTheme="outline"></span>
-            <span nz-col nz-icon nzSpan="4" nzType="step-backward" nzTheme="outline"></span>
-            <span *ngIf="!this.IsSongPlaying" nz-col nz-icon nzSpan="4" nzType="play-circle" nzTheme="outline"></span>
-            <span *ngIf="this.IsSongPlaying" nz-col nz-icon nzSpan="4" nzType="pause-circle" nzTheme="outline"></span>
-            <span nz-col nz-icon nzSpan="4" nzType="step-forward" nzTheme="outline"></span>
-            <span nz-col nz-icon nzSpan="4" nzType="retweet" nzTheme="outline"></span>
+    <div nz-col nzSpan="16" style="align-self: center;">
+        <div nz-row style="font-size: 150%; margin-bottom: 2%;">
+            <span nz-col style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="swap" nzTheme="outline"></span>
+            <span nz-col style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="step-backward" nzTheme="outline"></span>
+            <span nz-col *ngIf="!this.IsSongPlaying" style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="play-circle" nzTheme="outline"></span>
+            <span nz-col *ngIf="this.IsSongPlaying" style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="pause-circle" nzTheme="outline"></span>
+            <span nz-col style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="step-forward" nzTheme="outline"></span>
+            <span nz-col style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="retweet" nzTheme="outline"></span>
         </div>
-        <div nz-row>
-            <span nz-col nzSpan="1">{{this.CurrentSecondsPlayed | secondsToMinute}}</span>
+        <div nz-row style="font-size: 150%;">
+            <span nz-col nzSpan="2">{{this.CurrentSecondsPlayed | secondsToMinute}}</span>
             <nz-slider
             nz-col
-            nzSpan="17"
+            nzSpan="16"
             [(ngModel)]="this.durationSlider"
             (nzOnAfterChange)="onDurationChanged($event)"
           ></nz-slider>
-            <span nz-col nzSpan="1">{{this.CurrentPlayingSong.duration | secondsToMinute}}</span>
-            <button nz-col nz-button nzSpan="1" nz-popover nzType="primary" nzPopoverTitle="Title" nzPopoverContent="Content">
+            <span nz-col nzSpan="2">{{this.CurrentPlayingSong.duration | secondsToMinute}}</span>
+
+        </div>
+    </div>
+    <div nz-col nzSpan="4" style="align-self: center; font-size: 150%;">
+        <div nz-row style="justify-content: center;">
+            <button nz-button nz-popover nzType="primary" nzPopoverTitle="Queue" [nzPopoverContent]="queueTemplate">
                 <span nz-icon nzType="menu" nzTheme="outline"></span>
             </button>
-            <span nz-col nzSpan="1" nz-icon nzType="customer-service" nzTheme="outline"></span>
+            <ng-template #queueTemplate >
+                <div style="overflow-y: auto; height: 10%;">
+                    <div *ngFor="let song of this.CurrentQueue" >
+                        <div>
+                            {{song.name}}
+                        </div>
+                    </div>
+                </div>
+
+            
+            </ng-template>
+        </div>
+        <div nz-row style="font-size: 150%;">
+            
+            <span nz-col nzSpan="2" nz-icon nzType="customer-service" nzTheme="outline"></span>
             <nz-slider
             nz-col
-            nzSpan="2"
+            nzOffset="1"
+            nzSpan="19"
             [(ngModel)]="this.volumePercent"
             (nzOnAfterChange)="onVolumeChanged($event)"
           ></nz-slider>
         </div>
+
     </div>
     <audio style="display: none;"></audio>
 

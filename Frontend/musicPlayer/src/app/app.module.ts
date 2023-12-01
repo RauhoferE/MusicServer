@@ -24,6 +24,7 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import {NzSliderModule } from 'ng-zorro-antd/slider';
+import {NzPopoverModule } from 'ng-zorro-antd/popover';
 
 // Project Imports
 import { AppRoutingModule } from './app-routing.module';
@@ -94,7 +95,8 @@ registerLocaleData(en);
     NzTableModule,
     NzModalModule,
     NzDropDownModule,
-    NzSliderModule 
+    NzSliderModule ,
+    NzPopoverModule 
   ],
   providers: [
     CookieService,
