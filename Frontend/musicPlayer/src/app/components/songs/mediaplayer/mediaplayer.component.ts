@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { PlaylistSongModel } from 'src/app/models/playlist-models';
 import { QueueModel } from 'src/app/models/storage';
@@ -33,15 +34,28 @@ export class MediaplayerComponent implements OnInit {
 
   public randomizePlay: boolean = false;
 
+  private audioElement = new Audio();
+
   constructor(private rxjsService: RxjsStorageService, private playlistService: PlaylistService) {
+    this.audioElement.autoplay = false;
     
+    //TODO: Add events for audio element
     
   }
 
   ngOnInit(): void {
+    
     // Get values from storage
     this.rxjsService.currentPlayingSong.subscribe(x => {
       this.currentPlayingSong = x;
+      //this.audioElement.pause();
+
+      if (!this.currentPlayingSong.id) {
+        return;
+      }
+
+      this.audioElement.pause();
+      this.audioElement.src = this.AudioSrc;
     });
 
     this.rxjsService.currentQueueFilterAndPagination.subscribe(x => {
@@ -50,6 +64,14 @@ export class MediaplayerComponent implements OnInit {
 
     this.rxjsService.isSongPlayingState.subscribe(x => {
       this.isSongPlaying = x;
+
+      if (this.isSongPlaying) {
+        this.audioElement.play();
+      }
+
+      if (!this.isSongPlaying) {
+        this.audioElement.pause();
+      }      
     });
 
     this.rxjsService.currentSongQueue.subscribe(x => {
@@ -65,6 +87,7 @@ export class MediaplayerComponent implements OnInit {
   public onVolumeChanged(value: any){
     // Is number
     console.log(value)
+    this.audioElement.volume = this.AudioVolume;
   }
 
   public removeSongFromFavorites(): void{
@@ -159,6 +182,7 @@ export class MediaplayerComponent implements OnInit {
 
   public loopPlayback(): void{
     this.loopAudio = !this.loopAudio;
+    this.audioElement.loop = this.loopAudio;
   }
 
   // TOOD: Add events for audio end/start/stop/volume
@@ -179,15 +203,15 @@ export class MediaplayerComponent implements OnInit {
     this.rxjsService.setUpdateCurrentTableBoolean(!tableBool);
   }
 
-  get audioSrc(): string{
-    if (!this.CurrentPlayingSong) {
+  get AudioSrc(): string{
+    if (!this.currentPlayingSong.id) {
       return ``;
     }
 
     return `${environment.apiUrl}/${APIROUTES.file}/song/${this.currentPlayingSong.id}`;
   }
 
-  get getAlbumCoverSrc(): string{
+  get AlbumCoverSrc(): string{
     if (!this.CurrentPlayingSong.album) {
       return ``
     }
@@ -223,8 +247,8 @@ export class MediaplayerComponent implements OnInit {
     return (this.currentSecondsPlayed / this.currentPlayingSong.duration) * 100;
   }
 
-  get VolumePercent(): number{
-    return this.volumePercent;
+  get AudioVolume(): number{
+    return this.volumePercent / 100;
   }
 
   get ArtistsAsString(): string{

@@ -1,5 +1,5 @@
 <div nz-row style="height: 100%; background-color: white;">
-    <img [src]="this.getAlbumCoverSrc" nz-col nzSpan="2">
+    <img [src]="this.AlbumCoverSrc" nz-col nzSpan="2">
     <div nz-col nzSpan="2" style="align-self: center;">
         <a nz-row style="justify-content: center;">{{this.CurrentPlayingSong.name}}</a>
         <a nz-row style="justify-content: center;">{{this.ArtistsAsString}}</a>
@@ -61,7 +61,6 @@
         </div>
 
     </div>
-    <audio id="audio-element" style="display: none;" [loop]="loopAudio" [muted]="mutedAudio"></audio>
 
 
 </div>
