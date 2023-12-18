@@ -34,6 +34,9 @@ export class RxjsStorageService {
   private queueFilterAndPagination$ = new BehaviorSubject<any>({});
   currentQueueFilterAndPagination = this.queueFilterAndPagination$.asObservable();
 
+  private playedSongs$ = new BehaviorSubject<any>({});
+  currentPlayedSongs = this.playedSongs$.asObservable();
+
   // private songsInTable$ = new BehaviorSubject<any>({});
   // currentSongsInTable = this.songsInTable$.asObservable();
 
@@ -68,6 +71,10 @@ export class RxjsStorageService {
     this.songqueue$.next(songs);
   }
 
+  setPlayedSongs(songs: PlaylistSongModel[]){
+    this.playedSongs$.next(songs);
+  }
+
   // setCurrentSongsInTable(songs: PlaylistSongPaginationModel){
   //   this.songsInTable$.next(songs);
   // }
@@ -98,6 +105,32 @@ export class RxjsStorageService {
     }
 
     this.songqueue$.next([song]);
+  }
+
+  addSongToPlayed(song: PlaylistSongModel){
+    let currentPlayed: PlaylistSongModel[] = [];
+    let played = this.playedSongs$.getValue()as PlaylistSongModel[];
+
+    if (played && played.length > 0) {
+      currentPlayed = played;
+      currentPlayed.push(song);
+      this.playedSongs$.next(currentPlayed);
+      return;
+    }
+
+    this.playedSongs$.next([song]);
+  }
+
+  removeLastPlayedSong(){
+    let currentPlayed: PlaylistSongModel[] = [];
+    let played = this.playedSongs$.getValue()as PlaylistSongModel[];
+
+    if (played && played.length > 0) {
+      currentPlayed = played;
+      currentPlayed.splice((currentPlayed.length - 1),1);
+      this.playedSongs$.next(currentPlayed);
+      return;
+    }
   }
 
   addSongsToQueue(songs: PlaylistSongModel[]){

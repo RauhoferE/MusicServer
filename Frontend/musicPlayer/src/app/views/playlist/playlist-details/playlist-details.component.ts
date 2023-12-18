@@ -150,7 +150,7 @@ export class PlaylistDetailsComponent implements OnInit {
       type : 'playlist'
     });
 
-    this.playlistService.GetSongsFromPlaylist(0, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query, this.playlistId).subscribe({
+    this.playlistService.GetSongsFromPlaylist(0, 31, this.paginationModel.sortAfter, this.paginationModel.asc, '', this.playlistId).subscribe({
       next:(songsModel: PlaylistSongPaginationModel)=>{
         console.log(songsModel.songs)
         

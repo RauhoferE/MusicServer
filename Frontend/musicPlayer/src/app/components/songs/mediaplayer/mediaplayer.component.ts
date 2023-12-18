@@ -90,6 +90,73 @@ export class MediaplayerComponent implements OnInit {
     });
   }
 
+  public playPauseSong(): void{
+    if (this.isSongPlaying) {
+      console.log("Stop playback");
+      this.rxjsService.setIsSongPlaylingState(false);
+      return;
+    }
+
+    console.log("Start playback");
+    this.rxjsService.setIsSongPlaylingState(true);
+  }
+
+  public randomizePlayback(): void{
+    // TODO: Randomize queue
+
+  }
+
+  public playPrevSong(): void{
+    let lastPlayedSongs: PlaylistSongModel[] = [];
+    this.rxjsService.currentPlayedSongs.subscribe(x => {
+      lastPlayedSongs = x;
+    });
+
+    if (!Array.isArray(lastPlayedSongs)) {
+      // No previous songs found.
+      // TODO: Start Song from start.
+      return;
+    }
+
+    if (lastPlayedSongs.length == 0) {
+      // No previous songs found.
+      // TODO: Start Song from start.
+      return;
+    }
+
+    // Add current song to queue
+    this.rxjsService.addSongToQueue(this.currentPlayingSong);
+    // Push song to the top of the queue
+    this.rxjsService.pushSongToPlaceInQueue(this.currentQueue.length - 1, 0);
+    // Set last played song as current
+    this.rxjsService.setCurrentPlayingSong(lastPlayedSongs[lastPlayedSongs.length - 1]);
+    // Remove the last played song from played songs
+    this.rxjsService.removeLastPlayedSong();
+    this.rxjsService.decrementSongsInQueueFilter();
+  }
+
+  public playNextSong():void{
+
+    if (this.currentQueue.length == 0) {
+      // No next song found
+      // TODO: Start Song from start.
+      return;
+    }
+
+    const nextSong = this.CurrentQueue[0];
+    this.rxjsService.addSongToPlayed(this.currentPlayingSong);
+    this.rxjsService.setCurrentPlayingSong(nextSong);
+    this.rxjsService.removeSongWithIndexFromQueue(0);
+    this.rxjsService.incrementSongsInQueueFilter();
+  }
+
+  public loopPlayback(): void{
+    // TOOD: Loop audio
+
+  }
+
+  // TOOD: Add events for audio end/start/stop/volume
+
   public updateDashBoardAndSongTable(): void{
     let dashboardBool = false;
     let tableBool = false;

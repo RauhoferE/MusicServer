@@ -188,7 +188,7 @@ export class FavoritesComponent implements OnInit{
       type : 'favorites'
     });
 
-    this.playlistService.GetFavorites(skipSongs, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query).subscribe({
+    this.playlistService.GetFavorites(skipSongs, 31, this.paginationModel.sortAfter, this.paginationModel.asc, '').subscribe({
       next:(songsModel: PlaylistSongPaginationModel)=>{
         console.log(songsModel)
         this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
