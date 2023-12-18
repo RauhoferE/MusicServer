@@ -10,12 +10,14 @@
     </div>
     <div nz-col nzSpan="16" style="align-self: center;">
         <div nz-row style="font-size: 150%; margin-bottom: 2%;">
-            <span nz-col style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="swap" nzTheme="outline" (click)="randomizePlayback()"></span>
+            <span nz-col *ngIf="!this.randomizePlay" style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="swap" nzTheme="outline" (click)="randomizePlayback()"></span>
+            <span nz-col *ngIf="this.randomizePlay" style="justify-content: center;" class="clicked-color clickable" nz-icon nzSpan="4" nzType="swap" nzTheme="outline" (click)="randomizePlayback()"></span>
             <span nz-col style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="step-backward" nzTheme="outline" (click)="playPrevSong()"></span>
             <span nz-col *ngIf="!this.IsSongPlaying" style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="play-circle" nzTheme="outline" (click)="playPauseSong()"></span>
             <span nz-col *ngIf="this.IsSongPlaying" style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="pause-circle" nzTheme="outline" (click)="playPauseSong()"></span>
             <span nz-col style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="step-forward" nzTheme="outline" (click)="playNextSong()"></span>
-            <span nz-col style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="retweet" nzTheme="outline" (click)="loopPlayback()"></span>
+            <span nz-col *ngIf="!this.loopAudio" style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="retweet" nzTheme="outline" (click)="loopPlayback()"></span>
+            <span nz-col *ngIf="this.loopAudio" style="justify-content: center;" class="clicked-color clickable" nz-icon nzSpan="4" nzType="retweet" nzTheme="outline" (click)="loopPlayback()"></span>
         </div>
         <div nz-row style="font-size: 150%;">
             <span nz-col nzSpan="2">{{this.CurrentSecondsPlayed | secondsToMinute}}</span>
@@ -59,7 +61,7 @@
         </div>
 
     </div>
-    <audio style="display: none;"></audio>
+    <audio id="audio-element" style="display: none;" [loop]="loopAudio" [muted]="mutedAudio"></audio>
 
 
 </div>

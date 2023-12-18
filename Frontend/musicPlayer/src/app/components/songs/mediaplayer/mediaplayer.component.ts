@@ -27,6 +27,12 @@ export class MediaplayerComponent implements OnInit {
 
   public durationSlider: number = 0;
 
+  public loopAudio: boolean = false;
+
+  public mutedAudio: boolean = false;
+
+  public randomizePlay: boolean = false;
+
   constructor(private rxjsService: RxjsStorageService, private playlistService: PlaylistService) {
     
     
@@ -103,6 +109,7 @@ export class MediaplayerComponent implements OnInit {
 
   public randomizePlayback(): void{
     // TODO: Randomize queue
+    this.randomizePlay = !this.randomizePlay;
 
   }
 
@@ -151,8 +158,7 @@ export class MediaplayerComponent implements OnInit {
   }
 
   public loopPlayback(): void{
-    // TOOD: Loop audio
-
+    this.loopAudio = !this.loopAudio;
   }
 
   // TOOD: Add events for audio end/start/stop/volume
@@ -171,6 +177,14 @@ export class MediaplayerComponent implements OnInit {
 
     this.rxjsService.setUpdateDashboardBoolean(!dashboardBool);
     this.rxjsService.setUpdateCurrentTableBoolean(!tableBool);
+  }
+
+  get audioSrc(): string{
+    if (!this.CurrentPlayingSong) {
+      return ``;
+    }
+
+    return `${environment.apiUrl}/${APIROUTES.file}/song/${this.currentPlayingSong.id}`;
   }
 
   get getAlbumCoverSrc(): string{
