@@ -26,6 +26,7 @@
             nzSpan="16"
             [(ngModel)]="this.durationSlider"
             (nzOnAfterChange)="onDurationChanged($event)"
+            [nzMax]="this.Duration"
           ></nz-slider>
             <span nz-col nzSpan="2">{{this.CurrentPlayingSong.duration | secondsToMinute}}</span>
 

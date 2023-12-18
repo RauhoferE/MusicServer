@@ -40,6 +40,13 @@ export class MediaplayerComponent implements OnInit {
     this.audioElement.autoplay = false;
     
     //TODO: Add events for audio element
+    this.audioElement.addEventListener("timeupdate", (x) => {
+      if (isNaN(this.audioElement.currentTime) ) {
+        return;
+      }
+      
+      this.durationSlider = Math.round(this.audioElement.currentTime);
+    })
     
   }
 
@@ -51,11 +58,14 @@ export class MediaplayerComponent implements OnInit {
       //this.audioElement.pause();
 
       if (!this.currentPlayingSong.id) {
+        console.log("Current playing song is undef")
         return;
       }
 
       this.audioElement.pause();
+      console.log("Play new song")
       this.audioElement.src = this.AudioSrc;
+      this.audioElement.play();
     });
 
     this.rxjsService.currentQueueFilterAndPagination.subscribe(x => {
@@ -201,6 +211,14 @@ export class MediaplayerComponent implements OnInit {
 
     this.rxjsService.setUpdateDashboardBoolean(!dashboardBool);
     this.rxjsService.setUpdateCurrentTableBoolean(!tableBool);
+  }
+
+  get Duration(): number{
+    if (!this.currentPlayingSong.duration) {
+      return 100;
+    }
+
+    return this.currentPlayingSong.duration;
   }
 
   get AudioSrc(): string{
