@@ -6,7 +6,7 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Observable } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { AlbumArtistModel } from 'src/app/models/artist-models';
-import { TableQuery } from 'src/app/models/events';
+import { PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
 import { GuidNameModel, PlaylistSongModel, PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { PlaylistService } from 'src/app/services/playlist.service';
@@ -22,12 +22,16 @@ import { environment } from 'src/environments/environment';
 export class SongTableComponent implements OnInit {
 
   @Input() songs!: PlaylistSongPaginationModel;
+  
+  @Input() sortingEnabled: boolean = true;
+
+  @Input() displayRemoveFromQueueOption: boolean = false;
 
   private pagination: PaginationModel = {} as PaginationModel;
 
   @Output() paginationUpdated: EventEmitter<void> = new EventEmitter<void>();
 
-  @Output() playSongClicked: EventEmitter<PlaylistSongModel> = new EventEmitter<PlaylistSongModel>();
+  @Output() playSongClicked: EventEmitter<PlaylistSongModelParams> = new EventEmitter<PlaylistSongModelParams>();
 
   public IsLoading: Observable<boolean> = new Observable();
 
@@ -37,12 +41,15 @@ export class SongTableComponent implements OnInit {
 
   private indeterminate: boolean = false;
 
-  private selectedTableItem: PlaylistSongModel = {
-    id: '',
-    order: -1,
-    checked: false,
-    isInFavorites: false
-  } as PlaylistSongModel;
+  private selectedTableItem: PlaylistSongModelParams = {
+    songModel: {
+      id: '',
+      order: -1,
+      checked: false,
+      isInFavorites: false
+    },
+    index : -1
+  } as PlaylistSongModelParams;
 
 
   @Input() playlistId!: string;
@@ -52,6 +59,8 @@ export class SongTableComponent implements OnInit {
   private isSongPlaying: boolean = false;
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
+
+  private currentQueue: PlaylistSongModel[] = [];
 
 
   /**
@@ -80,6 +89,10 @@ export class SongTableComponent implements OnInit {
       this.currentPlayingSong = x;
     });
 
+    this.rxjsStorageService.currentSongQueue.subscribe(x => {
+      this.currentQueue = x;
+    });
+
     console.log("Set pag")
     this.pagination = pModel;
     // this.isSongPlaying = isSongPlaying;
@@ -91,7 +104,56 @@ export class SongTableComponent implements OnInit {
     this.paginationUpdated.emit();
   }
 
+  removeSongFromQueue(songId: string, index: number) {
+    if (!Array.isArray(this.currentQueue)) {
+      return;
+    }
 
+    const indexOfItemToRemove = this.currentQueue.findIndex(x => x.id == songId);
+
+    if (indexOfItemToRemove == -1 || index != indexOfItemToRemove) {
+      return;
+    }
+
+    this.rxjsStorageService.removeSongWithIndexFromQueue(index)
+  }
+
+  addSongToQueue(song: PlaylistSongModel) {
+    this.rxjsStorageService.addSongToQueue(song)
+  }
+
+  // This method is only used when the queue is displayed
+  removeSelectedSongsFromQueue() {
+    var checkedSongs = this.songs.songs.filter(x => x.checked);
+
+    if (!Array.isArray(this.currentQueue)) {
+      this.indeterminate = false;
+      this.allChecked = false;
+      return;
+    }
+
+    checkedSongs.forEach(element => {
+      const indexOfItemToRemove = this.songs.songs.findIndex(x => x.id == element.id && x.checked);
+
+      if (indexOfItemToRemove == -1) {
+        return;
+      }
+
+      this.rxjsStorageService.removeSongWithIndexFromQueue(indexOfItemToRemove)
+    });
+
+    // TODO: Bug! The elements stay checked
+    this.indeterminate = false;
+    this.allChecked = false;
+    this.paginationUpdated.emit();
+  }
+
+  addSelectedSongsToQueue() {
+    var checkedSongs = this.songs.songs.filter(x => x.checked);
+    this.rxjsStorageService.addSongsToQueue(checkedSongs)
+    this.indeterminate = false;
+    this.allChecked = false;
+  }
 
   onQueryParamsChange(event: any): void{
     console.log("Query Changed")
@@ -126,8 +188,8 @@ export class SongTableComponent implements OnInit {
     this.paginationUpdated.emit();
   }
 
-  contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: PlaylistSongModel): void {
-    this.selectedTableItem = item;
+  contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: PlaylistSongModel, index: number): void {
+    this.selectedTableItem = { index: index, songModel: item};
     this.playlistService.GetModifieablePlaylists(-1).subscribe((val)=>{
       this.modifieablePlaylists = val.playlists;
 
@@ -144,10 +206,6 @@ export class SongTableComponent implements OnInit {
 
   closeMenu(): void {
     this.nzContextMenuService.close();
-  }
-
-  getAlbumLink(albumModel: AlbumArtistModel): string{
-    return `album/${albumModel.id}`;
   }
 
   getAlbumCoverSrc(id: string): string{
@@ -206,7 +264,7 @@ export class SongTableComponent implements OnInit {
       return;
     }
 
-    this.removeSongsFromPlaylist([this.selectedTableItem.order], this.playlistId);
+    this.removeSongsFromPlaylist([this.SelectedTableItem.order], this.playlistId);
   }
 
   removeSelectedSongsFromPlaylist(): void{
@@ -348,7 +406,7 @@ export class SongTableComponent implements OnInit {
     });
   }
 
-  playSong(model: PlaylistSongModel): void{
+  playSong(model: PlaylistSongModel, index: number): void{
         // Creaste queue of songs on how they appear in the table
     // And start the media player
     // They player has the queue and also plays the music
@@ -358,7 +416,7 @@ export class SongTableComponent implements OnInit {
     // this.rxjsStorageService.clearSongQueue();
     // this.rxjsStorageService.addSongsToQueue(this.songs.songs);
     // TODO: Send event to outside component
-    this.playSongClicked.emit(model);
+    this.playSongClicked.emit({index: index, songModel: model} as PlaylistSongModelParams);
   }
 
   pauseSong(): void{
@@ -446,7 +504,11 @@ export class SongTableComponent implements OnInit {
   }
 
   public get SelectedTableItem(): PlaylistSongModel{
-    return this.selectedTableItem;
+    return this.selectedTableItem.songModel;
+  }
+
+  public get SelectedTableItemIndex(): number{
+    return this.selectedTableItem.index;
   }
 
   public get ModifieablePlaylists(): GuidNameModel[]{

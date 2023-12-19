@@ -49,6 +49,7 @@ import { SecondsToMinutePipe } from './pipes/seconds-to-minutes-pipe';
 import { MediaplayerComponent } from './components/songs/mediaplayer/mediaplayer.component';
 import { AudioSvgComponent } from './components/svg/audio-svg/audio-svg.component';
 import { AudioOffSvgComponent } from './components/svg/audio-off-svg/audio-off-svg.component';
+import { SongQueueComponent } from './views/playlist/song-queue/song-queue.component';
 
 
 registerLocaleData(en);
@@ -71,7 +72,8 @@ registerLocaleData(en);
     SecondsToMinutePipe,
     MediaplayerComponent,
     AudioSvgComponent,
-    AudioOffSvgComponent
+    AudioOffSvgComponent,
+    SongQueueComponent
   ],
   imports: [
     BrowserModule,

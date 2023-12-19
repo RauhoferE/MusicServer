@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { TableQuery } from 'src/app/models/events';
+import { PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
 import { PlaylistSongModel, PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
@@ -55,10 +55,6 @@ export class FavoritesComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    let isSongPlaying = false;
-    let queueModel = undefined as any;
-    let currentPlayingSong = undefined as any;
-
     this.rxjsStorageService.isSongPlayingState.subscribe(x => {
       this.isSongPlaying = x;
     });
@@ -74,10 +70,6 @@ export class FavoritesComponent implements OnInit{
     this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
       this.onPaginationUpdated();
     });
-
-    // this.isSongPlaying = isSongPlaying;
-    // this.queueModel = queueModel;
-    // this.currentPlayingSong = currentPlayingSong;
   }
 
   public onGetFavorites(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
@@ -138,6 +130,7 @@ export class FavoritesComponent implements OnInit{
       type : 'favorites'
     });
 
+    // TODO: Change so the query doesnt matter
     this.playlistService.GetFavorites(0, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query).subscribe({
       next:(songsModel: PlaylistSongPaginationModel)=>{
         console.log(songsModel.songs)
@@ -161,9 +154,10 @@ export class FavoritesComponent implements OnInit{
     this.rxjsStorageService.setIsSongPlaylingState(false);
   }
 
-  public onPlaySongClicked(songModel: PlaylistSongModel): void{
-    console.log(songModel);
-    const indexOfSong = this.songsModel.songs.findIndex(x => x.id == songModel.id);
+  public onPlaySongClicked(event: PlaylistSongModelParams): void{
+    console.log(event);
+    const indexOfSong = event.index;
+    const songModel = event.songModel;
 
     if (indexOfSong < 0) {
       return;
@@ -188,7 +182,8 @@ export class FavoritesComponent implements OnInit{
       type : 'favorites'
     });
 
-    this.playlistService.GetFavorites(skipSongs, 31, this.paginationModel.sortAfter, this.paginationModel.asc, '').subscribe({
+    // TODO: Change so the query doesnt matter
+    this.playlistService.GetFavorites(skipSongs, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query).subscribe({
       next:(songsModel: PlaylistSongPaginationModel)=>{
         console.log(songsModel)
         this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);

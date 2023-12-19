@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { APIROUTES } from 'src/app/constants/api-routes';
+import { PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, PlaylistSongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
@@ -173,9 +174,10 @@ export class PlaylistDetailsComponent implements OnInit {
     this.rxjsStorageService.setIsSongPlaylingState(false);
   }
 
-  public onPlaySongClicked(songModel: PlaylistSongModel): void{
-    console.log(songModel);
-    const indexOfSong = this.songsModel.songs.findIndex(x => x.id == songModel.id);
+  public onPlaySongClicked(event: PlaylistSongModelParams): void{
+    console.log(event);
+    const indexOfSong = event.index;
+    const songModel = event.songModel;
 
     if (indexOfSong < 0) {
       return;

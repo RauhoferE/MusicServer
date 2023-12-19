@@ -29,17 +29,17 @@
                 [(nzChecked)]="AllChecked"
                 [nzIndeterminate]="Indeterminate"
                 (nzCheckedChange)="checkAll($event)"></th>
-                <th nzColumnKey="order" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
-                <th nzColumnKey="name" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
-                <th nzColumnKey="album" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('album')">Album</th>
+                <th nzColumnKey="order" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
+                <th nzColumnKey="name" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
+                <th nzColumnKey="album" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('album')">Album</th>
                 <th nzColumnKey="created">Date added</th>
                 <th nzColumnKey="isInFavorites">Favorite</th>
-                <th nzColumnKey="duration" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('duration')">Duration</th>
+                <th nzColumnKey="duration" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('duration')">Duration</th>
             </tr>
 
         </thead>
         <tbody>
-            <tr *ngFor="let data of songs.songs" (contextmenu)="contextMenu($event, menu, data)"
+            <tr *ngFor="let data of songs.songs;let indexOfelement=index;" (contextmenu)="contextMenu($event, menu, data, indexOfelement)"
             class="song-item"
             >
                 <td
@@ -52,7 +52,7 @@
                     (!this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id)">{{data.order}}</span>
 
                     <span *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || !this.IsSongPlaying"
-                    id="play-song-button" nz-icon nzType="play-circle" nzTheme="outline" class="clickable" (click)="playSong(data)"></span>
+                    id="play-song-button" nz-icon nzType="play-circle" nzTheme="outline" class="clickable" (click)="playSong(data, indexOfelement)"></span>
 
                     <span *ngIf="this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id"
                      nz-icon nzType="pause-circle" nzTheme="outline" class="clickable" (click)="pauseSong()"></span>
@@ -86,12 +86,16 @@
                 <ul>
                     <li nz-menu-item *ngFor="let data of this.ModifieablePlaylists" (click)="addSongToPlaylist(data.id)">{{data.name}}</li>
                 </ul>
-              </li>
-              <li nz-submenu nzTitle="Add selected to playlist" id="add-all-pl" *ngIf="this.Indeterminate || this.AllChecked">
+            </li>
+            <li nz-submenu nzTitle="Add selected to playlist" id="add-all-pl" *ngIf="this.Indeterminate || this.AllChecked">
                 <ul>
                     <li nz-menu-item *ngFor="let data of this.ModifieablePlaylists" (click)="addSelectedSongsToPlaylist(data.id)">{{data.name}}</li>
                 </ul>
-              </li>
+            </li>
+            <li nz-menu-item id="add-queue" (click)="addSongToQueue(this.SelectedTableItem)">Add to queue</li>
+            <li nz-menu-item id="remove-queue" (click)="removeSongFromQueue(this.SelectedTableItem.id, this.SelectedTableItemIndex)" *ngIf="displayRemoveFromQueueOption">Remove from queue</li>
+            <li nz-menu-item id="add-all-queue" (click)="addSelectedSongsToQueue()" *ngIf="this.Indeterminate || this.AllChecked">Add selected to queue</li>
+            <li nz-menu-item id="rm-all-queue" (click)="removeSelectedSongsFromQueue()" *ngIf="displayRemoveFromQueueOption && (this.Indeterminate || this.AllChecked)">Remove selected from queue</li>
         </ul>
     </nz-dropdown-menu>
 
