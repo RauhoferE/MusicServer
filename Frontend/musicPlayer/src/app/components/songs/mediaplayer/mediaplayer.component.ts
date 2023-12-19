@@ -22,8 +22,6 @@ export class MediaplayerComponent implements OnInit {
 
   private currentQueue: PlaylistSongModel[] = [];
 
-  private currentSecondsPlayed: number = 0;
-
   public volumePercent: number = 100;
 
   public durationSlider: number = 0;
@@ -45,7 +43,17 @@ export class MediaplayerComponent implements OnInit {
       }
 
       this.durationSlider = Math.round(this.audioElement.currentTime);
-    })
+    });
+
+    this.audioElement.addEventListener("ended", () => {
+      if (this.CurrentQueue.length > 0) {
+        this.playNextSong();
+        return;
+      }
+
+      this.audioElement.currentTime = 0;
+      this.rxjsService.setIsSongPlaylingState(false);
+    });
 
   }
 
@@ -218,6 +226,18 @@ export class MediaplayerComponent implements OnInit {
     this.rxjsService.setUpdateCurrentTableBoolean(!tableBool);
   }
 
+  get SongUrl(): string{
+    if (!this.currentPlayingSong.id) {
+      return ``;
+    }
+
+    return `/song/${this.currentPlayingSong.id}`;
+  }
+
+  getArtistUrl(id: string): string{
+    return `/artist/${id}`;
+  }
+
   get Duration(): number{
     if (!this.currentPlayingSong.duration) {
       return 100;
@@ -258,32 +278,7 @@ export class MediaplayerComponent implements OnInit {
     return this.currentQueue;
   }
 
-  get CurrentSecondsPlayed(): number{
-    return this.currentSecondsPlayed;
-  }
-
-  get CurrentPercentagePlayed(): number{
-    if (!this.currentPlayingSong.duration) {
-      return 0;
-    }
-
-    return (this.currentSecondsPlayed / this.currentPlayingSong.duration) * 100;
-  }
-
   get AudioVolume(): number{
     return this.volumePercent / 100;
   }
-
-  get ArtistsAsString(): string{
-    if (!this.currentPlayingSong.artists) {
-      return '';
-    }
-
-    return this.CurrentPlayingSong.artists.map(x => x.name).join(', ');
-  }
-
-
-
-
-
 }

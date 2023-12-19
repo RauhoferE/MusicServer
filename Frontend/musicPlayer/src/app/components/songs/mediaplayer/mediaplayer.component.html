@@ -1,8 +1,11 @@
 <div nz-row style="height: 100%; background-color: white;">
     <img [src]="this.AlbumCoverSrc" nz-col nzSpan="2">
     <div nz-col nzSpan="2" style="align-self: center;">
-        <a nz-row style="justify-content: center;">{{this.CurrentPlayingSong.name}}</a>
-        <a nz-row style="justify-content: center;">{{this.ArtistsAsString}}</a>
+        <a nz-row style="justify-content: center;" [href]="SongUrl">{{this.CurrentPlayingSong.name}}</a>
+        <div *ngFor="let artist of this.CurrentPlayingSong.artists">
+            <a nz-row style="justify-content: center;" [href]="getArtistUrl(artist.id)">{{artist.name}}</a>
+        </div>
+        
         <span *ngIf="this.CurrentPlayingSong.isInFavorites" nz-row style="justify-content: center; font-size: 150%;" nz-icon nzType="heart" 
         nzTheme="fill" class="clickable" (click)="removeSongFromFavorites()"></span>
         <span *ngIf="!this.CurrentPlayingSong.isInFavorites" nz-row style="justify-content: center; font-size: 150%;" nz-icon nzType="heart" 
