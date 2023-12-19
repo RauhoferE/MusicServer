@@ -20,7 +20,7 @@
             <span nz-col *ngIf="this.loopAudio" style="justify-content: center;" class="clicked-color clickable" nz-icon nzSpan="4" nzType="retweet" nzTheme="outline" (click)="loopPlayback()"></span>
         </div>
         <div nz-row style="font-size: 150%;">
-            <span nz-col nzSpan="2">{{this.CurrentSecondsPlayed | secondsToMinute}}</span>
+            <span nz-col nzSpan="2">{{this.durationSlider | secondsToMinute}}</span>
             <nz-slider
             nz-col
             nzSpan="16"

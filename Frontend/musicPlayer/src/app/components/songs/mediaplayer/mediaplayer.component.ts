@@ -39,15 +39,14 @@ export class MediaplayerComponent implements OnInit {
   constructor(private rxjsService: RxjsStorageService, private playlistService: PlaylistService) {
     this.audioElement.autoplay = false;
     
-    //TODO: Add events for audio element
     this.audioElement.addEventListener("timeupdate", (x) => {
       if (isNaN(this.audioElement.currentTime) ) {
         return;
       }
-      
+      console.log(`set time ${this.audioElement.currentTime}`)
       this.durationSlider = Math.round(this.audioElement.currentTime);
     })
-    
+
   }
 
   ngOnInit(): void {
@@ -65,6 +64,7 @@ export class MediaplayerComponent implements OnInit {
       this.audioElement.pause();
       console.log("Play new song")
       this.audioElement.src = this.AudioSrc;
+      this.audioElement.load();
       this.audioElement.play();
     });
 
@@ -91,12 +91,11 @@ export class MediaplayerComponent implements OnInit {
 
   public onDurationChanged(value: any){
     // Is number
-    console.log(value)
+    this.audioElement.currentTime = value;
   }
 
   public onVolumeChanged(value: any){
     // Is number
-    console.log(value)
     this.audioElement.volume = this.AudioVolume;
   }
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MusicServer.Const;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
+using Serilog;
 using System.ComponentModel.DataAnnotations;
 
 namespace MusicServer.Controllers
@@ -23,8 +24,10 @@ namespace MusicServer.Controllers
         [HttpGet(ApiRoutes.File.Song)]
         public async Task<IActionResult> Song([FromRoute, Required] Guid songId)
         {
-            Response.ContentType = "audio/mp3"; 
-            return File(await this.fileService.GetSongStream(songId), "audio/mp3");
+            Response.ContentType = "audio/mp3";
+            var f =  File(await this.fileService.GetSongStream(songId), "audio/mp3");
+            f.EnableRangeProcessing = true;
+            return f;
         }
 
         [HttpGet(ApiRoutes.File.Album)]
