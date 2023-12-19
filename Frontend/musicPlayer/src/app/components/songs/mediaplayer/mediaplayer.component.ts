@@ -43,7 +43,7 @@ export class MediaplayerComponent implements OnInit {
       if (isNaN(this.audioElement.currentTime) ) {
         return;
       }
-      console.log(`set time ${this.audioElement.currentTime}`)
+
       this.durationSlider = Math.round(this.audioElement.currentTime);
     })
 
@@ -158,13 +158,15 @@ export class MediaplayerComponent implements OnInit {
 
     if (!Array.isArray(lastPlayedSongs)) {
       // No previous songs found.
-      // TODO: Start Song from start.
+      // Start Song from start.
+      this.audioElement.currentTime = 0;
       return;
     }
 
     if (lastPlayedSongs.length == 0) {
       // No previous songs found.
-      // TODO: Start Song from start.
+      // Start Song from start.
+      this.audioElement.currentTime = 0;
       return;
     }
 
@@ -183,7 +185,8 @@ export class MediaplayerComponent implements OnInit {
 
     if (this.currentQueue.length == 0) {
       // No next song found
-      // TODO: Start Song from start.
+      // Start Song from start.
+      this.audioElement.currentTime = 0;
       return;
     }
 
@@ -198,8 +201,6 @@ export class MediaplayerComponent implements OnInit {
     this.loopAudio = !this.loopAudio;
     this.audioElement.loop = this.loopAudio;
   }
-
-  // TOOD: Add events for audio end/start/stop/volume
 
   public updateDashBoardAndSongTable(): void{
     let dashboardBool = false;
