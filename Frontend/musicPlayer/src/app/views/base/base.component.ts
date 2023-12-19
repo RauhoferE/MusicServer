@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { ArtistShortModel } from 'src/app/models/artist-models';
-import { FollowedPlaylistModel } from 'src/app/models/playlist-models';
+import { FollowedPlaylistModel, PlaylistSongModel } from 'src/app/models/playlist-models';
 import { AllFollowedEntitiesModel, UserModel } from 'src/app/models/user-models';
 import { JwtService } from 'src/app/services/jwt.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
@@ -25,6 +25,8 @@ export class BaseComponent implements OnInit {
 
   private filterName: string = '';
 
+  private currentPlayingSong: PlaylistSongModel = {} as PlaylistSongModel;
+
   /**
    *
    */
@@ -35,6 +37,10 @@ export class BaseComponent implements OnInit {
 
   ngOnInit(): void {
     this.userName = this.jwtService.getUserName();
+
+    this.rxjsService.currentPlayingSong.subscribe(x => {
+      this.currentPlayingSong = x;
+    });
 
     this.getFollowedEntities();
   }
@@ -97,6 +103,10 @@ export class BaseComponent implements OnInit {
 
   getOwnAvatar(): string{
     return `${environment.apiUrl}/${APIROUTES.file}/user/-1`;
+  }
+
+  public get CurrentPlayingSong(): PlaylistSongModel{
+    return this.currentPlayingSong;
   }
 
   public get FollowedUser(): UserModel[]{

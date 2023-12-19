@@ -100,6 +100,11 @@ export class MediaplayerComponent implements OnInit {
     this.audioElement.volume = this.AudioVolume;
   }
 
+  public muteUnmuteAudio(){
+    this.mutedAudio = !this.mutedAudio;
+    this.audioElement.muted = this.mutedAudio;
+  }
+
   public removeSongFromFavorites(): void{
     this.playlistService.RemoveSongsFromFavorites([this.currentPlayingSong.id]).subscribe({
       next: ()=>{

@@ -50,8 +50,8 @@
             </ng-template>
         </div>
         <div nz-row style="font-size: 150%;">
-            
-            <span nz-col nzSpan="2" nz-icon nzType="customer-service" nzTheme="outline"></span>
+            <app-audio-svg *ngIf="!this.mutedAudio" nz-col nzSpan="2" style="width: 1em; height: 1em; align-self: center;" class="clickable" (click)="muteUnmuteAudio()"/>
+            <app-audio-off-svg *ngIf="this.mutedAudio" nz-col nzSpan="2" style="width: 1em; height: 1em; align-self: center;" class="clickable" (click)="muteUnmuteAudio()"/>
             <nz-slider
             nz-col
             nzOffset="1"

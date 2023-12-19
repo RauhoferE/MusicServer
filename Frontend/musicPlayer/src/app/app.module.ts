@@ -47,6 +47,8 @@ import { SongTableComponent } from './components/songs/song-table/song-table.com
 import { FavoritesComponent } from './views/favorites/favorites.component';
 import { SecondsToMinutePipe } from './pipes/seconds-to-minutes-pipe';
 import { MediaplayerComponent } from './components/songs/mediaplayer/mediaplayer.component';
+import { AudioSvgComponent } from './components/svg/audio-svg/audio-svg.component';
+import { AudioOffSvgComponent } from './components/svg/audio-off-svg/audio-off-svg.component';
 
 
 registerLocaleData(en);
@@ -67,7 +69,9 @@ registerLocaleData(en);
     SongTableComponent,
     FavoritesComponent,
     SecondsToMinutePipe,
-    MediaplayerComponent
+    MediaplayerComponent,
+    AudioSvgComponent,
+    AudioOffSvgComponent
   ],
   imports: [
     BrowserModule,

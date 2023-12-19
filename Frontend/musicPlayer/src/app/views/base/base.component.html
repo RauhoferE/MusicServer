@@ -107,7 +107,7 @@
             <router-outlet>
             </router-outlet>
         <!-- </nz-content> -->
-        <app-mediaplayer style="position: relative;"></app-mediaplayer>
+        <app-mediaplayer *ngIf="this.CurrentPlayingSong.id" style="position: relative;"></app-mediaplayer>
         <nz-footer class="footer">Developed By Emre Rauhofer <a href="mailto:emre.rauhofer@gmail.com">Contact me</a></nz-footer>
       </nz-layout>
       
