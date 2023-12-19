@@ -1,9 +1,9 @@
 <div nz-row style="height: 100%; background-color: white;">
     <img [src]="this.AlbumCoverSrc" nz-col nzSpan="2">
     <div nz-col nzSpan="2" style="align-self: center;">
-        <a nz-row style="justify-content: center;" [href]="SongUrl">{{this.CurrentPlayingSong.name}}</a>
+        <a nz-row style="justify-content: center;" [routerLink]="[SongUrl]">{{this.CurrentPlayingSong.name}}</a>
         <div *ngFor="let artist of this.CurrentPlayingSong.artists">
-            <a nz-row style="justify-content: center;" [href]="getArtistUrl(artist.id)">{{artist.name}}</a>
+            <a nz-row style="justify-content: center;" [routerLink]="['artist', artist.id]">{{artist.name}}</a>
         </div>
         
         <span *ngIf="this.CurrentPlayingSong.isInFavorites" nz-row style="justify-content: center; font-size: 150%;" nz-icon nzType="heart" 
@@ -37,14 +37,20 @@
     </div>
     <div nz-col nzSpan="4" style="align-self: center; font-size: 150%;">
         <div nz-row style="justify-content: center;">
-            <button nz-button nz-popover nzType="primary" nzPopoverTitle="Queue" [nzPopoverContent]="queueTemplate">
+            <button nz-button nz-popover nzType="primary" nzPopoverTitle="Queue" [nzPopoverContent]="queueTemplate" nzPopoverPlacement="top">
                 <span nz-icon nzType="menu" nzTheme="outline"></span>
             </button>
             <ng-template #queueTemplate >
                 <div style="overflow-y: auto; height: 10%;">
                     <div *ngFor="let song of this.CurrentQueue" >
                         <div>
-                            {{song.name}}
+                            <span>
+                                {{song.name}}
+                            </span>
+                            <span *ngFor="let artist of song.artists">
+                                    {{artist.name}}
+                            </span>
+                            
                         </div>
                     </div>
                 </div>

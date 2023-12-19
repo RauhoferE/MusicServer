@@ -61,7 +61,7 @@
                     <img [src]="getAlbumCoverSrc(data.album.id)" style="width: 50px; height: 50px;"/>
                     {{data.name}}
                 </td>
-                <td><a [href]="getAlbumLink(data.album)">{{data.album.name}}</a></td>
+                <td><a [routerLink]="['/album', data.album.id]">{{data.album.name}}</a></td>
                 <td>{{data.created | date:'longDate' }}</td>
                 <td>
                     <span *ngIf="data.isInFavorites" nz-icon nzType="heart" 

@@ -78,27 +78,12 @@ export class BaseComponent implements OnInit {
     return `${environment.apiUrl}/${APIROUTES.file}/artist/${id}`;
   }
 
-  getArtistSite(id: string): string{
-    // TODO: Return with correct frontend address
-    return `/artist/${id}`;
-  }
-
   getProfilePicSrc(id: number): string{
     return `${environment.apiUrl}/${APIROUTES.file}/user/${id}`;
   }
 
-  getProfileSite(id: number): string{
-    // TODO: Return with correct frontend address
-    return `/user/${id}`;
-  }
-
   getPlaylistCoverSrc(id: string): string{
     return `${environment.apiUrl}/${APIROUTES.file}/playlist/${id}`;
-  }
-
-  getPlaylistSite(id: string): string{
-    // TODO: Return with correct frontend address
-    return `/playlist/${id}`;
   }
 
   getOwnAvatar(): string{

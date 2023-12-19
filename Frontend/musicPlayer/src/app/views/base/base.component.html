@@ -55,7 +55,7 @@
                         {{ this.FavoriteSongsCount }} Songs
                     </nz-list-item-meta-description>
                     <nz-list-item-meta-title>
-                    <a href="favorites">Favorites</a>
+                    <a [routerLink]="['favorites']">Favorites</a>
                     </nz-list-item-meta-title>
                 </nz-list-item-meta>
             </nz-list-item>
@@ -68,7 +68,7 @@
                         Artist
                     </nz-list-item-meta-description>
                     <nz-list-item-meta-title>
-                    <a [href]="getArtistSite(artist.id)">{{artist.name}}</a>
+                    <a [routerLink]="['artist', artist.id]">{{artist.name}}</a>
                     </nz-list-item-meta-title>
                 </nz-list-item-meta>
             </nz-list-item>
@@ -83,7 +83,7 @@
                         User
                     </nz-list-item-meta-description>
                     <nz-list-item-meta-title>
-                    <a [href]="getProfileSite(user.id)">{{user.userName}}</a>
+                    <a [routerLink]="['user', user.id]">{{user.userName}}</a>
                     </nz-list-item-meta-title>
                 </nz-list-item-meta>
             </nz-list-item>
@@ -96,7 +96,7 @@
                         Playlist • {{playlist.creatorName}} <br> {{playlist.songCount}} Songs
                     </nz-list-item-meta-description>
                     <nz-list-item-meta-title>
-                    <a [href]="getPlaylistSite(playlist.id)">{{playlist.name}}</a>
+                    <a [routerLink]="['playlist', playlist.id]">{{playlist.name}}</a>
                     </nz-list-item-meta-title>
                 </nz-list-item-meta>
             </nz-list-item>
