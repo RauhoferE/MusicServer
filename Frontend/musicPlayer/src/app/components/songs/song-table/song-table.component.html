@@ -9,8 +9,8 @@
         
     </div>
 
-    <button *ngIf="!ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Show Selector</button>
-    <button *ngIf="ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Hide Selector</button>
+    <button *ngIf="displayHeader && !ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Show Selector</button>
+    <button *ngIf="displayHeader && ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Hide Selector</button>
     <nz-table
     nzShowSizeChanger
     [nzData]="songs.songs"
@@ -22,7 +22,7 @@
     (nzQueryParams)="onQueryParamsChange($event)"
     >
         <thead>
-            <tr>
+            <tr *ngIf="displayHeader">
                 <th             
                 *ngIf="ShowCheckbox"
                 nzWidth="60px"

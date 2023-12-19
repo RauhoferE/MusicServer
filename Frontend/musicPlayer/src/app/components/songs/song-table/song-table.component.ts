@@ -27,6 +27,8 @@ export class SongTableComponent implements OnInit {
 
   @Input() displayRemoveFromQueueOption: boolean = false;
 
+  @Input() displayHeader: boolean = true;
+
   private pagination: PaginationModel = {} as PaginationModel;
 
   @Output() paginationUpdated: EventEmitter<void> = new EventEmitter<void>();
@@ -142,17 +144,13 @@ export class SongTableComponent implements OnInit {
       this.rxjsStorageService.removeSongWithIndexFromQueue(indexOfItemToRemove)
     });
 
-    // TODO: Bug! The elements stay checked
-    this.indeterminate = false;
-    this.allChecked = false;
-    this.paginationUpdated.emit();
+    this.checkAll(false);
   }
 
   addSelectedSongsToQueue() {
     var checkedSongs = this.songs.songs.filter(x => x.checked);
     this.rxjsStorageService.addSongsToQueue(checkedSongs)
-    this.indeterminate = false;
-    this.allChecked = false;
+    this.checkAll(false);
   }
 
   onQueryParamsChange(event: any): void{
@@ -288,8 +286,7 @@ export class SongTableComponent implements OnInit {
           this.message.success("Songs were successfully removed from playlist!");
         }
 
-        this.AllChecked = false;
-        this.Indeterminate = false;
+        this.checkAll(false);
 
         this.updateDashBoard();
         this.paginationUpdated.emit();
@@ -329,8 +326,7 @@ export class SongTableComponent implements OnInit {
           this.message.success("Songs were successfully added to favorites!");
         }
 
-        this.indeterminate = false;
-        this.allChecked = false;
+        this.checkAll(false);
 
         this.updateCurrentSong(ids);
 
@@ -355,15 +351,15 @@ export class SongTableComponent implements OnInit {
 
         this.updateDashBoard();
 
-        if (this.playlistId == undefined) {
-          return;
-        }
+        // if (this.playlistId == undefined) {
+        //   return;
+        // }
 
-        if (this.playlistId == playlistId) {
-          this.indeterminate = false;
-          this.allChecked = false;
-          this.paginationUpdated.emit();
-        }
+        // this.indeterminate = false;
+        // this.allChecked = false;
+        this.checkAll(false);
+        
+        //this.paginationUpdated.emit();
         
         
       }
@@ -395,8 +391,7 @@ export class SongTableComponent implements OnInit {
           this.message.success("Songs were successfully removed from favorites!");
         }
 
-        this.indeterminate = false;
-        this.allChecked = false;
+        this.checkAll(false);
 
         this.updateCurrentSong(songIds);
 
