@@ -61,11 +61,17 @@ export class MediaplayerComponent implements OnInit {
     
     // Get values from storage
     this.rxjsService.currentPlayingSong.subscribe(x => {
+      let oldPlayingSong = JSON.parse(JSON.stringify(this.currentPlayingSong)) as PlaylistSongModel;
       this.currentPlayingSong = x;
       //this.audioElement.pause();
 
       if (!this.currentPlayingSong.id) {
         console.log("Current playing song is undef")
+        return;
+      }
+
+      if (this.currentPlayingSong.id == oldPlayingSong.id) {
+        console.log("Song is the same. No need to restart playback");
         return;
       }
 

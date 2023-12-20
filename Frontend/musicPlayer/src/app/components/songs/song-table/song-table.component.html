@@ -1,5 +1,5 @@
 <div>
-    <div nz-row style="margin-bottom: 2em;">        
+    <div *ngIf="displaySearch" nz-row style="margin-bottom: 2em;">        
         <nz-input-group nz-col [nzPrefix]="prefixIconSearch" style="align-self: center;">
             <input type="text" nz-input placeholder="Search for song" [(ngModel)]="SearchString" (keyup.enter)="onSearchQueryInput()"/>
         </nz-input-group>
@@ -20,8 +20,9 @@
     [nzPageSize]="PageSize"
     [nzPageIndex]="PageIndex"
     (nzQueryParams)="onQueryParamsChange($event)"
+    [nzShowPagination]="displayPagination"
     >
-        <thead>
+        <thead >
             <tr *ngIf="displayHeader">
                 <th             
                 *ngIf="ShowCheckbox"
@@ -47,7 +48,17 @@
                 [(nzChecked)]="data.checked"
                 (nzCheckedChange)="refreshTableHeader()"
               ></td>
-                <td>
+                <td *ngIf="displayHeader">
+                    <span id="order-id" *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || 
+                    (!this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id)">{{data.order}}</span>
+
+                    <span *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || !this.IsSongPlaying"
+                    id="play-song-button" nz-icon nzType="play-circle" nzTheme="outline" class="clickable" (click)="playSong(data, indexOfelement)"></span>
+
+                    <span *ngIf="this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id"
+                     nz-icon nzType="pause-circle" nzTheme="outline" class="clickable" (click)="pauseSong()"></span>
+                </td>
+                <td *ngIf="!displayHeader" style="width: 5em;">
                     <span id="order-id" *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || 
                     (!this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id)">{{data.order}}</span>
 

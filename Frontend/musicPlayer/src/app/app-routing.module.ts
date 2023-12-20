@@ -14,6 +14,7 @@ import { BaseComponent } from './views/base/base.component';
 import { PlaylistOverviewComponent } from './views/playlist/playlist-overview/playlist-overview.component';
 import { PlaylistDetailsComponent } from './views/playlist/playlist-details/playlist-details.component';
 import { FavoritesComponent } from './views/favorites/favorites.component';
+import { SongQueueComponent } from './views/playlist/song-queue/song-queue.component';
 
 const routes: Routes = [
   { 
@@ -49,6 +50,10 @@ const routes: Routes = [
       {
         path: '',
         component: HomeComponent
+      },
+      {
+        path: 'queue',
+        component: SongQueueComponent
       },
       {
         path: 'favorites',

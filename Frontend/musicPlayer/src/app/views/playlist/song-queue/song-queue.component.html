@@ -1,1 +1,30 @@
-<p>song-queue works!</p>
+<div>
+    <div>
+        <h2>
+            Current Song
+        </h2>
+        <app-song-table
+        [songs]="this.CurrentPlayingSongModel"
+         (paginationUpdated)="onCurrentSongPaginationUpdated()"
+         (playSongClicked)="onPlaySongClicked($event)"
+         [displayHeader]="false"
+         [displayPagination]="false"
+         [displaySearch]="false"
+         ></app-song-table>
+
+    </div>
+    <div>
+        <h2>
+            Next Songs
+        </h2>
+        <app-song-table
+        [songs]="this.SongsModel"
+         (paginationUpdated)="onQueueTablePaginationUpdated()"
+         (playSongClicked)="onPlaySongClicked($event)"
+         [displayHeader]="false"
+         [displayRemoveFromQueueOption]="true"
+         [displaySearch]="false"
+         ></app-song-table>
+
+    </div>
+</div>

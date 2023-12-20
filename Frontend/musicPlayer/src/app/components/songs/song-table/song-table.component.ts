@@ -21,13 +21,17 @@ import { environment } from 'src/environments/environment';
 })
 export class SongTableComponent implements OnInit {
 
-  @Input() songs!: PlaylistSongPaginationModel;
+  @Input() songs: PlaylistSongPaginationModel = {songs: [], totalCount : 0} as PlaylistSongPaginationModel;
   
   @Input() sortingEnabled: boolean = true;
 
   @Input() displayRemoveFromQueueOption: boolean = false;
 
   @Input() displayHeader: boolean = true;
+
+  @Input() displayPagination: boolean = true;
+
+  @Input() displaySearch: boolean = true;
 
   private pagination: PaginationModel = {} as PaginationModel;
 
@@ -97,6 +101,7 @@ export class SongTableComponent implements OnInit {
 
     console.log("Set pag")
     this.pagination = pModel;
+    console.log(this.songs);
     // this.isSongPlaying = isSongPlaying;
     // this.currentPlayingSong = currentPlayingSong;
   }

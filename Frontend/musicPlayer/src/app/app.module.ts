@@ -25,6 +25,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import {NzSliderModule } from 'ng-zorro-antd/slider';
 import {NzPopoverModule } from 'ng-zorro-antd/popover';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 // Project Imports
 import { AppRoutingModule } from './app-routing.module';
@@ -50,6 +51,7 @@ import { MediaplayerComponent } from './components/songs/mediaplayer/mediaplayer
 import { AudioSvgComponent } from './components/svg/audio-svg/audio-svg.component';
 import { AudioOffSvgComponent } from './components/svg/audio-off-svg/audio-off-svg.component';
 import { SongQueueComponent } from './views/playlist/song-queue/song-queue.component';
+
 
 
 registerLocaleData(en);
@@ -102,7 +104,8 @@ registerLocaleData(en);
     NzModalModule,
     NzDropDownModule,
     NzSliderModule ,
-    NzPopoverModule 
+    NzPopoverModule,
+    NzToolTipModule 
   ],
   providers: [
     CookieService,

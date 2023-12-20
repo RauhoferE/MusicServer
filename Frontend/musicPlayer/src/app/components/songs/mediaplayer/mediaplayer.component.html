@@ -37,26 +37,9 @@
     </div>
     <div nz-col nzSpan="4" style="align-self: center; font-size: 150%;">
         <div nz-row style="justify-content: center;">
-            <button nz-button nz-popover nzType="primary" nzPopoverTitle="Queue" [nzPopoverContent]="queueTemplate" nzPopoverPlacement="top">
+            <a nz-tooltip nzTooltipTitle="Queue" [routerLink]="['/queue']" class="clickable">
                 <span nz-icon nzType="menu" nzTheme="outline"></span>
-            </button>
-            <ng-template #queueTemplate >
-                <div style="overflow-y: auto; height: 10%;">
-                    <div *ngFor="let song of this.CurrentQueue" >
-                        <div>
-                            <span>
-                                {{song.name}}
-                            </span>
-                            <span *ngFor="let artist of song.artists">
-                                    {{artist.name}}
-                            </span>
-                            
-                        </div>
-                    </div>
-                </div>
-
-            
-            </ng-template>
+            </a>
         </div>
         <div nz-row style="font-size: 150%;">
             <app-audio-svg *ngIf="!this.mutedAudio" nz-col nzSpan="2" style="width: 1em; height: 1em; align-self: center;" class="clickable" (click)="muteUnmuteAudio()"/>
