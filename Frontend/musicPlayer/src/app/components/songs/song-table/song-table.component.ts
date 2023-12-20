@@ -413,9 +413,7 @@ export class SongTableComponent implements OnInit {
     // This should happen even when the user switches to another side so use the rxjs storage
     // Later sync the current song and the playlist with the server 
     
-    // this.rxjsStorageService.clearSongQueue();
-    // this.rxjsStorageService.addSongsToQueue(this.songs.songs);
-    // TODO: Send event to outside component
+    // Send event to outside component
     this.playSongClicked.emit({index: index, songModel: model} as PlaylistSongModelParams);
   }
 

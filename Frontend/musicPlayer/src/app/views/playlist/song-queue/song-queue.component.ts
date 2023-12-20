@@ -54,15 +54,9 @@ export class SongQueueComponent implements OnInit {
       this.onQueueTablePaginationUpdated();
       this.onCurrentSongPaginationUpdated();
     });
-
-    // TODO: Check with foreach loop for the details of each song and also the currently playing one and update them
-    // this.onQueueTablePaginationUpdated();
-    // this.onCurrentSongPaginationUpdated();
   }
   
   async onQueueTablePaginationUpdated() {
-    // TODO: Songs were removed or added to the favorites. 
-    // TODO: Check with foreach loop for the details of each song and also the currently playing one and update them
     if (this.songsModel.songs.length == 0) {
       this.rxjsStorageService.setSongTableLoadingState(false);
       return;
@@ -83,22 +77,19 @@ export class SongQueueComponent implements OnInit {
   }
 
   async onCurrentSongPaginationUpdated(): Promise<void> {
-    // TODO: Songs were removed or added to the favorites. 
-    // TODO: Check with foreach loop for the details of each song and also the currently playing one and update them
-
     if (!this.currentPlayingSong.id || this.currentPlayingSong.id == '-1') {
       this.rxjsStorageService.setSongTableLoadingState(false);
       return;
     }
+
     this.rxjsStorageService.setSongTableLoadingState(true);
     let newCurrentSong: PlaylistSongModel = this.currentPlayingSong;
     var songElement = await this.getSongDetails(this.currentPlayingSong.id);
-    console.log(songElement)
+    
     if (songElement.id != '-1') {
       songElement.order = 1;
       newCurrentSong = songElement;
     }
-
 
     this.rxjsStorageService.setCurrentPlayingSong(songElement);
     this.rxjsStorageService.setSongTableLoadingState(false);
@@ -120,7 +111,7 @@ export class SongQueueComponent implements OnInit {
       return;
     }
 
-    // TODO: Set the clicked song as the currently playing song but keep the rest of the queue as is
+    // Set the clicked song as the currently playing song but keep the rest of the queue as is
 
     this.rxjsStorageService.setCurrentPlayingSong(songModel);
     this.rxjsStorageService.removeSongWithIndexFromQueue(indexOfSong);
