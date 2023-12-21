@@ -4,6 +4,7 @@ import en from '@angular/common/locales/en';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 // NG-Zorro Imports
 import { NZ_I18N } from 'ng-zorro-antd/i18n';
@@ -54,6 +55,7 @@ import { SongQueueComponent } from './views/playlist/song-queue/song-queue.compo
 
 
 
+
 registerLocaleData(en);
 
 @NgModule({
@@ -86,6 +88,7 @@ registerLocaleData(en);
     HttpClientModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
+    DragDropModule,
 
     // Ng-zorro
     NzMessageModule,
@@ -105,7 +108,7 @@ registerLocaleData(en);
     NzDropDownModule,
     NzSliderModule ,
     NzPopoverModule,
-    NzToolTipModule 
+    NzToolTipModule
   ],
   providers: [
     CookieService,

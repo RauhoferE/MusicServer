@@ -171,9 +171,9 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.OrderFavorites)]
-        public async Task<IActionResult> ChangeOrderOfFavorit([FromQuery, Required] Guid songId, [FromQuery, Required] int order)
+        public async Task<IActionResult> ChangeOrderOfFavorit([FromQuery, Required] int oldOrder, [FromQuery, Required] int newOrder)
         {
-            await this.playlistService.ChangeOrderOfFavorit(songId, order);
+            await this.playlistService.ChangeOrderOfFavorit(oldOrder, newOrder);
             return NoContent();
         }
 

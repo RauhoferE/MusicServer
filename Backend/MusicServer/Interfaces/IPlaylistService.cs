@@ -44,7 +44,7 @@ namespace MusicServer.Interfaces
 
         public Task RemoveSongsFromFavorite(List<Guid> songIds);
 
-        public Task ChangeOrderOfFavorit(Guid songId, int newSpot);
+        public Task ChangeOrderOfFavorit(int oldSpot, int newSpot);
 
         public Task ChangeOrderOfSongInPlaylist(Guid playlistId, int oldSpot, int newSpot);
 

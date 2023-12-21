@@ -13,6 +13,7 @@ import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SongService } from 'src/app/services/song.service';
 import { environment } from 'src/environments/environment';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-song-table',
@@ -453,6 +454,10 @@ export class SongTableComponent implements OnInit {
       }
     })
   }
+
+  drop(event: CdkDragDrop<string[]>) {
+    console.log(event)
+    }
 
   public get IsSongPlaying(): boolean{
     return this.isSongPlaying;

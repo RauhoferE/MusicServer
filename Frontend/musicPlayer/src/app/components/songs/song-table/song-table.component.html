@@ -39,9 +39,9 @@
             </tr>
 
         </thead>
-        <tbody>
+        <tbody cdkDropList (cdkDropListDropped)="drop($event)">
             <tr *ngFor="let data of songs.songs;let indexOfelement=index;" (contextmenu)="contextMenu($event, menu, data, indexOfelement)"
-            class="song-item"
+            class="song-item" cdkDrag
             >
                 <td
                 *ngIf="ShowCheckbox"

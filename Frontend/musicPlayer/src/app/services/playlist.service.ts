@@ -78,5 +78,17 @@ export class PlaylistService {
     })
   }
 
+  public ChangeOrderOfSongInFavorites(oldOrder: number, newOrder: number): Observable<Object>{
+    return this.httpClient.get(`${environment.apiUrl}/${APIROUTES.playlist}/order/favorite?oldOrder=${oldOrder}&newOrder=${newOrder}`,{
+      withCredentials: true
+    })
+  }
+
+  public ChangeOrderOfSongInPlaylist(playlistId: string, oldOrder: number, newOrder: number): Observable<Object>{
+    return this.httpClient.get(`${environment.apiUrl}/${APIROUTES.playlist}/order/song?playlistId=${playlistId}&oldOrder=${oldOrder}&newOrder=${newOrder}`,{
+      withCredentials: true
+    })
+  }
+
 
 }

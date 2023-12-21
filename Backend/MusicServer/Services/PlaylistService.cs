@@ -715,7 +715,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task ChangeOrderOfFavorit(Guid songId, int newSpot)
+        public async Task ChangeOrderOfFavorit(int oldSpot, int newSpot)
         {
             var favorites = this.dBContext.Users
                 .Include(x => x.Favorites)
@@ -724,7 +724,7 @@ namespace MusicServer.Services
                 .Favorites
                 ?? throw new UserNotFoundException();
 
-            var songToMove = favorites.FirstOrDefault(x => x.FavoriteSong.Id == songId)
+            var songToMove = favorites.FirstOrDefault(x => x.Order == oldSpot)
                 ?? throw new SongNotFoundException();
 
             var targetPlace = favorites.FirstOrDefault(x => x.Order == newSpot) 
@@ -733,11 +733,11 @@ namespace MusicServer.Services
             var oldSongOrder = songToMove.Order;    
             songToMove.Order = newSpot;
 
-            var favoritesToTraverse = favorites.Where(x => x.Order <= newSpot && x.FavoriteSong.Id != songId && x.Order > oldSongOrder);
+            var favoritesToTraverse = favorites.Where(x => x.Order <= newSpot && x.FavoriteSong.Id != songToMove.FavoriteSong.Id && x.Order > oldSongOrder);
 
             if (oldSongOrder > newSpot)
             {
-                favoritesToTraverse = favorites.Where(x => x.Order >= newSpot && x.FavoriteSong.Id != songId && x.Order < oldSongOrder);
+                favoritesToTraverse = favorites.Where(x => x.Order >= newSpot && x.FavoriteSong.Id != songToMove.FavoriteSong.Id && x.Order < oldSongOrder);
             }
 
             foreach (var songBefore in favoritesToTraverse)
