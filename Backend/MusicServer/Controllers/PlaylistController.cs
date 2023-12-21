@@ -179,9 +179,9 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.OrderSongs)]
-        public async Task<IActionResult> ChangeOrderOfSongInPlaylist([FromQuery, Required] Guid playlistId, [FromQuery, Required] Guid songId, [FromQuery, Required] int order)
+        public async Task<IActionResult> ChangeOrderOfSongInPlaylist([FromQuery, Required] Guid playlistId, [FromQuery, Required] int oldOrder, [FromQuery, Required] int newOrder)
         {
-            await this.playlistService.ChangeOrderOfSongInPlaylist(playlistId, songId, order);
+            await this.playlistService.ChangeOrderOfSongInPlaylist(playlistId, oldOrder, newOrder);
             return NoContent();
         }
 

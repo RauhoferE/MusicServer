@@ -46,7 +46,7 @@ namespace MusicServer.Interfaces
 
         public Task ChangeOrderOfFavorit(Guid songId, int newSpot);
 
-        public Task ChangeOrderOfSongInPlaylist(Guid playlistId, Guid songId, int newSpot);
+        public Task ChangeOrderOfSongInPlaylist(Guid playlistId, int oldSpot, int newSpot);
 
         public Task ChangeOrderOfPlaylist(Guid playlistId, int newSpot);
     }

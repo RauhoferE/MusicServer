@@ -8,7 +8,6 @@ using MusicServer.Entities.Responses;
 using MusicServer.Exceptions;
 using MusicServer.Helpers;
 using MusicServer.Interfaces;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MusicServer.Services
 {
@@ -755,7 +754,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task ChangeOrderOfSongInPlaylist(Guid playlistId, Guid songId, int newSpot)
+        public async Task ChangeOrderOfSongInPlaylist(Guid playlistId, int oldSpot, int newSpot)
         {
             var playlist = this.dBContext.PlaylistUsers
                 .Include(x => x.Playlist)
@@ -766,7 +765,7 @@ namespace MusicServer.Services
                 ?? throw new PlaylistNotFoundException();
 
             var songToMove = playlist.Playlist.Songs
-                .FirstOrDefault(x => x.Song.Id == songId)
+                .FirstOrDefault(x => x.Order == oldSpot)
                 ?? throw new SongNotFoundException();
 
             var targetPlace = playlist.Playlist.Songs
@@ -776,11 +775,11 @@ namespace MusicServer.Services
             var oldSongOrder = songToMove.Order;
             songToMove.Order = newSpot;
 
-            var songsToTraverse = playlist.Playlist.Songs.Where(x => x.Order <= newSpot && x.Song.Id != songId && x.Order > oldSongOrder);
+            var songsToTraverse = playlist.Playlist.Songs.Where(x => x.Order <= newSpot && x.Song.Id != songToMove.Song.Id && x.Order > oldSongOrder);
 
             if (oldSongOrder > newSpot)
             {
-                songsToTraverse = playlist.Playlist.Songs.Where(x => x.Order >= newSpot && x.Song.Id != songId && x.Order < oldSongOrder);
+                songsToTraverse = playlist.Playlist.Songs.Where(x => x.Order >= newSpot && x.Song.Id != songToMove.Song.Id && x.Order < oldSongOrder);
             }
 
             foreach (var songBefore in songsToTraverse)
