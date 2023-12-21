@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
 import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Observable } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
-import { AlbumArtistModel } from 'src/app/models/artist-models';
+import { AlbumArtistModel, ArtistShortModel } from 'src/app/models/artist-models';
 import { PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
 import { GuidNameModel, PlaylistSongModel, PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
@@ -13,7 +13,8 @@ import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SongService } from 'src/app/services/song.service';
 import { environment } from 'src/environments/environment';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-song-table',
@@ -74,7 +75,7 @@ export class SongTableComponent implements OnInit {
    *
    */
   constructor(private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService,
-    private message: NzMessageService, private modal: NzModalService, private nzContextMenuService: NzContextMenuService, private songService: SongService) {
+    private message: NzMessageService, private modal: NzModalService, private nzContextMenuService: NzContextMenuService, private songService: SongService, @Inject(DOCUMENT) private doc: Document) {
     console.log("Construct")
     this.IsLoading = this.rxjsStorageService.currentSongTableLoading$;
   }
@@ -455,9 +456,19 @@ export class SongTableComponent implements OnInit {
     })
   }
 
+  getArtistsNamesAsList(artists: ArtistShortModel[]): string{
+    return artists.map(x => x.name).join(', ');
+
+  }
+
   drop(event: CdkDragDrop<string[]>) {
-    console.log(event)
+    //this.doc.body.style.cursor = 'default';
     }
+
+    drag($event: CdkDragStart<any>) {
+      console.log("drag")
+      //this.doc.body.style.cursor = 'grabbing';
+      }
 
   public get IsSongPlaying(): boolean{
     return this.isSongPlaying;
