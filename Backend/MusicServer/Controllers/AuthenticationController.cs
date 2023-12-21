@@ -191,8 +191,9 @@ namespace MusicServer.Controllers
                 SameSite = SameSiteMode.None,
                 HttpOnly = false,
                 Path = "/",
-                Expires = DateTime.Now.AddHours(this.appSettings.CookieExpirationTimeInMinutes)
-            });
+                Expires = DateTime.Now.AddMinutes(this.appSettings.CookieExpirationTimeInMinutes),
+                MaxAge = TimeSpan.FromMinutes(this.appSettings.CookieExpirationTimeInMinutes)
+        });
 
             var claimsIdentity = new ClaimsIdentity(result.AuthenticationClaims,
     CookieAuthenticationDefaults.AuthenticationScheme);
@@ -206,7 +207,7 @@ namespace MusicServer.Controllers
                         IsPersistent =
                         false, // When not persistent == SessionCookie (If browser gets closed the user has to login again)
                         AllowRefresh = true,
-                        ExpiresUtc = DateTime.Now.AddHours(this.appSettings.CookieExpirationTimeInMinutes)
+                        ExpiresUtc = DateTime.Now.AddMinutes(this.appSettings.CookieExpirationTimeInMinutes)
                     });
         }
 

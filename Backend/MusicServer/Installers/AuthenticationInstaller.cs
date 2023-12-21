@@ -44,7 +44,8 @@ namespace MusicServer.Installers
 
 
                 options.Cookie.HttpOnly = true;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.Cookie.MaxAge = TimeSpan.FromMinutes(60);
                 options.SlidingExpiration = true;
 
                 options.LogoutPath = $"/{ApiRoutes.Base}/{ApiRoutes.Authentication.Logout}";
