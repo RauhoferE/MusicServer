@@ -46,6 +46,7 @@ const routes: Routes = [
     path: '',
     component: BaseComponent,
     canActivate: [isAuthenticatedGuard],
+    canActivateChild: [isAuthenticatedGuard],
     children:[
       {
         path: '',
@@ -57,7 +58,7 @@ const routes: Routes = [
       },
       {
         path: 'favorites',
-        component: FavoritesComponent
+        component: FavoritesComponent,
       },
       {
         path: 'playlists',
