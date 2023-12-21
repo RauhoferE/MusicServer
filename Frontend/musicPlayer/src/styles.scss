@@ -62,3 +62,8 @@
 .text-end{
     text-align: end;
 }
+
+// This is done so the cursor for when grabbing objects changes
+body.inheritCursors * {
+    cursor: inherit !important;
+  }

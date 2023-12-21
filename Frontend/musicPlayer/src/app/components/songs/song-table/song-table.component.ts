@@ -3,7 +3,7 @@ import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dro
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { Observable } from 'rxjs';
+import { Observable, every } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { AlbumArtistModel, ArtistShortModel } from 'src/app/models/artist-models';
 import { PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
@@ -463,10 +463,14 @@ export class SongTableComponent implements OnInit {
 
   drop(event: CdkDragDrop<string[]>) {
     //this.doc.body.style.cursor = 'default';
+    this.doc.body.classList.remove('inheritCursors');
+    this.doc.body.style.cursor = 'unset'; 
     }
 
     drag($event: CdkDragStart<any>) {
       console.log("drag")
+      this.doc.body.classList.add('inheritCursors');
+      this.doc.body.style.cursor = 'grabbing'; 
       //this.doc.body.style.cursor = 'grabbing';
       }
 
