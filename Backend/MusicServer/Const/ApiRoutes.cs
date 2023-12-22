@@ -74,7 +74,8 @@
         {
             public const string Artist = "artist/{artistId}";
             public const string ArtistAlbums = "artist/{artistId}/albums";
-            public const string SongsInAlbum = "album/{albumId}";
+            public const string Album = "album/{albumId}";
+            public const string SongsInAlbum = "album/songs/{albumId}";
             public const string SongDefault = "{songId}";
             public const string Search = "search";
         }

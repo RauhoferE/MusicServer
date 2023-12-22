@@ -42,6 +42,13 @@ namespace MusicServer.Controllers
         }
 
         [HttpGet]
+        [Route(ApiRoutes.Song.Album)]
+        public async Task<IActionResult> GetAlbumInfo([FromRoute, Required] Guid albumId)
+        {
+            return Ok(await this.songService.GetAlbumInformation(albumId));
+        }
+
+        [HttpGet]
         [Route(ApiRoutes.Song.SongDefault)]
         public async Task<IActionResult> GetSongInfo([FromRoute, Required] Guid songId)
         {

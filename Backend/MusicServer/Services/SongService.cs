@@ -11,7 +11,6 @@ using MusicServer.Helpers;
 using MusicServer.Interfaces;
 using System.Diagnostics;
 using System.Linq;
-using static MusicServer.Const.ApiRoutes;
 
 namespace MusicServer.Services
 {
@@ -324,6 +323,17 @@ namespace MusicServer.Services
             {
                 Users = mappedUsers
             };
+        }
+
+        public async Task<AlbumDto> GetAlbumInformation(Guid albumId)
+        {
+            var album = this._dbContext.Albums
+                .Include(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Songs)
+                .FirstOrDefault(x => x.Id == albumId) ?? throw new AlbumNotFoundException();
+
+            return this._mapper.Map<AlbumDto>(album);
         }
     }
 }

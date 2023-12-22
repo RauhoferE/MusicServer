@@ -52,6 +52,7 @@ import { MediaplayerComponent } from './components/songs/mediaplayer/mediaplayer
 import { AudioSvgComponent } from './components/svg/audio-svg/audio-svg.component';
 import { AudioOffSvgComponent } from './components/svg/audio-off-svg/audio-off-svg.component';
 import { SongQueueComponent } from './views/playlist/song-queue/song-queue.component';
+import { AlbumDetailsComponent } from './views/album/album-details/album-details.component';
 
 
 
@@ -77,7 +78,8 @@ registerLocaleData(en);
     MediaplayerComponent,
     AudioSvgComponent,
     AudioOffSvgComponent,
-    SongQueueComponent
+    SongQueueComponent,
+    AlbumDetailsComponent
   ],
   imports: [
     BrowserModule,
