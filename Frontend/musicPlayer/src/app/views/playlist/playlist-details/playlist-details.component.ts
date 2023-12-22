@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { APIROUTES } from 'src/app/constants/api-routes';
-import { PlaylistSongModelParams } from 'src/app/models/events';
+import { DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, PlaylistSongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
@@ -213,6 +213,20 @@ export class PlaylistDetailsComponent implements OnInit {
       },
       error:(error: any)=>{
         this.message.error("Error when getting queue.");
+      },
+      complete: () => {
+      }
+    });
+  }
+
+  changeSongPosition(event: DragDropSongParams) {
+    // TODO: Change so the query doesnt matter
+    this.playlistService.ChangeOrderOfSongInPlaylist(this.playlistId, event.srcIndex, event.destIndex).subscribe({
+      next:()=>{
+        this.onPaginationUpdated();
+      },
+      error:(error: any)=>{
+        this.message.error("Error when changing order of songs.");
       },
       complete: () => {
       }

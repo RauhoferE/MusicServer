@@ -10,3 +10,10 @@ export interface PlaylistSongModelParams{
     index: number;
     songModel: PlaylistSongModel;
 }
+
+export interface DragDropSongParams{
+    srcSong: PlaylistSongModel;
+    destSong: PlaylistSongModel;
+    srcIndex: number;
+    destIndex: number;
+}

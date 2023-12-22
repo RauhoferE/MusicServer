@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
-import { PlaylistSongModelParams } from 'src/app/models/events';
+import { DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
@@ -127,6 +127,11 @@ export class SongQueueComponent implements OnInit {
 
     }
     
+  }
+
+  changeSongPosition(event: DragDropSongParams) {
+    this.rxjsStorageService.pushSongToPlaceInQueue(event.srcIndex, event.destIndex);
+    this.onQueueTablePaginationUpdated();
   }
 
   get SongsModel(): PlaylistSongPaginationModel{

@@ -21,6 +21,7 @@
         [songs]="this.SongsModel"
          (paginationUpdated)="onQueueTablePaginationUpdated()"
          (playSongClicked)="onPlaySongClicked($event)"
+         (songDropped)="changeSongPosition($event)"
          [displayHeader]="false"
          [displayRemoveFromQueueOption]="true"
          [displaySearch]="false"

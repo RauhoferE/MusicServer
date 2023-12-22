@@ -6,7 +6,7 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Observable, every } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { AlbumArtistModel, ArtistShortModel } from 'src/app/models/artist-models';
-import { PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
+import { DragDropSongParams, PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
 import { GuidNameModel, PlaylistSongModel, PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { PlaylistService } from 'src/app/services/playlist.service';
@@ -38,8 +38,10 @@ export class SongTableComponent implements OnInit {
   private pagination: PaginationModel = {} as PaginationModel;
 
   @Output() paginationUpdated: EventEmitter<void> = new EventEmitter<void>();
-
+  
   @Output() playSongClicked: EventEmitter<PlaylistSongModelParams> = new EventEmitter<PlaylistSongModelParams>();
+
+  @Output() songDropped: EventEmitter<DragDropSongParams> = new EventEmitter<DragDropSongParams>();
 
   public IsLoading: Observable<boolean> = new Observable();
 
@@ -462,17 +464,31 @@ export class SongTableComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<string[]>) {
-    //this.doc.body.style.cursor = 'default';
+    console.log("drop")
     this.doc.body.classList.remove('inheritCursors');
     this.doc.body.style.cursor = 'unset'; 
+
+    if (event.currentIndex == event.previousIndex) {
+      return;
     }
 
-    drag($event: CdkDragStart<any>) {
-      console.log("drag")
-      this.doc.body.classList.add('inheritCursors');
-      this.doc.body.style.cursor = 'grabbing'; 
-      //this.doc.body.style.cursor = 'grabbing';
-      }
+    const srcSong = this.songs.songs[event.previousIndex];
+
+    const destSong = this.songs.songs[event.currentIndex];
+
+    if (!srcSong || !destSong) {
+      return;
+    }
+
+    this.songDropped.emit({ srcSong: srcSong, destSong: destSong, srcIndex: event.previousIndex, destIndex: event.currentIndex});
+  }
+
+  drag(event: CdkDragStart<any>) {
+    console.log("drag")
+    this.doc.body.classList.add('inheritCursors');
+    this.doc.body.style.cursor = 'grabbing'; 
+
+  }
 
   public get IsSongPlaying(): boolean{
     return this.isSongPlaying;
