@@ -10,3 +10,12 @@ export interface AlbumArtistModel{
     name: string;
     release: Date;
 }
+
+export interface AlbumModel{
+    id: string;
+    name: string;
+    artists: ArtistShortModel[];
+    release: Date;
+    songCount: number;
+    duration: number;
+}

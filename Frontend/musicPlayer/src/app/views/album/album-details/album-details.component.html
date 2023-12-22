@@ -1,1 +1,27 @@
-<p>album-details works!</p>
+<div>
+    <div>
+        <img [src]="getAlbumCoverSrc()" style="width: 300px; height: 300px;"/>
+
+        <h1>
+            {{this.AlbumModel.name}}
+        </h1>
+        <p >
+            <span *ngFor="let artist of this.AlbumModel.artists;let indexOfelement=index;">
+                <a [routerLink]="['/artist', artist.id]">{{artist.name}}</a> 
+                <span *ngIf="this.AlbumModel.artists.length != indexOfelement + 1">*</span> 
+            </span>
+             / {{this.TotalSongCount}} songs, {{this.AlbumModel.duration | secondsToMinute}}
+        </p>
+    </div>
+    <div>
+        <span *ngIf="this.IsSongPlaying  && this.QueueModel && this.QueueModel.type == 'album'"
+        nz-col nz-icon nzType="pause-circle" nzTheme="outline" style="font-size: 150px;" class="clickable" (click)="pauseSongs()"></span>
+        <span *ngIf="!this.IsSongPlaying || !this.QueueModel || (this.QueueModel && this.QueueModel.type != 'album')" nz-col
+         nz-icon nzType="play-circle" nzTheme="outline" style="font-size: 150px;" class="clickable" (click)="playSongs()"></span>
+    </div>
+
+    <app-song-table [songs]="this.SongsModel" 
+     (paginationUpdated)="onPaginationUpdated()" (playSongClicked)="onPlaySongClicked($event)" 
+     [disableDragDrop]="true" [displayAlbum]="false" [displaySearch]="false"
+     [sortingEnabled]="false"></app-song-table>
+</div>

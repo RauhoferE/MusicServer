@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
-import { PlaylistSongModel, PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
+import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SongService } from 'src/app/services/song.service';
@@ -13,7 +13,7 @@ import { SongService } from 'src/app/services/song.service';
 })
 export class SongQueueComponent implements OnInit {
 
-  private songsModel: PlaylistSongPaginationModel = {} as PlaylistSongPaginationModel;
+  private songsModel: SongPaginationModel = {} as SongPaginationModel;
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
@@ -32,14 +32,14 @@ export class SongQueueComponent implements OnInit {
         this.songsModel = {
           songs : [],
           totalCount : 0
-        } as PlaylistSongPaginationModel;
+        } as SongPaginationModel;
         return;
       }
 
       this.songsModel = {
         songs : x,
         totalCount : x.length
-      } as PlaylistSongPaginationModel;
+      } as SongPaginationModel;
     });
 
     this.rxjsStorageService.currentPlayingSong.subscribe(x => {
@@ -134,11 +134,11 @@ export class SongQueueComponent implements OnInit {
     this.onQueueTablePaginationUpdated();
   }
 
-  get SongsModel(): PlaylistSongPaginationModel{
+  get SongsModel(): SongPaginationModel{
     return this.songsModel;
   }
 
-  get CurrentPlayingSongModel(): PlaylistSongPaginationModel{
+  get CurrentPlayingSongModel(): SongPaginationModel{
     if (!this.currentPlayingSong.id || this.currentPlayingSong.id == '-1') {
       return {
         songs: [],

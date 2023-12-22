@@ -8,7 +8,7 @@ export interface FollowedPlaylistModel{
     creatorName: string;
 }
 
-export interface PlaylistSongPaginationModel{
+export interface SongPaginationModel{
     totalCount: number;
     songs: PlaylistSongModel[];
 }

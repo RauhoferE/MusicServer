@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
-import { PlaylistSongModel, PlaylistSongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
+import { PlaylistSongModel, SongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
@@ -20,7 +20,7 @@ export class PlaylistDetailsComponent implements OnInit {
 
   private playlistId: string = '';
 
-  private songsModel: PlaylistSongPaginationModel = {} as PlaylistSongPaginationModel;
+  private songsModel: SongPaginationModel = {} as SongPaginationModel;
 
   private userName: string = '';
 
@@ -91,7 +91,7 @@ export class PlaylistDetailsComponent implements OnInit {
     this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
       this.onPaginationUpdated();
     });
-    return;
+    
   }
 
   public onGetSongs(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
@@ -99,7 +99,7 @@ export class PlaylistDetailsComponent implements OnInit {
     const skipSongs = (page - 1) * take;
     this.rxjsStorageService.setSongTableLoadingState(true);
     this.playlistService.GetSongsFromPlaylist(skipSongs, take, sortAfter, asc, query, this.playlistId).subscribe({
-      next:(songsModel: PlaylistSongPaginationModel)=>{
+      next:(songsModel: SongPaginationModel)=>{
         songsModel.songs.forEach(element => {
           element.checked = false;
         });
@@ -152,7 +152,7 @@ export class PlaylistDetailsComponent implements OnInit {
     });
 
     this.playlistService.GetSongsFromPlaylist(0, 31, this.paginationModel.sortAfter, this.paginationModel.asc, '', this.playlistId).subscribe({
-      next:(songsModel: PlaylistSongPaginationModel)=>{
+      next:(songsModel: SongPaginationModel)=>{
         console.log(songsModel.songs)
         
         this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
@@ -203,7 +203,7 @@ export class PlaylistDetailsComponent implements OnInit {
     });
 
     this.playlistService.GetSongsFromPlaylist(skipSongs, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query, this.playlistId).subscribe({
-      next:(songsModel: PlaylistSongPaginationModel)=>{
+      next:(songsModel: SongPaginationModel)=>{
         console.log(songsModel)
         this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
         this.rxjsStorageService.setSongQueue(songsModel.songs);
@@ -266,7 +266,7 @@ export class PlaylistDetailsComponent implements OnInit {
     return this.currentPlayingSong;
   }
 
-  public get SongsModel(): PlaylistSongPaginationModel{
+  public get SongsModel(): SongPaginationModel{
     return this.songsModel;
   }
 

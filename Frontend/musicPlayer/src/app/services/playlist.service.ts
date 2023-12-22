@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ModifieablePlaylistModel, PlaylistSongPaginationModel, PlaylistUserShortModel } from '../models/playlist-models';
+import { ModifieablePlaylistModel, SongPaginationModel, PlaylistUserShortModel } from '../models/playlist-models';
 import { environment } from 'src/environments/environment';
 import { APIROUTES } from '../constants/api-routes';
 
@@ -12,14 +12,14 @@ export class PlaylistService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public GetFavorites(skip: number, take: number, sortAfter: string, asc: boolean, query: string): Observable<PlaylistSongPaginationModel>{
-    return this.httpClient.get<PlaylistSongPaginationModel>(`${environment.apiUrl}/${APIROUTES.playlist}/favorites?skip=${skip}&take=${take}&query=${query}&sortAfter=${sortAfter}&asc=${asc}`,{
+  public GetFavorites(skip: number, take: number, sortAfter: string, asc: boolean, query: string): Observable<SongPaginationModel>{
+    return this.httpClient.get<SongPaginationModel>(`${environment.apiUrl}/${APIROUTES.playlist}/favorites?skip=${skip}&take=${take}&query=${query}&sortAfter=${sortAfter}&asc=${asc}`,{
       withCredentials: true
     })
   }
 
-  public GetSongsFromPlaylist(skip: number, take: number, sortAfter: string, asc: boolean, query: string, playlistId: string): Observable<PlaylistSongPaginationModel>{
-    return this.httpClient.get<PlaylistSongPaginationModel>(`${environment.apiUrl}/${APIROUTES.playlist}/songs/${playlistId}?skip=${skip}&take=${take}&query=${query}&sortAfter=${sortAfter}&asc=${asc}`,{
+  public GetSongsFromPlaylist(skip: number, take: number, sortAfter: string, asc: boolean, query: string, playlistId: string): Observable<SongPaginationModel>{
+    return this.httpClient.get<SongPaginationModel>(`${environment.apiUrl}/${APIROUTES.playlist}/songs/${playlistId}?skip=${skip}&take=${take}&query=${query}&sortAfter=${sortAfter}&asc=${asc}`,{
       withCredentials: true
     })
   }

@@ -32,7 +32,7 @@
                 (nzCheckedChange)="checkAll($event)"></th>
                 <th nzColumnKey="order" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
                 <th nzColumnKey="name" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
-                <th nzColumnKey="album" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('album')">Album</th>
+                <th *ngIf="displayAlbum" nzColumnKey="album" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('album')">Album</th>
                 <th nzColumnKey="created">Date added</th>
                 <th nzColumnKey="isInFavorites">Favorite</th>
                 <th nzColumnKey="duration" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('duration')">Duration</th>
@@ -41,7 +41,7 @@
         </thead>
         <tbody cdkDropList (cdkDropListDropped)="drop($event)" class="drag-boundry">
             <tr *ngFor="let data of songs.songs;let indexOfelement=index;" (contextmenu)="contextMenu($event, menu, data, indexOfelement)"
-            class="song-item" cdkDrag cdkDragBoundary=".drag-boundry" cdkDragLockAxis="y" (cdkDragStarted)="drag($event)"
+            class="song-item" cdkDrag [cdkDragDisabled]="disableDragDrop" cdkDragBoundary=".drag-boundry" cdkDragLockAxis="y" (cdkDragStarted)="drag($event)"
             >
                 <td
                 *ngIf="ShowCheckbox"
@@ -77,7 +77,7 @@
                     {{data.name}}
 
                 </td>
-                <td><a [routerLink]="['/album', data.album.id]">{{data.album.name}}</a></td>
+                <td *ngIf="displayAlbum"><a [routerLink]="['/album', data.album.id]">{{data.album.name}}</a></td>
                 <td>{{data.created | date:'longDate' }}</td>
                 <td>
                     <span *ngIf="data.isInFavorites" nz-icon nzType="heart" 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { PaginationModel, QueueModel } from '../models/storage';
-import { PlaylistSongModel, PlaylistSongPaginationModel } from '../models/playlist-models';
+import { PlaylistSongModel, SongPaginationModel } from '../models/playlist-models';
 
 @Injectable({
   providedIn: 'root'
@@ -240,7 +240,7 @@ export class RxjsStorageService {
   }
 
   removeSongWithIndexFromQueue(index: number){
-    let queue = this.songqueue$.getValue() as PlaylistSongPaginationModel[];
+    let queue = this.songqueue$.getValue() as SongPaginationModel[];
 
     if (!queue) {
       return;

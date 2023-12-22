@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { DragDropSongParams, PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
-import { PlaylistSongModel, PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
+import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
@@ -16,7 +16,7 @@ import { SessionStorageService } from 'src/app/services/session-storage.service'
 })
 export class FavoritesComponent implements OnInit{
 
-  private songsModel: PlaylistSongPaginationModel = {} as PlaylistSongPaginationModel;
+  private songsModel: SongPaginationModel = {} as SongPaginationModel;
 
   private userName: string = '';
 
@@ -77,7 +77,7 @@ export class FavoritesComponent implements OnInit{
     const skipSongs = (page - 1) * take;
     this.rxjsStorageService.setSongTableLoadingState(true);
     this.playlistService.GetFavorites(skipSongs, take, sortAfter, asc, query).subscribe({
-      next:(songsModel: PlaylistSongPaginationModel)=>{
+      next:(songsModel: SongPaginationModel)=>{
         songsModel.songs.forEach(element => {
           element.checked = false;
         });
@@ -132,7 +132,7 @@ export class FavoritesComponent implements OnInit{
 
     // TODO: Change so the query doesnt matter
     this.playlistService.GetFavorites(0, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query).subscribe({
-      next:(songsModel: PlaylistSongPaginationModel)=>{
+      next:(songsModel: SongPaginationModel)=>{
         console.log(songsModel.songs)
         
         this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
@@ -184,7 +184,7 @@ export class FavoritesComponent implements OnInit{
 
     // TODO: Change so the query doesnt matter
     this.playlistService.GetFavorites(skipSongs, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query).subscribe({
-      next:(songsModel: PlaylistSongPaginationModel)=>{
+      next:(songsModel: SongPaginationModel)=>{
         console.log(songsModel)
         this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
         this.rxjsStorageService.setSongQueue(songsModel.songs);
@@ -230,7 +230,7 @@ export class FavoritesComponent implements OnInit{
     return this.currentPlayingSong;
   }
 
-  public get SongsModel(): PlaylistSongPaginationModel{
+  public get SongsModel(): SongPaginationModel{
     return this.songsModel;
   }
 

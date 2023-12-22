@@ -7,7 +7,7 @@ import { Observable, every } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { AlbumArtistModel, ArtistShortModel } from 'src/app/models/artist-models';
 import { DragDropSongParams, PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
-import { GuidNameModel, PlaylistSongModel, PlaylistSongPaginationModel } from 'src/app/models/playlist-models';
+import { GuidNameModel, PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
@@ -23,7 +23,7 @@ import { DOCUMENT } from '@angular/common';
 })
 export class SongTableComponent implements OnInit {
 
-  @Input() songs: PlaylistSongPaginationModel = {songs: [], totalCount : 0} as PlaylistSongPaginationModel;
+  @Input() songs: SongPaginationModel = {songs: [], totalCount : 0} as SongPaginationModel;
   
   @Input() sortingEnabled: boolean = true;
 
@@ -34,6 +34,10 @@ export class SongTableComponent implements OnInit {
   @Input() displayPagination: boolean = true;
 
   @Input() displaySearch: boolean = true;
+
+  @Input() displayAlbum: boolean = true;
+
+  @Input() disableDragDrop: boolean = false;
 
   private pagination: PaginationModel = {} as PaginationModel;
 
