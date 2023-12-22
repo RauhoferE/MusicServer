@@ -60,6 +60,7 @@ export class AlbumDetailsComponent implements OnInit {
     this.songService.GetAlbumDetails(this.albumId).subscribe({
       next:(albumModel: AlbumModel)=>{
         this.albumModel = albumModel;
+        console.log(new Date(this.albumModel.release))
       },
       error:(error: any)=>{
         this.message.error("Error when getting album.");
@@ -240,5 +241,9 @@ export class AlbumDetailsComponent implements OnInit {
 
   public get AlbumModel(): AlbumModel{
     return this.albumModel;
+  }
+
+  public get ReleaseDate(): Date{
+    return new Date(this.AlbumModel.release);
   }
 }

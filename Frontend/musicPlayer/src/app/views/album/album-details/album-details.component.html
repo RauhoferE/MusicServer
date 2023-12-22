@@ -10,7 +10,7 @@
                 <a [routerLink]="['/artist', artist.id]">{{artist.name}}</a> 
                 <span *ngIf="this.AlbumModel.artists.length != indexOfelement + 1">*</span> 
             </span>
-             / {{this.TotalSongCount}} songs, {{this.AlbumModel.duration | secondsToMinute}}
+             / {{this.ReleaseDate.getFullYear()}} / {{this.TotalSongCount}} songs, {{this.AlbumModel.duration | secondsToMinute}}
         </p>
     </div>
     <div>

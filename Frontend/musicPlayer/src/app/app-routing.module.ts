@@ -16,6 +16,7 @@ import { PlaylistDetailsComponent } from './views/playlist/playlist-details/play
 import { FavoritesComponent } from './views/favorites/favorites.component';
 import { SongQueueComponent } from './views/playlist/song-queue/song-queue.component';
 import { AlbumDetailsComponent } from './views/album/album-details/album-details.component';
+import { SongDetailsComponent } from './views/song/song-details/song-details.component';
 
 const routes: Routes = [
   { 
@@ -60,6 +61,10 @@ const routes: Routes = [
       {
         path: 'favorites',
         component: FavoritesComponent,
+      },
+      {
+        path:'song/:songId',
+        component: SongDetailsComponent
       },
       {
         path:'album/:albumId',

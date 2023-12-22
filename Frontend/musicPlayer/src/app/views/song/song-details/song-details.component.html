@@ -1,0 +1,22 @@
+<div>
+    <div>
+        <img [src]="getAlbumCoverSrc()" style="width: 300px; height: 300px;"/>
+
+        <h1>
+            {{this.SongModel.name}}
+        </h1>
+        <p>
+            <span *ngFor="let artist of this.SongModel.artists;let indexOfelement=index;">
+                <a [routerLink]="['/artist', artist.id]">{{artist.name}}</a> 
+                <span *ngIf="this.SongModel.artists.length != indexOfelement + 1">*</span> 
+            </span>
+            / <a [routerLink]="['/album', this.SongModel.album.id]"> {{this.SongModel.album.name}} </a> / {{this.ReleaseDate.getFullYear()}} / {{this.SongModel.duration | secondsToMinute}}
+        </p>
+    </div>
+    <div>
+        <span *ngIf="this.IsSongPlaying  && this.SongModel.id == this.CurrentPlayingSong.id"
+        nz-col nz-icon nzType="pause-circle" nzTheme="outline" style="font-size: 150px;" class="clickable" (click)="pauseSongs()"></span>
+        <span *ngIf="!this.IsSongPlaying || !this.CurrentPlayingSong || (this.SongModel.id != this.CurrentPlayingSong.id)" nz-col
+         nz-icon nzType="play-circle" nzTheme="outline" style="font-size: 150px;" class="clickable" (click)="playSongs()"></span>
+    </div>
+</div>
