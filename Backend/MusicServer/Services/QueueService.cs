@@ -88,6 +88,11 @@ namespace MusicServer.Services
             return this.mapper.Map<PlaylistSongDto[]>(queue.Select(x => x.Song).ToArray());
         }
 
+        public Task<PlaylistSongDto> GetCurrentSongInQueue()
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<PlaylistSongDto> GetNextSongInQueue()
         {
             throw new NotImplementedException();

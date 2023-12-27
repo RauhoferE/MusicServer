@@ -24,6 +24,8 @@ namespace MusicServer.Interfaces
         // 2. Randomize case -> Play every Song In Playlist once and when queue finished return some error( add all the songs from playlist randomized again)
         public Task<PlaylistSongDto> GetNextSongInQueue();
 
+        public Task<PlaylistSongDto> GetCurrentSongInQueue();
+
         public Task<PlaylistSongDto> GetPreviousSongInQueue();
 
         public Task<PlaylistSongDto[]> RandomizeQueue();
