@@ -141,6 +141,10 @@ namespace MusicServer.Mapper
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.RoleId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Role.Name));
 
+            this.CreateMap<QueueEntity, PlaylistSongDto>(MemberList.Destination)
+    .ForMember(dest => dest, opt => opt.MapFrom(ps => ps.Song))
+    .ForMember(dest => dest.Order, opt => opt.MapFrom(ps => ps.Order));
+
         }
     }
 }

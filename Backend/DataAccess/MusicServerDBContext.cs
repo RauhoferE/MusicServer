@@ -47,6 +47,8 @@ namespace DataAccess
 
         public DbSet<MessageSongId> MessageSongIds { get; set; }
 
+        public DbSet<QueueEntity> Queues { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -331,6 +333,14 @@ namespace DataAccess
                 entity.Property(n => n.Id).ValueGeneratedOnAdd();
 
                 entity.HasOne(e => e.Message);
+            });
+
+            builder.Entity<QueueEntity>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(e => e.Song).WithMany();
             });
         }
     }
