@@ -874,5 +874,18 @@ namespace MusicServer.Services
                     Playlists = this.mapper.Map<GuidNameDto[]>(playlists)
                 };
         }
+
+        public async Task<int> GetPlaylistSongCount(Guid playlistId)
+        {
+            var p = this.dBContext.Playlists.FirstOrDefault(x => x.Id == playlistId) ?? throw new PlaylistNotFoundException();
+
+            return this.dBContext.PlaylistSongs.Include(x => x.Playlist).Count(x => x.Playlist.Id == playlistId);
+        }
+
+        public async Task<int> GetFavoriteSongCount()
+        {
+            var userId = this.activeUserService.Id;
+            return this.dBContext.FavoriteSongs.Count(x => x.User.Id == userId);
+        }
     }
 }

@@ -335,5 +335,11 @@ namespace MusicServer.Services
 
             return this._mapper.Map<AlbumDto>(album);
         }
+
+        public async Task<int> GetSongCountOfAlbum(Guid albumId)
+        {
+            var a = this._dbContext.Albums.FirstOrDefault(x => x.Id == albumId) ?? throw new AlbumNotFoundException();
+            return this._dbContext.Songs.Include(x => x.Album).Count(x => x.Album.Id == albumId);
+        }
     }
 }

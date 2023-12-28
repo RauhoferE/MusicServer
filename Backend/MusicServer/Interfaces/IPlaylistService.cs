@@ -49,5 +49,9 @@ namespace MusicServer.Interfaces
         public Task ChangeOrderOfSongInPlaylist(Guid playlistId, int oldSpot, int newSpot);
 
         public Task ChangeOrderOfPlaylist(Guid playlistId, int newSpot);
+
+        public Task<int> GetPlaylistSongCount(Guid playlistId);
+
+        public Task<int> GetFavoriteSongCount();
     }
 }

@@ -16,5 +16,7 @@ namespace MusicServer.Interfaces
         public Task<SongDto> GetSongInformation(Guid songId);
 
         public Task<SearchResultDto> Search(string filter, string searchTerm, int page, int take, string sortAfter, bool asc);
+
+        public Task<int> GetSongCountOfAlbum(Guid albumId);
     }
 }
