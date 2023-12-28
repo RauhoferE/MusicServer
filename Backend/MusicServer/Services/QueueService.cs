@@ -211,7 +211,7 @@ namespace MusicServer.Services
             return await this.GetCurrentQueue();
         }
 
-        public async Task<PlaylistSongDto[]> RemoveSongsWithIndexFromQueue(List<int> indices)
+        public async Task<PlaylistSongDto[]> RemoveSongsWithIndexFromQueue(int[] indices)
         {
             var userId = this.activeUserService.Id;
             

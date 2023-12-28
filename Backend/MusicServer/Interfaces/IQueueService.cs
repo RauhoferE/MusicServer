@@ -33,7 +33,7 @@ namespace MusicServer.Interfaces
 
         public Task ClearQueue();
 
-        public Task<PlaylistSongDto[]> RemoveSongsWithIndexFromQueue(List<int> indices);
+        public Task<PlaylistSongDto[]> RemoveSongsWithIndexFromQueue(int[] indices);
 
         public Task<PlaylistSongDto[]> PushSongToIndex(int srcIndex, int targetIndex);
     }
