@@ -22,19 +22,32 @@ namespace MusicServer.Interfaces
 
         // 1. Normal case -> Play every Song In Playlist once and when queue finished return some error (add all the songs from playlist again)
         // 2. Randomize case -> Play every Song In Playlist once and when queue finished return some error( add all the songs from playlist randomized again)
-        public Task<PlaylistSongDto> GetNextSongInQueue();
+
+
+        
+        //public Task<PlaylistSongDto[]> SkipForwardInQueue();
+
+        public Task<PlaylistSongDto> SkipForwardInQueue();
+
+        //public Task<PlaylistSongDto[]> SkipForwardInQueue(int index);
+
+        public Task<PlaylistSongDto> SkipForwardInQueue(int index);
 
         public Task<PlaylistSongDto> GetCurrentSongInQueue();
 
-        public Task<PlaylistSongDto> GetPreviousSongInQueue();
+        //public Task<PlaylistSongDto[]> SkipBackInQueue();
 
-        public Task<PlaylistSongDto[]> RandomizeQueue();
+        public Task<PlaylistSongDto> SkipBackInQueue();
+
+        public Task<PlaylistSongDto[]> RandomizeQueue(SongDto[] songs);
+
+        public Task<PlaylistSongDto[]> RandomizeQueue(PlaylistSongDto[] songs);
 
         public Task<PlaylistSongDto[]> GetCurrentQueue();
 
         public Task ClearQueue();
 
-        public Task<PlaylistSongDto[]> RemoveSongWithIndexFromQueue(int index);
+        public Task<PlaylistSongDto[]> RemoveSongsWithIndexFromQueue(List<int> indices);
 
         public Task<PlaylistSongDto[]> PushSongToIndex(int srcIndex, int targetIndex);
     }
