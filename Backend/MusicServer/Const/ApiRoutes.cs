@@ -79,5 +79,20 @@
             public const string SongDefault = "{songId}";
             public const string Search = "search";
         }
+
+        public static class Queue
+        {
+            public const string Default = "";
+            public const string CreateQueue = "create/";
+            public const string CreateQueueAlbum = CreateQueue + "album/{albumId}";
+            public const string CreateQueuePlaylist = CreateQueue + "playlist/{playlistId}";
+            public const string CreateQueueFavorites = CreateQueue + "favorites";
+            public const string SkipForward = "next";
+            public const string SkipBack = "prev";
+            public const string RemoveSongsFromQueue = "remove";
+            public const string PushSongInQueue = "push";
+
+
+        }
     }
 }

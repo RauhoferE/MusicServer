@@ -6,7 +6,6 @@ using MusicServer.Entities.Requests.User;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
 using System.Collections.Generic;
-using static MusicServer.Const.ApiRoutes;
 
 namespace MusicServer.Services
 {
@@ -32,10 +31,17 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        public async Task<PlaylistSongDto[]> CreateQueue(PlaylistSongDto[] songs)
+        public async Task<PlaylistSongDto[]> CreateQueue(PlaylistSongDto[] songs, bool orderRandom)
         {
+            var rnd = new Random();
             var userId = this.activeUserService.Id;
             await this.ClearQueue();
+
+            if (orderRandom)
+            {
+                // Order items random
+                songs = songs.OrderBy(x => rnd.Next()).ToArray();
+            }
 
             for (int i = 0; i < songs.Length; i++)
             {
@@ -53,10 +59,18 @@ namespace MusicServer.Services
             return songs;
         }
 
-        public async Task<PlaylistSongDto[]> CreateQueue(SongDto[] songs)
+        public async Task<PlaylistSongDto[]> CreateQueue(SongDto[] songs, bool orderRandom)
         {
+            var rnd = new Random();
             var userId = this.activeUserService.Id;
             await this.ClearQueue();
+
+            if (orderRandom)
+            {
+                // Order items random
+                songs = songs.OrderBy(x => rnd.Next()).ToArray();
+            }
+
             List<PlaylistSongDto> mappedSongs = new List<PlaylistSongDto>();
 
             for (int i = 0; i < songs.Length; i++)
@@ -195,64 +209,6 @@ namespace MusicServer.Services
 
             await this.dbContext.SaveChangesAsync();
             return await this.GetCurrentQueue();
-        }
-
-        public async Task<PlaylistSongDto[]> RandomizeQueue(SongDto[] songs)
-        {
-            var userId = this.activeUserService.Id;
-            var rng = new Random();
-
-            await this.ClearQueue();
-
-            // Order items random
-            songs = songs.OrderBy(x => rng.Next()).ToArray();
-
-            List<PlaylistSongDto> mappedSongs = new List<PlaylistSongDto>();
-
-            for (int i = 0; i < songs.Length; i++)
-            {
-                var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == songs[i].Id) ?? throw new SongNotFoundException();
-                this.dbContext.Queues.Add(new QueueEntity()
-                {
-                    Order = i,
-                    Song = song,
-                    UserId = userId
-                });
-                var mappedSong = this.mapper.Map<PlaylistSongDto>(song);
-                mappedSong.Order = i;
-                mappedSongs.Add(mappedSong);
-            }
-
-            await this.dbContext.SaveChangesAsync();
-
-            return mappedSongs.Take(30).ToArray();
-        }
-
-        public async Task<PlaylistSongDto[]> RandomizeQueue(PlaylistSongDto[] songs)
-        {
-            var userId = this.activeUserService.Id;
-            var rng = new Random();
-
-            await this.ClearQueue();
-
-            // Order items random
-            songs = songs.OrderBy(x => rng.Next()).ToArray();
-
-            for (int i = 0; i < songs.Length; i++)
-            {
-                var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == songs[i].Id) ?? throw new SongNotFoundException();
-                this.dbContext.Queues.Add(new QueueEntity()
-                {
-                    Order = i,
-                    Song = song,
-                    UserId = userId
-                });
-                songs[i].Order = i;
-            }
-
-            await this.dbContext.SaveChangesAsync();
-
-            return songs.Take(30).ToArray();
         }
 
         public async Task<PlaylistSongDto[]> RemoveSongsWithIndexFromQueue(List<int> indices)
