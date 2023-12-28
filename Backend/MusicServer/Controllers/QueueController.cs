@@ -94,7 +94,7 @@ namespace MusicServer.Controllers
             return Ok(await this.queueService.SkipBackInQueue());
         }
 
-        [HttpPost]
+        [HttpDelete]
         [Route(ApiRoutes.Queue.RemoveSongsFromQueue)]
         public async Task<IActionResult> RemoveSongsInQueue([FromBody, Required] SongsToRemove request)
         {

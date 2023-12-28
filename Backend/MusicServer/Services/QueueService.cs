@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess;
 using DataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
 using MusicServer.Entities.DTOs;
 using MusicServer.Entities.Requests.User;
 using MusicServer.Exceptions;
@@ -82,7 +83,7 @@ namespace MusicServer.Services
                     Song = song,
                     UserId = userId
                 });
-                var mappedSong = this.mapper.Map<PlaylistSongDto>(song);
+                var mappedSong = this.mapper.Map<PlaylistSongDto>(songs[i]);
                 mappedSong.Order = i;
                 mappedSongs.Add(mappedSong);
             }
@@ -97,30 +98,64 @@ namespace MusicServer.Services
         {
             var userId = this.activeUserService.Id;
             // Only return the current and next songs in the queue
-            var queue = this.dbContext.Queues.Where(x => x.UserId == userId && x.Order > -1);
+            var queue = this.dbContext.Queues
+                .Include(x => x.Song)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Song.Album)
+                .Where(x => x.UserId == userId && x.Order > -1);
 
             if (queue.Count() == 0)
             {
                 return new PlaylistSongDto[0];
             }
 
-            return this.mapper.Map<PlaylistSongDto[]>(
-                queue.OrderBy(x => x.Order).Take(30).Select(x => x.Song).ToArray()
+            var mappedSongs = this.mapper.Map<PlaylistSongDto[]>(
+                queue.OrderBy(x => x.Order).Take(30).ToArray()
                 );
+
+            foreach (var song in mappedSongs)
+            {
+                // Check if song is in favorites
+                if (this.dbContext.FavoriteSongs.Include(x => x.User).Include(x => x.FavoriteSong).FirstOrDefault(x => x.User.Id == userId && x.FavoriteSong.Id == song.Id) != null)
+                {
+                    song.IsInFavorites = true;
+                }
+            }
+
+            return mappedSongs;
         }
 
         public async Task<PlaylistSongDto> GetCurrentSongInQueue()
         {
             var userId = this.activeUserService.Id;
-            var song = this.dbContext.Queues.FirstOrDefault(x => x.UserId == userId && x.Order == 0) ?? throw new SongNotFoundException();
+            var song = this.dbContext.Queues
+                                .Include(x => x.Song)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Song.Album)
+                .FirstOrDefault(x => x.UserId == userId && x.Order == 0) ?? throw new SongNotFoundException();
 
-            return this.mapper.Map<PlaylistSongDto>(song);
+            var mappedSong = this.mapper.Map<PlaylistSongDto>(song);
+
+            // Check if song is in favorites
+            if (this.dbContext.FavoriteSongs.Include(x => x.User).Include(x => x.FavoriteSong).FirstOrDefault(x => x.User.Id == userId && x.FavoriteSong.Id == mappedSong.Id) != null)
+            {
+                mappedSong.IsInFavorites = true;
+            }
+
+            return mappedSong;
         }
 
         public async Task<PlaylistSongDto> SkipForwardInQueue()
         {
             var userId = this.activeUserService.Id;
-            var queue = this.dbContext.Queues.Where(x => x.UserId == userId);
+            var queue = this.dbContext.Queues
+                                .Include(x => x.Song)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Song.Album)
+                .Where(x => x.UserId == userId);
 
             // IF queue is empty
             if (queue.Count() == 0)
@@ -141,7 +176,12 @@ namespace MusicServer.Services
         public async Task<PlaylistSongDto> SkipForwardInQueue(int index)
         {
             var userId = this.activeUserService.Id;
-            var queue = this.dbContext.Queues.Where(x => x.UserId == userId);
+            var queue = this.dbContext.Queues
+                                .Include(x => x.Song)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Song.Album)
+                .Where(x => x.UserId == userId);
 
             var targetSong = this.dbContext.Queues.Where(x => x.UserId == userId && x.Order == index) ?? throw new SongNotFoundException();
 
@@ -160,7 +200,12 @@ namespace MusicServer.Services
         public async Task<PlaylistSongDto> SkipBackInQueue()
         {
             var userId = this.activeUserService.Id;
-            var queue = this.dbContext.Queues.Where(x => x.UserId == userId);
+            var queue = this.dbContext.Queues
+                                .Include(x => x.Song)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Song.Album)
+                .Where(x => x.UserId == userId);
 
             if (queue.FirstOrDefault(x => x.Order != -1) == null)
             {

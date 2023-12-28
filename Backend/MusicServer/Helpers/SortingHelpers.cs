@@ -12,7 +12,7 @@ namespace MusicServer.Helpers
                   playlists = playlists
                     .Where(x => x.Name.Contains(query));
             }
-
+            
             if (asc)
             {
                 switch (sortAfter)
@@ -43,6 +43,7 @@ namespace MusicServer.Helpers
 
         public static IQueryable<PlaylistSong> SortSearchSongsInPlaylist(IQueryable<PlaylistSong> songs, bool asc, string sortAfter, string query)
         {
+            //TODO: Add Date Added
             if (query != null)
             {
                 songs = songs
@@ -99,7 +100,7 @@ namespace MusicServer.Helpers
                   .Where(x => x.FavoriteSong.Name.ToLower().Contains(query.ToLower()) ||
                         x.FavoriteSong.Artists.Where(x => x.Artist.Name.ToLower().Contains(query.ToLower())).Any());
             }
-
+            //TODO: Add Date Added
             if (sortAfter != null)
             {
                 sortAfter = sortAfter.ToLower();

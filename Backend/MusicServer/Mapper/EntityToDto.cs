@@ -69,11 +69,10 @@ namespace MusicServer.Mapper
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Artist.Name));
 
             this.CreateMap<ArtistSong, SongDto>(MemberList.Destination)
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Song.Id))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Song.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Song.Name))
                 .ForMember(dest => dest.Duration, opt => opt.MapFrom(ps => ps.Song.Length))
                 .ForMember(dest => dest.Modified, opt => opt.MapFrom(ps => ps.Song.Modified))
-                .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Song.Created))
                 .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Song.Created))
                 .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Song.Artists))
                 .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.Song.Album));
@@ -92,6 +91,12 @@ namespace MusicServer.Mapper
 
             this.CreateMap<Song, SongDto>(MemberList.Destination)
                 .ForMember(dest => dest.Duration, opt => opt.MapFrom(ps => ps.Length));
+
+            this.CreateMap<Song, PlaylistSongDto>(MemberList.Destination)
+    .ForMember(dest => dest.Duration, opt => opt.MapFrom(ps => ps.Length))
+                    .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.Album))
+                .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Artists))
+    .ForMember(dest => dest.Order, opt => opt.MapFrom(ps => -1));
 
             this.CreateMap<User, UserDto>(MemberList.Destination);
 
@@ -142,7 +147,14 @@ namespace MusicServer.Mapper
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Role.Name));
 
             this.CreateMap<QueueEntity, PlaylistSongDto>(MemberList.Destination)
-    .ForMember(dest => dest, opt => opt.MapFrom(ps => ps.Song))
+                    .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Song.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Song.Name))
+                .ForMember(dest => dest.Duration, opt => opt.MapFrom(ps => ps.Song.Length))
+                .ForMember(dest => dest.Modified, opt => opt.MapFrom(ps => ps.Song.Modified))
+                .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Song.Created))
+                .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Song.Created))
+                .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Song.Artists))
+                .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.Song.Album))
     .ForMember(dest => dest.Order, opt => opt.MapFrom(ps => ps.Order));
 
         }
