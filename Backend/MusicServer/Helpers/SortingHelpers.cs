@@ -43,7 +43,6 @@ namespace MusicServer.Helpers
 
         public static IQueryable<PlaylistSong> SortSearchSongsInPlaylist(IQueryable<PlaylistSong> songs, bool asc, string sortAfter, string query)
         {
-            //TODO: Add Date Added
             if (query != null)
             {
                 songs = songs
@@ -70,6 +69,8 @@ namespace MusicServer.Helpers
                         return songs.OrderBy(x => x.Order).ThenBy(x => x.Id);
                     case SortingElementsOwnPlaylistSongs.Album:
                         return songs.OrderBy(x => x.Song.Album.Name).ThenBy(x => x.Id);
+                    case SortingElementsOwnPlaylistSongs.DateAdded:
+                        return songs.OrderBy(x => x.Added).ThenBy(x => x.Id);
                     default:
                         return songs.OrderBy(x => x.Song.Name).ThenBy(x => x.Id);
                 }
@@ -87,6 +88,8 @@ namespace MusicServer.Helpers
                     return songs.OrderByDescending(x => x.Order).ThenBy(x => x.Id);
                 case SortingElementsOwnPlaylistSongs.Album:
                     return songs.OrderByDescending(x => x.Song.Album.Name).ThenBy(x => x.Id);
+                case SortingElementsOwnPlaylistSongs.DateAdded:
+                    return songs.OrderByDescending(x => x.Added).ThenBy(x => x.Id);
                 default:
                     return songs.OrderByDescending(x => x.Song.Name).ThenBy(x => x.Id);
             }
@@ -100,7 +103,7 @@ namespace MusicServer.Helpers
                   .Where(x => x.FavoriteSong.Name.ToLower().Contains(query.ToLower()) ||
                         x.FavoriteSong.Artists.Where(x => x.Artist.Name.ToLower().Contains(query.ToLower())).Any());
             }
-            //TODO: Add Date Added
+
             if (sortAfter != null)
             {
                 sortAfter = sortAfter.ToLower();
@@ -120,6 +123,8 @@ namespace MusicServer.Helpers
                         return songs.OrderBy(x => x.Order);
                     case SortingElementsOwnPlaylistSongs.Album:
                         return songs.OrderBy(x => x.FavoriteSong.Album.Name).ThenBy(x => x.Id);
+                    case SortingElementsOwnPlaylistSongs.DateAdded:
+                        return songs.OrderBy(x => x.Created).ThenBy(x => x.Id);
                     default:
                         return songs.OrderBy(x => x.FavoriteSong.Name).ThenBy(x => x.Id);
                 }
@@ -137,6 +142,8 @@ namespace MusicServer.Helpers
                     return songs.OrderByDescending(x => x.Order);
                 case SortingElementsOwnPlaylistSongs.Album:
                     return songs.OrderByDescending(x => x.FavoriteSong.Album.Name).ThenBy(x => x.Id);
+                case SortingElementsOwnPlaylistSongs.DateAdded:
+                    return songs.OrderByDescending(x => x.Created).ThenBy(x => x.Id);
                 default:
                     return songs.OrderByDescending(x => x.FavoriteSong.Name).ThenBy(x => x.Id);
             }
