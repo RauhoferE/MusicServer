@@ -23,6 +23,56 @@ namespace MusicServer.Controllers
             this.songService = songService;
         }
 
+        public async Task<IActionResult> CreateQueueFromAlbum()
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> CreateQueueFromPlaylist()
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> CreateQueueFromFavorites()
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> GetCurrentQueue()
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> ClearCurrentQueue()
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> GetCurrentSong()
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> SkipForwardInQueue()
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> SkipBackInQueue()
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> RemoveSongsInQueue()
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> PushSongsInQueue()
+        {
+            return Ok();
+        }
+
 
     }
 }
