@@ -5,6 +5,7 @@ export interface ApiRoutes{
     song: string;
     playlist: string;
     user: string;
+    queue: string;
 }
 
 export const APIROUTES: ApiRoutes = {
@@ -13,5 +14,6 @@ export const APIROUTES: ApiRoutes = {
     file: "file",
     playlist: "playlist",
     song: "song",
-    user: "user"
+    user: "user",
+    queue: "queue"
 }
