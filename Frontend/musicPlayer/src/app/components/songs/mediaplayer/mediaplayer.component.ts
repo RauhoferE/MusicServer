@@ -133,7 +133,7 @@ export class MediaplayerComponent implements OnInit {
         let currentSong = JSON.parse(JSON.stringify(this.currentPlayingSong)) as PlaylistSongModel;
         currentSong.isInFavorites = false;
         this.rxjsService.setCurrentPlayingSong(currentSong);
-        this.rxjsService.replaceSongInQueue(currentSong);
+        //this.rxjsService.replaceSongInQueue(currentSong);
         this.updateDashBoardAndSongTable();
       }
     });
@@ -147,7 +147,7 @@ export class MediaplayerComponent implements OnInit {
         let currentSong = JSON.parse(JSON.stringify(this.currentPlayingSong)) as PlaylistSongModel;
         currentSong.isInFavorites = true;
         this.rxjsService.setCurrentPlayingSong(currentSong);
-        this.rxjsService.replaceSongInQueue(currentSong);
+        //this.rxjsService.replaceSongInQueue(currentSong);
         this.updateDashBoardAndSongTable();
       }
 
@@ -166,14 +166,14 @@ export class MediaplayerComponent implements OnInit {
     this.rxjsService.setIsSongPlaylingState(true);
   }
 
-  public randomizePlayback(): void{
+  public async randomizePlayback(): Promise<void>{
     this.randomizePlay = !this.randomizePlay;
 
     if (!this.queueModel.type) {
       return;
     }
 
-    if (this.queueModel.type == 'favorites') {
+    if (this.queueModel.type == 'favorites' && this.randomizePlay) {
       // Randomize favorite queue
       this.queueService.RandomizeQueueFromFavorites().subscribe({
         next:(songs: PlaylistSongModel[])=>{
@@ -191,7 +191,12 @@ export class MediaplayerComponent implements OnInit {
       });
     }
 
-    if (this.queueModel.type == 'playlist') {
+    if (this.queueModel.type == 'favorites' && !this.randomizePlay) {
+      // Randomize favorite queue
+      await this.startFavoriteQueueFromStart();
+    }
+
+    if (this.queueModel.type == 'playlist' && this.randomizePlay) {
       // Randomize playlist queue
       this.queueService.RandomizeQueueFromPlaylist(this.queueModel.itemGuid).subscribe({
         next:(songs: PlaylistSongModel[])=>{
@@ -209,7 +214,12 @@ export class MediaplayerComponent implements OnInit {
       });
     }
 
-    if (this.queueModel.type == 'album') {
+    if (this.queueModel.type == 'playlist' && !this.randomizePlay) {
+      // Randomize favorite queue
+      await this.startPlaylistQueueFromStart();
+    }
+
+    if (this.queueModel.type == 'album' && this.randomizePlay) {
       // Randomize playlist queue
       this.queueService.RandomizeQueueFromAlbum(this.queueModel.itemGuid).subscribe({
         next:(songs: PlaylistSongModel[])=>{
@@ -227,9 +237,19 @@ export class MediaplayerComponent implements OnInit {
       });
     }
 
-    if (this.queueModel.type == 'song') {
+    if (this.queueModel.type == 'album' && !this.randomizePlay) {
+      // Randomize favorite queue
+      await this.startAlbumQueueFromStart();
+    }
+
+    if (this.queueModel.type == 'song' && this.randomizePlay) {
       // Randomize playlist queue
       // TODO: Implement
+    }
+
+    if (this.queueModel.type == 'song' && !this.randomizePlay) {
+      // Randomize favorite queue
+      await this.startSingleSongQueueFromStart();
     }
 
 
