@@ -32,11 +32,15 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        public async Task<PlaylistSongDto[]> CreateQueue(PlaylistSongDto[] songs, bool orderRandom)
+        public async Task<PlaylistSongDto[]> CreateQueue(PlaylistSongDto[] songs, bool orderRandom, int playFromOrder)
         {
             var rnd = new Random();
             var userId = this.activeUserService.Id;
             await this.ClearQueue();
+
+            var indexFromWhichToPlay = songs.ToList().FindIndex(x => x.Order == playFromOrder);
+
+            songs = songs.Skip(indexFromWhichToPlay).ToArray();
 
             if (orderRandom)
             {

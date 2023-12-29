@@ -10,7 +10,7 @@ namespace MusicServer.Interfaces
         // 1,2,3 -> Next Songs
         public Task<PlaylistSongDto[]> CreateQueue(SongDto[] songs, bool orderRandom);
 
-        public Task<PlaylistSongDto[]> CreateQueue(PlaylistSongDto[] songs, bool orderRandom);
+        public Task<PlaylistSongDto[]> CreateQueue(PlaylistSongDto[] songs, bool orderRandom, int playFromOrder);
 
         // 1. Normal case -> Play every Song In Playlist once and when queue finished return some error (add all the songs from playlist again)
         // 2. Randomize case -> Play every Song In Playlist once and when queue finished return some error( add all the songs from playlist randomized again)
