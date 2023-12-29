@@ -21,12 +21,11 @@ namespace MusicServer.Core.Const
         };
     }
 
-    //TODO: Why is this small??
     public static class SortingElementsOwnPlaylistSongs
     {
         public const string Name = "name";
         public const string Duration = "duration";
-        public const string DateAdded = "dateadded";
+        public const string DateAdded = "created";
         public const string Order = "order";
         public const string Artist = "artist";
         public const string Album = "album";

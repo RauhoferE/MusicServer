@@ -33,7 +33,7 @@
                 <th nzColumnKey="order" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
                 <th nzColumnKey="name" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
                 <th *ngIf="displayAlbum" nzColumnKey="album" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('album')">Album</th>
-                <th nzColumnKey="created">Date added</th>
+                <th nzColumnKey="created" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('created')">Date added</th>
                 <th nzColumnKey="isInFavorites">Favorite</th>
                 <th nzColumnKey="duration" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('duration')">Duration</th>
             </tr>
