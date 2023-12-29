@@ -28,28 +28,28 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueueAlbum)]
-        public async Task<IActionResult> CreateQueueFromAlbum(Guid albumId, [FromQuery, Required] bool randomize)
+        public async Task<IActionResult> CreateQueueFromAlbum(Guid albumId, [FromQuery, Required] bool randomize, [FromQuery]int playFromIndex = 0)
         {
             var albumSongCount = await this.songService.GetSongCountOfAlbum(albumId);
-            var albumSongs = await this.songService.GetSongsInAlbum(albumId, 0, albumSongCount);
+            var albumSongs = await this.songService.GetSongsInAlbum(albumId, playFromIndex, albumSongCount);
             return Ok(await this.queueService.CreateQueue(albumSongs.Songs, randomize));
         }
 
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueuePlaylist)]
-        public async Task<IActionResult> CreateQueueFromPlaylist(Guid playlistId, [FromQuery, Required] bool randomize, [FromQuery, Required] string sortAfter = null, [FromQuery, Required] bool asc = true)
+        public async Task<IActionResult> CreateQueueFromPlaylist(Guid playlistId, [FromQuery, Required] bool randomize, [FromQuery, Required] string sortAfter = null, [FromQuery, Required] bool asc = true, [FromQuery] int playFromIndex = 0)
         {
             var playlistSongCount = await this.playlistService.GetPlaylistSongCount(playlistId);
-            var playlistSongs = await this.playlistService.GetSongsInPlaylist(playlistId, 0, playlistSongCount, sortAfter, asc, null);
+            var playlistSongs = await this.playlistService.GetSongsInPlaylist(playlistId, playFromIndex, playlistSongCount, sortAfter, asc, null);
             return Ok(await this.queueService.CreateQueue(playlistSongs.Songs, randomize));
         }
 
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueueFavorites)]
-        public async Task<IActionResult> CreateQueueFromFavorites([FromQuery, Required] bool randomize, [FromQuery, Required] string sortAfter = null, [FromQuery, Required] bool asc = true)
+        public async Task<IActionResult> CreateQueueFromFavorites([FromQuery, Required] bool randomize, [FromQuery, Required] string sortAfter = null, [FromQuery, Required] bool asc = true, [FromQuery] int playFromIndex = 0)
         {
             var favoriteSongCount = await this.playlistService.GetFavoriteSongCount();
-            var favoriteSongs = await this.playlistService.GetFavorites(0, favoriteSongCount, sortAfter, asc, null);
+            var favoriteSongs = await this.playlistService.GetFavorites(playFromIndex, favoriteSongCount, sortAfter, asc, null);
             return Ok(await this.queueService.CreateQueue(favoriteSongs.Songs, randomize));
         }
 
