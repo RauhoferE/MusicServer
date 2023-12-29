@@ -92,9 +92,12 @@ export class AlbumDetailsComponent implements OnInit {
     this.rxjsService.setSongTableLoadingState(true);
     this.songService.GetAlbumSongs(this.albumId, skipSongs, take).subscribe({
       next:(songsModel: SongPaginationModel)=>{
-        songsModel.songs.forEach(element => {
-          element.checked = false;
-        });
+        for (let index = 0; index < songsModel.songs.length; index++) {
+          songsModel.songs[index].checked = false;
+          songsModel.songs[index].order = index;
+          
+        }
+
         this.songsModel = songsModel;
       },
       error:(error: any)=>{

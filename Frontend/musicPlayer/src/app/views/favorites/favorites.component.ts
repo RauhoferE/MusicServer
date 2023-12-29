@@ -6,6 +6,7 @@ import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
+import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SessionStorageService } from 'src/app/services/session-storage.service';
 
@@ -37,7 +38,9 @@ export class FavoritesComponent implements OnInit{
   /**
    *
    */
-  constructor(private playlistService: PlaylistService, private message: NzMessageService, 
+  constructor(private playlistService: PlaylistService,
+    private queuService: QueueService,
+     private message: NzMessageService, 
     private sessionStorage: SessionStorageService, private jwtService: JwtService,
     private rxjsStorageService: RxjsStorageService) {
     
@@ -131,15 +134,14 @@ export class FavoritesComponent implements OnInit{
     });
 
     // TODO: Change so the query doesnt matter
-    this.playlistService.GetFavorites(0, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query).subscribe({
-      next:(songsModel: SongPaginationModel)=>{
-        console.log(songsModel.songs)
+    this.queuService.CreateQueueFromFavorites(false, this.paginationModel.sortAfter, this.paginationModel.asc).subscribe({
+      next:(songs: PlaylistSongModel[])=>{
         
-        this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
-        this.rxjsStorageService.setSongQueue(songsModel.songs);
+        this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+        this.rxjsStorageService.setSongQueue(songs);
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
-        console.log(songsModel.songs)
+        console.log(songs)
       },
       error:(error: any)=>{
         this.message.error("Error when getting queue.");
