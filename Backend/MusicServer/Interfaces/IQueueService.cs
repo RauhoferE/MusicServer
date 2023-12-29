@@ -25,6 +25,8 @@ namespace MusicServer.Interfaces
 
         public Task<PlaylistSongDto> GetCurrentSongInQueue();
 
+        public Task<PlaylistSongDto> GetSongInQueueWithIndex(int index);
+
         //public Task<PlaylistSongDto[]> SkipBackInQueue();
 
         public Task<PlaylistSongDto> SkipBackInQueue();

@@ -93,7 +93,7 @@
             public const string PushSongInQueue = "push";
             public const string CurrentSong = "playing-item";
             public const string RandomizeQueue = "randomize";
-
+            public const string SongWithIndex = "song/{index}";
 
         }
     }

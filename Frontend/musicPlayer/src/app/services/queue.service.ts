@@ -66,6 +66,12 @@ export class QueueService {
     })
   }
 
+  public GetSongWithIndexFromQueue(index: number): Observable<PlaylistSongModel>{
+    return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/song?index=${index}`,{
+      withCredentials: true
+    })
+  }
+
   public ClearQueue(): Observable<object>{
     return this.httpClient.delete<object>(`${environment.apiUrl}/${APIROUTES.queue}`,{
       withCredentials: true

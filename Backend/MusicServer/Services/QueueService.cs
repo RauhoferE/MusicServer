@@ -38,9 +38,13 @@ namespace MusicServer.Services
             var userId = this.activeUserService.Id;
             await this.ClearQueue();
 
-            var indexFromWhichToPlay = songs.ToList().FindIndex(x => x.Order == playFromOrder);
+            if (playFromOrder > -1)
+            {
+                var indexFromWhichToPlay = songs.ToList().FindIndex(x => x.Order == playFromOrder);
 
-            songs = songs.Skip(indexFromWhichToPlay).ToArray();
+                songs = songs.Skip(indexFromWhichToPlay).ToArray();
+            }
+
 
             if (orderRandom)
             {
@@ -375,6 +379,32 @@ namespace MusicServer.Services
 
             await this.dbContext.SaveChangesAsync();
             return mappedSongs.ToArray();
+        }
+
+        public async Task<PlaylistSongDto> GetSongInQueueWithIndex(int index)
+        {
+            if (index - 1 < 0)
+            {
+                throw new SongNotFoundException();
+            }
+
+            var userId = this.activeUserService.Id;
+            var song = this.dbContext.Queues
+                                .Include(x => x.Song)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Song.Album)
+                .FirstOrDefault(x => x.UserId == userId && x.Order == (index - 1)) ?? throw new SongNotFoundException();
+
+            var mappedSong = this.mapper.Map<PlaylistSongDto>(song);
+
+            // Check if song is in favorites
+            if (this.dbContext.FavoriteSongs.Include(x => x.User).Include(x => x.FavoriteSong).FirstOrDefault(x => x.User.Id == userId && x.FavoriteSong.Id == mappedSong.Id) != null)
+            {
+                mappedSong.IsInFavorites = true;
+            }
+
+            return mappedSong;
         }
     }
 }

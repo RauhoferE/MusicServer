@@ -39,7 +39,7 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueuePlaylist)]
-        public async Task<IActionResult> CreateQueueFromPlaylist(Guid playlistId, [FromQuery, Required] bool randomize, [FromQuery, Required] string sortAfter = null, [FromQuery, Required] bool asc = true, [FromQuery] int playFromOrder = 0)
+        public async Task<IActionResult> CreateQueueFromPlaylist(Guid playlistId, [FromQuery, Required] bool randomize, [FromQuery] string sortAfter = null, [FromQuery] bool asc = true, [FromQuery] int playFromOrder = 0)
         {
             var playlistSongCount = await this.playlistService.GetPlaylistSongCount(playlistId);
             var playlistSongs = await this.playlistService.GetSongsInPlaylist(playlistId, 0, playlistSongCount, sortAfter, asc, null);
@@ -48,7 +48,7 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueueFavorites)]
-        public async Task<IActionResult> CreateQueueFromFavorites([FromQuery, Required] bool randomize, [FromQuery, Required] string sortAfter = null, [FromQuery, Required] bool asc = true, [FromQuery] int playFromOrder = 0)
+        public async Task<IActionResult> CreateQueueFromFavorites([FromQuery, Required] bool randomize, [FromQuery] string sortAfter = null, [FromQuery] bool asc = true, [FromQuery] int playFromOrder = 0)
         {
             var favoriteSongCount = await this.playlistService.GetFavoriteSongCount();
             var favoriteSongs = await this.playlistService.GetFavorites(0, favoriteSongCount, sortAfter, asc, null);
@@ -60,6 +60,13 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> GetCurrentQueue()
         {
             return Ok(await this.queueService.GetCurrentQueue());
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.Queue.SongWithIndex)]
+        public async Task<IActionResult> GetSongWithIndexFromQueue([FromRoute, Required] int index)
+        {
+            return Ok(await this.queueService.GetSongInQueueWithIndex(index));
         }
 
         [HttpDelete]

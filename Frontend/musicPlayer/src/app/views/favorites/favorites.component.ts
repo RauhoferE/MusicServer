@@ -118,7 +118,6 @@ export class FavoritesComponent implements OnInit{
     if (this.QueueModel &&
       this.QueueModel.type == 'favorites' && 
     this.QueueModel.asc == this.paginationModel.asc && 
-    this.QueueModel.query == this.paginationModel.query &&
     this.QueueModel.sortAfter == this.paginationModel.sortAfter) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
       return;
@@ -126,15 +125,15 @@ export class FavoritesComponent implements OnInit{
     this.rxjsStorageService.setQueueFilterAndPagination({
       asc : this.paginationModel.asc,
       page : 0,
-      take : 31,
-      query : this.paginationModel.query,
+      take : 0,
+      query : '',
       sortAfter : this.paginationModel.sortAfter,
       itemGuid : '-1',
       type : 'favorites'
     });
 
     // TODO: Change so the query doesnt matter
-    this.queueService.CreateQueueFromFavorites(false, this.paginationModel.sortAfter, this.paginationModel.asc, 0).subscribe({
+    this.queueService.CreateQueueFromFavorites(false, this.paginationModel.sortAfter, this.paginationModel.asc, -1).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
@@ -176,16 +175,16 @@ export class FavoritesComponent implements OnInit{
 
     this.rxjsStorageService.setQueueFilterAndPagination({
       asc : this.paginationModel.asc,
-      page : skipSongs,
-      take : 31,
-      query : this.paginationModel.query,
+      page : 0,
+      take : 0,
+      query : '',
       sortAfter : this.paginationModel.sortAfter,
       itemGuid : '-1',
       type : 'favorites'
     });
 
     // TODO: Change so the query doesnt matter
-    this.queueService.CreateQueueFromFavorites(false, this.paginationModel.sortAfter, this.paginationModel.asc, 0).subscribe({
+    this.queueService.CreateQueueFromFavorites(false, this.paginationModel.sortAfter, this.paginationModel.asc, event.songModel.order).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
