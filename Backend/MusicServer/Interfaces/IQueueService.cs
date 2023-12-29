@@ -36,5 +36,11 @@ namespace MusicServer.Interfaces
         public Task<PlaylistSongDto[]> RemoveSongsWithIndexFromQueue(int[] indices);
 
         public Task<PlaylistSongDto[]> PushSongToIndex(int srcIndex, int targetIndex);
+
+        // This method is called when a song is already playing and the user wants to randomize the rest of the queue
+        public Task<PlaylistSongDto[]> RandomizeQueue(PlaylistSongDto[] songs);
+
+        // This method is called when a song is already playing and the user wants to randomize the rest of the queue
+        public Task<PlaylistSongDto[]> RandomizeQueue(SongDto[] songs);
     }
 }

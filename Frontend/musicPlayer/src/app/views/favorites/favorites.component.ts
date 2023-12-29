@@ -39,7 +39,7 @@ export class FavoritesComponent implements OnInit{
    *
    */
   constructor(private playlistService: PlaylistService,
-    private queuService: QueueService,
+    private queueService: QueueService,
      private message: NzMessageService, 
     private sessionStorage: SessionStorageService, private jwtService: JwtService,
     private rxjsStorageService: RxjsStorageService) {
@@ -134,7 +134,7 @@ export class FavoritesComponent implements OnInit{
     });
 
     // TODO: Change so the query doesnt matter
-    this.queuService.CreateQueueFromFavorites(false, this.paginationModel.sortAfter, this.paginationModel.asc).subscribe({
+    this.queueService.CreateQueueFromFavorites(false, this.paginationModel.sortAfter, this.paginationModel.asc, 0).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
@@ -185,14 +185,13 @@ export class FavoritesComponent implements OnInit{
     });
 
     // TODO: Change so the query doesnt matter
-    this.playlistService.GetFavorites(skipSongs, 31, this.paginationModel.sortAfter, this.paginationModel.asc, this.paginationModel.query).subscribe({
-      next:(songsModel: SongPaginationModel)=>{
-        console.log(songsModel)
-        this.rxjsStorageService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
-        this.rxjsStorageService.setSongQueue(songsModel.songs);
+    this.queueService.CreateQueueFromFavorites(false, this.paginationModel.sortAfter, this.paginationModel.asc, 0).subscribe({
+      next:(songs: PlaylistSongModel[])=>{
+        console.log(songs)
+        this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+        this.rxjsStorageService.setSongQueue(songs);
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
-        console.log(songsModel.songs)
       },
       error:(error: any)=>{
         this.message.error("Error when getting queue.");

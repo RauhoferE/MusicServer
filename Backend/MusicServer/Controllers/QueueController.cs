@@ -26,6 +26,8 @@ namespace MusicServer.Controllers
             this.songService = songService;
         }
 
+        // TODO: Add action for only playing one song
+
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueueAlbum)]
         public async Task<IActionResult> CreateQueueFromAlbum(Guid albumId, [FromQuery, Required] bool randomize, [FromQuery]int playFromIndex = 0)
@@ -106,6 +108,40 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> PushSongsInQueue([FromQuery, Required] int srcIndex, [FromQuery, Required] int targetIndex)
         {
             return Ok(await this.queueService.PushSongToIndex(srcIndex, targetIndex));
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.Queue.RandomizeQueue)]
+        public async Task<IActionResult> RandomizeQueue([FromQuery]Guid playlistId, [FromQuery] Guid albumId, [FromQuery] Guid songId)
+        {
+            if (playlistId == Guid.Empty && albumId == Guid.Empty && songId == Guid.Empty)
+            {
+                // Get favroites
+                var favoriteSongCount = await this.playlistService.GetFavoriteSongCount();
+                var favorites = await this.playlistService.GetFavorites(0, favoriteSongCount, null, true, null);
+                return Ok(await this.queueService.RandomizeQueue(favorites.Songs));
+            }
+
+            if (playlistId != Guid.Empty)
+            {
+                // Get playlist
+                var playlistSongCount = await this.playlistService.GetPlaylistSongCount(playlistId);
+                var playlistSongs = await this.playlistService.GetSongsInPlaylist(playlistId, 0, playlistSongCount, null, true, null);
+                return Ok(await this.queueService.RandomizeQueue(playlistSongs.Songs));
+            }
+
+            if (albumId != Guid.Empty)
+            {
+                // Get Album songs
+                var albumSongCount = await this.songService.GetSongCountOfAlbum(albumId);
+                var albumSongs = await this.songService.GetSongsInAlbum(albumId, 0, albumSongCount);
+                return Ok(await this.queueService.RandomizeQueue(albumSongs.Songs));
+            }
+
+            // TOOD: Add method for only playing one song and the randomized songs are taken from the album
+
+            return BadRequest();
+
         }
 
 

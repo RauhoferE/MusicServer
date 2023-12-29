@@ -92,6 +92,7 @@
             public const string RemoveSongsFromQueue = "remove";
             public const string PushSongInQueue = "push";
             public const string CurrentSong = "playing-item";
+            public const string RandomizeQueue = "randomize";
 
 
         }
