@@ -105,6 +105,14 @@ export class QueueService {
     })
   }
 
+  public AddSongsToQueue(ids: number[]): Observable<object>{
+    return this.httpClient.post<object>(`${environment.apiUrl}/${APIROUTES.queue}/add`, {
+      SongIds: ids
+    },{
+      withCredentials: true
+    })
+  }
+
   public PushSongInQueue(srcIndex: number, targetIndex: number): Observable<PlaylistSongModel[]>{
     return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/push?srcIndex=${srcIndex}&targetIndex=${targetIndex}`,{
       withCredentials: true

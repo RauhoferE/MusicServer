@@ -3,6 +3,7 @@ using DataAccess;
 using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using MusicServer.Entities.DTOs;
+using MusicServer.Entities.Requests.Song;
 using MusicServer.Entities.Requests.User;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
@@ -411,6 +412,35 @@ namespace MusicServer.Services
             }
 
             return mappedSong;
+        }
+
+        public async Task AddSongsToQueue(Guid[] songIds)
+        {
+            var userId = this.activeUserService.Id;
+            var queue = this.dbContext.Queues
+                .Include(x => x.Song)
+                .ThenInclude(x => x.Artists)
+                .ThenInclude(x => x.Artist)
+                .Include(x => x.Song.Album)
+                .Where(x => x.UserId == userId && x.Order > -1);
+
+            foreach (var item in queue)
+            {
+                item.Order = item.Order + songIds.Length;
+            }
+
+            int order = 1;
+            foreach (var songId in songIds)
+            {
+                var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == songId) ?? throw new SongNotFoundException();
+                queue.Append(new QueueEntity()
+                {
+                    Order = order,
+                    Song = song
+                });
+            }
+
+            await this.dbContext.SaveChangesAsync();
         }
     }
 }

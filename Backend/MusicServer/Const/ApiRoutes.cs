@@ -90,6 +90,7 @@
             public const string SkipForward = "next";
             public const string SkipBack = "prev";
             public const string RemoveSongsFromQueue = "remove";
+            public const string AddSongsToQueue = "add";
             public const string PushSongInQueue = "push";
             public const string CurrentSong = "playing-item";
             public const string RandomizeQueue = "randomize";

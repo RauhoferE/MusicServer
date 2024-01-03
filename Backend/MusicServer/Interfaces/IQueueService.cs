@@ -1,4 +1,5 @@
 ﻿using MusicServer.Entities.DTOs;
+using MusicServer.Entities.Requests.Song;
 
 namespace MusicServer.Interfaces
 {
@@ -18,6 +19,8 @@ namespace MusicServer.Interfaces
         //public Task<PlaylistSongDto[]> SkipForwardInQueue();
 
         public Task<PlaylistSongDto> SkipForwardInQueue();
+
+        public Task AddSongsToQueue(Guid[] songIds);
 
         //public Task<PlaylistSongDto[]> SkipForwardInQueue(int index);
 

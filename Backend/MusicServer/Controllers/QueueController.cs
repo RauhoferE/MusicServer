@@ -110,6 +110,14 @@ namespace MusicServer.Controllers
             return Ok(await this.queueService.RemoveSongsWithIndexFromQueue(request.OrderIds));
         }
 
+        [HttpPost]
+        [Route(ApiRoutes.Queue.AddSongsToQueue)]
+        public async Task<IActionResult> AddSongsInQueue([FromBody, Required] SongsToPlaylist request)
+        {
+            await this.queueService.AddSongsToQueue(request.SongIds);
+            return Ok();
+        }
+
         [HttpGet]
         [Route(ApiRoutes.Queue.PushSongInQueue)]
         public async Task<IActionResult> PushSongsInQueue([FromQuery, Required] int srcIndex, [FromQuery, Required] int targetIndex)
