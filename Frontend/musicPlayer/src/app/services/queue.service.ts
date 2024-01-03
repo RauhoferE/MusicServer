@@ -105,7 +105,7 @@ export class QueueService {
     })
   }
 
-  public AddSongsToQueue(ids: number[]): Observable<object>{
+  public AddSongsToQueue(ids: string[]): Observable<object>{
     return this.httpClient.post<object>(`${environment.apiUrl}/${APIROUTES.queue}/add`, {
       SongIds: ids
     },{

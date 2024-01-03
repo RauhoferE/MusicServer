@@ -422,7 +422,7 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artists)
                 .ThenInclude(x => x.Artist)
                 .Include(x => x.Song.Album)
-                .Where(x => x.UserId == userId && x.Order > -1);
+                .Where(x => x.UserId == userId && x.Order > 0);
 
             foreach (var item in queue)
             {
@@ -433,11 +433,13 @@ namespace MusicServer.Services
             foreach (var songId in songIds)
             {
                 var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == songId) ?? throw new SongNotFoundException();
-                queue.Append(new QueueEntity()
+                this.dbContext.Queues.Add(new QueueEntity()
                 {
                     Order = order,
-                    Song = song
+                    Song = song,
+                    UserId = userId
                 });
+                order = order + 1;
             }
 
             await this.dbContext.SaveChangesAsync();

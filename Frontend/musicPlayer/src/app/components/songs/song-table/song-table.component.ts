@@ -15,6 +15,7 @@ import { SongService } from 'src/app/services/song.service';
 import { environment } from 'src/environments/environment';
 import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DOCUMENT } from '@angular/common';
+import { QueueService } from 'src/app/services/queue.service';
 
 @Component({
   selector: 'app-song-table',
@@ -38,6 +39,8 @@ export class SongTableComponent implements OnInit {
   @Input() displayAlbum: boolean = true;
 
   @Input() disableDragDrop: boolean = false;
+
+  @Input() showSongMediaControls: boolean = true; 
 
   private pagination: PaginationModel = {} as PaginationModel;
 
@@ -81,7 +84,9 @@ export class SongTableComponent implements OnInit {
    *
    */
   constructor(private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService,
-    private message: NzMessageService, private modal: NzModalService, private nzContextMenuService: NzContextMenuService, private songService: SongService, @Inject(DOCUMENT) private doc: Document) {
+    private message: NzMessageService, private modal: NzModalService, private nzContextMenuService: NzContextMenuService, private songService: SongService,
+    private queueService: QueueService,
+     @Inject(DOCUMENT) private doc: Document) {
     console.log("Construct")
     this.IsLoading = this.rxjsStorageService.currentSongTableLoading$;
   }
@@ -120,50 +125,92 @@ export class SongTableComponent implements OnInit {
   }
 
   removeSongFromQueue(songId: string, index: number) {
-    if (!Array.isArray(this.currentQueue)) {
-      return;
-    }
+    // if (!Array.isArray(this.currentQueue)) {
+    //   return;
+    // }
 
-    const indexOfItemToRemove = this.currentQueue.findIndex(x => x.id == songId);
+    // const indexOfItemToRemove = this.currentQueue.findIndex(x => x.id == songId);
 
-    if (indexOfItemToRemove == -1 || index != indexOfItemToRemove) {
-      return;
-    }
+    // if (indexOfItemToRemove == -1 || index != indexOfItemToRemove) {
+    //   return;
+    // }
 
-    this.rxjsStorageService.removeSongWithIndexFromQueue(index)
+    // this.rxjsStorageService.removeSongWithIndexFromQueue(index)
+
+    this.queueService.RemoveSongsFromQueue([index]).subscribe({
+      next: ()=>{
+        this.updateQueue();
+      },
+      error: (error)=>{
+        console.log("Error when removing song to queue");
+      }
+    });
   }
 
   addSongToQueue(song: PlaylistSongModel) {
-    this.rxjsStorageService.addSongToQueue(song)
+    //this.rxjsStorageService.addSongToQueue(song)
+    this.queueService.AddSongsToQueue([song.id]).subscribe({
+      next: ()=>{
+        this.updateQueue();
+      },
+      error: (error)=>{
+        console.log("Error when adding song to queue");
+      }
+    });
+    
   }
 
   // This method is only used when the queue is displayed
   removeSelectedSongsFromQueue() {
     var checkedSongs = this.songs.songs.filter(x => x.checked);
 
-    if (!Array.isArray(this.currentQueue)) {
-      this.indeterminate = false;
-      this.allChecked = false;
-      return;
-    }
+    // if (!Array.isArray(this.currentQueue)) {
+    //   this.indeterminate = false;
+    //   this.allChecked = false;
+    //   return;
+    // }
 
-    checkedSongs.forEach(element => {
-      const indexOfItemToRemove = this.songs.songs.findIndex(x => x.id == element.id && x.checked);
+    // checkedSongs.forEach(element => {
+    //   const indexOfItemToRemove = this.songs.songs.findIndex(x => x.id == element.id && x.checked);
 
-      if (indexOfItemToRemove == -1) {
-        return;
+    //   if (indexOfItemToRemove == -1) {
+    //     return;
+    //   }
+
+    //   this.rxjsStorageService.removeSongWithIndexFromQueue(indexOfItemToRemove)
+    // });
+
+    this.queueService.RemoveSongsFromQueue(checkedSongs.map(x => x.order)).subscribe({
+      next: ()=>{
+        this.updateQueue();
+      },
+      error: (error)=>{
+        console.log("Error when removing songs to queue");
+      },
+      complete: ()=>{
+        this.checkAll(false);
       }
-
-      this.rxjsStorageService.removeSongWithIndexFromQueue(indexOfItemToRemove)
     });
 
-    this.checkAll(false);
+    //this.checkAll(false);
   }
 
   addSelectedSongsToQueue() {
     var checkedSongs = this.songs.songs.filter(x => x.checked);
-    this.rxjsStorageService.addSongsToQueue(checkedSongs)
-    this.checkAll(false);
+
+    this.queueService.AddSongsToQueue(checkedSongs.map(x => x.id)).subscribe({
+      next: ()=>{
+        this.updateQueue();
+      },
+      error: (error)=>{
+        console.log("Error when adding songs to queue");
+      },
+      complete: ()=>{
+        this.checkAll(false);
+      }
+    });
+    // this.rxjsStorageService.addSongsToQueue(checkedSongs)
+    // this.checkAll(false);
   }
 
   onQueryParamsChange(event: any): void{
@@ -437,6 +484,15 @@ export class SongTableComponent implements OnInit {
 
     // Update value in rxjs so the dashboard gets updated
     this.rxjsStorageService.setUpdateDashboardBoolean(!currenState);
+  }
+
+  public updateQueue(): void{
+    let queueBool = false;
+    this.rxjsStorageService.updateQueueBoolean$.subscribe(x => {
+      queueBool = x;
+    });
+
+    this.rxjsStorageService.setUpdateQueueBoolean(!queueBool);
   }
 
   updateCurrentSong(idOfChangedSongs: string[]): void{

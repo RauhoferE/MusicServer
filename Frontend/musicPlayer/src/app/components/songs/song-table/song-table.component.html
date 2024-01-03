@@ -50,22 +50,22 @@
               ></td>
                 <td *ngIf="displayHeader" class="first-td">
                     <span id="order-id" *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || 
-                    (!this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id)">{{data.order}}</span>
+                    (!this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id) || !this.showSongMediaControls">{{data.order}}</span>
 
-                    <span *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || !this.IsSongPlaying"
+                    <span *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || !this.IsSongPlaying || !this.showSongMediaControls"
                     id="play-song-button" nz-icon nzType="play-circle" nzTheme="outline" class="clickable" (click)="playSong(data, indexOfelement)"></span>
 
-                    <span *ngIf="this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id"
+                    <span *ngIf="this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id && this.showSongMediaControls"
                      nz-icon nzType="pause-circle" nzTheme="outline" class="clickable" (click)="pauseSong()"></span>
                 </td>
                 <td *ngIf="!displayHeader" style="width: 5em;">
                     <span id="order-id" *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || 
-                    (!this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id)">{{data.order}}</span>
+                    (!this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id) || !this.showSongMediaControls">{{data.order}}</span>
 
-                    <span *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || !this.IsSongPlaying"
+                    <span *ngIf="(this.CurrentPlayingSong && this.CurrentPlayingSong.id != data.id) || !this.IsSongPlaying || !this.showSongMediaControls"
                     id="play-song-button" nz-icon nzType="play-circle" nzTheme="outline" class="clickable" (click)="playSong(data, indexOfelement)"></span>
 
-                    <span *ngIf="this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id"
+                    <span *ngIf="this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id && this.showSongMediaControls"
                      nz-icon nzType="pause-circle" nzTheme="outline" class="clickable" (click)="pauseSong()"></span>
                 </td>
                 <td>
@@ -111,7 +111,7 @@
                 </ul>
             </li>
             <li nz-menu-item id="add-queue" (click)="addSongToQueue(this.SelectedTableItem)">Add to queue</li>
-            <li nz-menu-item id="remove-queue" (click)="removeSongFromQueue(this.SelectedTableItem.id, this.SelectedTableItemIndex)" *ngIf="displayRemoveFromQueueOption">Remove from queue</li>
+            <li nz-menu-item id="remove-queue" (click)="removeSongFromQueue(this.SelectedTableItem.id, this.SelectedTableItem.order)" *ngIf="displayRemoveFromQueueOption">Remove from queue</li>
             <li nz-menu-item id="add-all-queue" (click)="addSelectedSongsToQueue()" *ngIf="this.Indeterminate || this.AllChecked">Add selected to queue</li>
             <li nz-menu-item id="rm-all-queue" (click)="removeSelectedSongsFromQueue()" *ngIf="displayRemoveFromQueueOption && (this.Indeterminate || this.AllChecked)">Remove selected from queue</li>
         </ul>
