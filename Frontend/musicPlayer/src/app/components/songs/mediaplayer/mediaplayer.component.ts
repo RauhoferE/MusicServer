@@ -275,6 +275,11 @@ export class MediaplayerComponent implements OnInit {
 
     // TODO: If song is not at 0:0 replay it from beginning otherwise do the thing under here
 
+    if (this.durationSlider > 5) {
+      this.onDurationChanged(0);
+      return;
+    }
+
     try {
       var lastPlayedSong = await lastValueFrom(this.queueService.SkipBackInQueue());
 
