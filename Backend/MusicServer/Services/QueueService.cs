@@ -171,6 +171,12 @@ namespace MusicServer.Services
                 throw new SongNotFoundException();
             }
 
+            // If there are no next songs
+            if (!queue.Any(x => x.Order > 0))
+            {
+                throw new SongNotFoundException();
+            }
+
             foreach (var queueEntity in queue)
             {
                 queueEntity.Order = queueEntity.Order + (-1);
@@ -215,7 +221,7 @@ namespace MusicServer.Services
                 .Include(x => x.Song.Album)
                 .Where(x => x.UserId == userId);
 
-            if (queue.FirstOrDefault(x => x.Order != -1) == null)
+            if (!queue.Any(x => x.Order < 0))
             {
                 // In frontend replay the current song
                 throw new SongNotFoundException();

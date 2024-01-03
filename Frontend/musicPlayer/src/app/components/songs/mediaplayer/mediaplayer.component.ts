@@ -275,8 +275,11 @@ export class MediaplayerComponent implements OnInit {
     //   return;
     // }
 
+    // TODO: If song is not at 0:0 replay it from beginning otherwise do the thing under here
+
     try {
       var lastPlayedSong = await lastValueFrom(this.queueService.SkipBackInQueue());
+
       // Add current song to queue
       this.rxjsService.addSongToQueue(this.currentPlayingSong);
       // Push song to the top of the queue
@@ -295,31 +298,6 @@ export class MediaplayerComponent implements OnInit {
   }
 
   public async playNextSong():Promise<void>{
-
-    if (this.currentQueue.length == 0 && this.queueModel.type) {
-      // No next song found
-      
-      switch (this.queueModel.type) {
-        case 'favorites':
-          await this.startFavoriteQueueFromStart();
-          break;
-        case 'playlist':
-          await this.startPlaylistQueueFromStart();
-          break;
-        case 'album':
-          await this.startAlbumQueueFromStart();
-          break;
-        case 'song':
-          await this.startSingleSongQueueFromStart();
-          break;
-        default:
-          this.audioElement.currentTime = 0;
-          return;
-      }
-
-      return;
-    }
-
     if (this.currentQueue.length == 0 && !this.queueModel.type) {
       return;
     }
@@ -329,10 +307,34 @@ export class MediaplayerComponent implements OnInit {
       //this.rxjsService.addSongToPlayed(this.currentPlayingSong);
       this.rxjsService.setCurrentPlayingSong(nextSong);
       this.rxjsService.removeSongWithIndexFromQueue(0);
+
     } catch (error) {
+
+      if (this.queueModel.type) {
+        switch (this.queueModel.type) {
+          case 'favorites':
+            await this.startFavoriteQueueFromStart();
+            break;
+          case 'playlist':
+            await this.startPlaylistQueueFromStart();
+            break;
+          case 'album':
+            await this.startAlbumQueueFromStart();
+            break;
+          case 'song':
+            await this.startSingleSongQueueFromStart();
+            break;
+          default:
+            this.audioElement.currentTime = 0;
+            return;
+        }
+
+        return;
+      }
+
+
       // Shouldn't happen as we check it above
       this.audioElement.currentTime = 0;
-      return;
     }
 
     try {
@@ -340,7 +342,7 @@ export class MediaplayerComponent implements OnInit {
       var lastSong = await lastValueFrom(this.queueService.GetSongWithIndexFromQueue(30));
       this.rxjsService.addSongToQueue(lastSong);
     } catch (error) {
-      // If there isnt a last song then a badrequest will be returned so don't add anything
+      // If there are no more next songs don't add anything
     }
 
     // const nextSong = this.CurrentQueue[0];
