@@ -47,14 +47,12 @@ export class MediaplayerComponent implements OnInit {
       this.durationSlider = Math.round(this.audioElement.currentTime);
     });
 
-    this.audioElement.addEventListener("ended", () => {
-      if (this.CurrentQueue.length > 0) {
-        this.playNextSong();
-        return;
-      }
+    this.audioElement.addEventListener("ended", async () => {
+      await this.playNextSong();
 
-      this.audioElement.currentTime = 0;
-      this.rxjsService.setIsSongPlaylingState(false);
+      // TODO: Put the below code in the playNextSong() Method when you implement the loop song/playlist feature
+      // this.audioElement.currentTime = 0;
+      // this.rxjsService.setIsSongPlaylingState(false);
     });
 
   }
@@ -286,6 +284,8 @@ export class MediaplayerComponent implements OnInit {
       this.rxjsService.pushSongToPlaceInQueue(this.currentQueue.length - 1, 0);
       // Set last played song as current
       this.rxjsService.setCurrentPlayingSong(lastPlayedSong);
+
+      this.updateQueue();
     } catch (error) {
       // If there is no previous song restart current one
       this.audioElement.currentTime = 0;
@@ -307,7 +307,7 @@ export class MediaplayerComponent implements OnInit {
       //this.rxjsService.addSongToPlayed(this.currentPlayingSong);
       this.rxjsService.setCurrentPlayingSong(nextSong);
       this.rxjsService.removeSongWithIndexFromQueue(0);
-
+      this.updateQueue();
     } catch (error) {
 
       if (this.queueModel.type) {
@@ -337,13 +337,14 @@ export class MediaplayerComponent implements OnInit {
       this.audioElement.currentTime = 0;
     }
 
-    try {
-      // Get the last song of the queue, so the queue stays populated
-      var lastSong = await lastValueFrom(this.queueService.GetSongWithIndexFromQueue(30));
-      this.rxjsService.addSongToQueue(lastSong);
-    } catch (error) {
-      // If there are no more next songs don't add anything
-    }
+    // try {
+    //   // Get the last song of the queue, so the queue stays populated
+    //   var lastSong = await lastValueFrom(this.queueService.GetSongWithIndexFromQueue(30));
+    //   this.rxjsService.addSongToQueue(lastSong);
+    //   this.updateQueue();
+    // } catch (error) {
+    //   // If there are no more next songs don't add anything
+    // }
 
     // const nextSong = this.CurrentQueue[0];
     // this.rxjsService.addSongToPlayed(this.currentPlayingSong);
@@ -358,7 +359,7 @@ export class MediaplayerComponent implements OnInit {
       this.rxjsService.setCurrentPlayingSong(queue.splice(0,1)[0]);
       this.rxjsService.setSongQueue(queue);
       this.rxjsService.setIsSongPlaylingState(true);
-
+      this.updateQueue();
     } catch (error) {
       console.log(error);
     }
@@ -371,7 +372,7 @@ export class MediaplayerComponent implements OnInit {
       this.rxjsService.setCurrentPlayingSong(queue.splice(0,1)[0]);
       this.rxjsService.setSongQueue(queue);
       this.rxjsService.setIsSongPlaylingState(true);
-
+      this.updateQueue();
     } catch (error) {
       console.log(error);
     }
@@ -383,7 +384,7 @@ export class MediaplayerComponent implements OnInit {
       this.rxjsService.setCurrentPlayingSong(queue.splice(0,1)[0]);
       this.rxjsService.setSongQueue(queue);
       this.rxjsService.setIsSongPlaylingState(true);
-
+      this.updateQueue();
     } catch (error) {
       console.log(error);
     }
@@ -421,6 +422,15 @@ export class MediaplayerComponent implements OnInit {
     });
 
     this.rxjsService.setUpdateCurrentTableBoolean(!tableBool);
+  }
+
+  public updateQueue(): void{
+    let queueBool = false;
+    this.rxjsService.updateQueueBoolean$.subscribe(x => {
+      queueBool = x;
+    });
+
+    this.rxjsService.setUpdateQueueBoolean(!queueBool);
   }
 
   get SongUrl(): string{

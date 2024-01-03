@@ -6,7 +6,7 @@
         <app-song-table
         [songs]="this.CurrentPlayingSongModel"
          (paginationUpdated)="onCurrentSongPaginationUpdated()"
-         (playSongClicked)="onPlaySongClicked($event)"
+         (playSongClicked)="resumeSong($event)"
          [displayHeader]="false"
          [displayPagination]="false"
          [displaySearch]="false"

@@ -19,6 +19,9 @@ export class RxjsStorageService {
   private updateCurrentTableState$ = new BehaviorSubject<any>({});
   updateCurrentTableBoolean$ = this.updateCurrentTableState$.asObservable();
 
+  private updateQueueState$ = new BehaviorSubject<any>({});
+  updateQueueBoolean$ = this.updateQueueState$.asObservable();
+
   private isSongPlayingChangedState$ = new BehaviorSubject<any>(false);
   isSongPlayingState = this.isSongPlayingChangedState$.asObservable();
 
@@ -57,6 +60,10 @@ export class RxjsStorageService {
 
   setUpdateCurrentTableBoolean(val: boolean){
     this.updateCurrentTableState$.next(val);
+  }
+
+  setUpdateQueueBoolean(val: boolean){
+    this.updateQueueState$.next(val);
   }
 
   setIsSongPlaylingState(isPlayling: boolean){
