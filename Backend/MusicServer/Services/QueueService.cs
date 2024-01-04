@@ -76,7 +76,17 @@ namespace MusicServer.Services
             var userId = this.activeUserService.Id;
             await this.ClearQueue();
 
-            if (orderRandom)
+            if (orderRandom && playFromOrder > -1)
+            {
+                var songToAppend = songs[playFromOrder];
+
+                songs = songs.Where(x => x.Id != songToAppend.Id).ToArray();
+                // Order items random
+                songs = songs.OrderBy(x => rnd.Next()).ToArray();
+                songs = songs.Prepend(songToAppend).ToArray();
+            }
+
+            if (orderRandom && playFromOrder == -1)
             {
                 // Order items random
                 songs = songs.OrderBy(x => rnd.Next()).ToArray();
