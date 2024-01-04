@@ -6,6 +6,7 @@ import { AlbumModel } from 'src/app/models/artist-models';
 import { PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, SongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
+import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SessionStorageService } from 'src/app/services/session-storage.service';
 import { SongService } from 'src/app/services/song.service';
@@ -47,7 +48,8 @@ export class AlbumDetailsComponent implements OnInit {
    */
   constructor(private route: ActivatedRoute, private rxjsService: RxjsStorageService, private songService: SongService,
     private message: NzMessageService, 
-    private sessionStorage: SessionStorageService) {
+    private sessionStorage: SessionStorageService,
+    private queueService: QueueService) {
 
     this.rxjsService.setCurrentPaginationSongModel(this.paginationModel);
     
@@ -129,8 +131,8 @@ export class AlbumDetailsComponent implements OnInit {
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
       this.QueueModel.type == 'album' && 
+      this.QueueModel.itemGuid == this.albumId &&
     this.QueueModel.asc == this.paginationModel.asc && 
-    this.QueueModel.query == this.paginationModel.query &&
     this.QueueModel.sortAfter == this.paginationModel.sortAfter) {
       this.rxjsService.setIsSongPlaylingState(true);
       return;
@@ -138,23 +140,22 @@ export class AlbumDetailsComponent implements OnInit {
     this.rxjsService.setQueueFilterAndPagination({
       asc : this.paginationModel.asc,
       page : 0,
-      take : 31,
-      query : this.paginationModel.query,
+      take : 0,
+      query : '',
       sortAfter : this.paginationModel.sortAfter,
       itemGuid : this.albumId,
       // TOOD: Replace with interface
       type : 'album'
     });
 
-    this.songService.GetAlbumSongs(this.albumId, 0, 31).subscribe({
-      next:(songsModel: SongPaginationModel)=>{
-        console.log(songsModel.songs)
+    this.queueService.CreateQueueFromAlbum(this.albumId, false,-1).subscribe({
+      next:(songs: PlaylistSongModel[])=>{
+        console.log(songs)
         
-        this.rxjsService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
-        this.rxjsService.setSongQueue(songsModel.songs);
+        this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+        //this.rxjsService.setSongQueue(songs.songs);
         this.rxjsService.setIsSongPlaylingState(true);
         this.rxjsService.showMediaPlayer(true);
-        console.log(songsModel.songs)
       },
       error:(error: any)=>{
         this.message.error("Error when getting queue.");
@@ -189,22 +190,23 @@ export class AlbumDetailsComponent implements OnInit {
 
     this.rxjsService.setQueueFilterAndPagination({
       asc : this.paginationModel.asc,
-      page : skipSongs,
-      take : 31,
-      query : this.paginationModel.query,
+      page : 0,
+      take : 0,
+      query : '',
       sortAfter : this.paginationModel.sortAfter,
       itemGuid : this.albumId,
       type : 'album'
     });
 
-    this.songService.GetAlbumSongs(this.albumId, skipSongs, 31).subscribe({
-      next:(songsModel: SongPaginationModel)=>{
-        console.log(songsModel)
-        this.rxjsService.setCurrentPlayingSong(songsModel.songs.splice(0,1)[0]);
-        this.rxjsService.setSongQueue(songsModel.songs);
+    console.log(event.songModel.order)
+
+    this.queueService.CreateQueueFromAlbum(this.albumId, false, event.songModel.order).subscribe({
+      next:(songs: PlaylistSongModel[])=>{
+        console.log(songs)
+        this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+        //this.rxjsService.setSongQueue(songs.songs);
         this.rxjsService.setIsSongPlaylingState(true);
         this.rxjsService.showMediaPlayer(true);
-        console.log(songsModel.songs)
       },
       error:(error: any)=>{
         this.message.error("Error when getting queue.");

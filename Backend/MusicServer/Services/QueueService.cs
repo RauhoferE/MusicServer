@@ -69,7 +69,7 @@ namespace MusicServer.Services
             return songs;
         }
 
-        public async Task<PlaylistSongDto[]> CreateQueue(SongDto[] songs, bool orderRandom)
+        public async Task<PlaylistSongDto[]> CreateQueue(SongDto[] songs, bool orderRandom, int playFromOrder)
         {
             var rnd = new Random();
             var userId = this.activeUserService.Id;
@@ -81,26 +81,27 @@ namespace MusicServer.Services
                 songs = songs.OrderBy(x => rnd.Next()).ToArray();
             }
 
-            List<PlaylistSongDto> mappedSongs = new List<PlaylistSongDto>();
+            int subtractFromOrder = 0;
+
+            if (playFromOrder != -1 && !orderRandom)
+            {
+                subtractFromOrder = 0 - playFromOrder;
+            }
 
             for (int i = 0; i < songs.Length; i++)
             {
                 var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == songs[i].Id) ?? throw new SongNotFoundException();
                 this.dbContext.Queues.Add(new QueueEntity()
                 {
-                    Order = i,
+                    Order = i + subtractFromOrder,
                     Song = song,
                     UserId = userId
                 });
-                var mappedSong = this.mapper.Map<PlaylistSongDto>(songs[i]);
-                mappedSong.Order = i;
-                mappedSongs.Add(mappedSong);
             }
 
             await this.dbContext.SaveChangesAsync();
 
-            // Return only the first 30
-            return mappedSongs.OrderBy(x => x.Order).Take(30).ToArray(); ;
+            return await this.GetCurrentQueue();
         }
 
         public async Task<PlaylistSongDto[]> GetCurrentQueue()

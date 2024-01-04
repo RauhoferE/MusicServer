@@ -9,7 +9,7 @@ namespace MusicServer.Interfaces
         // -1, -2, -3 -> Previous played songs
         // 0 -> Current Song
         // 1,2,3 -> Next Songs
-        public Task<PlaylistSongDto[]> CreateQueue(SongDto[] songs, bool orderRandom);
+        public Task<PlaylistSongDto[]> CreateQueue(SongDto[] songs, bool orderRandom, int playFromOrder);
 
         public Task<PlaylistSongDto[]> CreateQueue(PlaylistSongDto[] songs, bool orderRandom, int playFromOrder);
 

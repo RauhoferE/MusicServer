@@ -183,7 +183,6 @@ export class FavoritesComponent implements OnInit{
       type : 'favorites'
     });
 
-    // TODO: Change so the query doesnt matter
     this.queueService.CreateQueueFromFavorites(false, this.paginationModel.sortAfter, this.paginationModel.asc, event.songModel.order).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)

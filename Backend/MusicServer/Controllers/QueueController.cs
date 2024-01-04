@@ -33,8 +33,8 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> CreateQueueFromAlbum(Guid albumId, [FromQuery, Required] bool randomize, [FromQuery]int playFromIndex = 0)
         {
             var albumSongCount = await this.songService.GetSongCountOfAlbum(albumId);
-            var albumSongs = await this.songService.GetSongsInAlbum(albumId, playFromIndex, albumSongCount);
-            return Ok(await this.queueService.CreateQueue(albumSongs.Songs, randomize));
+            var albumSongs = await this.songService.GetSongsInAlbum(albumId, 0, albumSongCount);
+            return Ok(await this.queueService.CreateQueue(albumSongs.Songs, randomize, playFromIndex));
         }
 
         [HttpGet]
