@@ -39,6 +39,7 @@ namespace MusicServer.Services
             var userId = this.activeUserService.Id;
             await this.ClearQueue();
 
+            // TODO: Change this so it looks like the createalbum method
             if (playFromOrder > -1)
             {
                 var indexFromWhichToPlay = songs.ToList().FindIndex(x => x.Order == playFromOrder);

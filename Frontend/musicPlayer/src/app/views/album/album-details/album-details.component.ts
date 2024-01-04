@@ -198,9 +198,7 @@ export class AlbumDetailsComponent implements OnInit {
       type : 'album'
     });
 
-    console.log(event.songModel.order)
-
-    this.queueService.CreateQueueFromAlbum(this.albumId, false, event.songModel.order).subscribe({
+    this.queueService.CreateQueueFromAlbum(this.albumId, false, skipSongs).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
