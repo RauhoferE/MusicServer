@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { firstValueFrom } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
+import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, SongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
@@ -138,7 +139,7 @@ export class PlaylistDetailsComponent implements OnInit {
 
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
-      this.QueueModel.type == 'playlist' && 
+      this.QueueModel.type == QUEUETYPES.playlist && 
       this.QueueModel.itemGuid == this.playlistId) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
       return;
@@ -152,7 +153,7 @@ export class PlaylistDetailsComponent implements OnInit {
       query : '',
       sortAfter : paginationModel.sortAfter,
       itemGuid : this.playlistId,
-      type : 'playlist'
+      type : QUEUETYPES.playlist
     });
 
     this.queueService.CreateQueueFromPlaylist(this.playlistId, false, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
@@ -203,7 +204,7 @@ export class PlaylistDetailsComponent implements OnInit {
       query : '',
       sortAfter : paginationModel.sortAfter,
       itemGuid : this.playlistId,
-      type : 'playlist'
+      type : QUEUETYPES.playlist
     });
 
     this.queueService.CreateQueueFromPlaylist(this.playlistId, false, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({

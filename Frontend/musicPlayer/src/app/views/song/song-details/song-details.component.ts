@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { APIROUTES } from 'src/app/constants/api-routes';
+import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { QueueModel } from 'src/app/models/storage';
 import { QueueService } from 'src/app/services/queue.service';
@@ -80,7 +81,7 @@ export class SongDetailsComponent implements OnInit {
       query : '',
       sortAfter : '',
       itemGuid : this.songId,
-      type : 'song'
+      type : QUEUETYPES.song
     });
 
     this.queueService.CreateQueueFromSingleSong(this.songId, false).subscribe({

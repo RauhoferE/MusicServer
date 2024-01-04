@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { firstValueFrom, lastValueFrom } from 'rxjs';
+import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { DragDropSongParams, PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
 import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
@@ -116,7 +117,7 @@ export class FavoritesComponent implements OnInit{
 
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
-      this.QueueModel.type == 'favorites') {
+      this.QueueModel.type == QUEUETYPES.favorites) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
       return;
     }
@@ -129,7 +130,7 @@ export class FavoritesComponent implements OnInit{
       query : '',
       sortAfter : paginationModel.sortAfter,
       itemGuid : '-1',
-      type : 'favorites'
+      type : QUEUETYPES.favorites
     });
 
     this.queueService.CreateQueueFromFavorites(false, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
@@ -181,7 +182,7 @@ export class FavoritesComponent implements OnInit{
       query : '',
       sortAfter : paginationModel.sortAfter,
       itemGuid : '-1',
-      type : 'favorites'
+      type : QUEUETYPES.favorites
     });
 
     this.queueService.CreateQueueFromFavorites(false, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({

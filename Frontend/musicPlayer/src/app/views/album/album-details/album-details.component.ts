@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { APIROUTES } from 'src/app/constants/api-routes';
+import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { AlbumModel } from 'src/app/models/artist-models';
 import { PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, SongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
@@ -130,7 +131,7 @@ export class AlbumDetailsComponent implements OnInit {
 
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
-      this.QueueModel.type == 'album' && 
+      this.QueueModel.type == QUEUETYPES.album && 
       this.QueueModel.itemGuid == this.albumId) {
       this.rxjsService.setIsSongPlaylingState(true);
       return;
@@ -143,7 +144,7 @@ export class AlbumDetailsComponent implements OnInit {
       sortAfter : this.paginationModel.sortAfter,
       itemGuid : this.albumId,
       // TOOD: Replace with interface
-      type : 'album'
+      type : QUEUETYPES.album
     });
 
     this.queueService.CreateQueueFromAlbum(this.albumId, false,-1).subscribe({
@@ -192,7 +193,7 @@ export class AlbumDetailsComponent implements OnInit {
       query : '',
       sortAfter : this.paginationModel.sortAfter,
       itemGuid : this.albumId,
-      type : 'album'
+      type : QUEUETYPES.album
     });
 
     this.queueService.CreateQueueFromAlbum(this.albumId, false, skipSongs).subscribe({

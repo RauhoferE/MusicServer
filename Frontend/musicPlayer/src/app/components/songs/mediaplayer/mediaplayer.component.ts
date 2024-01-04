@@ -3,6 +3,7 @@ import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core'
 import { lastValueFrom } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { LoopMode } from 'src/app/constants/loop-modes';
+import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { PlaylistSongModel } from 'src/app/models/playlist-models';
 import { QueueModel } from 'src/app/models/storage';
 import { PlaylistService } from 'src/app/services/playlist.service';
@@ -160,7 +161,7 @@ export class MediaplayerComponent implements OnInit {
       return;
     }
 
-    if (this.queueModel.type == 'favorites' && this.randomizePlay) {
+    if (this.queueModel.type == QUEUETYPES.favorites && this.randomizePlay) {
       // Randomize favorite queue
       this.queueService.RandomizeQueueFromFavorites().subscribe({
         next:(songs: PlaylistSongModel[])=>{
@@ -177,12 +178,12 @@ export class MediaplayerComponent implements OnInit {
       });
     }
 
-    if (this.queueModel.type == 'favorites' && !this.randomizePlay) {
+    if (this.queueModel.type == QUEUETYPES.favorites && !this.randomizePlay) {
       // Randomize favorite queue
       await this.startFavoriteQueueFromStart();
     }
 
-    if (this.queueModel.type == 'playlist' && this.randomizePlay) {
+    if (this.queueModel.type == QUEUETYPES.playlist && this.randomizePlay) {
       // Randomize playlist queue
       this.queueService.RandomizeQueueFromPlaylist(this.queueModel.itemGuid).subscribe({
         next:(songs: PlaylistSongModel[])=>{
@@ -199,12 +200,12 @@ export class MediaplayerComponent implements OnInit {
       });
     }
 
-    if (this.queueModel.type == 'playlist' && !this.randomizePlay) {
+    if (this.queueModel.type == QUEUETYPES.playlist && !this.randomizePlay) {
       // Randomize favorite queue
       await this.startPlaylistQueueFromStart();
     }
 
-    if (this.queueModel.type == 'album' && this.randomizePlay) {
+    if (this.queueModel.type == QUEUETYPES.album && this.randomizePlay) {
       // Randomize playlist queue
       this.queueService.RandomizeQueueFromAlbum(this.queueModel.itemGuid).subscribe({
         next:(songs: PlaylistSongModel[])=>{
@@ -221,12 +222,12 @@ export class MediaplayerComponent implements OnInit {
       });
     }
 
-    if (this.queueModel.type == 'album' && !this.randomizePlay) {
+    if (this.queueModel.type == QUEUETYPES.album && !this.randomizePlay) {
       // Randomize favorite queue
       await this.startAlbumQueueFromStart();
     }
 
-    if (this.queueModel.type == 'song' && this.randomizePlay) {
+    if (this.queueModel.type == QUEUETYPES.song && this.randomizePlay) {
       // Randomize playlist queue
       this.queueService.RandomizeQueueFromSingleSong(this.queueModel.itemGuid).subscribe({
         next:(songs: PlaylistSongModel[])=>{
@@ -243,7 +244,7 @@ export class MediaplayerComponent implements OnInit {
       });
     }
 
-    if (this.queueModel.type == 'song' && !this.randomizePlay) {
+    if (this.queueModel.type == QUEUETYPES.song && !this.randomizePlay) {
       // Randomize favorite queue
       await this.startSingleSongQueueFromStart();
     }
@@ -294,16 +295,16 @@ export class MediaplayerComponent implements OnInit {
 
       if (this.queueModel.type) {
         switch (this.queueModel.type) {
-          case 'favorites':
+          case QUEUETYPES.favorites:
             await this.startFavoriteQueueFromStart();
             break;
-          case 'playlist':
+          case QUEUETYPES.playlist:
             await this.startPlaylistQueueFromStart();
             break;
-          case 'album':
+          case QUEUETYPES.album:
             await this.startAlbumQueueFromStart();
             break;
-          case 'song':
+          case QUEUETYPES.song:
             await this.startSingleSongQueueFromStart();
             break;
           default:
