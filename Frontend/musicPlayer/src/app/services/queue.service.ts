@@ -18,6 +18,12 @@ export class QueueService {
     })
   }
 
+  public CreateQueueFromSingleSong(songId: string): Observable<PlaylistSongModel[]>{
+    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/create/song/${songId}`,{
+      withCredentials: true
+    })
+  }
+
   public CreateQueueFromPlaylist(playlistId: string, randomize: boolean, sortAfter: string, asc: boolean, playFromOrder: number): Observable<PlaylistSongModel[]>{
     return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/create/playlist/${playlistId}?randomize=${randomize}&sortAfter=${sortAfter}&asc=${asc}&playFromOrder=${playFromOrder}`,{
       withCredentials: true

@@ -87,6 +87,7 @@
             public const string CreateQueueAlbum = CreateQueue + "album/{albumId}";
             public const string CreateQueuePlaylist = CreateQueue + "playlist/{playlistId}";
             public const string CreateQueueFavorites = CreateQueue + "favorites";
+            public const string CreateQueueSingleSong = CreateQueue + "song/{songId}";
             public const string SkipForward = "next";
             public const string SkipBack = "prev";
             public const string RemoveSongsFromQueue = "remove";

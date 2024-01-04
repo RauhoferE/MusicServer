@@ -4,6 +4,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { QueueModel } from 'src/app/models/storage';
+import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SongService } from 'src/app/services/song.service';
 import { environment } from 'src/environments/environment';
@@ -31,7 +32,7 @@ export class SongDetailsComponent implements OnInit {
    */
   constructor(private route: ActivatedRoute, 
     private songService: SongService, private message: NzMessageService, 
-    private rxjsStorageService: RxjsStorageService) {
+    private rxjsStorageService: RxjsStorageService, private queueService: QueueService) {
     
       if (!this.route.snapshot.paramMap.has('songId')) {
         console.log("Playlist id not found");
@@ -72,10 +73,36 @@ export class SongDetailsComponent implements OnInit {
       return;
     }
 
-    this.rxjsStorageService.setCurrentPlayingSong(this.songModel);
-    this.rxjsStorageService.setSongQueue([]);
-    this.rxjsStorageService.setIsSongPlaylingState(true);
-    this.rxjsStorageService.showMediaPlayer(true);
+    this.rxjsStorageService.setQueueFilterAndPagination({
+      asc : true,
+      page : 0,
+      take : 0,
+      query : '',
+      sortAfter : '',
+      itemGuid : this.songId,
+      type : 'song'
+    });
+
+    this.queueService.CreateQueueFromSingleSong(this.songId).subscribe({
+      next:(songs: PlaylistSongModel[])=>{
+        
+        this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+        //this.rxjsStorageService.setSongQueue(songs);
+        this.rxjsStorageService.setIsSongPlaylingState(true);
+        this.rxjsStorageService.showMediaPlayer(true);
+        console.log(songs)
+      },
+      error:(error: any)=>{
+        this.message.error("Error when getting queue.");
+      },
+      complete: () => {
+      }
+    });
+
+    // this.rxjsStorageService.setCurrentPlayingSong(this.songModel);
+    // //this.rxjsStorageService.setSongQueue([]);
+    // this.rxjsStorageService.setIsSongPlaylingState(true);
+    // this.rxjsStorageService.showMediaPlayer(true);
   }
 
   public pauseSongs() {

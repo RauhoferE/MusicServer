@@ -26,8 +26,6 @@ namespace MusicServer.Controllers
             this.songService = songService;
         }
 
-        // TODO: Add action for only playing one song
-
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueueAlbum)]
         public async Task<IActionResult> CreateQueueFromAlbum(Guid albumId, [FromQuery, Required] bool randomize, [FromQuery]int playFromIndex = 0)
@@ -53,6 +51,14 @@ namespace MusicServer.Controllers
             var favoriteSongCount = await this.playlistService.GetFavoriteSongCount();
             var favoriteSongs = await this.playlistService.GetFavorites(0, favoriteSongCount, sortAfter, asc, null);
             return Ok(await this.queueService.CreateQueue(favoriteSongs.Songs, randomize, playFromOrder));
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.Queue.CreateQueueSingleSong)]
+        public async Task<IActionResult> CreateQueueFromSingleSong(Guid songId)
+        {
+            var song = await this.songService.GetSongInformation(songId);
+            return Ok(await this.queueService.CreateQueue(new[] {song} , false, -1));
         }
 
         [HttpGet]
