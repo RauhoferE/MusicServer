@@ -39,19 +39,29 @@ namespace MusicServer.Services
             var userId = this.activeUserService.Id;
             await this.ClearQueue();
 
-            // TODO: Change this so it looks like the createalbum method
-            if (playFromOrder > -1)
+            if (orderRandom && playFromOrder > -1)
             {
                 var indexFromWhichToPlay = songs.ToList().FindIndex(x => x.Order == playFromOrder);
+                var songToAppend = songs[indexFromWhichToPlay];
 
-                songs = songs.Skip(indexFromWhichToPlay).ToArray();
+                songs = songs.Where(x => x.Id != songToAppend.Id).ToArray();
+                // Order items random
+                songs = songs.OrderBy(x => rnd.Next()).ToArray();
+                songs = songs.Prepend(songToAppend).ToArray();
             }
 
-
-            if (orderRandom)
+            if (orderRandom && playFromOrder == -1)
             {
                 // Order items random
                 songs = songs.OrderBy(x => rnd.Next()).ToArray();
+            }
+
+            int subtractFromOrder = 0;
+
+            if (playFromOrder != -1 && !orderRandom)
+            {
+                var indexFromWhichToPlay = songs.ToList().FindIndex(x => x.Order == playFromOrder);
+                subtractFromOrder = 0 - indexFromWhichToPlay;
             }
 
             for (int i = 0; i < songs.Length; i++)
@@ -59,15 +69,14 @@ namespace MusicServer.Services
                 var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == songs[i].Id) ?? throw new SongNotFoundException();
                 this.dbContext.Queues.Add(new QueueEntity()
                 {
-                    Order = i,
+                    Order = i + subtractFromOrder,
                     Song = song,
                     UserId = userId
                 });
-                songs[i].Order = i;
             }
 
             await this.dbContext.SaveChangesAsync();
-            return songs;
+            return await this.GetCurrentQueue();
         }
 
         public async Task<PlaylistSongDto[]> CreateQueue(SongDto[] songs, bool orderRandom, int playFromOrder)

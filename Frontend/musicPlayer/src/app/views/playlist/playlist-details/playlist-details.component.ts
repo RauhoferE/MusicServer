@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { firstValueFrom } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, SongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
@@ -56,7 +57,8 @@ export class PlaylistDetailsComponent implements OnInit {
     if (savedPagination) {
       // Save pagination from session storage in rxjs storage
       // This is done 
-      this.rxjsStorageService.setCurrentPaginationSongModel(savedPagination);
+      //this.rxjsStorageService.setCurrentPaginationSongModel(savedPagination);
+      this.paginationModel = savedPagination;
     }
 
     this.rxjsStorageService.setCurrentPaginationSongModel(this.paginationModel);
@@ -67,6 +69,7 @@ export class PlaylistDetailsComponent implements OnInit {
     }
 
     this.playlistId = this.route.snapshot.paramMap.get('playlistId') as string;
+    console.log(this.playlistId)
     this.playlistService.GetPlaylistInfo(this.playlistId).subscribe({
       next:(playlistModel: PlaylistUserShortModel)=>{
         this.playlistModel = playlistModel;
@@ -130,29 +133,29 @@ export class PlaylistDetailsComponent implements OnInit {
       pModel.asc, pModel.query);
   }
 
-  public playSongs(): void{
+  public async playSongs(): Promise<void>{
     console.log("Play songs")
 
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
       this.QueueModel.type == 'playlist' && 
-      this.QueueModel.itemGuid == this.playlistId &&
-    this.QueueModel.asc == this.paginationModel.asc && 
-    this.QueueModel.sortAfter == this.paginationModel.sortAfter) {
+      this.QueueModel.itemGuid == this.playlistId) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
       return;
     }
+    const paginationModel = await this.getCurrentPaginationModel();
+
     this.rxjsStorageService.setQueueFilterAndPagination({
-      asc : this.paginationModel.asc,
+      asc : paginationModel.asc,
       page : 0,
       take : 0,
       query : '',
-      sortAfter : this.paginationModel.sortAfter,
+      sortAfter : paginationModel.sortAfter,
       itemGuid : this.playlistId,
       type : 'playlist'
     });
 
-    this.queueService.CreateQueueFromPlaylist(this.playlistId, false, this.paginationModel.sortAfter, this.paginationModel.asc, -1).subscribe({
+    this.queueService.CreateQueueFromPlaylist(this.playlistId, false, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         
@@ -174,7 +177,7 @@ export class PlaylistDetailsComponent implements OnInit {
     this.rxjsStorageService.setIsSongPlaylingState(false);
   }
 
-  public onPlaySongClicked(event: PlaylistSongModelParams): void{
+  public async onPlaySongClicked(event: PlaylistSongModelParams): Promise<void>{
     console.log(event);
     const indexOfSong = event.index;
     const songModel = event.songModel;
@@ -190,19 +193,21 @@ export class PlaylistDetailsComponent implements OnInit {
       return;
     }
 
+    const paginationModel = await this.getCurrentPaginationModel();
+
     const skipSongs = ((this.paginationModel.page - 1) * this.paginationModel.take) + indexOfSong;
 
     this.rxjsStorageService.setQueueFilterAndPagination({
-      asc : this.paginationModel.asc,
+      asc : paginationModel.asc,
       page : 0,
       take : 0,
       query : '',
-      sortAfter : this.paginationModel.sortAfter,
+      sortAfter : paginationModel.sortAfter,
       itemGuid : this.playlistId,
       type : 'playlist'
     });
 
-    this.queueService.CreateQueueFromPlaylist(this.playlistId, false, this.paginationModel.sortAfter, this.paginationModel.asc, event.songModel.order).subscribe({
+    this.queueService.CreateQueueFromPlaylist(this.playlistId, false, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
@@ -230,6 +235,18 @@ export class PlaylistDetailsComponent implements OnInit {
       complete: () => {
       }
     });
+  }
+
+  private async getCurrentPaginationModel(): Promise<PaginationModel>{
+    let pModel = {} as PaginationModel;
+
+    try {
+      pModel = await firstValueFrom(this.rxjsStorageService.currentPaginationSongModel$);
+    } catch (error) {
+      
+    }
+
+    return pModel;
   }
 
   public getCreatorName(): string{

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { DragDropSongParams, PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
 import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
@@ -51,7 +52,8 @@ export class FavoritesComponent implements OnInit{
       if (savedPagination) {
         // Save pagination from session storage in rxjs storage
         // This is done 
-        this.rxjsStorageService.setCurrentPaginationSongModel(savedPagination);
+        //this.rxjsStorageService.setCurrentPaginationSongModel(savedPagination);
+        this.paginationModel = savedPagination;
       }
   
       this.rxjsStorageService.setCurrentPaginationSongModel(this.paginationModel);
@@ -111,33 +113,32 @@ export class FavoritesComponent implements OnInit{
       pModel.asc, pModel.query);
   }
 
-  public playSongs(): void{
+  public async playSongs(): Promise<void>{
     console.log("Play songs")
 
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
-      this.QueueModel.type == 'favorites' && 
-    this.QueueModel.asc == this.paginationModel.asc && 
-    this.QueueModel.sortAfter == this.paginationModel.sortAfter) {
+      this.QueueModel.type == 'favorites') {
       this.rxjsStorageService.setIsSongPlaylingState(true);
       return;
     }
+    const paginationModel = await this.getCurrentPaginationModel();
+
     this.rxjsStorageService.setQueueFilterAndPagination({
-      asc : this.paginationModel.asc,
+      asc : paginationModel.asc,
       page : 0,
       take : 0,
       query : '',
-      sortAfter : this.paginationModel.sortAfter,
+      sortAfter : paginationModel.sortAfter,
       itemGuid : '-1',
       type : 'favorites'
     });
 
-    // TODO: Change so the query doesnt matter
-    this.queueService.CreateQueueFromFavorites(false, this.paginationModel.sortAfter, this.paginationModel.asc, -1).subscribe({
+    this.queueService.CreateQueueFromFavorites(false, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-        this.rxjsStorageService.setSongQueue(songs);
+        //this.rxjsStorageService.setSongQueue(songs);
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
         console.log(songs)
@@ -155,7 +156,7 @@ export class FavoritesComponent implements OnInit{
     this.rxjsStorageService.setIsSongPlaylingState(false);
   }
 
-  public onPlaySongClicked(event: PlaylistSongModelParams): void{
+  public async onPlaySongClicked(event: PlaylistSongModelParams): Promise<void>{
     console.log(event);
     const indexOfSong = event.index;
     const songModel = event.songModel;
@@ -171,23 +172,26 @@ export class FavoritesComponent implements OnInit{
       return;
     }
 
+
     const skipSongs = ((this.paginationModel.page - 1) * this.paginationModel.take) + indexOfSong;
 
+    const paginationModel = await this.getCurrentPaginationModel();
+
     this.rxjsStorageService.setQueueFilterAndPagination({
-      asc : this.paginationModel.asc,
+      asc : paginationModel.asc,
       page : 0,
       take : 0,
       query : '',
-      sortAfter : this.paginationModel.sortAfter,
+      sortAfter : paginationModel.sortAfter,
       itemGuid : '-1',
       type : 'favorites'
     });
 
-    this.queueService.CreateQueueFromFavorites(false, this.paginationModel.sortAfter, this.paginationModel.asc, event.songModel.order).subscribe({
+    this.queueService.CreateQueueFromFavorites(false, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-        this.rxjsStorageService.setSongQueue(songs);
+        //this.rxjsStorageService.setSongQueue(songs);
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
       },
@@ -200,7 +204,6 @@ export class FavoritesComponent implements OnInit{
   }
 
   changeSongPosition(event: DragDropSongParams) {
-    // TODO: Change so the query doesnt matter
     this.playlistService.ChangeOrderOfSongInFavorites(event.srcIndex, event.destIndex).subscribe({
       next:()=>{
         this.onPaginationUpdated();
@@ -211,6 +214,18 @@ export class FavoritesComponent implements OnInit{
       complete: () => {
       }
     });
+  }
+
+  private async getCurrentPaginationModel(): Promise<PaginationModel>{
+    let pModel = {} as PaginationModel;
+
+    try {
+      pModel = await firstValueFrom(this.rxjsStorageService.currentPaginationSongModel$);
+    } catch (error) {
+      
+    }
+
+    return pModel;
   }
 
   public getUserHref(): string{
