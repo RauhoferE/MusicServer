@@ -2,7 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
-import { LoopMode } from 'src/app/constants/loop-modes';
+import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { PlaylistSongModel } from 'src/app/models/playlist-models';
 import { QueueModel } from 'src/app/models/storage';
@@ -30,7 +30,7 @@ export class MediaplayerComponent implements OnInit {
 
   public loopAudio: boolean = false;
 
-  public loopMode: string = LoopMode.none;
+  public loopMode: string = LOOPMODES.none;
 
   public mutedAudio: boolean = false;
 
@@ -478,15 +478,15 @@ export class MediaplayerComponent implements OnInit {
   }
 
   get LoopModeNone(): string{
-    return LoopMode.none;
+    return LOOPMODES.none;
   }
 
   get LoopModeAudio(): string{
-    return LoopMode.audio;
+    return LOOPMODES.audio;
   }
 
   get LoopModePlaylist(): string{
-    return LoopMode.playlist;
+    return LOOPMODES.playlist;
   }
 
   get CurrentLoopMode(): string{
