@@ -2,6 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
+import { LoopMode } from 'src/app/constants/loop-modes';
 import { PlaylistSongModel } from 'src/app/models/playlist-models';
 import { QueueModel } from 'src/app/models/storage';
 import { PlaylistService } from 'src/app/services/playlist.service';
@@ -22,13 +23,15 @@ export class MediaplayerComponent implements OnInit {
 
   private queueModel: QueueModel = {} as QueueModel;
 
-  private currentQueue: PlaylistSongModel[] = [];
+  //private currentQueue: PlaylistSongModel[] = [];
 
   public volumePercent: number = 100;
 
   public durationSlider: number = 0;
 
   public loopAudio: boolean = false;
+
+  public loopMode: string = LoopMode.none;
 
   public mutedAudio: boolean = false;
 
@@ -104,9 +107,9 @@ export class MediaplayerComponent implements OnInit {
 
 
 
-    this.rxjsService.currentSongQueue.subscribe(x => {
-      this.currentQueue = x;
-    });
+    // this.rxjsService.currentSongQueue.subscribe(x => {
+    //   this.currentQueue = x;
+    // });
   }
 
   public onDurationChanged(value: any){
@@ -177,7 +180,7 @@ export class MediaplayerComponent implements OnInit {
         next:(songs: PlaylistSongModel[])=>{
           console.log(songs)
           this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-          this.rxjsService.setSongQueue(songs);
+          //this.rxjsService.setSongQueue(songs);
           // Update possible queue view
           this.updateSongTable();
         },
@@ -200,7 +203,7 @@ export class MediaplayerComponent implements OnInit {
         next:(songs: PlaylistSongModel[])=>{
           console.log(songs)
           this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-          this.rxjsService.setSongQueue(songs);
+          //this.rxjsService.setSongQueue(songs);
           // Update possible queue view
           this.updateSongTable();
         },
@@ -223,7 +226,7 @@ export class MediaplayerComponent implements OnInit {
         next:(songs: PlaylistSongModel[])=>{
           console.log(songs)
           this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-          this.rxjsService.setSongQueue(songs);
+          //this.rxjsService.setSongQueue(songs);
           // Update possible queue view
           this.updateSongTable();
         },
@@ -273,8 +276,14 @@ export class MediaplayerComponent implements OnInit {
     //   return;
     // }
 
-    // TODO: If song is not at 0:0 replay it from beginning otherwise do the thing under here
+    // If the audio loop then restart song
+    if (this.loopAudio) {
+      this.audioElement.currentTime = 0;
+      return;
+    }
 
+    
+    // If song is not at 0:0 replay it from beginning otherwise do the thing under here
     if (this.durationSlider > 5) {
       this.onDurationChanged(0);
       return;
@@ -284,9 +293,9 @@ export class MediaplayerComponent implements OnInit {
       var lastPlayedSong = await lastValueFrom(this.queueService.SkipBackInQueue());
 
       // Add current song to queue
-      this.rxjsService.addSongToQueue(this.currentPlayingSong);
+      //this.rxjsService.addSongToQueue(this.currentPlayingSong);
       // Push song to the top of the queue
-      this.rxjsService.pushSongToPlaceInQueue(this.currentQueue.length - 1, 0);
+      //this.rxjsService.pushSongToPlaceInQueue(this.currentQueue.length - 1, 0);
       // Set last played song as current
       this.rxjsService.setCurrentPlayingSong(lastPlayedSong);
 
@@ -303,7 +312,13 @@ export class MediaplayerComponent implements OnInit {
   }
 
   public async playNextSong():Promise<void>{
-    if (this.currentQueue.length == 0 && !this.queueModel.type) {
+    // if (this.currentQueue.length == 0 && !this.queueModel.type) {
+    //   return;
+    // }
+
+    // If the audio loop then restart song
+    if (this.loopAudio) {
+      this.audioElement.currentTime = 0;
       return;
     }
 
@@ -311,7 +326,7 @@ export class MediaplayerComponent implements OnInit {
       var nextSong = await lastValueFrom(this.queueService.SkipForwardInQueue(-1));
       //this.rxjsService.addSongToPlayed(this.currentPlayingSong);
       this.rxjsService.setCurrentPlayingSong(nextSong);
-      this.rxjsService.removeSongWithIndexFromQueue(0);
+      //this.rxjsService.removeSongWithIndexFromQueue(0);
       this.updateQueue();
     } catch (error) {
 
@@ -362,8 +377,8 @@ export class MediaplayerComponent implements OnInit {
     try {
       var queue = await lastValueFrom(this.queueService.CreateQueueFromFavorites(this.randomizePlay, this.queueModel.sortAfter, this.queueModel.asc, -1));
       this.rxjsService.setCurrentPlayingSong(queue.splice(0,1)[0]);
-      this.rxjsService.setSongQueue(queue);
-      this.rxjsService.setIsSongPlaylingState(true);
+      //this.rxjsService.setSongQueue(queue);
+      this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist);
       this.updateQueue();
     } catch (error) {
       console.log(error);
@@ -375,8 +390,8 @@ export class MediaplayerComponent implements OnInit {
     try {
       var queue = await lastValueFrom(this.queueService.CreateQueueFromPlaylist(this.queueModel.itemGuid, this.randomizePlay, this.queueModel.sortAfter, this.queueModel.asc, -1));
       this.rxjsService.setCurrentPlayingSong(queue.splice(0,1)[0]);
-      this.rxjsService.setSongQueue(queue);
-      this.rxjsService.setIsSongPlaylingState(true);
+      //this.rxjsService.setSongQueue(queue);
+      this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist);
       this.updateQueue();
     } catch (error) {
       console.log(error);
@@ -387,8 +402,8 @@ export class MediaplayerComponent implements OnInit {
     try {
       var queue = await lastValueFrom(this.queueService.CreateQueueFromAlbum(this.queueModel.itemGuid, this.randomizePlay, -1));
       this.rxjsService.setCurrentPlayingSong(queue.splice(0,1)[0]);
-      this.rxjsService.setSongQueue(queue);
-      this.rxjsService.setIsSongPlaylingState(true);
+      //this.rxjsService.setSongQueue(queue);
+      this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist);
       this.updateQueue();
     } catch (error) {
       console.log(error);
@@ -400,7 +415,26 @@ export class MediaplayerComponent implements OnInit {
   }
 
   public loopPlayback(): void{
-    this.loopAudio = !this.loopAudio;
+
+    // Check the current loop mode
+    switch (this.loopMode) {
+      case this.LoopModeNone:
+        this.loopMode = this.LoopModePlaylist;
+        this.loopAudio = false;
+        break;
+      case this.LoopModeAudio:
+        this.loopMode = this.LoopModeNone;
+        this.loopAudio = false;
+        break;
+      case this.LoopModePlaylist:
+        this.loopMode = this.LoopModeAudio;
+        this.loopAudio = true;
+        break;
+      default:
+        break;
+    }
+
+    
     this.audioElement.loop = this.loopAudio;
   }
 
@@ -486,11 +520,23 @@ export class MediaplayerComponent implements OnInit {
     return this.queueModel;
   }
 
-  get CurrentQueue(): PlaylistSongModel[]{
-    return this.currentQueue;
-  }
-
   get AudioVolume(): number{
     return this.volumePercent / 100;
+  }
+
+  get LoopModeNone(): string{
+    return LoopMode.none;
+  }
+
+  get LoopModeAudio(): string{
+    return LoopMode.audio;
+  }
+
+  get LoopModePlaylist(): string{
+    return LoopMode.playlist;
+  }
+
+  get CurrentLoopMode(): string{
+    return this.loopMode;
   }
 }

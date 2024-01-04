@@ -19,8 +19,9 @@
             <span nz-col *ngIf="!this.IsSongPlaying" style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="play-circle" nzTheme="outline" (click)="playPauseSong()"></span>
             <span nz-col *ngIf="this.IsSongPlaying" style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="pause-circle" nzTheme="outline" (click)="playPauseSong()"></span>
             <span nz-col style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="step-forward" nzTheme="outline" (click)="playNextSong()"></span>
-            <span nz-col *ngIf="!this.loopAudio" style="justify-content: center;" class="clickable" nz-icon nzSpan="4" nzType="retweet" nzTheme="outline" (click)="loopPlayback()"></span>
-            <span nz-col *ngIf="this.loopAudio" style="justify-content: center;" class="clicked-color clickable" nz-icon nzSpan="4" nzType="retweet" nzTheme="outline" (click)="loopPlayback()"></span>
+            <app-audio-loop *ngIf="this.CurrentLoopMode == this.LoopModeNone" style="width: 1em; height: 1em;justify-content: center;" class="clickable" nz-icon nzSpan="4" (click)="loopPlayback()"/>
+            <app-audio-loop *ngIf="this.CurrentLoopMode == this.LoopModePlaylist" style="width: 1em; height: 1em;justify-content: center;" class="clicked-color clickable" nz-icon nzSpan="4" (click)="loopPlayback()"/>
+            <app-audio-loop-one *ngIf="this.CurrentLoopMode == this.LoopModeAudio" style="width: 1em; height: 1em;justify-content: center;" class="clicked-color clickable" nz-icon nzSpan="4" (click)="loopPlayback()"/>
         </div>
         <div nz-row style="font-size: 150%;">
             <span nz-col nzSpan="2">{{this.durationSlider | secondsToMinute}}</span>

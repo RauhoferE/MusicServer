@@ -54,6 +54,8 @@ import { AudioOffSvgComponent } from './components/svg/audio-off-svg/audio-off-s
 import { SongQueueComponent } from './views/playlist/song-queue/song-queue.component';
 import { AlbumDetailsComponent } from './views/album/album-details/album-details.component';
 import { SongDetailsComponent } from './views/song/song-details/song-details.component';
+import { AudioLoopComponent } from './components/svg/audio-loop/audio-loop.component';
+import { AudioLoopOneComponent } from './components/svg/audio-loop-one/audio-loop-one.component';
 
 
 
@@ -81,7 +83,9 @@ registerLocaleData(en);
     AudioOffSvgComponent,
     SongQueueComponent,
     AlbumDetailsComponent,
-    SongDetailsComponent
+    SongDetailsComponent,
+    AudioLoopComponent,
+    AudioLoopOneComponent
   ],
   imports: [
     BrowserModule,

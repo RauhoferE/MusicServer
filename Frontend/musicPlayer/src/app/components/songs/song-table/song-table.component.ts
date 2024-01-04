@@ -77,8 +77,6 @@ export class SongTableComponent implements OnInit {
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
-  private currentQueue: PlaylistSongModel[] = [];
-
 
   /**
    *
@@ -108,10 +106,6 @@ export class SongTableComponent implements OnInit {
       this.currentPlayingSong = x;
     });
 
-    this.rxjsStorageService.currentSongQueue.subscribe(x => {
-      this.currentQueue = x;
-    });
-
     console.log("Set pag")
     this.pagination = pModel;
     console.log(this.songs);
@@ -125,17 +119,6 @@ export class SongTableComponent implements OnInit {
   }
 
   removeSongFromQueue(songId: string, index: number) {
-    // if (!Array.isArray(this.currentQueue)) {
-    //   return;
-    // }
-
-    // const indexOfItemToRemove = this.currentQueue.findIndex(x => x.id == songId);
-
-    // if (indexOfItemToRemove == -1 || index != indexOfItemToRemove) {
-    //   return;
-    // }
-
-    // this.rxjsStorageService.removeSongWithIndexFromQueue(index)
 
     this.queueService.RemoveSongsFromQueue([index]).subscribe({
       next: ()=>{
@@ -163,22 +146,6 @@ export class SongTableComponent implements OnInit {
   // This method is only used when the queue is displayed
   removeSelectedSongsFromQueue() {
     var checkedSongs = this.songs.songs.filter(x => x.checked);
-
-    // if (!Array.isArray(this.currentQueue)) {
-    //   this.indeterminate = false;
-    //   this.allChecked = false;
-    //   return;
-    // }
-
-    // checkedSongs.forEach(element => {
-    //   const indexOfItemToRemove = this.songs.songs.findIndex(x => x.id == element.id && x.checked);
-
-    //   if (indexOfItemToRemove == -1) {
-    //     return;
-    //   }
-
-    //   this.rxjsStorageService.removeSongWithIndexFromQueue(indexOfItemToRemove)
-    // });
 
     this.queueService.RemoveSongsFromQueue(checkedSongs.map(x => x.order)).subscribe({
       next: ()=>{
