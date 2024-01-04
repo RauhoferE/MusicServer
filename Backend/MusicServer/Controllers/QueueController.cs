@@ -55,10 +55,20 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueueSingleSong)]
-        public async Task<IActionResult> CreateQueueFromSingleSong(Guid songId)
+        public async Task<IActionResult> CreateQueueFromSingleSong(Guid songId, [FromQuery, Required] bool randomize)
         {
             var song = await this.songService.GetSongInformation(songId);
+
+            if (randomize)
+            {
+                var albumCount = await this.songService.GetSongCountOfAlbum(song.Album.Id);
+                var albumSongs = await this.songService.GetSongsInAlbum(song.Album.Id, 0, albumCount);
+                albumSongs.Songs = albumSongs.Songs.Where(x => x.Id != songId).Prepend(song).ToArray();
+                return Ok(await this.queueService.CreateQueue(albumSongs.Songs, randomize, 0));
+            }
+
             return Ok(await this.queueService.CreateQueue(new[] {song} , false, -1));
+
         }
 
         [HttpGet]
@@ -159,7 +169,13 @@ namespace MusicServer.Controllers
                 return Ok(await this.queueService.RandomizeQueue(albumSongs.Songs));
             }
 
-            // TOOD: Add method for only playing one song and the randomized songs are taken from the album
+            if (songId != Guid.Empty)
+            {
+                var songDetails = await this.songService.GetSongInformation(songId);
+                var albumSongCount = await this.songService.GetSongCountOfAlbum(songDetails.Album.Id);
+                var albumSongs = await this.songService.GetSongsInAlbum(songDetails.Album.Id, 0, albumSongCount);
+                return Ok(await this.queueService.RandomizeQueue(albumSongs.Songs));
+            }
 
             return BadRequest();
 

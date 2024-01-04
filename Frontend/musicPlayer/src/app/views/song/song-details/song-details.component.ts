@@ -83,7 +83,7 @@ export class SongDetailsComponent implements OnInit {
       type : 'song'
     });
 
-    this.queueService.CreateQueueFromSingleSong(this.songId).subscribe({
+    this.queueService.CreateQueueFromSingleSong(this.songId, false).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);

@@ -18,8 +18,8 @@ export class QueueService {
     })
   }
 
-  public CreateQueueFromSingleSong(songId: string): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/create/song/${songId}`,{
+  public CreateQueueFromSingleSong(songId: string, randomize: boolean): Observable<PlaylistSongModel[]>{
+    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/create/song/${songId}?randomize=${randomize}`,{
       withCredentials: true
     })
   }
@@ -38,6 +38,12 @@ export class QueueService {
 
   public RandomizeQueueFromAlbum(albumId: string): Observable<PlaylistSongModel[]>{
     return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?albumId=${albumId}`,{
+      withCredentials: true
+    })
+  }
+
+  public RandomizeQueueFromSingleSong(songId: string): Observable<PlaylistSongModel[]>{
+    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?songId=${songId}`,{
       withCredentials: true
     })
   }
