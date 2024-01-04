@@ -160,7 +160,6 @@ export class PlaylistDetailsComponent implements OnInit {
         console.log(songs)
         
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-        //this.rxjsStorageService.setSongQueue(songs);
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
       },
@@ -211,7 +210,6 @@ export class PlaylistDetailsComponent implements OnInit {
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-        //this.rxjsStorageService.setSongQueue(songs.songs);
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
       },

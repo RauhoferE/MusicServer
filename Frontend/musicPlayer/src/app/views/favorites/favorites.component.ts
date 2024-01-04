@@ -87,8 +87,6 @@ export class FavoritesComponent implements OnInit{
           element.checked = false;
         });
         this.songsModel = songsModel;
-        // this.rxjsStorageService.replaceSongsInQueue(this.songsModel.songs);
-        // this.rxjsStorageService.checkFoReplaceingCurrentPlayingSong(this.songsModel.songs);
       },
       error:(error: any)=>{
         this.message.error("Error when getting favorites.");
@@ -138,7 +136,6 @@ export class FavoritesComponent implements OnInit{
       next:(songs: PlaylistSongModel[])=>{
         
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-        //this.rxjsStorageService.setSongQueue(songs);
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
         console.log(songs)
@@ -191,7 +188,6 @@ export class FavoritesComponent implements OnInit{
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-        //this.rxjsStorageService.setSongQueue(songs);
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
       },

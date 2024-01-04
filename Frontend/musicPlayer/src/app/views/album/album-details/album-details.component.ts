@@ -131,9 +131,7 @@ export class AlbumDetailsComponent implements OnInit {
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
       this.QueueModel.type == 'album' && 
-      this.QueueModel.itemGuid == this.albumId &&
-    this.QueueModel.asc == this.paginationModel.asc && 
-    this.QueueModel.sortAfter == this.paginationModel.sortAfter) {
+      this.QueueModel.itemGuid == this.albumId) {
       this.rxjsService.setIsSongPlaylingState(true);
       return;
     }
@@ -153,7 +151,6 @@ export class AlbumDetailsComponent implements OnInit {
         console.log(songs)
         
         this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-        //this.rxjsService.setSongQueue(songs.songs);
         this.rxjsService.setIsSongPlaylingState(true);
         this.rxjsService.showMediaPlayer(true);
       },
@@ -202,7 +199,6 @@ export class AlbumDetailsComponent implements OnInit {
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-        //this.rxjsService.setSongQueue(songs.songs);
         this.rxjsService.setIsSongPlaylingState(true);
         this.rxjsService.showMediaPlayer(true);
       },

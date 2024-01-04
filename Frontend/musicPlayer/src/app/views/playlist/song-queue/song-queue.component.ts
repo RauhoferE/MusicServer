@@ -18,8 +18,6 @@ export class SongQueueComponent implements OnInit {
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
-  //private queueModel: QueueModel = undefined as any;
-
   private isSongPlaying: boolean = false;
 
   /**
@@ -30,21 +28,6 @@ export class SongQueueComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.rxjsStorageService.currentSongQueue.subscribe(x => {
-    //   if (!Array.isArray(x)) {
-    //     this.songsModel = {
-    //       songs : [],
-    //       totalCount : 0
-    //     } as SongPaginationModel;
-    //     return;
-    //   }
-
-    //   this.songsModel = {
-    //     songs : x,
-    //     totalCount : x.length
-    //   } as SongPaginationModel;
-    // });
-
     this.rxjsStorageService.updateQueueBoolean$.subscribe(x => {
       this.onQueueTablePaginationUpdated();
     });
@@ -52,10 +35,6 @@ export class SongQueueComponent implements OnInit {
     this.rxjsStorageService.currentPlayingSong.subscribe(x => {
       this.currentPlayingSong = x;
     });
-
-    // this.rxjsStorageService.currentQueueFilterAndPagination.subscribe(x => {
-    //   this.queueModel = x;
-    // });
 
     this.rxjsStorageService.isSongPlayingState.subscribe(x => {
       this.isSongPlaying = x;
@@ -69,20 +48,6 @@ export class SongQueueComponent implements OnInit {
   
   async onQueueTablePaginationUpdated() {
     this.rxjsStorageService.setSongTableLoadingState(true);
-    // if (this.songsModel.songs.length == 0) {
-    //   this.rxjsStorageService.setSongTableLoadingState(false);
-    //   return;
-    // }
-
-    // this.rxjsStorageService.setSongTableLoadingState(true);
-    // let songsList: PlaylistSongModel[] = [];
-    // for (let index = 0; index < this.SongsModel.songs.length; index++) {
-    //   var songElement = await this.getSongDetails(this.SongsModel.songs[index].id);
-    //   if (songElement.id != '-1') {
-    //     songElement.order = index + 2;
-    //     songsList.push(songElement);
-    //   }
-    // }
 
     // this.rxjsStorageService.setSongQueue(songsList);
     this.queueService.GetCurrentQueue().subscribe({
@@ -104,19 +69,6 @@ export class SongQueueComponent implements OnInit {
   }
 
   async onCurrentSongPaginationUpdated(): Promise<void> {
-    // if (!this.currentPlayingSong.id || this.currentPlayingSong.id == '-1') {
-    //   this.rxjsStorageService.setSongTableLoadingState(false);
-    //   return;
-    // }
-
-    // this.rxjsStorageService.setSongTableLoadingState(true);
-    // let newCurrentSong: PlaylistSongModel = this.currentPlayingSong;
-    // var songElement = await this.getSongDetails(this.currentPlayingSong.id);
-    
-    // if (songElement.id != '-1') {
-    //   songElement.order = 1;
-    //   newCurrentSong = songElement;
-    // }
 
     this.rxjsStorageService.setSongTableLoadingState(true);
 
@@ -131,30 +83,10 @@ export class SongQueueComponent implements OnInit {
       
     })
 
-    //this.rxjsStorageService.setCurrentPlayingSong(songElement);
     this.rxjsStorageService.setSongTableLoadingState(false);
   }
 
   public onPlaySongClicked(event: PlaylistSongModelParams): void{
-    // console.log(event);
-    // const indexOfSong = event.index;
-    // const songModel = event.songModel;
-
-    // if (indexOfSong < 0) {
-    //   return;
-    // }
-
-    // // IF the user wants to resume the same song
-    // if (this.CurrentlyPlayingSong && 
-    //   this.CurrentlyPlayingSong.id == songModel.id) {
-    //   this.rxjsStorageService.setIsSongPlaylingState(true);
-    //   return;
-    // }
-
-    // // Set the clicked song as the currently playing song but keep the rest of the queue as is
-
-    // this.rxjsStorageService.setCurrentPlayingSong(songModel);
-    // this.rxjsStorageService.removeSongWithIndexFromQueue(indexOfSong);
     this.rxjsStorageService.setSongTableLoadingState(true);
 
     this.queueService.SkipForwardInQueue(event.songModel.order).subscribe({
@@ -172,8 +104,6 @@ export class SongQueueComponent implements OnInit {
       
     })
 
-    //this.rxjsStorageService.setCurrentPlayingSong(songElement);
-    //this.rxjsStorageService.setSongTableLoadingState(false);
   }
 
   public resumeSong(event: PlaylistSongModelParams): void{
@@ -195,7 +125,6 @@ export class SongQueueComponent implements OnInit {
   changeSongPosition(event: DragDropSongParams) {
     this.rxjsStorageService.setSongTableLoadingState(true);
 
-    //this.rxjsStorageService.pushSongToPlaceInQueue(event.srcIndex, event.destIndex);
     this.queueService.PushSongInQueue(event.srcSong.order, event.destSong.order).subscribe({
       next: (songs: PlaylistSongModel[])=>{
         songs.splice(0,1);

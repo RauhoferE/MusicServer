@@ -87,7 +87,6 @@ export class SongDetailsComponent implements OnInit {
       next:(songs: PlaylistSongModel[])=>{
         
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
-        //this.rxjsStorageService.setSongQueue(songs);
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
         console.log(songs)
@@ -98,11 +97,6 @@ export class SongDetailsComponent implements OnInit {
       complete: () => {
       }
     });
-
-    // this.rxjsStorageService.setCurrentPlayingSong(this.songModel);
-    // //this.rxjsStorageService.setSongQueue([]);
-    // this.rxjsStorageService.setIsSongPlaylingState(true);
-    // this.rxjsStorageService.showMediaPlayer(true);
   }
 
   public pauseSongs() {

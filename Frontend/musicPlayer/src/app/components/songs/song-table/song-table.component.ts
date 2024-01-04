@@ -131,7 +131,6 @@ export class SongTableComponent implements OnInit {
   }
 
   addSongToQueue(song: PlaylistSongModel) {
-    //this.rxjsStorageService.addSongToQueue(song)
     this.queueService.AddSongsToQueue([song.id]).subscribe({
       next: ()=>{
         this.updateQueue();
@@ -176,7 +175,6 @@ export class SongTableComponent implements OnInit {
         this.checkAll(false);
       }
     });
-    // this.rxjsStorageService.addSongsToQueue(checkedSongs)
     // this.checkAll(false);
   }
 
@@ -429,11 +427,6 @@ export class SongTableComponent implements OnInit {
   }
 
   playSong(model: PlaylistSongModel, index: number): void{
-        // Creaste queue of songs on how they appear in the table
-    // And start the media player
-    // They player has the queue and also plays the music
-    // This should happen even when the user switches to another side so use the rxjs storage
-    // Later sync the current song and the playlist with the server 
     
     // Send event to outside component
     this.playSongClicked.emit({index: index, songModel: model} as PlaylistSongModelParams);
