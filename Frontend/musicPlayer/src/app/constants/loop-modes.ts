@@ -5,7 +5,7 @@ export interface LoopModes{
 }
 
 export const LOOPMODES: LoopModes = {
-    none: "None",
-    audio:  "Audio",
-    playlist : "Playlist",
+    none: "none",
+    audio:  "audio",
+    playlist : "playlist",
 }

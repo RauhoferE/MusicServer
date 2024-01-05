@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(MusicServerDBContext))]
-    partial class MusicServerDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240105092038_AddedTableForQueueMetadata")]
+    partial class AddedTableForQueueMetadata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,39 +126,6 @@ namespace DataAccess.Migrations
                     b.HasIndex("SongId");
 
                     b.ToTable("ArtistSongs");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.LutLoopMode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LoopModes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "none"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "playlist"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "audio"
-                        });
                 });
 
             modelBuilder.Entity("DataAccess.Entities.LutQueueTarget", b =>
@@ -283,43 +252,43 @@ namespace DataAccess.Migrations
                         new
                         {
                             Id = 1L,
-                            Created = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(8999),
-                            Modified = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(9006),
+                            Created = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5231),
+                            Modified = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5240),
                             Name = "PlaylistAdded"
                         },
                         new
                         {
                             Id = 2L,
-                            Created = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(9053),
-                            Modified = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(9056),
+                            Created = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5286),
+                            Modified = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5288),
                             Name = "PlaylistSongsAdded"
                         },
                         new
                         {
                             Id = 3L,
-                            Created = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(9060),
-                            Modified = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(9061),
+                            Created = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5291),
+                            Modified = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5293),
                             Name = "PlaylistShared"
                         },
                         new
                         {
                             Id = 4L,
-                            Created = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(9064),
-                            Modified = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(9065),
+                            Created = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5295),
+                            Modified = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5297),
                             Name = "PlaylistShareRemoved"
                         },
                         new
                         {
                             Id = 5L,
-                            Created = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(9068),
-                            Modified = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(9070),
+                            Created = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5299),
+                            Modified = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5301),
                             Name = "ArtistTracksAdded"
                         },
                         new
                         {
                             Id = 6L,
-                            Created = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(9072),
-                            Modified = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(9074),
+                            Created = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5303),
+                            Modified = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(5305),
                             Name = "ArtistAdded"
                         });
                 });
@@ -434,12 +403,6 @@ namespace DataAccess.Migrations
                     b.Property<Guid>("ItemId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("LoopModeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Random")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("TargetId")
                         .HasColumnType("int");
 
@@ -447,8 +410,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("LoopModeId");
 
                     b.HasIndex("TargetId");
 
@@ -501,8 +462,8 @@ namespace DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a9d1b2de-5c2c-4fe7-bfa6-51bab53c90ba"),
-                            CreatedDate = new DateTime(2024, 1, 5, 10, 39, 48, 220, DateTimeKind.Local).AddTicks(5954)
+                            Id = new Guid("1d36991e-9fcf-4b53-b468-deb1988fb897"),
+                            CreatedDate = new DateTime(2024, 1, 5, 10, 20, 38, 262, DateTimeKind.Local).AddTicks(3152)
                         });
                 });
 
@@ -550,18 +511,18 @@ namespace DataAccess.Migrations
                         new
                         {
                             Id = 1L,
-                            ConcurrencyStamp = "9bdfadfd-e741-4828-8502-5350f51fd489",
-                            Created = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(8302),
-                            Modified = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(8345),
+                            ConcurrencyStamp = "794eda8f-84a6-4ac6-ae5c-6f5897d9799a",
+                            Created = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(4360),
+                            Modified = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(4397),
                             Name = "Root",
                             NormalizedName = "ROOT"
                         },
                         new
                         {
                             Id = 2L,
-                            ConcurrencyStamp = "683c2f0f-56aa-4040-bd68-b5054daff45b",
-                            Created = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(8503),
-                            Modified = new DateTime(2024, 1, 5, 10, 39, 48, 218, DateTimeKind.Local).AddTicks(8506),
+                            ConcurrencyStamp = "432a442e-48b2-4194-a4df-f1db27245a3e",
+                            Created = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(4539),
+                            Modified = new DateTime(2024, 1, 5, 10, 20, 38, 259, DateTimeKind.Local).AddTicks(4542),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -987,15 +948,9 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entities.QueueData", b =>
                 {
-                    b.HasOne("DataAccess.Entities.LutLoopMode", "LoopMode")
-                        .WithMany()
-                        .HasForeignKey("LoopModeId");
-
                     b.HasOne("DataAccess.Entities.LutQueueTarget", "Target")
                         .WithMany()
                         .HasForeignKey("TargetId");
-
-                    b.Navigation("LoopMode");
 
                     b.Navigation("Target");
                 });

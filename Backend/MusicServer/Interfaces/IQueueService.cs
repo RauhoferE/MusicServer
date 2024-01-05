@@ -47,5 +47,9 @@ namespace MusicServer.Interfaces
 
         // This method is called when a song is already playing and the user wants to randomize the rest of the queue
         public Task<PlaylistSongDto[]> RandomizeQueue(SongDto[] songs);
+
+        public Task UpdateQueueData(Guid itemId, string loopMode, string target, bool randomize, bool asc);
+
+        public Task<QueueDataDto> GetQueueData();
     }
 }

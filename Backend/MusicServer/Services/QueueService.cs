@@ -29,7 +29,9 @@ namespace MusicServer.Services
             var userId = this.activeUserService.Id;
 
             var queue = this.dbContext.Queues.Where(x => x.UserId == userId);
+            var queuData = this.dbContext.QueueData.Where(x => x.UserId == userId);
             this.dbContext.Queues.RemoveRange(queue);
+            this.dbContext.QueueData.RemoveRange(queuData);
             await this.dbContext.SaveChangesAsync();
         }
 
@@ -464,6 +466,16 @@ namespace MusicServer.Services
             }
 
             await this.dbContext.SaveChangesAsync();
+        }
+
+        public Task UpdateQueueData(Guid itemId, string loopMode, string target, bool randomize, bool asc)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<QueueDataDto> GetQueueData()
+        {
+            throw new NotImplementedException();
         }
     }
 }

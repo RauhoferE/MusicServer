@@ -49,6 +49,12 @@ namespace DataAccess
 
         public DbSet<QueueEntity> Queues { get; set; }
 
+        public DbSet<LutQueueTarget> LutQueueTargets { get; set; }
+        
+        public DbSet<QueueData> QueueData { get; set; }
+
+        public DbSet<LutLoopMode> LoopModes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -341,6 +347,78 @@ namespace DataAccess
                 entity.Property(n => n.Id).ValueGeneratedOnAdd();
 
                 entity.HasOne(e => e.Song).WithMany();
+            });
+
+            builder.Entity<Entities.LutQueueTarget>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasData(
+                        new Entities.LutQueueTarget()
+                        {
+                            Id = 1,
+                            Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.Album,
+                        },
+                        new Entities.LutQueueTarget()
+                        {
+                            Id = 2,
+                            Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.Name,
+                        },
+                         new Entities.LutQueueTarget()
+                         {
+                             Id = 3,
+                             Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.DateAdded,
+                         },
+                         new Entities.LutQueueTarget()
+                         {
+                             Id = 4,
+                             Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.Artist,
+                         },
+                         new Entities.LutQueueTarget()
+                         {
+                             Id = 5,
+                             Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.Duration,
+                         },
+                         new Entities.LutQueueTarget()
+                         {
+                             Id = 6,
+                             Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.Order,
+                         }
+                        );
+            });
+
+            builder.Entity<Entities.LutLoopMode>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasData(
+                        new Entities.LutLoopMode()
+                        {
+                            Id = 1,
+                            Name = MusicServer.Core.Const.LoopMode.None,
+                        },
+                        new Entities.LutLoopMode()
+                        {
+                            Id = 2,
+                            Name = MusicServer.Core.Const.LoopMode.Playlist,
+                        },
+                         new Entities.LutLoopMode()
+                         {
+                             Id = 3,
+                             Name = MusicServer.Core.Const.LoopMode.Audio,
+                         }
+                        );
+            });
+
+            builder.Entity<QueueData>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(e => e.Target).WithMany();
+                entity.HasOne(e => e.LoopMode).WithMany();
             });
         }
     }
