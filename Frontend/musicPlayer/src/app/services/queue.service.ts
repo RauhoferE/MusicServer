@@ -4,6 +4,7 @@ import { PlaylistSongModel } from '../models/playlist-models';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { APIROUTES } from '../constants/api-routes';
+import { QueueModelResponse } from '../models/responses';
 
 @Injectable({
   providedIn: 'root'
@@ -127,6 +128,31 @@ export class QueueService {
 
   public PushSongInQueue(srcIndex: number, targetIndex: number): Observable<PlaylistSongModel[]>{
     return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/push?srcIndex=${srcIndex}&targetIndex=${targetIndex}`,{
+      withCredentials: true
+    })
+  }
+
+  public GetQueueData(): Observable<QueueModelResponse>{
+    return this.httpClient.get<QueueModelResponse>(`${environment.apiUrl}/${APIROUTES.queue}/data`,{
+      withCredentials: true
+    })
+  }
+
+  public UpdateQueueData(itemId: string,
+    asc: boolean,
+    random: boolean,
+    target: string,
+    loopMode: string,
+    sortAfter: string): Observable<object>{
+      if (itemId == '-1') {
+        return this.httpClient.post<object>(`${environment.apiUrl}/${APIROUTES.queue}/data?itemId=00000000-0000-0000-0000-000000000000&asc=${asc}&randomize=${random}&target=${target}&loopMode=${loopMode}&sortAfter=${sortAfter}`,
+        {},{
+          withCredentials: true
+        })
+      }
+
+    return this.httpClient.post<object>(`${environment.apiUrl}/${APIROUTES.queue}/data?itemId=${itemId}&asc=${asc}&randomize=${random}&target=${target}&loopMode=${loopMode}&sortAfter=${sortAfter}`,
+    {},{
       withCredentials: true
     })
   }
