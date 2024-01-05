@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Entities
 {
-    public class LutQueueTarget
+    public class LovQueueTarget
     {
         public int Id { get; set; }
 

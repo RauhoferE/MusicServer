@@ -49,11 +49,13 @@ namespace DataAccess
 
         public DbSet<QueueEntity> Queues { get; set; }
 
-        public DbSet<LutQueueTarget> LutQueueTargets { get; set; }
+        public DbSet<LovPlaylistSortAfter> LovPlaylistSortAfter { get; set; }
         
-        public DbSet<QueueData> QueueData { get; set; }
+        public DbSet<QueueData> QueueData { get; set; } 
 
-        public DbSet<LutLoopMode> LoopModes { get; set; }
+        public DbSet<LovLoopMode> LovLoopModes { get; set; }
+
+        public DbSet<LovQueueTarget> LovQueueTargets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -349,38 +351,38 @@ namespace DataAccess
                 entity.HasOne(e => e.Song).WithMany();
             });
 
-            builder.Entity<Entities.LutQueueTarget>(entity =>
+            builder.Entity<Entities.LovPlaylistSortAfter>(entity =>
             {
                 entity.HasKey(n => n.Id);
                 entity.Property(n => n.Id).ValueGeneratedOnAdd();
 
                 entity.HasData(
-                        new Entities.LutQueueTarget()
+                        new Entities.LovPlaylistSortAfter()
                         {
                             Id = 1,
                             Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.Album,
                         },
-                        new Entities.LutQueueTarget()
+                        new Entities.LovPlaylistSortAfter()
                         {
                             Id = 2,
                             Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.Name,
                         },
-                         new Entities.LutQueueTarget()
+                         new Entities.LovPlaylistSortAfter()
                          {
                              Id = 3,
                              Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.DateAdded,
                          },
-                         new Entities.LutQueueTarget()
+                         new Entities.LovPlaylistSortAfter()
                          {
                              Id = 4,
                              Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.Artist,
                          },
-                         new Entities.LutQueueTarget()
+                         new Entities.LovPlaylistSortAfter()
                          {
                              Id = 5,
                              Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.Duration,
                          },
-                         new Entities.LutQueueTarget()
+                         new Entities.LovPlaylistSortAfter()
                          {
                              Id = 6,
                              Name = MusicServer.Core.Const.SortingElementsOwnPlaylistSongs.Order,
@@ -388,23 +390,52 @@ namespace DataAccess
                         );
             });
 
-            builder.Entity<Entities.LutLoopMode>(entity =>
+            builder.Entity<Entities.LovQueueTarget>(entity =>
             {
                 entity.HasKey(n => n.Id);
                 entity.Property(n => n.Id).ValueGeneratedOnAdd();
 
                 entity.HasData(
-                        new Entities.LutLoopMode()
+                        new Entities.LovQueueTarget()
+                        {
+                            Id = 1,
+                            Name = MusicServer.Core.Const.QueueTarget.Favorites,
+                        },
+                        new Entities.LovQueueTarget()
+                        {
+                            Id = 2,
+                            Name = MusicServer.Core.Const.QueueTarget.Playlist,
+                        },
+                         new Entities.LovQueueTarget()
+                         {
+                             Id = 3,
+                             Name = MusicServer.Core.Const.QueueTarget.Album,
+                         },
+                         new Entities.LovQueueTarget()
+                         {
+                             Id = 4,
+                             Name = MusicServer.Core.Const.QueueTarget.Song,
+                         }
+                        );
+            });
+
+            builder.Entity<Entities.LovLoopMode>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasData(
+                        new Entities.LovLoopMode()
                         {
                             Id = 1,
                             Name = MusicServer.Core.Const.LoopMode.None,
                         },
-                        new Entities.LutLoopMode()
+                        new Entities.LovLoopMode()
                         {
                             Id = 2,
                             Name = MusicServer.Core.Const.LoopMode.Playlist,
                         },
-                         new Entities.LutLoopMode()
+                         new Entities.LovLoopMode()
                          {
                              Id = 3,
                              Name = MusicServer.Core.Const.LoopMode.Audio,
@@ -417,8 +448,9 @@ namespace DataAccess
                 entity.HasKey(n => n.Id);
                 entity.Property(n => n.Id).ValueGeneratedOnAdd();
 
-                entity.HasOne(e => e.Target).WithMany();
+                entity.HasOne(e => e.SortAfter).WithMany();
                 entity.HasOne(e => e.LoopMode).WithMany();
+                entity.HasOne(e => e.Target).WithMany();
             });
         }
     }

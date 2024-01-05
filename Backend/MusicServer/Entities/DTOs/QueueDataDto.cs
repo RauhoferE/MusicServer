@@ -12,6 +12,8 @@ namespace MusicServer.Entities.DTOs
 
         public string LoopMode { get; set; }
 
+        public string SortAfter { get; set; }
+
         public Guid ItemId { get; set; }
     }
 }

@@ -16,9 +16,11 @@ namespace DataAccess.Entities
 
         public long UserId { get; set; }
 
-        public LutQueueTarget Target { get; set; }
+        public LovPlaylistSortAfter SortAfter { get; set; }
 
-        public LutLoopMode LoopMode { get; set; }
+        public LovQueueTarget Target { get; set; }
+
+        public LovLoopMode LoopMode { get; set; }
 
         public Guid ItemId { get; set; }
     }

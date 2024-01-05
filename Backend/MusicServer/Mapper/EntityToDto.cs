@@ -159,7 +159,8 @@ namespace MusicServer.Mapper
 
             this.CreateMap<QueueData, QueueDataDto>(MemberList.Destination)
     .ForMember(dest => dest.Target, opt => opt.MapFrom(ps => ps.Target.Name))
-    .ForMember(dest => dest.LoopMode, opt => opt.MapFrom(ps => ps.LoopMode.Name));
+    .ForMember(dest => dest.LoopMode, opt => opt.MapFrom(ps => ps.LoopMode.Name))
+    .ForMember(dest => dest.SortAfter, opt => opt.MapFrom(ps => ps.SortAfter.Name));
         }
     }
 }

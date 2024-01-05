@@ -2,6 +2,7 @@
 using DataAccess;
 using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
+using MusicServer.Core.Const;
 using MusicServer.Entities.DTOs;
 using MusicServer.Entities.Requests.Song;
 using MusicServer.Entities.Requests.User;
@@ -29,9 +30,9 @@ namespace MusicServer.Services
             var userId = this.activeUserService.Id;
 
             var queue = this.dbContext.Queues.Where(x => x.UserId == userId);
-            var queuData = this.dbContext.QueueData.Where(x => x.UserId == userId);
+            //var queuData = this.dbContext.QueueData.Where(x => x.UserId == userId);
             this.dbContext.Queues.RemoveRange(queue);
-            this.dbContext.QueueData.RemoveRange(queuData);
+            //this.dbContext.QueueData.RemoveRange(queuData);
             await this.dbContext.SaveChangesAsync();
         }
 
@@ -468,14 +469,57 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        public Task UpdateQueueData(Guid itemId, string loopMode, string target, bool randomize, bool asc)
+        public async Task UpdateQueueData(Guid itemId, string loopMode, string sortAfter, string target, bool randomize, bool asc)
         {
-            throw new NotImplementedException();
+            var userId = this.activeUserService.Id;
+
+            var queueData = this.dbContext.QueueData.Include(x => x.SortAfter)
+    .Include(x => x.LoopMode)
+    .FirstOrDefault(x => x.UserId == userId);
+
+            if (queueData == null)
+            {
+                return;
+            }
+
+            queueData.ItemId = itemId;
+            queueData.Asc = asc;
+            queueData.Random = randomize;
+
+            switch (loopMode)
+            {
+                case LoopMode.None:
+                    break;
+                case LoopMode.Audio:
+                    break;
+                case LoopMode.Playlist:
+                    break;
+                default:
+                    break;
+            }
+
+            switch (target)
+            {
+                case LoopMode.None:
+                    break;
+                case LoopMode.Audio:
+                    break;
+                case LoopMode.Playlist:
+                    break;
+                default:
+                    break;
+            }
         }
 
-        public Task<QueueDataDto> GetQueueData()
+        public async Task<QueueDataDto> GetQueueData()
         {
-            throw new NotImplementedException();
+            var userId = this.activeUserService.Id;
+            var queueData = this.dbContext.QueueData.Include(x => x.SortAfter)
+                .Include(x => x.Target)
+                .Include(x => x.LoopMode)
+                .FirstOrDefault(x => x.UserId == userId) ?? throw new DataNotFoundException("No queue Data available");
+
+            return this.mapper.Map<QueueDataDto>(queueData);
         }
     }
 }

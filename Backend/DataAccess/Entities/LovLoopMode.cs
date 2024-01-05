@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Entities
 {
-    public class LutLoopMode
+    public class LovLoopMode
     {
         public int Id { get; set; }
 
