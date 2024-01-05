@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { firstValueFrom, lastValueFrom } from 'rxjs';
+import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { DragDropSongParams, PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
 import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
@@ -115,6 +116,7 @@ export class FavoritesComponent implements OnInit{
   public async playSongs(): Promise<void>{
     console.log("Play songs")
 
+    console.log(this.queueModel)
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
       this.QueueModel.target == QUEUETYPES.favorites) {
@@ -128,16 +130,15 @@ export class FavoritesComponent implements OnInit{
       page : 0,
       take : 0,
       query : '',
-      sortAfter : paginationModel.sortAfter,
+      sortAfter : this.paginationModel.sortAfter == '' ? 'name' : this.paginationModel.sortAfter,
       itemId : '-1',
       target : QUEUETYPES.favorites,
-      loopMode: this.queueModel.loopMode,
-      random: this.queueModel.random
+      loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
+      random: this.queueModel.random == undefined ? false: this.queueModel.random
     });
 
-    this.queueService.CreateQueueFromFavorites(false, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
+    this.queueService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
       next:(songs: PlaylistSongModel[])=>{
-        
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
@@ -182,14 +183,14 @@ export class FavoritesComponent implements OnInit{
       page : 0,
       take : 0,
       query : '',
-      sortAfter : paginationModel.sortAfter,
+      sortAfter : this.paginationModel.sortAfter == '' ? 'name' : this.paginationModel.sortAfter,
       itemId : '-1',
       target : QUEUETYPES.favorites,
-      loopMode: this.queueModel.loopMode,
-      random: this.queueModel.random
+      loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
+      random: this.queueModel.random == undefined ? false: this.queueModel.random
     });
 
-    this.queueService.CreateQueueFromFavorites(false, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({
+    this.queueService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);

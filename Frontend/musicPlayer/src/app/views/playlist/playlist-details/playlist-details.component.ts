@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { firstValueFrom } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
+import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, SongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
@@ -154,11 +155,11 @@ export class PlaylistDetailsComponent implements OnInit {
       sortAfter : paginationModel.sortAfter,
       itemId : this.playlistId,
       target : QUEUETYPES.playlist,
-      loopMode: this.queueModel.loopMode,
-      random: this.queueModel.random
+      loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
+      random: this.queueModel.random == undefined ? false: this.queueModel.random
     });
 
-    this.queueService.CreateQueueFromPlaylist(this.playlistId, false, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
+    this.queueService.CreateQueueFromPlaylist(this.playlistId, this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         
@@ -207,11 +208,11 @@ export class PlaylistDetailsComponent implements OnInit {
       sortAfter : paginationModel.sortAfter,
       itemId : this.playlistId,
       target : QUEUETYPES.playlist,
-      loopMode: this.queueModel.loopMode,
-      random: this.queueModel.random
+      loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
+      random: this.queueModel.random == undefined ? false: this.queueModel.random
     });
 
-    this.queueService.CreateQueueFromPlaylist(this.playlistId, false, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({
+    this.queueService.CreateQueueFromPlaylist(this.playlistId, this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { APIROUTES } from 'src/app/constants/api-routes';
+import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { QueueModel } from 'src/app/models/storage';
@@ -88,11 +89,11 @@ export class SongDetailsComponent implements OnInit {
       sortAfter : '',
       itemId : this.songId,
       target : QUEUETYPES.song,
-      loopMode: this.queueModel.loopMode,
-      random: this.queueModel.random
+      loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
+      random: this.queueModel.random == undefined ? false: this.queueModel.random
     });
 
-    this.queueService.CreateQueueFromSingleSong(this.songId, false).subscribe({
+    this.queueService.CreateQueueFromSingleSong(this.songId, this.queueModel.random, this.queueModel.loopMode).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);

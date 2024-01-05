@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { APIROUTES } from 'src/app/constants/api-routes';
+import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { AlbumModel } from 'src/app/models/artist-models';
 import { PlaylistSongModelParams } from 'src/app/models/events';
@@ -141,15 +142,15 @@ export class AlbumDetailsComponent implements OnInit {
       page : 0,
       take : 0,
       query : '',
-      sortAfter : this.paginationModel.sortAfter,
+      sortAfter : this.paginationModel.sortAfter == '' ? 'name' : this.paginationModel.sortAfter,
       itemId : this.albumId,
       // TOOD: Replace with interface
       target : QUEUETYPES.album,
-      loopMode: this.queueModel.loopMode,
-      random: this.queueModel.random
+      loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
+      random: this.queueModel.random == undefined ? false: this.queueModel.random
     });
 
-    this.queueService.CreateQueueFromAlbum(this.albumId, false,-1).subscribe({
+    this.queueService.CreateQueueFromAlbum(this.albumId, this.queueModel.random, this.queueModel.loopMode,-1).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         
@@ -193,14 +194,14 @@ export class AlbumDetailsComponent implements OnInit {
       page : 0,
       take : 0,
       query : '',
-      sortAfter : this.paginationModel.sortAfter,
+      sortAfter : this.paginationModel.sortAfter == '' ? 'name' : this.paginationModel.sortAfter,
       itemId : this.albumId,
       target : QUEUETYPES.album,
-      loopMode: this.queueModel.loopMode,
-      random: this.queueModel.random
+      loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
+      random: this.queueModel.random == undefined ? false: this.queueModel.random
     });
 
-    this.queueService.CreateQueueFromAlbum(this.albumId, false, skipSongs).subscribe({
+    this.queueService.CreateQueueFromAlbum(this.albumId, this.queueModel.random,this.queueModel.loopMode, skipSongs).subscribe({
       next:(songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);

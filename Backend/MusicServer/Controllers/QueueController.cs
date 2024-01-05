@@ -27,43 +27,43 @@ namespace MusicServer.Controllers
             this.playlistService = playlistService;
             this.songService = songService;
         }
-        //TODO: Send loop mode
+
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueueAlbum)]
-        public async Task<IActionResult> CreateQueueFromAlbum(Guid albumId, [FromQuery, Required] bool randomize, [FromQuery]int playFromIndex = 0)
+        public async Task<IActionResult> CreateQueueFromAlbum(Guid albumId, [FromQuery, Required] bool randomize, [FromQuery, Required] string loopMode, [FromQuery]int playFromIndex = 0)
         {
             var albumSongCount = await this.songService.GetSongCountOfAlbum(albumId);
             var albumSongs = await this.songService.GetSongsInAlbum(albumId, 0, albumSongCount);
-            await this.queueService.UpdateQueueData(albumId, LoopMode.None, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Album, randomize, true);
+            await this.queueService.UpdateQueueData(albumId, loopMode, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Album, randomize, true);
             return Ok(await this.queueService.CreateQueue(albumSongs.Songs, randomize, playFromIndex));
         }
 
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueuePlaylist)]
-        public async Task<IActionResult> CreateQueueFromPlaylist(Guid playlistId, [FromQuery, Required] bool randomize, [FromQuery] string sortAfter = null, [FromQuery] bool asc = true, [FromQuery] int playFromOrder = 0)
+        public async Task<IActionResult> CreateQueueFromPlaylist(Guid playlistId, [FromQuery, Required] bool randomize, [FromQuery, Required] string loopMode, [FromQuery] string sortAfter = null, [FromQuery] bool asc = true, [FromQuery] int playFromOrder = 0)
         {
             var playlistSongCount = await this.playlistService.GetPlaylistSongCount(playlistId);
             var playlistSongs = await this.playlistService.GetSongsInPlaylist(playlistId, 0, playlistSongCount, sortAfter, asc, null);
-            await this.queueService.UpdateQueueData(playlistId, LoopMode.None, sortAfter, QueueTarget.Playlist, randomize, asc);
+            await this.queueService.UpdateQueueData(playlistId, loopMode, sortAfter, QueueTarget.Playlist, randomize, asc);
             return Ok(await this.queueService.CreateQueue(playlistSongs.Songs, randomize, playFromOrder));
         }
 
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueueFavorites)]
-        public async Task<IActionResult> CreateQueueFromFavorites([FromQuery, Required] bool randomize, [FromQuery] string sortAfter = null, [FromQuery] bool asc = true, [FromQuery] int playFromOrder = 0)
+        public async Task<IActionResult> CreateQueueFromFavorites([FromQuery, Required] bool randomize, [FromQuery, Required] string loopMode, [FromQuery] string sortAfter = null, [FromQuery] bool asc = true, [FromQuery] int playFromOrder = 0)
         {
             var favoriteSongCount = await this.playlistService.GetFavoriteSongCount();
             var favoriteSongs = await this.playlistService.GetFavorites(0, favoriteSongCount, sortAfter, asc, null);
-            await this.queueService.UpdateQueueData(Guid.Empty, LoopMode.None, sortAfter, QueueTarget.Favorites, randomize, asc);
+            await this.queueService.UpdateQueueData(Guid.Empty, loopMode, sortAfter, QueueTarget.Favorites, randomize, asc);
             return Ok(await this.queueService.CreateQueue(favoriteSongs.Songs, randomize, playFromOrder));
         }
 
         [HttpGet]
         [Route(ApiRoutes.Queue.CreateQueueSingleSong)]
-        public async Task<IActionResult> CreateQueueFromSingleSong(Guid songId, [FromQuery, Required] bool randomize)
+        public async Task<IActionResult> CreateQueueFromSingleSong(Guid songId, [FromQuery, Required] bool randomize, [FromQuery, Required] string loopMode)
         {
             var song = await this.songService.GetSongInformation(songId);
-            await this.queueService.UpdateQueueData(songId, LoopMode.None, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Song, randomize, true);
+            await this.queueService.UpdateQueueData(songId, loopMode, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Song, randomize, true);
 
             if (randomize)
             {
@@ -149,14 +149,14 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Queue.RandomizeQueue)]
-        public async Task<IActionResult> RandomizeQueue([FromQuery]Guid playlistId, [FromQuery] Guid albumId, [FromQuery] Guid songId)
+        public async Task<IActionResult> RandomizeQueue([FromQuery]Guid playlistId, [FromQuery] Guid albumId, [FromQuery] Guid songId, [FromQuery, Required] string loopMode)
         {
             if (playlistId == Guid.Empty && albumId == Guid.Empty && songId == Guid.Empty)
             {
                 // Get favroites
                 var favoriteSongCount = await this.playlistService.GetFavoriteSongCount();
                 var favorites = await this.playlistService.GetFavorites(0, favoriteSongCount, null, true, null);
-                await this.queueService.UpdateQueueData(Guid.Empty, LoopMode.None, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Favorites, true, true);
+                await this.queueService.UpdateQueueData(Guid.Empty, loopMode, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Favorites, true, true);
                 return Ok(await this.queueService.RandomizeQueue(favorites.Songs));
             }
 
@@ -165,7 +165,7 @@ namespace MusicServer.Controllers
                 // Get playlist
                 var playlistSongCount = await this.playlistService.GetPlaylistSongCount(playlistId);
                 var playlistSongs = await this.playlistService.GetSongsInPlaylist(playlistId, 0, playlistSongCount, null, true, null);
-                await this.queueService.UpdateQueueData(playlistId, LoopMode.None, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Playlist, true, true);
+                await this.queueService.UpdateQueueData(playlistId, loopMode, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Playlist, true, true);
                 return Ok(await this.queueService.RandomizeQueue(playlistSongs.Songs));
             }
 
@@ -174,7 +174,7 @@ namespace MusicServer.Controllers
                 // Get Album songs
                 var albumSongCount = await this.songService.GetSongCountOfAlbum(albumId);
                 var albumSongs = await this.songService.GetSongsInAlbum(albumId, 0, albumSongCount);
-                await this.queueService.UpdateQueueData(albumId, LoopMode.None, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Album, true, true);
+                await this.queueService.UpdateQueueData(albumId, loopMode, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Album, true, true);
                 return Ok(await this.queueService.RandomizeQueue(albumSongs.Songs));
             }
 
@@ -183,7 +183,7 @@ namespace MusicServer.Controllers
                 var songDetails = await this.songService.GetSongInformation(songId);
                 var albumSongCount = await this.songService.GetSongCountOfAlbum(songDetails.Album.Id);
                 var albumSongs = await this.songService.GetSongsInAlbum(songDetails.Album.Id, 0, albumSongCount);
-                await this.queueService.UpdateQueueData(songId, LoopMode.None, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Song, true, true);
+                await this.queueService.UpdateQueueData(songId, loopMode, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Song, true, true);
                 return Ok(await this.queueService.RandomizeQueue(albumSongs.Songs));
             }
 
