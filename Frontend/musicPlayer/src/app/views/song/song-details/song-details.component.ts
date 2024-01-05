@@ -94,12 +94,12 @@ export class SongDetailsComponent implements OnInit {
     });
 
     this.queueService.CreateQueueFromSingleSong(this.songId, this.queueModel.random, this.queueModel.loopMode).subscribe({
-      next:(songs: PlaylistSongModel[])=>{
+      next:(song: PlaylistSongModel)=>{
         
-        this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+        this.rxjsStorageService.setCurrentPlayingSong(song);
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
-        console.log(songs)
+        console.log(song)
       },
       error:(error: any)=>{
         this.message.error("Error when getting queue.");

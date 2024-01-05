@@ -138,12 +138,12 @@ export class FavoritesComponent implements OnInit{
     });
 
     this.queueService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
-      next:async (songs: PlaylistSongModel[])=>{
-        this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+      next:async (song: PlaylistSongModel)=>{
+        this.rxjsStorageService.setCurrentPlayingSong(song);
         await this.rxjsStorageService.setUpdateSongState();
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
-        console.log(songs)
+        console.log(song)
       },
       error:(error: any)=>{
         this.message.error("Error when getting queue.");
@@ -192,9 +192,9 @@ export class FavoritesComponent implements OnInit{
     });
 
     this.queueService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({
-      next:async (songs: PlaylistSongModel[])=>{
-        console.log(songs)
-        this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+      next:async (song: PlaylistSongModel)=>{
+        console.log(song)
+        this.rxjsStorageService.setCurrentPlayingSong(song);
         await this.rxjsStorageService.setUpdateSongState();
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);

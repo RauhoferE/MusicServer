@@ -9,9 +9,9 @@ namespace MusicServer.Interfaces
         // -1, -2, -3 -> Previous played songs
         // 0 -> Current Song
         // 1,2,3 -> Next Songs
-        public Task<PlaylistSongDto[]> CreateQueue(SongDto[] songs, bool orderRandom, int playFromOrder);
+        public Task<PlaylistSongDto> CreateQueue(SongDto[] songs, bool orderRandom, int playFromOrder);
 
-        public Task<PlaylistSongDto[]> CreateQueue(PlaylistSongDto[] songs, bool orderRandom, int playFromOrder);
+        public Task<PlaylistSongDto> CreateQueue(PlaylistSongDto[] songs, bool orderRandom, int playFromOrder);
 
         // 1. Normal case -> Play every Song In Playlist once and when queue finished return some error (add all the songs from playlist again)
         // 2. Randomize case -> Play every Song In Playlist once and when queue finished return some error( add all the songs from playlist randomized again)
@@ -43,10 +43,10 @@ namespace MusicServer.Interfaces
         public Task<PlaylistSongDto[]> PushSongToIndex(int srcIndex, int targetIndex);
 
         // This method is called when a song is already playing and the user wants to randomize the rest of the queue
-        public Task<PlaylistSongDto[]> RandomizeQueue(PlaylistSongDto[] songs);
+        public Task<PlaylistSongDto> RandomizeQueue(PlaylistSongDto[] songs);
 
         // This method is called when a song is already playing and the user wants to randomize the rest of the queue
-        public Task<PlaylistSongDto[]> RandomizeQueue(SongDto[] songs);
+        public Task<PlaylistSongDto> RandomizeQueue(SongDto[] songs);
 
         public Task UpdateQueueData(Guid itemId, string loopMode, string sortAfter, string target, bool randomize, bool asc);
 

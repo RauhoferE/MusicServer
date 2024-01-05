@@ -36,7 +36,7 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        public async Task<PlaylistSongDto[]> CreateQueue(PlaylistSongDto[] songs, bool orderRandom, int playFromOrder)
+        public async Task<PlaylistSongDto> CreateQueue(PlaylistSongDto[] songs, bool orderRandom, int playFromOrder)
         {
             var rnd = new Random();
             var userId = this.activeUserService.Id;
@@ -79,10 +79,10 @@ namespace MusicServer.Services
             }
 
             await this.dbContext.SaveChangesAsync();
-            return await this.GetCurrentQueue();
+            return await this.GetCurrentSongInQueue();
         }
 
-        public async Task<PlaylistSongDto[]> CreateQueue(SongDto[] songs, bool orderRandom, int playFromOrder)
+        public async Task<PlaylistSongDto> CreateQueue(SongDto[] songs, bool orderRandom, int playFromOrder)
         {
             var rnd = new Random();
             var userId = this.activeUserService.Id;
@@ -124,7 +124,7 @@ namespace MusicServer.Services
 
             await this.dbContext.SaveChangesAsync();
 
-            return await this.GetCurrentQueue();
+            return await this.GetCurrentSongInQueue();
         }
 
         public async Task<PlaylistSongDto[]> GetCurrentQueue()
@@ -321,7 +321,7 @@ namespace MusicServer.Services
             return await this.GetCurrentQueue();
         }
 
-        public async Task<PlaylistSongDto[]> RandomizeQueue(PlaylistSongDto[] songs)
+        public async Task<PlaylistSongDto> RandomizeQueue(PlaylistSongDto[] songs)
         {
             var userId = this.activeUserService.Id;
             var rnd = new Random();
@@ -361,10 +361,16 @@ namespace MusicServer.Services
             }
 
             await this.dbContext.SaveChangesAsync();
-            return songs;
+
+            if (songs.Length == 0)
+            {
+                throw new SongNotFoundException();
+            }
+
+            return songs[0];
         }
 
-        public async Task<PlaylistSongDto[]> RandomizeQueue(SongDto[] songs)
+        public async Task<PlaylistSongDto> RandomizeQueue(SongDto[] songs)
         {
             var userId = this.activeUserService.Id;
             var rnd = new Random();
@@ -409,7 +415,13 @@ namespace MusicServer.Services
             }
 
             await this.dbContext.SaveChangesAsync();
-            return mappedSongs.ToArray();
+
+            if (mappedSongs.Count == 0)
+            {
+                throw new SongNotFoundException();
+            }
+
+            return mappedSongs.First();
         }
 
         public async Task<PlaylistSongDto> GetSongInQueueWithIndex(int index)

@@ -13,56 +13,56 @@ export class QueueService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public CreateQueueFromAlbum(albumId: string, randomize: boolean, loopMode: string, playFromIndex: number): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/create/album/${albumId}?randomize=${randomize}&loopMode=${loopMode}&playFromIndex=${playFromIndex}`,{
+  public CreateQueueFromAlbum(albumId: string, randomize: boolean, loopMode: string, playFromIndex: number): Observable<PlaylistSongModel>{
+    return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/create/album/${albumId}?randomize=${randomize}&loopMode=${loopMode}&playFromIndex=${playFromIndex}`,{
       withCredentials: true
     })
   }
 
-  public CreateQueueFromSingleSong(songId: string, randomize: boolean, loopMode: string): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/create/song/${songId}?randomize=${randomize}&loopMode=${loopMode}`,{
+  public CreateQueueFromSingleSong(songId: string, randomize: boolean, loopMode: string): Observable<PlaylistSongModel>{
+    return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/create/song/${songId}?randomize=${randomize}&loopMode=${loopMode}`,{
       withCredentials: true
     })
   }
 
-  public CreateQueueFromPlaylist(playlistId: string, randomize: boolean,loopMode: string, sortAfter: string, asc: boolean, playFromOrder: number): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/create/playlist/${playlistId}?randomize=${randomize}&loopMode=${loopMode}&sortAfter=${sortAfter}&asc=${asc}&playFromOrder=${playFromOrder}`,{
+  public CreateQueueFromPlaylist(playlistId: string, randomize: boolean,loopMode: string, sortAfter: string, asc: boolean, playFromOrder: number): Observable<PlaylistSongModel>{
+    return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/create/playlist/${playlistId}?randomize=${randomize}&loopMode=${loopMode}&sortAfter=${sortAfter}&asc=${asc}&playFromOrder=${playFromOrder}`,{
       withCredentials: true
     })
   }
 
-  public CreateQueueFromFavorites(randomize: boolean,loopMode: string, sortAfter: string, asc: boolean, playFromOrder: number): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/create/favorites?randomize=${randomize}&loopMode=${loopMode}&sortAfter=${sortAfter}&asc=${asc}&playFromOrder=${playFromOrder}`,{
+  public CreateQueueFromFavorites(randomize: boolean,loopMode: string, sortAfter: string, asc: boolean, playFromOrder: number): Observable<PlaylistSongModel>{
+    return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/create/favorites?randomize=${randomize}&loopMode=${loopMode}&sortAfter=${sortAfter}&asc=${asc}&playFromOrder=${playFromOrder}`,{
       withCredentials: true
     })
   }
 
-  public RandomizeQueueFromAlbum(albumId: string, loopMode: string,): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?albumId=${albumId}&loopMode=${loopMode}`,{
+  public RandomizeQueueFromAlbum(albumId: string, loopMode: string,): Observable<PlaylistSongModel>{
+    return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?albumId=${albumId}&loopMode=${loopMode}`,{
       withCredentials: true
     })
   }
 
-  public RandomizeQueueFromSingleSong(songId: string, loopMode: string,): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?songId=${songId}&loopMode=${loopMode}`,{
+  public RandomizeQueueFromSingleSong(songId: string, loopMode: string,): Observable<PlaylistSongModel>{
+    return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?songId=${songId}&loopMode=${loopMode}`,{
       withCredentials: true
     })
   }
 
-  public RandomizeQueueFromFavorites(loopMode: string): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?loopMode=${loopMode}`,{
+  public RandomizeQueueFromFavorites(loopMode: string): Observable<PlaylistSongModel>{
+    return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?loopMode=${loopMode}`,{
       withCredentials: true
     })
   }
 
-  public RandomizeQueueFromPlaylist(playlistId: string, loopMode: string): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?playlistId=${playlistId}&loopMode=${loopMode}`,{
+  public RandomizeQueueFromPlaylist(playlistId: string, loopMode: string): Observable<PlaylistSongModel>{
+    return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?playlistId=${playlistId}&loopMode=${loopMode}`,{
       withCredentials: true
     })
   }
 
-  public RandomizeQueueFromSong(songId: string, loopMode: string): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?songId=${songId}&loopMode=${loopMode}`,{
+  public RandomizeQueueFromSong(songId: string, loopMode: string): Observable<PlaylistSongModel>{
+    return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?songId=${songId}&loopMode=${loopMode}`,{
       withCredentials: true
     })
   }
