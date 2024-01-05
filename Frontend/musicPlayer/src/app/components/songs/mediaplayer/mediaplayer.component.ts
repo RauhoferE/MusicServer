@@ -99,9 +99,20 @@ export class MediaplayerComponent implements OnInit {
     this.queueModel = queueModel;
 
     if (!this.queueModel.random || !this.queueModel.loopMode) {
+      console.log("No Loop or random found")
       this.queueModel.random = this.randomizePlay;
       this.queueModel.loopMode = this.loopMode;
       this.rxjsService.setQueueFilterAndPagination(this.queueModel);
+    }
+
+    if (this.queueModel.random) {
+      this.randomizePlay = this.queueModel.random;
+      console.log("Set random")
+    }
+
+    if (this.queueModel.loopMode) {
+      this.loopMode = this.queueModel.loopMode;
+      console.log("Set loop")
     }
 
   }
@@ -166,6 +177,8 @@ export class MediaplayerComponent implements OnInit {
       return;
     }
 
+    this.queueModel.random = this.randomizePlay;
+    this.rxjsService.setQueueFilterAndPagination(this.queueModel);
     if (this.queueModel.target == QUEUETYPES.favorites && this.randomizePlay) {
       // Randomize favorite queue
       this.queueService.RandomizeQueueFromFavorites().subscribe({
@@ -394,6 +407,8 @@ export class MediaplayerComponent implements OnInit {
 
     
     this.audioElement.loop = this.loopAudio;
+    this.queueModel.loopMode = this.loopMode;
+    this.rxjsService.setQueueFilterAndPagination(this.queueModel);
   }
 
   public updateDashBoardAndSongTable(): void{
