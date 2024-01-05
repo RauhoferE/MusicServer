@@ -95,6 +95,10 @@ export class MediaplayerComponent implements OnInit {
       
     });
 
+    this.rxjsService.updateReplaySongState.subscribe(x => {
+      this.audioElement.currentTime = 0;
+    })
+
     this.rxjsService.currentQueueFilterAndPagination.subscribe(x => {
       this.queueModel = x;
     })

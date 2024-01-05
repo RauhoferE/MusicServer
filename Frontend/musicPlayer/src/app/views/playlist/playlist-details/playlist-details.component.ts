@@ -160,10 +160,11 @@ export class PlaylistDetailsComponent implements OnInit {
     });
 
     this.queueService.CreateQueueFromPlaylist(this.playlistId, this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
-      next:(songs: PlaylistSongModel[])=>{
+      next:async (songs: PlaylistSongModel[])=>{
         console.log(songs)
         
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+        await this.rxjsStorageService.setUpdateSongState();
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
       },
@@ -213,9 +214,10 @@ export class PlaylistDetailsComponent implements OnInit {
     });
 
     this.queueService.CreateQueueFromPlaylist(this.playlistId, this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({
-      next:(songs: PlaylistSongModel[])=>{
+      next:async (songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsStorageService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+        await this.rxjsStorageService.setUpdateSongState();
         this.rxjsStorageService.setIsSongPlaylingState(true);
         this.rxjsStorageService.showMediaPlayer(true);
       },

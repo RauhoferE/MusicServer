@@ -151,10 +151,11 @@ export class AlbumDetailsComponent implements OnInit {
     });
 
     this.queueService.CreateQueueFromAlbum(this.albumId, this.queueModel.random, this.queueModel.loopMode,-1).subscribe({
-      next:(songs: PlaylistSongModel[])=>{
+      next:async (songs: PlaylistSongModel[])=>{
         console.log(songs)
         
         this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+        await this.rxjsService.setUpdateSongState();
         this.rxjsService.setIsSongPlaylingState(true);
         this.rxjsService.showMediaPlayer(true);
       },
@@ -202,9 +203,10 @@ export class AlbumDetailsComponent implements OnInit {
     });
 
     this.queueService.CreateQueueFromAlbum(this.albumId, this.queueModel.random,this.queueModel.loopMode, skipSongs).subscribe({
-      next:(songs: PlaylistSongModel[])=>{
+      next:async (songs: PlaylistSongModel[])=>{
         console.log(songs)
         this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
+        await this.rxjsService.setUpdateSongState();
         this.rxjsService.setIsSongPlaylingState(true);
         this.rxjsService.showMediaPlayer(true);
       },

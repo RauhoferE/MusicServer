@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, first, firstValueFrom } from 'rxjs';
 import { PaginationModel, QueueModel } from '../models/storage';
 import { PlaylistSongModel, SongPaginationModel } from '../models/playlist-models';
 
@@ -34,8 +34,17 @@ export class RxjsStorageService {
   private queueFilterAndPagination$ = new BehaviorSubject<any>({});
   currentQueueFilterAndPagination = this.queueFilterAndPagination$.asObservable();
 
+  private replaySongState$ = new BehaviorSubject<any>({});
+  updateReplaySongState = this.replaySongState$.asObservable();
+
 
   constructor() { }
+
+  async setUpdateSongState(){
+
+    let oldState = await firstValueFrom(this.updateReplaySongState);
+    this.replaySongState$.next(!oldState);
+  }
 
   setCurrentPaginationSongModel(model: PaginationModel){
     this.paginationSongModel$.next(model);
