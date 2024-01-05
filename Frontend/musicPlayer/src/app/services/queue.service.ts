@@ -4,7 +4,7 @@ import { PlaylistSongModel } from '../models/playlist-models';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { APIROUTES } from '../constants/api-routes';
-import { QueueModelResponse } from '../models/responses';
+import { QueueModel } from '../models/storage';
 
 @Injectable({
   providedIn: 'root'
@@ -132,8 +132,8 @@ export class QueueService {
     })
   }
 
-  public GetQueueData(): Observable<QueueModelResponse>{
-    return this.httpClient.get<QueueModelResponse>(`${environment.apiUrl}/${APIROUTES.queue}/data`,{
+  public GetQueueData(): Observable<QueueModel>{
+    return this.httpClient.get<QueueModel>(`${environment.apiUrl}/${APIROUTES.queue}/data`,{
       withCredentials: true
     })
   }

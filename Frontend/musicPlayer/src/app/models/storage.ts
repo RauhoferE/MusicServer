@@ -8,8 +8,14 @@ export interface PaginationModel{
 
 export interface QueueModel extends PaginationModel{
     // Is -1 for favorites and none
-    itemGuid: string;
+    itemId: string;
     // Can be favorites, playlist, album, artist, none (for single song)
-    type: string;
+    target: string;
+
+    // If the mediaplayer has loopmode activated
+    loopMode: string;
+
+    // IF the mediaplayer has random actived
+    random: boolean;
 
 }

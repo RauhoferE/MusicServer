@@ -26,6 +26,8 @@ export class SongDetailsComponent implements OnInit {
 
   private isSongPlaying: boolean = false;
 
+  private queueModel: QueueModel = undefined as any;
+
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
   /**
@@ -60,6 +62,10 @@ export class SongDetailsComponent implements OnInit {
       this.currentPlayingSong = x;
     });
 
+    this.rxjsStorageService.currentQueueFilterAndPagination.subscribe(x => {
+      this.queueModel = x;
+    });
+
     this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
       this.updateSong();
     });
@@ -80,8 +86,10 @@ export class SongDetailsComponent implements OnInit {
       take : 0,
       query : '',
       sortAfter : '',
-      itemGuid : this.songId,
-      type : QUEUETYPES.song
+      itemId : this.songId,
+      target : QUEUETYPES.song,
+      loopMode: this.queueModel.loopMode,
+      random: this.queueModel.random
     });
 
     this.queueService.CreateQueueFromSingleSong(this.songId, false).subscribe({

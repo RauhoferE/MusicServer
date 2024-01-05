@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
@@ -55,7 +55,7 @@ export class MediaplayerComponent implements OnInit {
 
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
 
     this.rxjsService.isSongPlayingState.subscribe(x => {
       this.isSongPlaying = x;
@@ -95,9 +95,14 @@ export class MediaplayerComponent implements OnInit {
       
     });
 
-    this.rxjsService.currentQueueFilterAndPagination.subscribe(x => {
-      this.queueModel = x;
-    });
+    var queueModel = await firstValueFrom(this.rxjsService.currentQueueFilterAndPagination);
+    this.queueModel = queueModel;
+
+    if (!this.queueModel.random || !this.queueModel.loopMode) {
+      this.queueModel.random = this.randomizePlay;
+      this.queueModel.loopMode = this.loopMode;
+      this.rxjsService.setQueueFilterAndPagination(this.queueModel);
+    }
 
   }
 
@@ -157,11 +162,11 @@ export class MediaplayerComponent implements OnInit {
   public async randomizePlayback(): Promise<void>{
     this.randomizePlay = !this.randomizePlay;
 
-    if (!this.queueModel.type) {
+    if (!this.queueModel.target) {
       return;
     }
 
-    if (this.queueModel.type == QUEUETYPES.favorites && this.randomizePlay) {
+    if (this.queueModel.target == QUEUETYPES.favorites && this.randomizePlay) {
       // Randomize favorite queue
       this.queueService.RandomizeQueueFromFavorites().subscribe({
         next:(songs: PlaylistSongModel[])=>{
@@ -178,14 +183,14 @@ export class MediaplayerComponent implements OnInit {
       });
     }
 
-    if (this.queueModel.type == QUEUETYPES.favorites && !this.randomizePlay) {
+    if (this.queueModel.target == QUEUETYPES.favorites && !this.randomizePlay) {
       // Randomize favorite queue
       await this.startFavoriteQueueFromStart();
     }
 
-    if (this.queueModel.type == QUEUETYPES.playlist && this.randomizePlay) {
+    if (this.queueModel.target == QUEUETYPES.playlist && this.randomizePlay) {
       // Randomize playlist queue
-      this.queueService.RandomizeQueueFromPlaylist(this.queueModel.itemGuid).subscribe({
+      this.queueService.RandomizeQueueFromPlaylist(this.queueModel.itemId).subscribe({
         next:(songs: PlaylistSongModel[])=>{
           console.log(songs)
           this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
@@ -200,14 +205,14 @@ export class MediaplayerComponent implements OnInit {
       });
     }
 
-    if (this.queueModel.type == QUEUETYPES.playlist && !this.randomizePlay) {
+    if (this.queueModel.target == QUEUETYPES.playlist && !this.randomizePlay) {
       // Randomize favorite queue
       await this.startPlaylistQueueFromStart();
     }
 
-    if (this.queueModel.type == QUEUETYPES.album && this.randomizePlay) {
+    if (this.queueModel.target == QUEUETYPES.album && this.randomizePlay) {
       // Randomize playlist queue
-      this.queueService.RandomizeQueueFromAlbum(this.queueModel.itemGuid).subscribe({
+      this.queueService.RandomizeQueueFromAlbum(this.queueModel.itemId).subscribe({
         next:(songs: PlaylistSongModel[])=>{
           console.log(songs)
           this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
@@ -222,14 +227,14 @@ export class MediaplayerComponent implements OnInit {
       });
     }
 
-    if (this.queueModel.type == QUEUETYPES.album && !this.randomizePlay) {
+    if (this.queueModel.target == QUEUETYPES.album && !this.randomizePlay) {
       // Randomize favorite queue
       await this.startAlbumQueueFromStart();
     }
 
-    if (this.queueModel.type == QUEUETYPES.song && this.randomizePlay) {
+    if (this.queueModel.target == QUEUETYPES.song && this.randomizePlay) {
       // Randomize playlist queue
-      this.queueService.RandomizeQueueFromSingleSong(this.queueModel.itemGuid).subscribe({
+      this.queueService.RandomizeQueueFromSingleSong(this.queueModel.itemId).subscribe({
         next:(songs: PlaylistSongModel[])=>{
           console.log(songs)
           this.rxjsService.setCurrentPlayingSong(songs.splice(0,1)[0]);
@@ -244,7 +249,7 @@ export class MediaplayerComponent implements OnInit {
       });
     }
 
-    if (this.queueModel.type == QUEUETYPES.song && !this.randomizePlay) {
+    if (this.queueModel.target == QUEUETYPES.song && !this.randomizePlay) {
       // Randomize favorite queue
       await this.startSingleSongQueueFromStart();
     }
@@ -293,8 +298,8 @@ export class MediaplayerComponent implements OnInit {
       this.updateQueue();
     } catch (error) {
 
-      if (this.queueModel.type) {
-        switch (this.queueModel.type) {
+      if (this.queueModel.target) {
+        switch (this.queueModel.target) {
           case QUEUETYPES.favorites:
             await this.startFavoriteQueueFromStart();
             break;
@@ -336,7 +341,7 @@ export class MediaplayerComponent implements OnInit {
 
   public async startPlaylistQueueFromStart(): Promise<void>{
     try {
-      var queue = await lastValueFrom(this.queueService.CreateQueueFromPlaylist(this.queueModel.itemGuid, this.randomizePlay, this.queueModel.sortAfter, this.queueModel.asc, -1));
+      var queue = await lastValueFrom(this.queueService.CreateQueueFromPlaylist(this.queueModel.itemId, this.randomizePlay, this.queueModel.sortAfter, this.queueModel.asc, -1));
       this.rxjsService.setCurrentPlayingSong(queue.splice(0,1)[0]);
       this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist&& this.isSongPlaying);
       this.updateQueue();
@@ -347,7 +352,7 @@ export class MediaplayerComponent implements OnInit {
 
   public async startAlbumQueueFromStart(): Promise<void>{
     try {
-      var queue = await lastValueFrom(this.queueService.CreateQueueFromAlbum(this.queueModel.itemGuid, this.randomizePlay, -1));
+      var queue = await lastValueFrom(this.queueService.CreateQueueFromAlbum(this.queueModel.itemId, this.randomizePlay, -1));
       this.rxjsService.setCurrentPlayingSong(queue.splice(0,1)[0]);
       this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist&& this.isSongPlaying);
       this.updateQueue();
@@ -358,7 +363,7 @@ export class MediaplayerComponent implements OnInit {
 
   public async startSingleSongQueueFromStart(): Promise<void>{
     try {
-      var queue = await lastValueFrom(this.queueService.CreateQueueFromSingleSong(this.queueModel.itemGuid, this.randomizePlay));
+      var queue = await lastValueFrom(this.queueService.CreateQueueFromSingleSong(this.queueModel.itemId, this.randomizePlay));
       this.rxjsService.setCurrentPlayingSong(queue.splice(0,1)[0]);
       this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist&& this.isSongPlaying);
       this.updateQueue();

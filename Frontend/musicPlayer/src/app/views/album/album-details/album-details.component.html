@@ -14,9 +14,9 @@
         </p>
     </div>
     <div>
-        <span *ngIf="this.IsSongPlaying  && this.QueueModel && this.QueueModel.type == 'album'"
+        <span *ngIf="this.IsSongPlaying  && this.QueueModel && this.QueueModel.target == 'album'"
         nz-col nz-icon nzType="pause-circle" nzTheme="outline" style="font-size: 150px;" class="clickable" (click)="pauseSongs()"></span>
-        <span *ngIf="!this.IsSongPlaying || !this.QueueModel || (this.QueueModel && this.QueueModel.type != 'album')" nz-col
+        <span *ngIf="!this.IsSongPlaying || !this.QueueModel || (this.QueueModel && this.QueueModel.target != 'album')" nz-col
          nz-icon nzType="play-circle" nzTheme="outline" style="font-size: 150px;" class="clickable" (click)="playSongs()"></span>
     </div>
 

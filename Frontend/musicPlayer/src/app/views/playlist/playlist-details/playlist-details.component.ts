@@ -139,8 +139,8 @@ export class PlaylistDetailsComponent implements OnInit {
 
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
-      this.QueueModel.type == QUEUETYPES.playlist && 
-      this.QueueModel.itemGuid == this.playlistId) {
+      this.QueueModel.target == QUEUETYPES.playlist && 
+      this.QueueModel.itemId == this.playlistId) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
       return;
     }
@@ -152,8 +152,10 @@ export class PlaylistDetailsComponent implements OnInit {
       take : 0,
       query : '',
       sortAfter : paginationModel.sortAfter,
-      itemGuid : this.playlistId,
-      type : QUEUETYPES.playlist
+      itemId : this.playlistId,
+      target : QUEUETYPES.playlist,
+      loopMode: this.queueModel.loopMode,
+      random: this.queueModel.random
     });
 
     this.queueService.CreateQueueFromPlaylist(this.playlistId, false, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
@@ -203,8 +205,10 @@ export class PlaylistDetailsComponent implements OnInit {
       take : 0,
       query : '',
       sortAfter : paginationModel.sortAfter,
-      itemGuid : this.playlistId,
-      type : QUEUETYPES.playlist
+      itemId : this.playlistId,
+      target : QUEUETYPES.playlist,
+      loopMode: this.queueModel.loopMode,
+      random: this.queueModel.random
     });
 
     this.queueService.CreateQueueFromPlaylist(this.playlistId, false, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({

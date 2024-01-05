@@ -131,8 +131,8 @@ export class AlbumDetailsComponent implements OnInit {
 
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
-      this.QueueModel.type == QUEUETYPES.album && 
-      this.QueueModel.itemGuid == this.albumId) {
+      this.QueueModel.target == QUEUETYPES.album && 
+      this.QueueModel.itemId == this.albumId) {
       this.rxjsService.setIsSongPlaylingState(true);
       return;
     }
@@ -142,9 +142,11 @@ export class AlbumDetailsComponent implements OnInit {
       take : 0,
       query : '',
       sortAfter : this.paginationModel.sortAfter,
-      itemGuid : this.albumId,
+      itemId : this.albumId,
       // TOOD: Replace with interface
-      type : QUEUETYPES.album
+      target : QUEUETYPES.album,
+      loopMode: this.queueModel.loopMode,
+      random: this.queueModel.random
     });
 
     this.queueService.CreateQueueFromAlbum(this.albumId, false,-1).subscribe({
@@ -192,8 +194,10 @@ export class AlbumDetailsComponent implements OnInit {
       take : 0,
       query : '',
       sortAfter : this.paginationModel.sortAfter,
-      itemGuid : this.albumId,
-      type : QUEUETYPES.album
+      itemId : this.albumId,
+      target : QUEUETYPES.album,
+      loopMode: this.queueModel.loopMode,
+      random: this.queueModel.random
     });
 
     this.queueService.CreateQueueFromAlbum(this.albumId, false, skipSongs).subscribe({

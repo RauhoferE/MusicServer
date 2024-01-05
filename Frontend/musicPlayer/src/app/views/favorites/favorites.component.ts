@@ -117,7 +117,7 @@ export class FavoritesComponent implements OnInit{
 
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
-      this.QueueModel.type == QUEUETYPES.favorites) {
+      this.QueueModel.target == QUEUETYPES.favorites) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
       return;
     }
@@ -129,8 +129,10 @@ export class FavoritesComponent implements OnInit{
       take : 0,
       query : '',
       sortAfter : paginationModel.sortAfter,
-      itemGuid : '-1',
-      type : QUEUETYPES.favorites
+      itemId : '-1',
+      target : QUEUETYPES.favorites,
+      loopMode: this.queueModel.loopMode,
+      random: this.queueModel.random
     });
 
     this.queueService.CreateQueueFromFavorites(false, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
@@ -181,8 +183,10 @@ export class FavoritesComponent implements OnInit{
       take : 0,
       query : '',
       sortAfter : paginationModel.sortAfter,
-      itemGuid : '-1',
-      type : QUEUETYPES.favorites
+      itemId : '-1',
+      target : QUEUETYPES.favorites,
+      loopMode: this.queueModel.loopMode,
+      random: this.queueModel.random
     });
 
     this.queueService.CreateQueueFromFavorites(false, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({
