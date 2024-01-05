@@ -42,7 +42,7 @@ namespace MusicServer.Middleware
 
             if (exception.GetType() == typeof(DataNotFoundException))
             {
-                statusCode = (int)HttpStatusCode.Conflict;
+                statusCode = (int)HttpStatusCode.BadRequest;
                 responseMessage = errorMessage;
             }
 

@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { ArtistShortModel } from 'src/app/models/artist-models';
 import { FollowedPlaylistModel, PlaylistSongModel } from 'src/app/models/playlist-models';
+import { QueueModel } from 'src/app/models/storage';
 import { AllFollowedEntitiesModel, UserModel } from 'src/app/models/user-models';
 import { JwtService } from 'src/app/services/jwt.service';
+import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
@@ -30,12 +33,12 @@ export class BaseComponent implements OnInit {
   /**
    *
    */
-  constructor(private userService: UserService, private jwtService: JwtService, private rxjsService: RxjsStorageService) {
+  constructor(private userService: UserService, private jwtService: JwtService, private rxjsService: RxjsStorageService, private queueService: QueueService) {
     this.rxjsService.updateDashboardBoolean$.subscribe((val) => this.getFollowedEntities());
     
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.userName = this.jwtService.getUserName();
 
     this.rxjsService.currentPlayingSong.subscribe(x => {
@@ -43,6 +46,27 @@ export class BaseComponent implements OnInit {
     });
 
     this.getFollowedEntities();
+    await this.getQueueData();
+    await this.getCurrentPlayingSong();
+  }
+
+  async getQueueData(): Promise<void> {
+    try {
+      let queueData = await lastValueFrom(this.queueService.GetQueueData());
+      this.rxjsService.setQueueFilterAndPagination(queueData);
+    } catch (error) {
+      
+    }
+  }
+
+  async getCurrentPlayingSong(): Promise<void> {
+    try {
+      let currentSong = await lastValueFrom(this.queueService.GetCurrentSong());
+      this.rxjsService.setCurrentPlayingSong(currentSong);
+      this.rxjsService.showMediaPlayer(true);
+    } catch (error) {
+      // No current Song found 
+    }
   }
 
   getFollowedEntities(): void{
