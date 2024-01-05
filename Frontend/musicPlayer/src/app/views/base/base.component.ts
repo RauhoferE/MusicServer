@@ -46,11 +46,11 @@ export class BaseComponent implements OnInit {
     });
 
     this.getFollowedEntities();
-    await this.getQueueData();
-    await this.getCurrentPlayingSong();
+    await this.getQueueDataAsync();
+    await this.getCurrentPlayingSongAsync();
   }
 
-  async getQueueData(): Promise<void> {
+  async getQueueDataAsync(): Promise<void> {
     try {
       let queueData = await lastValueFrom(this.queueService.GetQueueData());
       this.rxjsService.setQueueFilterAndPagination(queueData);
@@ -59,7 +59,7 @@ export class BaseComponent implements OnInit {
     }
   }
 
-  async getCurrentPlayingSong(): Promise<void> {
+  async getCurrentPlayingSongAsync(): Promise<void> {
     try {
       let currentSong = await lastValueFrom(this.queueService.GetCurrentSong());
       this.rxjsService.setCurrentPlayingSong(currentSong);
