@@ -474,12 +474,15 @@ namespace MusicServer.Services
             var userId = this.activeUserService.Id;
 
             var queueData = this.dbContext.QueueData.Include(x => x.SortAfter)
+                .Include(x => x.Target)
     .Include(x => x.LoopMode)
     .FirstOrDefault(x => x.UserId == userId);
 
             if (queueData == null)
             {
-                return;
+                queueData = new QueueData();
+                queueData.UserId = userId;
+                this.dbContext.QueueData.Add(queueData);
             }
 
             queueData.ItemId = itemId;
@@ -489,10 +492,37 @@ namespace MusicServer.Services
             switch (loopMode)
             {
                 case LoopMode.None:
+                    queueData.LoopMode = this.dbContext.LovLoopModes.First(x => x.Name == LoopMode.None);
                     break;
                 case LoopMode.Audio:
+                    queueData.LoopMode = this.dbContext.LovLoopModes.First(x => x.Name == LoopMode.Audio);
                     break;
                 case LoopMode.Playlist:
+                    queueData.LoopMode = this.dbContext.LovLoopModes.First(x => x.Name == LoopMode.Playlist);
+                    break;
+                default:
+                    break;
+            }
+
+            switch (sortAfter)
+            {
+                case SortingElementsOwnPlaylistSongs.Artist:
+                    queueData.SortAfter = this.dbContext.LovPlaylistSortAfter.First(x => x.Name == SortingElementsOwnPlaylistSongs.Artist);
+                    break;
+                case SortingElementsOwnPlaylistSongs.Order:
+                    queueData.SortAfter = this.dbContext.LovPlaylistSortAfter.First(x => x.Name == SortingElementsOwnPlaylistSongs.Order);
+                    break;
+                case SortingElementsOwnPlaylistSongs.Duration:
+                    queueData.SortAfter = this.dbContext.LovPlaylistSortAfter.First(x => x.Name == SortingElementsOwnPlaylistSongs.Duration);
+                    break;
+                case SortingElementsOwnPlaylistSongs.Album:
+                    queueData.SortAfter = this.dbContext.LovPlaylistSortAfter.First(x => x.Name == SortingElementsOwnPlaylistSongs.Album);
+                    break;
+                case SortingElementsOwnPlaylistSongs.Name:
+                    queueData.SortAfter = this.dbContext.LovPlaylistSortAfter.First(x => x.Name == SortingElementsOwnPlaylistSongs.Name);
+                    break;
+                case SortingElementsOwnPlaylistSongs.DateAdded:
+                    queueData.SortAfter = this.dbContext.LovPlaylistSortAfter.First(x => x.Name == SortingElementsOwnPlaylistSongs.DateAdded);
                     break;
                 default:
                     break;
@@ -500,15 +530,23 @@ namespace MusicServer.Services
 
             switch (target)
             {
-                case LoopMode.None:
+                case QueueTarget.Playlist:
+                    queueData.Target = this.dbContext.LovQueueTargets.First(x => x.Name == QueueTarget.Playlist);
                     break;
-                case LoopMode.Audio:
+                case QueueTarget.Song:
+                    queueData.Target = this.dbContext.LovQueueTargets.First(x => x.Name == QueueTarget.Song);
                     break;
-                case LoopMode.Playlist:
+                case QueueTarget.Favorites:
+                    queueData.Target = this.dbContext.LovQueueTargets.First(x => x.Name == QueueTarget.Favorites);
+                    break;
+                case QueueTarget.Album:
+                    queueData.Target = this.dbContext.LovQueueTargets.First(x => x.Name == QueueTarget.Album);
                     break;
                 default:
                     break;
             }
+
+            await this.dbContext.SaveChangesAsync();
         }
 
         public async Task<QueueDataDto> GetQueueData()

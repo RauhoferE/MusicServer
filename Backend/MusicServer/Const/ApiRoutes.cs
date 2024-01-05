@@ -96,6 +96,7 @@
             public const string CurrentSong = "playing-item";
             public const string RandomizeQueue = "randomize";
             public const string SongWithIndex = "song/{index}";
+            public const string QueueData = "data";
 
         }
     }

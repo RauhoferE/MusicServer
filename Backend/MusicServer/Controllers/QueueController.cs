@@ -178,7 +178,21 @@ namespace MusicServer.Controllers
             }
 
             return BadRequest();
+        }
 
+        [HttpGet]
+        [Route(ApiRoutes.Queue.QueueData)]
+        public async Task<IActionResult> GetQueueData()
+        {
+            return Ok(await this.queueService.GetQueueData());
+        }
+
+        [HttpPost]
+        [Route(ApiRoutes.Queue.QueueData)]
+        public async Task<IActionResult> UpdateQueueData([FromQuery, Required]Guid itemId, [FromQuery, Required] string loopMode, [FromQuery, Required] string sortAfter, [FromQuery, Required] string target, [FromQuery, Required] bool randomize, [FromQuery, Required] bool asc)
+        {
+            await this.queueService.UpdateQueueData(itemId, loopMode, sortAfter, target, randomize, asc);
+            return Ok(await this.queueService.GetQueueData());
         }
 
 
