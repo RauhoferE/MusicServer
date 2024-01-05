@@ -192,7 +192,7 @@ namespace MusicServer.Services
 
             await this.dBContext.SaveChangesAsync();
 
-            await this.mailService.SendWelcomeEmail(user, 
+            await this.mailService.SendWelcomeEmailAsync(user, 
                 $"{this._appSettings.FrontendAddress}/{ApiRoutes.Authentication.ConfirmMail.Replace("{email}", user.Email).Replace("{token}", token)}");
         }
 
@@ -206,7 +206,7 @@ namespace MusicServer.Services
             user.TemporarayEmail = newEmail;
             await this.dBContext.SaveChangesAsync();
 
-            await this.mailService.SendEmailChangeEmail(user,
+            await this.mailService.SendEmailChangeEmailAsync(user,
     $"{this._appSettings.FrontendAddress}/{ApiRoutes.Authentication.ChangeEmail.Replace("{userId}", user.Id.ToString()).Replace("{token}", token)}");
         }
 
@@ -217,7 +217,7 @@ namespace MusicServer.Services
 
             var token = await this._userManager.GeneratePasswordResetTokenAsync(user);
 
-            await this.mailService.SendPasswordResetEmail(user,
+            await this.mailService.SendPasswordResetEmailAsync(user,
 $"{this._appSettings.FrontendAddress}/{ApiRoutes.Authentication.ResetPassword.Replace("{userId}", user.Id.ToString()).Replace("{token}", token)}");
         }
 

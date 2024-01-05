@@ -5,18 +5,18 @@ namespace MusicServer.Interfaces
 {
     public interface ISongService
     {
-        public Task<ArtistDto> GetArtist(Guid artistId);
+        public Task<ArtistDto> GetArtistAsync(Guid artistId);
 
-        public Task<AlbumPaginationResponse> GetAlbumsOfArtist(Guid artistId, int page, int take);
+        public Task<AlbumPaginationResponse> GetAlbumsOfArtistAsync(Guid artistId, int page, int take);
 
-        public Task<AlbumDto> GetAlbumInformation(Guid albumId);
+        public Task<AlbumDto> GetAlbumInformationAsync(Guid albumId);
 
-        public Task<SongPaginationResponse> GetSongsInAlbum(Guid albumId, int skip, int take);
+        public Task<SongPaginationResponse> GetSongsInAlbumAsync(Guid albumId, int skip, int take);
 
-        public Task<SongDto> GetSongInformation(Guid songId);
+        public Task<SongDto> GetSongInformationAsync(Guid songId);
 
-        public Task<SearchResultDto> Search(string filter, string searchTerm, int page, int take, string sortAfter, bool asc);
+        public Task<SearchResultDto> SearchAsync(string filter, string searchTerm, int page, int take, string sortAfter, bool asc);
 
-        public Task<int> GetSongCountOfAlbum(Guid albumId);
+        public Task<int> GetSongCountOfAlbumAsync(Guid albumId);
     }
 }

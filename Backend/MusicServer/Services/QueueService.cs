@@ -25,7 +25,7 @@ namespace MusicServer.Services
             this.mapper = mapper;
         }
 
-        public async Task ClearQueue()
+        public async Task ClearQueueAsync()
         {
             var userId = this.activeUserService.Id;
 
@@ -36,11 +36,11 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        public async Task<PlaylistSongDto> CreateQueue(PlaylistSongDto[] songs, bool orderRandom, int playFromOrder)
+        public async Task<PlaylistSongDto> CreateQueueAsync(PlaylistSongDto[] songs, bool orderRandom, int playFromOrder)
         {
             var rnd = new Random();
             var userId = this.activeUserService.Id;
-            await this.ClearQueue();
+            await this.ClearQueueAsync();
 
             if (orderRandom && playFromOrder > -1)
             {
@@ -79,14 +79,14 @@ namespace MusicServer.Services
             }
 
             await this.dbContext.SaveChangesAsync();
-            return await this.GetCurrentSongInQueue();
+            return await this.GetCurrentSongInQueueAsync();
         }
 
-        public async Task<PlaylistSongDto> CreateQueue(SongDto[] songs, bool orderRandom, int playFromOrder)
+        public async Task<PlaylistSongDto> CreateQueueAsync(SongDto[] songs, bool orderRandom, int playFromOrder)
         {
             var rnd = new Random();
             var userId = this.activeUserService.Id;
-            await this.ClearQueue();
+            await this.ClearQueueAsync();
 
             if (orderRandom && playFromOrder > -1)
             {
@@ -124,10 +124,10 @@ namespace MusicServer.Services
 
             await this.dbContext.SaveChangesAsync();
 
-            return await this.GetCurrentSongInQueue();
+            return await this.GetCurrentSongInQueueAsync();
         }
 
-        public async Task<PlaylistSongDto[]> GetCurrentQueue()
+        public async Task<PlaylistSongDto[]> GetCurrentQueueAsync()
         {
             var userId = this.activeUserService.Id;
             // Only return the current and next songs in the queue
@@ -159,7 +159,7 @@ namespace MusicServer.Services
             return mappedSongs;
         }
 
-        public async Task<PlaylistSongDto> GetCurrentSongInQueue()
+        public async Task<PlaylistSongDto> GetCurrentSongInQueueAsync()
         {
             var userId = this.activeUserService.Id;
             var song = this.dbContext.Queues
@@ -180,7 +180,7 @@ namespace MusicServer.Services
             return mappedSong;
         }
 
-        public async Task<PlaylistSongDto> SkipForwardInQueue()
+        public async Task<PlaylistSongDto> SkipForwardInQueueAsync()
         {
             var userId = this.activeUserService.Id;
             var queue = this.dbContext.Queues
@@ -209,10 +209,10 @@ namespace MusicServer.Services
 
             await this.dbContext.SaveChangesAsync();
             //TODO: If there is no next song call get current queue from frontend
-            return await this.GetCurrentSongInQueue();
+            return await this.GetCurrentSongInQueueAsync();
         }
 
-        public async Task<PlaylistSongDto> SkipForwardInQueue(int index)
+        public async Task<PlaylistSongDto> SkipForwardInQueueAsync(int index)
         {
             var userId = this.activeUserService.Id;
             var queue = this.dbContext.Queues
@@ -233,10 +233,10 @@ namespace MusicServer.Services
 
             await this.dbContext.SaveChangesAsync();
             //TODO: If there is no next song call get current queue from frontend
-            return await this.GetCurrentSongInQueue();
+            return await this.GetCurrentSongInQueueAsync();
         }
 
-        public async Task<PlaylistSongDto> SkipBackInQueue()
+        public async Task<PlaylistSongDto> SkipBackInQueueAsync()
         {
             var userId = this.activeUserService.Id;
             var queue = this.dbContext.Queues
@@ -258,10 +258,10 @@ namespace MusicServer.Services
             }
 
             await this.dbContext.SaveChangesAsync();
-            return await this.GetCurrentSongInQueue();
+            return await this.GetCurrentSongInQueueAsync();
         }
 
-        public async Task<PlaylistSongDto[]> PushSongToIndex(int srcIndex, int targetIndex)
+        public async Task<PlaylistSongDto[]> PushSongToIndexAsync(int srcIndex, int targetIndex)
         {
             var userId = this.activeUserService.Id;
             var songToMove = this.dbContext.Queues.FirstOrDefault(x => x.Order == srcIndex && x.UserId == userId)
@@ -292,10 +292,10 @@ namespace MusicServer.Services
             }
 
             await this.dbContext.SaveChangesAsync();
-            return await this.GetCurrentQueue();
+            return await this.GetCurrentQueueAsync();
         }
 
-        public async Task<PlaylistSongDto[]> RemoveSongsWithIndexFromQueue(int[] indices)
+        public async Task<PlaylistSongDto[]> RemoveSongsWithIndexFromQueueAsync(int[] indices)
         {
             var userId = this.activeUserService.Id;
             
@@ -318,10 +318,10 @@ namespace MusicServer.Services
             }
 
             await this.dbContext.SaveChangesAsync();
-            return await this.GetCurrentQueue();
+            return await this.GetCurrentQueueAsync();
         }
 
-        public async Task<PlaylistSongDto> RandomizeQueue(PlaylistSongDto[] songs)
+        public async Task<PlaylistSongDto> RandomizeQueueAsync(PlaylistSongDto[] songs)
         {
             var userId = this.activeUserService.Id;
             var rnd = new Random();
@@ -330,7 +330,7 @@ namespace MusicServer.Services
                 .Include(x => x.Song)
                 .FirstOrDefault(x => x.Order == 0 && x.UserId == userId) ?? throw new SongNotFoundException();
 
-            await this.ClearQueue();
+            await this.ClearQueueAsync();
 
             var currentSongInSongs = songs.OrderByDescending(x => x.Id == currentSong.Song.Id).FirstOrDefault() ?? throw new SongNotFoundException();
 
@@ -370,7 +370,7 @@ namespace MusicServer.Services
             return songs[0];
         }
 
-        public async Task<PlaylistSongDto> RandomizeQueue(SongDto[] songs)
+        public async Task<PlaylistSongDto> RandomizeQueueAsync(SongDto[] songs)
         {
             var userId = this.activeUserService.Id;
             var rnd = new Random();
@@ -379,7 +379,7 @@ namespace MusicServer.Services
                 .Include(x => x.Song)
                 .FirstOrDefault(x => x.Order == 0 && x.UserId == userId) ?? throw new SongNotFoundException();
 
-            await this.ClearQueue();
+            await this.ClearQueueAsync();
 
             if (!songs.Any(x => x.Id == currentSong.Song.Id ))
             {
@@ -424,7 +424,7 @@ namespace MusicServer.Services
             return mappedSongs.First();
         }
 
-        public async Task<PlaylistSongDto> GetSongInQueueWithIndex(int index)
+        public async Task<PlaylistSongDto> GetSongInQueueWithIndexAsync(int index)
         {
             if (index - 1 < 0)
             {
@@ -450,7 +450,7 @@ namespace MusicServer.Services
             return mappedSong;
         }
 
-        public async Task AddSongsToQueue(Guid[] songIds)
+        public async Task AddSongsToQueueAsync(Guid[] songIds)
         {
             var userId = this.activeUserService.Id;
             var queue = this.dbContext.Queues
@@ -481,7 +481,7 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateQueueData(Guid itemId, string loopMode, string sortAfter, string target, bool randomize, bool asc)
+        public async Task UpdateQueueDataAsync(Guid itemId, string loopMode, string sortAfter, string target, bool randomize, bool asc)
         {
             var userId = this.activeUserService.Id;
 
@@ -561,7 +561,7 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        public async Task<QueueDataDto> GetQueueData()
+        public async Task<QueueDataDto> GetQueueDataAsync()
         {
             var userId = this.activeUserService.Id;
             var queueData = this.dbContext.QueueData.Include(x => x.SortAfter)

@@ -3,19 +3,19 @@
     public interface IFileService
     {
 
-        public Task UploadPlaylistCover(Guid playlistId, IFormFile image, string extension);
+        public Task UploadPlaylistCoverAsync(Guid playlistId, IFormFile image, string extension);
 
-        public Task UploadUserAvatar(IFormFile image, string extension);
+        public Task UploadUserAvatarAsync(IFormFile image, string extension);
 
-        public Task<byte[]> GetSongStream(Guid songId);
+        public Task<byte[]> GetSongStreamAsync(Guid songId);
 
-        public Task<byte[]> GetPlaylistCover(Guid playlistId);
+        public Task<byte[]> GetPlaylistCoverAsync(Guid playlistId);
 
-        public Task<byte[]> GetUserAvatar(long userId);
+        public Task<byte[]> GetUserAvatarAsync(long userId);
 
-        public Task<byte[]> GetAlbumCover(Guid albumId);
+        public Task<byte[]> GetAlbumCoverAsync(Guid albumId);
 
-        public Task<byte[]> GetArtistCover(Guid artistId);
+        public Task<byte[]> GetArtistCoverAsync(Guid artistId);
 
         //public Task<string> GetMimeTypeForPlaylistCover(Guid playlistid);
 

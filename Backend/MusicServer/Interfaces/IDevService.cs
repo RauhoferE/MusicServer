@@ -4,6 +4,6 @@
     {
         public Task AddMoqArtistsAlbumsSongsAsync(int numberOfArtists, int numberOfAlbums, int numberOfSongs);
 
-        public Task AddMoqUsersAndPlaylists(int numberOfUsers, int numberOfPlaylists);
+        public Task AddMoqUsersAndPlaylistsAsync(int numberOfUsers, int numberOfPlaylists);
     }
 }

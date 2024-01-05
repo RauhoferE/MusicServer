@@ -30,7 +30,7 @@ namespace MusicServer.Services
             this.mapper = mapper;
         }
 
-        public async Task<GuidNamePaginationResponse> GetFollowedArtists(int page, int take, string query, bool asc)
+        public async Task<GuidNamePaginationResponse> GetFollowedArtistsAsync(int page, int take, string query, bool asc)
         {
             var targetUser = this.dBContext.Users
                 .Include(x => x.FollowedArtists)
@@ -53,7 +53,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<UserDtoPaginationResponse> GetFollowedUsers(int page, int take, string query, bool asc)
+        public async Task<UserDtoPaginationResponse> GetFollowedUsersAsync(int page, int take, string query, bool asc)
         {
             var targetUser = this.dBContext.Users
                 .Include(x => x.FollowedUsers)
@@ -86,7 +86,7 @@ namespace MusicServer.Services
             return this.mapper.Map<UserDetailsDto>(user);
         }
 
-        public async Task<FullUserPaginationResponse> GetUsersAsync(int page, int take, string searchTerm, bool asc)
+        public async Task<FullUserPaginationResponse> GetUsersAsyncAsync(int page, int take, string searchTerm, bool asc)
         {
             var users = this.dBContext.Users.Where(x => true);
 
@@ -110,7 +110,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task SubscribeToUser(long userId)
+        public async Task SubscribeToUserAsync(long userId)
         {
             var targetUser = this.dBContext.Users
                 .FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
@@ -137,7 +137,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task SuscribeToArtist(Guid artistId)
+        public async Task SuscribeToArtistAsync(Guid artistId)
         {
             var sourceUser = this.dBContext.Users
                 .Include(x => x.FollowedArtists)
@@ -158,7 +158,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task UnsubscribeFromArtist(Guid artistId)
+        public async Task UnsubscribeFromArtistAsync(Guid artistId)
         {
             var sourceUser = this.dBContext.Users
                 .Include(x => x.FollowedArtists)
@@ -171,7 +171,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task UnsubscribeFromUser(long userId)
+        public async Task UnsubscribeFromUserAsync(long userId)
         {
             var sourceUser = this.dBContext.Users
                 .Include(x => x.FollowedUsers)
@@ -232,7 +232,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task<LongNameDto[]> GetRoles()
+        public async Task<LongNameDto[]> GetRolesAsync()
         {
             List<LongNameDto> roles = new List<LongNameDto>();
             int i = 1;
@@ -251,7 +251,7 @@ namespace MusicServer.Services
         }
 
         
-        public async Task<AllFollowedEntitiesResponse> GetAllFollowedUsersArtistsPlaylistsFavorites(string filter, string searchTerm)
+        public async Task<AllFollowedEntitiesResponse> GetAllFollowedUsersArtistsPlaylistsFavoritesAsync(string filter, string searchTerm)
         {
             filter = filter ?? string.Empty;
             searchTerm = searchTerm ?? string.Empty;

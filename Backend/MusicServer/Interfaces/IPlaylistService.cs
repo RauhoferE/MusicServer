@@ -22,7 +22,7 @@ namespace MusicServer.Interfaces
 
         public Task UpdatePlaylistShareListAsync(Guid playlistId, List<UserPlaylistModifieable> dtos);
 
-        public Task RemoveUsersFromPlaylist(Guid playlistId, List<long> userIds);
+        public Task RemoveUsersFromPlaylistAsync(Guid playlistId, List<long> userIds);
 
         public Task CopyPlaylistToLibraryAsync(Guid playlistId);
 
@@ -30,28 +30,28 @@ namespace MusicServer.Interfaces
 
         public Task<PlaylistPaginationResponse> GetPlaylistsAsync(long userId, int page, int take, string sortAfter, bool asc, string query);
 
-        public Task<ModifieablePlaylistsResponse> GetModifiablePlaylists(long userId);
+        public Task<ModifieablePlaylistsResponse> GetModifiablePlaylistsAsync(long userId);
 
-        public Task<PlaylistPaginationResponse> GetPublicPlaylists(int page, int take, string sortAfter, bool asc, string query);
+        public Task<PlaylistPaginationResponse> GetPublicPlaylistsAsync(int page, int take, string sortAfter, bool asc, string query);
 
-        public Task<PlaylistUserShortDto> GetPlaylistInfo(Guid playlistId);
+        public Task<PlaylistUserShortDto> GetPlaylistInfoAsync(Guid playlistId);
 
-        public Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int skip, int take, string sortAfter, bool asc, string query);
+        public Task<PlaylistSongPaginationResponse> GetSongsInPlaylistAsync(Guid playlistId, int skip, int take, string sortAfter, bool asc, string query);
 
-        public Task<PlaylistSongPaginationResponse> GetFavorites(int skip, int take, string sortAfter, bool asc, string query);
+        public Task<PlaylistSongPaginationResponse> GetFavoritesAsync(int skip, int take, string sortAfter, bool asc, string query);
 
-        public Task AddSongsToFavorite(List<Guid> songIds);
+        public Task AddSongsToFavoriteAsync(List<Guid> songIds);
 
-        public Task RemoveSongsFromFavorite(List<Guid> songIds);
+        public Task RemoveSongsFromFavoriteAsync(List<Guid> songIds);
 
-        public Task ChangeOrderOfFavorit(int oldSpot, int newSpot);
+        public Task ChangeOrderOfFavoritAsync(int oldSpot, int newSpot);
 
-        public Task ChangeOrderOfSongInPlaylist(Guid playlistId, int oldSpot, int newSpot);
+        public Task ChangeOrderOfSongInPlaylistAsync(Guid playlistId, int oldSpot, int newSpot);
 
-        public Task ChangeOrderOfPlaylist(Guid playlistId, int newSpot);
+        public Task ChangeOrderOfPlaylistAsync(Guid playlistId, int newSpot);
 
-        public Task<int> GetPlaylistSongCount(Guid playlistId);
+        public Task<int> GetPlaylistSongCountAsync(Guid playlistId);
 
-        public Task<int> GetFavoriteSongCount();
+        public Task<int> GetFavoriteSongCountAsync();
     }
 }

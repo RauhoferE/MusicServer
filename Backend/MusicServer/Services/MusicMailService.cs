@@ -20,7 +20,7 @@ namespace MusicServer.Services
             this._mailSettings = mailSettings.Value;
         }
 
-        public async Task SendEmailChangeEmail(User user, string changeMailLink)
+        public async Task SendEmailChangeEmailAsync(User user, string changeMailLink)
         {
             var message = new MimeMessage();
 
@@ -35,7 +35,7 @@ namespace MusicServer.Services
             await this.SendMessage(message);
         }
 
-        public async Task SendNewArtistsAddedEmail(User user, List<Artist> artists)
+        public async Task SendNewArtistsAddedEmailAsync(User user, List<Artist> artists)
         {
             var message = new MimeMessage();
 
@@ -62,7 +62,7 @@ namespace MusicServer.Services
             await this.SendMessage(message);
         }
 
-        public async Task SendPasswordResetEmail(User user, string resetlink)
+        public async Task SendPasswordResetEmailAsync(User user, string resetlink)
         {
             var message = new MimeMessage();
 
@@ -77,7 +77,7 @@ namespace MusicServer.Services
             await this.SendMessage(message);
         }
 
-        public async Task SendPlaylistAddedFromUserEmail(User user, Playlist playlist, User addedUser)
+        public async Task SendPlaylistAddedFromUserEmailAsync(User user, Playlist playlist, User addedUser)
         {
             var message = new MimeMessage();
 
@@ -96,7 +96,7 @@ namespace MusicServer.Services
             await this.SendMessage(message);
         }
 
-        public async Task SendPlaylistRemovedFromUserEmail(User user, Playlist playlist, User removedUser)
+        public async Task SendPlaylistRemovedFromUserEmailAsync(User user, Playlist playlist, User removedUser)
         {
             var message = new MimeMessage();
 
@@ -114,7 +114,7 @@ namespace MusicServer.Services
             await this.SendMessage(message);
         }
 
-        public async Task SendPlaylistSharedWithUserEmail(User user, Playlist playlist, User sharedUser)
+        public async Task SendPlaylistSharedWithUserEmailAsync(User user, Playlist playlist, User sharedUser)
         {
             var message = new MimeMessage();
 
@@ -133,7 +133,7 @@ namespace MusicServer.Services
             await this.SendMessage(message);
         }
 
-        public async Task SendTracksAddedFromArtistEmail(User user, Artist artist, List<Song> songs)
+        public async Task SendTracksAddedFromArtistEmailAsync(User user, Artist artist, List<Song> songs)
         {
             var message = new MimeMessage();
 
@@ -161,7 +161,7 @@ namespace MusicServer.Services
             await this.SendMessage(message);
         }
 
-        public async Task SendTracksAddedToPlaylistEmail(User user, Playlist playlist, List<Song> songs, User targetUser)
+        public async Task SendTracksAddedToPlaylistEmailAsync(User user, Playlist playlist, List<Song> songs, User targetUser)
         {
             var message = new MimeMessage();
 
@@ -191,7 +191,7 @@ namespace MusicServer.Services
             await this.SendMessage(message);
         }
 
-        public async Task SendWelcomeEmail(User user, string activationlink)
+        public async Task SendWelcomeEmailAsync(User user, string activationlink)
         {
             var message = new MimeMessage();
 

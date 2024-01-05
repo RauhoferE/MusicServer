@@ -28,22 +28,22 @@ namespace MusicServer.Services
             this.fileserverSettings = fileSettings.Value;
         }
 
-        public async Task<byte[]> GetAlbumCover(Guid albumId)
+        public async Task<byte[]> GetAlbumCoverAsync(Guid albumId)
         {
             var album = this.dBContext.Albums.FirstOrDefault(x => x.Id == albumId)
                 ?? throw new AlbumNotFoundException();
 
             var path = $"{this.fileserverSettings.AlbumCoverFolder}/{albumId}.jpg";
-            if (!(await this.sftpService.FileExists(path)))
+            if (!(await this.sftpService.FileExistsAsync(path)))
             {
                 return await this.GetLocalFile(Path.Combine("Assets\\Images\\No-Album-Cover.png"));
             }
 
 
-            return await this.sftpService.DownloadFile(path);
+            return await this.sftpService.DownloadFileAsync(path);
         }
 
-        public async Task<byte[]> GetArtistCover(Guid artistId)
+        public async Task<byte[]> GetArtistCoverAsync(Guid artistId)
         {
             var artist = this.dBContext.Artists
                 .Include(x => x.Albums)
@@ -55,10 +55,10 @@ namespace MusicServer.Services
                 ?? throw new AlbumNotFoundException();
 
             
-            return await this.GetAlbumCover(latestAlbum.Album.Id);
+            return await this.GetAlbumCoverAsync(latestAlbum.Album.Id);
         }
 
-        public async Task<byte[]> GetPlaylistCover(Guid playlistId)
+        public async Task<byte[]> GetPlaylistCoverAsync(Guid playlistId)
         {
             var playlistUser = this.dBContext.PlaylistUsers
                 .Include(x => x.User)
@@ -68,29 +68,29 @@ namespace MusicServer.Services
                 ?? throw new NotAllowedException();
 
             var path = $"{this.fileserverSettings.PlaylistCoverFolder}/{playlistId}.png";
-            if (!(await this.sftpService.FileExists(path)))
+            if (!(await this.sftpService.FileExistsAsync(path)))
             {
                 return await this.GetLocalFile(Path.Combine("Assets\\Images\\No-Playlist-Cover.png"));
             }
 
-            return await this.sftpService.DownloadFile(path);
+            return await this.sftpService.DownloadFileAsync(path);
         }
 
-        public async Task<byte[]> GetSongStream(Guid songId)
+        public async Task<byte[]> GetSongStreamAsync(Guid songId)
         {
             var song = this.dBContext.Songs.FirstOrDefault(x => x.Id == songId)
                 ?? throw new SongNotFoundException();
 
             var path = $"{this.fileserverSettings.SongFolder}/{songId}.mp3";// Path.Combine(this.fileserverSettings.SongFolder, $"{songId}.mp3");
-            if (!( await this.sftpService.FileExists(path)))
+            if (!( await this.sftpService.FileExistsAsync(path)))
             {
                 throw new FileNotFoundException();
             }
 
-            return await this.sftpService.DownloadFile(path);
+            return await this.sftpService.DownloadFileAsync(path);
         }
 
-        public async Task<byte[]> GetUserAvatar(long userId)
+        public async Task<byte[]> GetUserAvatarAsync(long userId)
         {
             if (userId == -1)
             {
@@ -101,15 +101,15 @@ namespace MusicServer.Services
                 ?? throw new UserNotFoundException();
 
             var path = $"{this.fileserverSettings.ProfileCoverFolder}/{userId}.png";
-            if (!(await this.sftpService.FileExists(path)))
+            if (!(await this.sftpService.FileExistsAsync(path)))
             {
                 return await this.GetLocalFile(Path.Combine("Assets\\Images\\No-Profile-Cover.png"));
             }
 
-            return await this.sftpService.DownloadFile(path);
+            return await this.sftpService.DownloadFileAsync(path);
         }
 
-        public async Task UploadPlaylistCover(Guid playlistId, IFormFile image, string extension)
+        public async Task UploadPlaylistCoverAsync(Guid playlistId, IFormFile image, string extension)
         {
             var playlistUser = this.dBContext.PlaylistUsers
                 .Include(x => x.User)
@@ -121,27 +121,27 @@ namespace MusicServer.Services
 
             using (var stream = image.OpenReadStream())
             {
-                if (await sftpService.FileExists(path))
+                if (await sftpService.FileExistsAsync(path))
                 {
-                    await sftpService.DeleteFile(path);
+                    await sftpService.DeleteFileAsync(path);
                 }
 
-                await this.sftpService.UploadFile(stream, path);
+                await this.sftpService.UploadFileAsync(stream, path);
             }
         }
 
-        public async Task UploadUserAvatar(IFormFile image, string extension)
+        public async Task UploadUserAvatarAsync(IFormFile image, string extension)
         {
             var path = $"{this.fileserverSettings.ProfileCoverFolder}/{this.activeUserService.Id}{extension}";
 
             using (var stream = image.OpenReadStream())
             {
-                if (await sftpService.FileExists(path))
+                if (await sftpService.FileExistsAsync(path))
                 {
-                    await sftpService.DeleteFile(path);
+                    await sftpService.DeleteFileAsync(path);
                 }
 
-                await this.sftpService.UploadFile(stream, path);
+                await this.sftpService.UploadFileAsync(stream, path);
             }
         }
 

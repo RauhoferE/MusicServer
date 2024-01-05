@@ -103,7 +103,7 @@ namespace MusicImporter.Services
             // Save File on samba server
             using (var ms = new MemoryStream(bytes))
             {
-                await this.sftpService.UploadFile(ms, $"{fileserverSettings.AlbumCoverFolder}/{albumId}.jpg");
+                await this.sftpService.UploadFileAsync(ms, $"{fileserverSettings.AlbumCoverFolder}/{albumId}.jpg");
             }
             
         }

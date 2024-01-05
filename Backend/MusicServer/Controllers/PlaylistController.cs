@@ -56,7 +56,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.Default)]
         public async Task<IActionResult> GetPlaylistInfo([FromQuery, Required] Guid playlistId)
         {
-            var t = await this.playlistService.GetPlaylistInfo(playlistId);
+            var t = await this.playlistService.GetPlaylistInfoAsync(playlistId);
             return Ok(t);
         }
 
@@ -64,7 +64,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.Songs)]
         public async Task<IActionResult> GetSongsInPlaylist([FromRoute, Required] Guid playlistId, [FromQuery, Required] SongPaginationSearchRequest request)
         {
-            return Ok(await this.playlistService.GetSongsInPlaylist(playlistId, request.Skip, request.Take, request.SortAfter, request.Asc, request.Query));
+            return Ok(await this.playlistService.GetSongsInPlaylistAsync(playlistId, request.Skip, request.Take, request.SortAfter, request.Asc, request.Query));
         }
 
         [HttpGet]
@@ -78,14 +78,14 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.ModifieablePlaylists)]
         public async Task<IActionResult> GetModifieablePlaylists([FromQuery] long userId = -1)
         {
-            return Ok(await this.playlistService.GetModifiablePlaylists(userId));
+            return Ok(await this.playlistService.GetModifiablePlaylistsAsync(userId));
         }
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.PublicPlaylist)]
         public async Task<IActionResult> GetPublicPlaylists([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            var t = await this.playlistService.GetPublicPlaylists(request.Page, request.Take, request.SortAfter, request.Asc, request.Query);
+            var t = await this.playlistService.GetPublicPlaylistsAsync(request.Page, request.Take, request.SortAfter, request.Asc, request.Query);
             return Ok(t);
         }
 
@@ -126,7 +126,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.PlaylistShare)]
         public async Task<IActionResult> RemoveUserFromPlaylist([FromRoute, Required] Guid playlistId, [FromBody, Required] UserIds request)
         {
-            await this.playlistService.RemoveUsersFromPlaylist(playlistId, request.UserIdArray.ToList());
+            await this.playlistService.RemoveUsersFromPlaylistAsync(playlistId, request.UserIdArray.ToList());
             return NoContent();
         }
 
@@ -150,7 +150,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.Favorite)]
         public async Task<IActionResult> AddSongToFavorites([FromBody, Required] SongsToPlaylist songs)
         {
-            await this.playlistService.AddSongsToFavorite(songs.SongIds.ToList());
+            await this.playlistService.AddSongsToFavoriteAsync(songs.SongIds.ToList());
             return NoContent();
         }
 
@@ -158,7 +158,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.Favorite)]
         public async Task<IActionResult> RemoveSongsFromFavorites([FromBody, Required] SongsToPlaylist songs)
         {
-            await this.playlistService.RemoveSongsFromFavorite(songs.SongIds.ToList());
+            await this.playlistService.RemoveSongsFromFavoriteAsync(songs.SongIds.ToList());
             return NoContent();
         }
 
@@ -166,14 +166,14 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.Favorite)]
         public async Task<IActionResult> GetFavorites([FromQuery, Required] SongPaginationSearchRequest request)
         {
-            return Ok(await this.playlistService.GetFavorites(request.Skip, request.Take, request.SortAfter, request.Asc, request.Query));
+            return Ok(await this.playlistService.GetFavoritesAsync(request.Skip, request.Take, request.SortAfter, request.Asc, request.Query));
         }
 
         [HttpGet]
         [Route(ApiRoutes.Playlist.OrderFavorites)]
         public async Task<IActionResult> ChangeOrderOfFavorit([FromQuery, Required] int oldOrder, [FromQuery, Required] int newOrder)
         {
-            await this.playlistService.ChangeOrderOfFavorit(oldOrder, newOrder);
+            await this.playlistService.ChangeOrderOfFavoritAsync(oldOrder, newOrder);
             return NoContent();
         }
 
@@ -181,7 +181,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.OrderSongs)]
         public async Task<IActionResult> ChangeOrderOfSongInPlaylist([FromQuery, Required] Guid playlistId, [FromQuery, Required] int oldOrder, [FromQuery, Required] int newOrder)
         {
-            await this.playlistService.ChangeOrderOfSongInPlaylist(playlistId, oldOrder, newOrder);
+            await this.playlistService.ChangeOrderOfSongInPlaylistAsync(playlistId, oldOrder, newOrder);
             return NoContent();
         }
 
@@ -189,7 +189,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Playlist.OrderPlaylists)]
         public async Task<IActionResult> ChangeOrderOfPlaylist([FromQuery, Required] Guid playlistId, [FromQuery, Required] int order)
         {
-            await this.playlistService.ChangeOrderOfPlaylist(playlistId, order);
+            await this.playlistService.ChangeOrderOfPlaylistAsync(playlistId, order);
             return NoContent();
         }
 

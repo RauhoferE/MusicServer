@@ -8,18 +8,18 @@ namespace MusicServer.Core.Interfaces
 {
     public interface ISftpService
     {
-        Task<bool> FileExists(string path);
+        Task<bool> FileExistsAsync(string path);
 
-        Task DeleteFile(string path);
+        Task DeleteFileAsync(string path);
 
-        Task<string> GetFileExtension(string path);
+        Task<string> GetFileExtensionAsync(string path);
 
-        Task<string[]> GetFileName(string path);
+        Task<string[]> GetFileNameAsync(string path);
 
-        Task UploadFile(Stream stream, string remotePath);
+        Task UploadFileAsync(Stream stream, string remotePath);
 
-        Task<Stream> StreamFile(string path);
+        Task<Stream> StreamFileAsync(string path);
 
-        Task<byte[]> DownloadFile(string path);
+        Task<byte[]> DownloadFileAsync(string path);
     }
 }

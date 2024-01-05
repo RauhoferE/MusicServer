@@ -19,7 +19,7 @@ namespace MusicServer.Core.Services
             this.credentials = serverCredentials;
         }
 
-        public async Task DeleteFile(string path)
+        public async Task DeleteFileAsync(string path)
         {
             using (var client = new SftpClient(this.credentials.Host, this.credentials.Port, this.credentials.UserName, this.credentials.Password))
             {
@@ -29,7 +29,7 @@ namespace MusicServer.Core.Services
             }
         }
 
-        public async Task<byte[]> DownloadFile(string path)
+        public async Task<byte[]> DownloadFileAsync(string path)
         {
             using (var client = new SftpClient(this.credentials.Host, this.credentials.Port, this.credentials.UserName, this.credentials.Password))
             {
@@ -46,7 +46,7 @@ namespace MusicServer.Core.Services
             }
         }
 
-        public async Task<bool> FileExists(string path)
+        public async Task<bool> FileExistsAsync(string path)
         {
             using (var client = new SftpClient(this.credentials.Host, this.credentials.Port, this.credentials.UserName, this.credentials.Password))
             {
@@ -56,7 +56,7 @@ namespace MusicServer.Core.Services
             }
         }
 
-        public async Task<string[]> GetFileName(string path)
+        public async Task<string[]> GetFileNameAsync(string path)
         {
             using (var client = new SftpClient(this.credentials.Host, this.credentials.Port, this.credentials.UserName, this.credentials.Password))
             {
@@ -65,7 +65,7 @@ namespace MusicServer.Core.Services
             }
         }
 
-        public async Task<Stream> StreamFile(string path)
+        public async Task<Stream> StreamFileAsync(string path)
         {
             using (var client = new SftpClient(this.credentials.Host, this.credentials.Port, this.credentials.UserName, this.credentials.Password))
             {
@@ -74,7 +74,7 @@ namespace MusicServer.Core.Services
             }
         }
 
-        public async Task UploadFile(Stream stream, string remotePath)
+        public async Task UploadFileAsync(Stream stream, string remotePath)
         {
             using (var client = new SftpClient(this.credentials.Host, this.credentials.Port, this.credentials.UserName, this.credentials.Password))
             {
@@ -86,7 +86,7 @@ namespace MusicServer.Core.Services
             }
         }
 
-        public async Task<string> GetFileExtension(string path)
+        public async Task<string> GetFileExtensionAsync(string path)
         {
             using (var client = new SftpClient(this.credentials.Host, this.credentials.Port, this.credentials.UserName, this.credentials.Password))
             {

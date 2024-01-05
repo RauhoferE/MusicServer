@@ -4,22 +4,22 @@ namespace MusicServer.Interfaces
 {
     public interface IMusicMailService
     {
-        Task SendWelcomeEmail(User user, string activationlink);
+        Task SendWelcomeEmailAsync(User user, string activationlink);
 
-        Task SendPasswordResetEmail(User user, string resetlink);
+        Task SendPasswordResetEmailAsync(User user, string resetlink);
 
-        Task SendEmailChangeEmail(User user, string changeMailLink);
+        Task SendEmailChangeEmailAsync(User user, string changeMailLink);
 
-        Task SendPlaylistAddedFromUserEmail(User user, Playlist playlist, User addedUser);
+        Task SendPlaylistAddedFromUserEmailAsync(User user, Playlist playlist, User addedUser);
 
-        Task SendPlaylistSharedWithUserEmail(User user, Playlist playlist, User sharedUser);
+        Task SendPlaylistSharedWithUserEmailAsync(User user, Playlist playlist, User sharedUser);
 
-        Task SendPlaylistRemovedFromUserEmail(User user, Playlist playlist, User removedUser);
+        Task SendPlaylistRemovedFromUserEmailAsync(User user, Playlist playlist, User removedUser);
 
-        Task SendTracksAddedFromArtistEmail(User user, Artist artist, List<Song> songs);
+        Task SendTracksAddedFromArtistEmailAsync(User user, Artist artist, List<Song> songs);
 
-        Task SendNewArtistsAddedEmail(User user, List<Artist> artists);
+        Task SendNewArtistsAddedEmailAsync(User user, List<Artist> artists);
 
-        Task SendTracksAddedToPlaylistEmail(User user, Playlist playlist, List<Song> songs, User targetUser);
+        Task SendTracksAddedToPlaylistEmailAsync(User user, Playlist playlist, List<Song> songs, User targetUser);
     }
 }

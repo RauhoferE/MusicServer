@@ -53,7 +53,7 @@ internal class Program
         await TASK_FACTORY.StartNew(async () =>
         {
             using var scope = APP.Services.CreateScope();
-            await scope.ServiceProvider.GetRequiredService<IAutomatedMessagingService>().SendAutomatedMessages();
+            await scope.ServiceProvider.GetRequiredService<IAutomatedMessagingService>().SendAutomatedMessagesAsync();
         });
     }
 

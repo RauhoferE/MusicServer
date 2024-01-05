@@ -25,7 +25,7 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> Song([FromRoute, Required] Guid songId)
         {
             Response.ContentType = "audio/mp3";
-            var f =  File(await this.fileService.GetSongStream(songId), "audio/mp3");
+            var f =  File(await this.fileService.GetSongStreamAsync(songId), "audio/mp3");
             f.EnableRangeProcessing = true;
             return f;
         }
@@ -34,28 +34,28 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> Album([FromRoute, Required] Guid albumId)
         {
             Response.ContentType = "image/jpeg";
-            return File(await this.fileService.GetAlbumCover(albumId), "image/jpeg");
+            return File(await this.fileService.GetAlbumCoverAsync(albumId), "image/jpeg");
         }
 
         [HttpGet(ApiRoutes.File.Artist)]
         public async Task<IActionResult> Artist([FromRoute, Required] Guid artistId)
         {
             Response.ContentType = "image/jpeg";
-            return File(await this.fileService.GetArtistCover(artistId), "image/jpeg");
+            return File(await this.fileService.GetArtistCoverAsync(artistId), "image/jpeg");
         }
 
         [HttpGet(ApiRoutes.File.Playlist)]
         public async Task<IActionResult> Playlist([FromRoute, Required] Guid playlistId)
         {
             Response.ContentType = "image/png";
-            return File(await this.fileService.GetPlaylistCover(playlistId), "image/png");
+            return File(await this.fileService.GetPlaylistCoverAsync(playlistId), "image/png");
         }
 
         [HttpGet(ApiRoutes.File.User)]
         public async Task<IActionResult> User([FromRoute, Required] long userId)
         {
             Response.ContentType = "image/png";
-            return File(await this.fileService.GetUserAvatar(userId), "image/png");
+            return File(await this.fileService.GetUserAvatarAsync(userId), "image/png");
         }
 
         [HttpPost(ApiRoutes.File.Playlist)]
@@ -68,7 +68,7 @@ namespace MusicServer.Controllers
                     throw new UploadedFileNotSupportedException();
                 }
 
-                await this.fileService.UploadPlaylistCover(playlistId, file, Path.GetExtension(file.FileName));
+                await this.fileService.UploadPlaylistCoverAsync(playlistId, file, Path.GetExtension(file.FileName));
                 return Ok();
             }
 
@@ -84,7 +84,7 @@ namespace MusicServer.Controllers
                 {
                     throw new UploadedFileNotSupportedException();
                 }
-                await this.fileService.UploadUserAvatar(file, Path.GetExtension(file.FileName));
+                await this.fileService.UploadUserAvatarAsync(file, Path.GetExtension(file.FileName));
                 return Ok();
             }
 

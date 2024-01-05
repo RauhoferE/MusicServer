@@ -58,7 +58,7 @@ namespace MusicImporter.Services
             
             using (var fs = new FileStream(file, FileMode.Open))
             {
-                await this.sftpService.UploadFile(fs, $@"{fileserverSettings.SongFolder}/{songId}.mp3");
+                await this.sftpService.UploadFileAsync(fs, $@"{fileserverSettings.SongFolder}/{songId}.mp3");
             }
         }
 

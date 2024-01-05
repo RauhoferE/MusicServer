@@ -8,21 +8,21 @@ namespace MusicServer.Interfaces
 {
     public interface IUserService
     {
-        public Task SubscribeToUser(long userId);
+        public Task SubscribeToUserAsync(long userId);
 
-        public Task SuscribeToArtist(Guid artistId);
+        public Task SuscribeToArtistAsync(Guid artistId);
 
-        public Task UnsubscribeFromUser(long userId);
+        public Task UnsubscribeFromUserAsync(long userId);
 
-        public Task UnsubscribeFromArtist(Guid artistId);
+        public Task UnsubscribeFromArtistAsync(Guid artistId);
 
-        public Task<GuidNamePaginationResponse> GetFollowedArtists(int page, int take, string query, bool asc);
+        public Task<GuidNamePaginationResponse> GetFollowedArtistsAsync(int page, int take, string query, bool asc);
 
-        public Task<UserDtoPaginationResponse> GetFollowedUsers(int page, int take, string query, bool asc);
+        public Task<UserDtoPaginationResponse> GetFollowedUsersAsync(int page, int take, string query, bool asc);
 
-        public Task<FullUserPaginationResponse> GetUsersAsync(int page, int take, string searchTerm, bool asc);
+        public Task<FullUserPaginationResponse> GetUsersAsyncAsync(int page, int take, string searchTerm, bool asc);
 
-        public Task<AllFollowedEntitiesResponse> GetAllFollowedUsersArtistsPlaylistsFavorites(string filter, string searchTerm);
+        public Task<AllFollowedEntitiesResponse> GetAllFollowedUsersArtistsPlaylistsFavoritesAsync(string filter, string searchTerm);
 
         public Task<UserDetailsDto> GetUserAsync(long userId);
 
@@ -32,6 +32,6 @@ namespace MusicServer.Interfaces
 
         public Task RemoveRoleFromUserAsync(long userId, long roleId);
 
-        public Task<LongNameDto[]> GetRoles();
+        public Task<LongNameDto[]> GetRolesAsync();
     }
 }

@@ -4,15 +4,15 @@ namespace MusicServer.Interfaces
 {
     public interface IAutomatedMessagingService
     {
-        Task SendAutomatedMessages();
+        Task SendAutomatedMessagesAsync();
 
-        Task AddPlaylistMessage(long userId, Guid playlistId);
+        Task AddPlaylistMessageAsync(long userId, Guid playlistId);
 
-        Task AddSongsToPlaylistMessage(long userId, Guid playlistId, List<Guid> songIds);
+        Task AddSongsToPlaylistMessageAsync(long userId, Guid playlistId, List<Guid> songIds);
 
-        Task PlaylistShareMessage(long userId, Guid playlistId, long targetUserId);
+        Task PlaylistShareMessageAsync(long userId, Guid playlistId, long targetUserId);
 
-        Task PlaylistRemoveMessage(long userId, Guid playlistId, long targetUserId);
+        Task PlaylistRemoveMessageAsync(long userId, Guid playlistId, long targetUserId);
 
 
     }

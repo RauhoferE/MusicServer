@@ -35,7 +35,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.User.SubscribeUser)]
         public async Task<IActionResult> SubscribeToUser([FromRoute, Required] long userId)
         {
-            await this.userService.SubscribeToUser(userId);
+            await this.userService.SubscribeToUserAsync(userId);
             return NoContent();
         }
 
@@ -43,7 +43,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.User.SubscribeUser)]
         public async Task<IActionResult> UnSubscribeFromUser([FromRoute, Required] long userId)
         {
-            await this.userService.UnsubscribeFromUser(userId);
+            await this.userService.UnsubscribeFromUserAsync(userId);
             return NoContent();
         }
 
@@ -51,7 +51,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.User.SubscribeArtist)]
         public async Task<IActionResult> SubscribeToArtist([FromRoute, Required] Guid artistId)
         {
-            await this.userService.SuscribeToArtist(artistId);
+            await this.userService.SuscribeToArtistAsync(artistId);
             return NoContent();
         }
 
@@ -59,7 +59,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.User.SubscribeArtist)]
         public async Task<IActionResult> UnSubscribeFromArtist([FromRoute, Required] Guid artistId)
         {
-            await this.userService.UnsubscribeFromArtist(artistId);
+            await this.userService.UnsubscribeFromArtistAsync(artistId);
             return NoContent();
         }
 
@@ -67,21 +67,21 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.User.GetFollowedArtists)]
         public async Task<IActionResult> GetSubscribedArtists([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            return Ok(await this.userService.GetFollowedArtists(request.Page, request.Take, request.Query, request.Asc));
+            return Ok(await this.userService.GetFollowedArtistsAsync(request.Page, request.Take, request.Query, request.Asc));
         }
 
         [HttpGet]
         [Route(ApiRoutes.User.GetFollowedUsers)]
         public async Task<IActionResult> GetSubscribedUsers([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            return Ok(await this.userService.GetFollowedUsers(request.Page, request.Take, request.Query, request.Asc));
+            return Ok(await this.userService.GetFollowedUsersAsync(request.Page, request.Take, request.Query, request.Asc));
         }
 
         [HttpGet]
         [Route(ApiRoutes.User.GetUsers)]
         public async Task<IActionResult> GetUserList([FromQuery, Required] QueryPaginationSearchRequest request)
         {
-            return Ok(await this.userService.GetUsersAsync(request.Page, request.Take, request.Query, request.Asc));
+            return Ok(await this.userService.GetUsersAsyncAsync(request.Page, request.Take, request.Query, request.Asc));
         }
 
         [HttpGet]
@@ -119,14 +119,14 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.User.Roles)]
         public async Task<IActionResult> GetRoles()
         {
-            return Ok(await this.userService.GetRoles());
+            return Ok(await this.userService.GetRolesAsync());
         }
 
         [HttpGet]
         [Route(ApiRoutes.User.GetFollowedEntiies)]
         public async Task<IActionResult> GetFollowedEntities([FromQuery] string filter = "", [FromQuery] string searchTerm = "")
         {
-            return Ok(await this.userService.GetAllFollowedUsersArtistsPlaylistsFavorites(filter, searchTerm));
+            return Ok(await this.userService.GetAllFollowedUsersArtistsPlaylistsFavoritesAsync(filter, searchTerm));
         }
     }
 }

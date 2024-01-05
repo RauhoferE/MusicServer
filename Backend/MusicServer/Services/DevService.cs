@@ -74,7 +74,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task AddMoqUsersAndPlaylists(int numberOfUsers, int numberOfPlaylists)
+        public async Task AddMoqUsersAndPlaylistsAsync(int numberOfUsers, int numberOfPlaylists)
         {
             var emailList = new List<string>();
             var rnd = new Random();

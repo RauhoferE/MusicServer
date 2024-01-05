@@ -31,7 +31,7 @@ namespace MusicServer.Services
             this._mapper = mapper;
         }
 
-        public async Task<AlbumPaginationResponse> GetAlbumsOfArtist(Guid artistId, int page, int take)
+        public async Task<AlbumPaginationResponse> GetAlbumsOfArtistAsync(Guid artistId, int page, int take)
         {
             var artist = this._dbContext.Artists.FirstOrDefault(x => x.Id == artistId) ?? throw new ArtistNotFoundException();
 
@@ -51,7 +51,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<ArtistDto> GetArtist(Guid artistId)
+        public async Task<ArtistDto> GetArtistAsync(Guid artistId)
         {
             var artist = this._dbContext.Artists
                 .Include(x => x.Albums)
@@ -91,7 +91,7 @@ namespace MusicServer.Services
             return mappedArtists;
         }
 
-        public async Task<SongDto> GetSongInformation(Guid songId)
+        public async Task<SongDto> GetSongInformationAsync(Guid songId)
         {
             var song = this._dbContext.Songs
                 .Include(x => x.Artists)
@@ -114,7 +114,7 @@ namespace MusicServer.Services
             return mappedSong;
         }
 
-        public async Task<SongPaginationResponse> GetSongsInAlbum(Guid albumId, int skip, int take)
+        public async Task<SongPaginationResponse> GetSongsInAlbumAsync(Guid albumId, int skip, int take)
         {
             var album = this._dbContext.Albums.FirstOrDefault(x => x.Id == albumId) ?? throw new AlbumNotFoundException();
 
@@ -148,7 +148,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<SearchResultDto> Search(string filter, string searchTerm, int page, int take, string sortAfter, bool asc)
+        public async Task<SearchResultDto> SearchAsync(string filter, string searchTerm, int page, int take, string sortAfter, bool asc)
         {
             switch (filter)
             {
@@ -325,7 +325,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<AlbumDto> GetAlbumInformation(Guid albumId)
+        public async Task<AlbumDto> GetAlbumInformationAsync(Guid albumId)
         {
             var album = this._dbContext.Albums
                 .Include(x => x.Artists)
@@ -336,7 +336,7 @@ namespace MusicServer.Services
             return this._mapper.Map<AlbumDto>(album);
         }
 
-        public async Task<int> GetSongCountOfAlbum(Guid albumId)
+        public async Task<int> GetSongCountOfAlbumAsync(Guid albumId)
         {
             var a = this._dbContext.Albums.FirstOrDefault(x => x.Id == albumId) ?? throw new AlbumNotFoundException();
             return this._dbContext.Songs.Include(x => x.Album).Count(x => x.Album.Id == albumId);

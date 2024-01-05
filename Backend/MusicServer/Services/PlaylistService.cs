@@ -134,7 +134,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task AddSongsToFavorite(List<Guid> songIds)
+        public async Task AddSongsToFavoriteAsync(List<Guid> songIds)
         {
             var user = this.dBContext.Users.Include(x => x.Favorites)
                 .ThenInclude(x => x.FavoriteSong).FirstOrDefault(x => x.Id == this.activeUserService.Id) 
@@ -195,7 +195,7 @@ namespace MusicServer.Services
                 });
             }
 
-            await this.automatedMessagingService.AddSongsToPlaylistMessage(user.Id, playlist.Playlist.Id, songIds.Distinct().ToList());
+            await this.automatedMessagingService.AddSongsToPlaylistMessageAsync(user.Id, playlist.Playlist.Id, songIds.Distinct().ToList());
 
             await this.dBContext.SaveChangesAsync();
         }
@@ -249,7 +249,7 @@ namespace MusicServer.Services
 
             if (isPublic)
             {
-                await this.automatedMessagingService.AddPlaylistMessage(this.activeUserService.Id, entity.Entity.Playlist.Id);
+                await this.automatedMessagingService.AddPlaylistMessageAsync(this.activeUserService.Id, entity.Entity.Playlist.Id);
             }
 
             return entity.Entity.Playlist.Id;
@@ -292,7 +292,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task<PlaylistSongPaginationResponse> GetFavorites(int skip, int take, string sortAfter, bool asc, string query)
+        public async Task<PlaylistSongPaginationResponse> GetFavoritesAsync(int skip, int take, string sortAfter, bool asc, string query)
         {
             var user = this.dBContext.Users.Include(x => x.Favorites)
             .ThenInclude(x => x.FavoriteSong)
@@ -320,7 +320,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<PlaylistUserShortDto> GetPlaylistInfo(Guid playlistId)
+        public async Task<PlaylistUserShortDto> GetPlaylistInfoAsync(Guid playlistId)
         {
             var playlist = this.dBContext.Playlists
                 .Include(x => x.Users)
@@ -424,7 +424,7 @@ namespace MusicServer.Services
             };  
         }
 
-        public async Task<PlaylistPaginationResponse> GetPublicPlaylists(int page, int take, string sortAfter, bool asc, string query)
+        public async Task<PlaylistPaginationResponse> GetPublicPlaylistsAsync(int page, int take, string sortAfter, bool asc, string query)
         {
             var playlists = this.dBContext.Playlists
                 .Include(x => x.Songs)
@@ -470,7 +470,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<PlaylistSongPaginationResponse> GetSongsInPlaylist(Guid playlistId, int skip, int take, string sortAfter, bool asc, string query)
+        public async Task<PlaylistSongPaginationResponse> GetSongsInPlaylistAsync(Guid playlistId, int skip, int take, string sortAfter, bool asc, string query)
         {
             var playlist = this.dBContext.Playlists
                                 .Include(x => x.Users)
@@ -519,7 +519,7 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task RemoveSongsFromFavorite(List<Guid> songIds)
+        public async Task RemoveSongsFromFavoriteAsync(List<Guid> songIds)
         {
             var user = this.dBContext.Users.Include(x => x.Favorites)
     .ThenInclude(x => x.FavoriteSong).FirstOrDefault(x => x.Id == this.activeUserService.Id)
@@ -597,7 +597,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task RemoveUsersFromPlaylist(Guid playlistId, List<long> userIds)
+        public async Task RemoveUsersFromPlaylistAsync(Guid playlistId, List<long> userIds)
         {
             var user = this.dBContext.Users
                 .Include(x => x.Playlists)
@@ -639,7 +639,7 @@ namespace MusicServer.Services
 
                 this.dBContext.Remove(entityToRemove);
 
-                await this.automatedMessagingService.PlaylistRemoveMessage(this.activeUserService.Id, playlist.Playlist.Id, entityToRemove.User.Id);
+                await this.automatedMessagingService.PlaylistRemoveMessageAsync(this.activeUserService.Id, playlist.Playlist.Id, entityToRemove.User.Id);
             }
 
             await this.dBContext.SaveChangesAsync();
@@ -709,13 +709,13 @@ namespace MusicServer.Services
                 });
 
                 await this.automatedMessagingService
-                    .PlaylistShareMessage(this.activeUserService.Id, playlist.Playlist.Id, targetUser.Id);
+                    .PlaylistShareMessageAsync(this.activeUserService.Id, playlist.Playlist.Id, targetUser.Id);
             }
 
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task ChangeOrderOfFavorit(int oldSpot, int newSpot)
+        public async Task ChangeOrderOfFavoritAsync(int oldSpot, int newSpot)
         {
             var favorites = this.dBContext.Users
                 .Include(x => x.Favorites)
@@ -754,7 +754,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task ChangeOrderOfSongInPlaylist(Guid playlistId, int oldSpot, int newSpot)
+        public async Task ChangeOrderOfSongInPlaylistAsync(Guid playlistId, int oldSpot, int newSpot)
         {
             var playlist = this.dBContext.PlaylistUsers
                 .Include(x => x.Playlist)
@@ -796,7 +796,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task ChangeOrderOfPlaylist(Guid playlistId, int newSpot)
+        public async Task ChangeOrderOfPlaylistAsync(Guid playlistId, int newSpot)
         {
             var playlists = this.dBContext.PlaylistUsers
     .Include(x => x.Playlist)
@@ -861,7 +861,7 @@ namespace MusicServer.Services
             return lastSongInOrder.Order;
         }
 
-        public async Task<ModifieablePlaylistsResponse> GetModifiablePlaylists(long userId)
+        public async Task<ModifieablePlaylistsResponse> GetModifiablePlaylistsAsync(long userId)
         {
             var userIdToSearch = userId == -1 ? this.activeUserService.Id : userId;
             var playlists = this.dBContext.PlaylistUsers
@@ -875,14 +875,14 @@ namespace MusicServer.Services
                 };
         }
 
-        public async Task<int> GetPlaylistSongCount(Guid playlistId)
+        public async Task<int> GetPlaylistSongCountAsync(Guid playlistId)
         {
             var p = this.dBContext.Playlists.FirstOrDefault(x => x.Id == playlistId) ?? throw new PlaylistNotFoundException();
 
             return this.dBContext.PlaylistSongs.Include(x => x.Playlist).Count(x => x.Playlist.Id == playlistId);
         }
 
-        public async Task<int> GetFavoriteSongCount()
+        public async Task<int> GetFavoriteSongCountAsync()
         {
             var userId = this.activeUserService.Id;
             return this.dBContext.FavoriteSongs.Count(x => x.User.Id == userId);

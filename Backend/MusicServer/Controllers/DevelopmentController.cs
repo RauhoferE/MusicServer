@@ -42,7 +42,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Development.CreateUsersAndPlaylists)]
         public async Task<IActionResult> CreateMoqUsersWithPlaylists([FromRoute, Required] int users, [FromRoute, Required] int playlists)
         {
-            await this.devService.AddMoqUsersAndPlaylists(users, playlists);
+            await this.devService.AddMoqUsersAndPlaylistsAsync(users, playlists);
             return NoContent();
         }
     }

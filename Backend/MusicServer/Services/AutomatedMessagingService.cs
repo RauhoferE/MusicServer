@@ -21,7 +21,7 @@ namespace MusicServer.Services
             this.dBContext = dBContext;
         }
 
-        public async Task AddPlaylistMessage(long userId, Guid playlistId)
+        public async Task AddPlaylistMessageAsync(long userId, Guid playlistId)
         {
             var messageType = this.dBContext.LovMessageTypes
                 .FirstOrDefault(x => x.Id == (long)Core.Const.MessageType.PlaylistAdded) ??
@@ -38,7 +38,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task AddSongsToPlaylistMessage(long userId, Guid playlistId, List<Guid> songIds)
+        public async Task AddSongsToPlaylistMessageAsync(long userId, Guid playlistId, List<Guid> songIds)
         {
             var messageType = this.dBContext.LovMessageTypes
     .FirstOrDefault(x => x.Id == (long)Core.Const.MessageType.PlaylistSongsAdded) ??
@@ -73,7 +73,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task PlaylistRemoveMessage(long userId, Guid playlistId, long targetUserId)
+        public async Task PlaylistRemoveMessageAsync(long userId, Guid playlistId, long targetUserId)
         {
             var messageType = this.dBContext.LovMessageTypes
             .FirstOrDefault(x => x.Id == (long)Core.Const.MessageType.PlaylistShareRemoved) ??
@@ -91,7 +91,7 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task PlaylistShareMessage(long userId, Guid playlistId, long targetUserId)
+        public async Task PlaylistShareMessageAsync(long userId, Guid playlistId, long targetUserId)
         {
             var messageType = this.dBContext.LovMessageTypes
 .FirstOrDefault(x => x.Id == (long)Core.Const.MessageType.PlaylistShared) ??
@@ -109,7 +109,7 @@ throw new MessageTypeNotFoundException();
             await this.dBContext.SaveChangesAsync();
         }
 
-        public async Task SendAutomatedMessages()
+        public async Task SendAutomatedMessagesAsync()
         {
             var messages = this.dBContext.MessageQueue
                 .Include(x => x.Songs)
@@ -161,7 +161,7 @@ throw new MessageTypeNotFoundException();
 
             foreach (var user in users)
             {
-                await this.mailService.SendNewArtistsAddedEmail(user, artists);
+                await this.mailService.SendNewArtistsAddedEmailAsync(user, artists);
             }
         }
 
@@ -188,7 +188,7 @@ throw new MessageTypeNotFoundException();
 
                 foreach (var user in followedUser)
                 {
-                    await this.mailService.SendTracksAddedFromArtistEmail(user, artist, songs);
+                    await this.mailService.SendTracksAddedFromArtistEmailAsync(user, artist, songs);
                 }
             }
         }
@@ -210,11 +210,11 @@ throw new MessageTypeNotFoundException();
 
                 if (removeUser)
                 {
-                    await this.mailService.SendPlaylistRemovedFromUserEmail(user, playlist, sharedUser);
+                    await this.mailService.SendPlaylistRemovedFromUserEmailAsync(user, playlist, sharedUser);
                     continue;
                 }
 
-                await this.mailService.SendPlaylistSharedWithUserEmail(user, playlist, sharedUser);
+                await this.mailService.SendPlaylistSharedWithUserEmailAsync(user, playlist, sharedUser);
             }
         }
 
@@ -245,7 +245,7 @@ throw new MessageTypeNotFoundException();
 
                 foreach (var followedUser in followedUsers)
                 {
-                    await this.mailService.SendTracksAddedToPlaylistEmail(user, playlist, songs, followedUser);
+                    await this.mailService.SendTracksAddedToPlaylistEmailAsync(user, playlist, songs, followedUser);
                 }
             }
         }
@@ -271,7 +271,7 @@ throw new MessageTypeNotFoundException();
 
                 foreach (var followedUser in followedUsers)
                 {
-                    await this.mailService.SendPlaylistAddedFromUserEmail(user, playlist, followedUser);
+                    await this.mailService.SendPlaylistAddedFromUserEmailAsync(user, playlist, followedUser);
                 }
             }
         }
