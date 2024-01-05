@@ -40,6 +40,12 @@ namespace MusicServer.Middleware
                 responseMessage = errorMessage;
             }
 
+            if (exception.GetType() == typeof(DataNotFoundException))
+            {
+                statusCode = (int)HttpStatusCode.Conflict;
+                responseMessage = errorMessage;
+            }
+
             if (exception.GetType() == typeof(PlaylistNotFoundException))
             {
                 statusCode = (int)HttpStatusCode.BadRequest;
