@@ -17,4 +17,40 @@ export class UserService {
       withCredentials: true
     })
   }
+
+  public SuscribeToArtist(artistId: string): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.user}/subscribe/artist/${artistId}`,{
+      withCredentials: true
+    })
+  }
+
+  public UnSuscribeFromArtist(artistId: string): Observable<object>{
+    return this.httpClient.delete<object>(`${environment.apiUrl}/${APIROUTES.user}/subscribe/artist/${artistId}`,{
+      withCredentials: true
+    })
+  }
+
+  public SuscribeToUser(userId: string): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.user}/subscribe/user/${userId}`,{
+      withCredentials: true
+    })
+  }
+
+  public UnSuscribeFromUser(userId: string): Observable<object>{
+    return this.httpClient.delete<object>(`${environment.apiUrl}/${APIROUTES.user}/subscribe/user/${userId}`,{
+      withCredentials: true
+    })
+  }
+
+  public ReceiveNotficationsFromArtist(artistId: string): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.user}/notifications/artist/${artistId}`,{
+      withCredentials: true
+    })
+  }
+
+  public RemoveNotficationsFromArtist(artistId: string): Observable<object>{
+    return this.httpClient.delete<object>(`${environment.apiUrl}/${APIROUTES.user}/notifications/artist/${artistId}`,{
+      withCredentials: true
+    })
+  }
 }

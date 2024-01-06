@@ -331,5 +331,45 @@ namespace MusicServer.Services
                 FollowedPlaylists = mappedFollowedPlaylists
             };
         }
+
+        public async Task ActivateNotificationsFromArtistAsync(Guid artistId)
+        {
+            var followedArtist = this.dBContext.FollowedArtists
+    .Include(x => x.Artist)
+    .Include(x => x.User)
+    .FirstOrDefault(x => x.User.Id == this.activeUserService.Id && x.Artist.Id == artistId);
+
+            // IF player already follows artist
+            if (followedArtist != null)
+            {
+                followedArtist.ReceiveNotifications = true;
+                await this.dBContext.SaveChangesAsync();
+                return;
+            }
+
+            var artist = this.dBContext.Artists.FirstOrDefault(x => x.Id == artistId) ?? throw new ArtistNotFoundException();
+
+            var user = this.dBContext.Users.FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
+            this.dBContext.FollowedArtists.Add(new UserArtist()
+            {
+                Artist = artist,
+                User = user,
+                ReceiveNotifications = true
+            });
+
+            await this.dBContext.SaveChangesAsync();
+        }
+
+        public async Task DeactivateNotificationsFromArtistAsync(Guid artistId)
+        {
+            var followedArtist = this.dBContext.FollowedArtists
+.Include(x => x.Artist)
+.Include(x => x.User)
+.FirstOrDefault(x => x.User.Id == this.activeUserService.Id && x.Artist.Id == artistId) ?? throw new DataNotFoundException();
+
+            followedArtist.ReceiveNotifications = false;
+            await this.dBContext.SaveChangesAsync();
+        }
     }
 }

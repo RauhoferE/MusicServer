@@ -64,6 +64,22 @@ namespace MusicServer.Controllers
         }
 
         [HttpGet]
+        [Route(ApiRoutes.User.ReceiveNotificationsArtist)]
+        public async Task<IActionResult> ReceiveNotificationsFromArtist([FromRoute, Required] Guid artistId)
+        {
+            await this.userService.ActivateNotificationsFromArtistAsync(artistId);
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route(ApiRoutes.User.ReceiveNotificationsArtist)]
+        public async Task<IActionResult> RemoveNotificationsFromArtist([FromRoute, Required] Guid artistId)
+        {
+            await this.userService.DeactivateNotificationsFromArtistAsync(artistId);
+            return NoContent();
+        }
+
+        [HttpGet]
         [Route(ApiRoutes.User.GetFollowedArtists)]
         public async Task<IActionResult> GetSubscribedArtists([FromQuery, Required] QueryPaginationSearchRequest request)
         {

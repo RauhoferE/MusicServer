@@ -1,1 +1,31 @@
-<p>artist-details works!</p>
+<div>
+    <div>
+        <div nz-row>
+            <img nz-col [src]="getAlbumCoverSrc()" style="width: 300px; height: 300px;"/>
+
+            <h1 nz-col style="align-self: center;">
+                {{this.ArtistModel.name}}
+            </h1>
+        </div>
+
+        <div style="margin-top: 2em;" nz-row>
+            <!-- Put follow component here -->
+            <button *ngIf="!this.ArtistModel.followedByUser" nz-col nz-button nzType="default" class="clickable-button" (click)="subscribeToArtist()">Follow</button>
+            <button *ngIf="this.ArtistModel.followedByUser" nz-col nz-button nzType="default" class="clickable-button success-color" (click)="subscribeToArtist()">Unfollow</button>
+            <button *ngIf="!this.ArtistModel.receiveNotifications" nz-col nz-button nzType="default" class="clickable-button" nzShape="circle" (click)="activateNotifications()">
+                <span nz-icon nzType="mail" nzTheme="outline"></span>
+            </button>
+            <button *ngIf="this.ArtistModel.receiveNotifications" nz-col nz-button nzType="default" class="clickable-button success-color" nzShape="circle" (click)="activateNotifications()">
+                <span nz-icon nzType="mail" nzTheme="outline"></span>
+            </button>
+        </div>
+        <p >
+            {{this.ArtistModel.description == ''}}
+        </p>
+    </div>
+    <div>
+        Album component here
+    </div>
+
+    <!-- Put album list here -->
+</div>

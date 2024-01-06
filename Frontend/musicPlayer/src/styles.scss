@@ -48,6 +48,16 @@
     cursor: pointer;
 }
 
+.clickable-button{
+    cursor: pointer;
+}
+
+.clickable-button:hover{
+    color: #52c41a;
+    cursor: pointer;
+    border-color: #52c41a;
+}
+
 /*Bootstrap Shenanigans*/
 
 .mt-1{
