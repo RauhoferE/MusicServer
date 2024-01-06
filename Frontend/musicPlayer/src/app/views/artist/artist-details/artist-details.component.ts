@@ -85,6 +85,7 @@ export class ArtistDetailsComponent implements OnInit {
       },
       complete: () => {
         this.getArtistDetails();
+        this.updateDashBoard();
         // Get new model
       }
     })
@@ -100,6 +101,7 @@ export class ArtistDetailsComponent implements OnInit {
         },
         complete: () => {
           this.getArtistDetails();
+          this.updateDashBoard();
           // Get new model
         }
       })
@@ -114,10 +116,21 @@ export class ArtistDetailsComponent implements OnInit {
       },
       complete: () => {
         this.getArtistDetails();
+        this.updateDashBoard();
         // Get new model
       }
     })
 
+  }
+
+  updateDashBoard(): void{
+    var currenState = false;
+    this.rxjsService.updateDashboardBoolean$.subscribe((val) =>{
+      currenState = val;
+    })
+
+    // Update value in rxjs so the dashboard gets updated
+    this.rxjsService.setUpdateDashboardBoolean(!currenState);
   }
 
   getAlbumCoverSrc(): string{

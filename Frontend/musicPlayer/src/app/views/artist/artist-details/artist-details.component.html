@@ -9,7 +9,6 @@
         </div>
 
         <div style="margin-top: 2em;" nz-row>
-            <!-- Put follow component here -->
             <button *ngIf="!this.ArtistModel.followedByUser" nz-col nz-button nzType="default" class="clickable-button" (click)="subscribeToArtist()">Follow</button>
             <button *ngIf="this.ArtistModel.followedByUser" nz-col nz-button nzType="default" class="clickable-button success-color" (click)="subscribeToArtist()">Unfollow</button>
             <button *ngIf="!this.ArtistModel.receiveNotifications" nz-col nz-button nzType="default" class="clickable-button" nzShape="circle" (click)="activateNotifications()">
