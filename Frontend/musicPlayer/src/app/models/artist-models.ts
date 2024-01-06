@@ -3,6 +3,7 @@ export interface ArtistShortModel{
     name: string;
     followedByUser: boolean;
     receiveNotifications: boolean;
+    description: string;
 }
 
 export interface AlbumArtistModel{
@@ -18,4 +19,9 @@ export interface AlbumModel{
     release: Date;
     songCount: number;
     duration: number;
+}
+
+export interface AlbumPaginationModel{
+    totalCount: number;
+    albums: AlbumModel[];
 }

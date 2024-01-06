@@ -12,8 +12,8 @@
 
         public bool ReceiveNotifications { get; set; } = false;
 
-        public AlbumArtistDto[] Albums { get; set; }
+        //public AlbumArtistDto[] Albums { get; set; }
 
-        public SongDto[] Songs { get; set; }
+        //public SongDto[] Songs { get; set; }
     }
 }

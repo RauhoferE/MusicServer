@@ -79,9 +79,9 @@ namespace MusicServer.Mapper
 
             this.CreateMap<Album, AlbumArtistDto>(MemberList.Destination);
 
-            this.CreateMap<Artist, ArtistDto>(MemberList.Destination)
-                .ForMember(dest => dest.Albums, opt => opt.MapFrom(ps => ps.Albums.Select(x => x.Album)))
-                .ForMember(dest => dest.Songs, opt => opt.MapFrom(ps => ps.Songs.Select(x => x.Song)));
+            this.CreateMap<Artist, ArtistDto>(MemberList.Destination);
+                //.ForMember(dest => dest.Albums, opt => opt.MapFrom(ps => ps.Albums.Select(x => x.Album)))
+                //.ForMember(dest => dest.Songs, opt => opt.MapFrom(ps => ps.Songs.Select(x => x.Song)));
 
 
             this.CreateMap<Album, AlbumDto>(MemberList.Destination)

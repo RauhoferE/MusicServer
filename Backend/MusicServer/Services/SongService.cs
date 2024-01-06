@@ -54,10 +54,6 @@ namespace MusicServer.Services
         public async Task<ArtistDto> GetArtistAsync(Guid artistId)
         {
             var artist = this._dbContext.Artists
-                .Include(x => x.Albums)
-                .ThenInclude(x => x.Album)
-                .Include(x => x.Songs)
-                .ThenInclude(x => x.Song)
                 .FirstOrDefault(x => x.Id == artistId) ?? throw new ArtistNotFoundException();
 
             var mappedArtists = this._mapper.Map<ArtistDto>(artist);
@@ -73,20 +69,20 @@ namespace MusicServer.Services
                 mappedArtists.ReceiveNotifications = followedArtist.ReceiveNotifications;
             }
 
-            foreach (var song in mappedArtists.Songs)
-            {
-                var favoriteSong = this._dbContext.FavoriteSongs
-                    .Include(x => x.FavoriteSong)
-                    .Include(x => x.User)
-                    .FirstOrDefault(x => x.FavoriteSong.Id == song.Id && x.User.Id == this._activeUserService.Id);  
+            //foreach (var song in mappedArtists.Songs)
+            //{
+            //    var favoriteSong = this._dbContext.FavoriteSongs
+            //        .Include(x => x.FavoriteSong)
+            //        .Include(x => x.User)
+            //        .FirstOrDefault(x => x.FavoriteSong.Id == song.Id && x.User.Id == this._activeUserService.Id);  
                 
-                if (favoriteSong == null)
-                {
-                    continue;
-                }
+            //    if (favoriteSong == null)
+            //    {
+            //        continue;
+            //    }
 
-                song.IsInFavorites = true;
-            }
+            //    song.IsInFavorites = true;
+            //}
 
             return mappedArtists;
         }

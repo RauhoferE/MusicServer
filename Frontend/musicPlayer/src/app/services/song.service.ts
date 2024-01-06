@@ -4,7 +4,7 @@ import { PlaylistSongModel, SongPaginationModel } from '../models/playlist-model
 import { environment } from 'src/environments/environment';
 import { APIROUTES } from '../constants/api-routes';
 import { Observable } from 'rxjs';
-import { AlbumModel } from '../models/artist-models';
+import { AlbumModel, AlbumPaginationModel, ArtistShortModel } from '../models/artist-models';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +27,18 @@ export class SongService {
 
   public GetAlbumSongs(id: string, skip: number, take: number): Observable<SongPaginationModel>{
     return this.httpClient.get<SongPaginationModel>(`${environment.apiUrl}/${APIROUTES.song}/album/songs/${id}?skip=${skip}&take=${take}`,{
+      withCredentials: true
+    })
+  }
+
+  public GetArtistDetails(id: string): Observable<ArtistShortModel>{
+    return this.httpClient.get<ArtistShortModel>(`${environment.apiUrl}/${APIROUTES.song}/artist/${id}`,{
+      withCredentials: true
+    })
+  }
+
+  public GetArtistAlbums(id: string, page:number, take: number): Observable<AlbumPaginationModel>{
+    return this.httpClient.get<AlbumPaginationModel>(`${environment.apiUrl}/${APIROUTES.song}/artist/${id}/albums?page=${page}&take=${take}`,{
       withCredentials: true
     })
   }

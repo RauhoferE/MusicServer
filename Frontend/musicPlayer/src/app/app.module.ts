@@ -56,6 +56,7 @@ import { AlbumDetailsComponent } from './views/album/album-details/album-details
 import { SongDetailsComponent } from './views/song/song-details/song-details.component';
 import { AudioLoopComponent } from './components/svg/audio-loop/audio-loop.component';
 import { AudioLoopOneComponent } from './components/svg/audio-loop-one/audio-loop-one.component';
+import { ArtistDetailsComponent } from './views/artist/artist-details/artist-details.component';
 
 
 
@@ -85,7 +86,8 @@ registerLocaleData(en);
     AlbumDetailsComponent,
     SongDetailsComponent,
     AudioLoopComponent,
-    AudioLoopOneComponent
+    AudioLoopOneComponent,
+    ArtistDetailsComponent
   ],
   imports: [
     BrowserModule,
