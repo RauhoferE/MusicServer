@@ -9,8 +9,10 @@ import { QueueModel } from 'src/app/models/storage';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QueueService } from 'src/app/services/queue.service';
-import { PlaylistSongModel } from 'src/app/models/playlist-models';
+import { GuidNameModel, PlaylistSongModel } from 'src/app/models/playlist-models';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
+import { PlaylistService } from 'src/app/services/playlist.service';
 
 @Component({
   selector: 'app-album-list',
@@ -34,11 +36,18 @@ export class AlbumListComponent implements OnInit {
   private queueModel: QueueModel = {} as any;
 
   private isSongPlaying: boolean = false;
+
+  private modifieablePlaylists: GuidNameModel[] = [];
+
+  private selectedTableItem: AlbumModel = {
+  } as AlbumModel;
   
   /**
    *
    */
-  constructor(private songService: SongService, private queueService: QueueService,private message: NzMessageService,  private rxjstorageService: RxjsStorageService) {
+  constructor(private songService: SongService, private queueService: QueueService, 
+    private playlistService: PlaylistService,private nzContextMenuService: NzContextMenuService,
+    private message: NzMessageService,  private rxjstorageService: RxjsStorageService) {
     
     
   }
@@ -79,6 +88,48 @@ export class AlbumListComponent implements OnInit {
         console.log(error);
       }
     })
+  }
+
+  addAlbumToPlaylist(id: string, params: AlbumModel): void{
+
+    this.playlistService.AddAlbumToPlaylist(id, params.id).subscribe({
+      next: ()=>{
+        this.updateDashBoard();
+
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    })
+
+  }
+
+  addAlbumToQueue(params: AlbumModel): void{
+    this.queueService.AddAlbumToQueue(params.id).subscribe({
+      next: ()=>{
+        this.updateDashBoard();
+
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    })
+  }
+
+  contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: AlbumModel): void {
+    this.selectedTableItem = item;
+    this.playlistService.GetModifieablePlaylists(-1).subscribe((val)=>{
+      this.modifieablePlaylists = val.playlists;
+    })
+
+    this.nzContextMenuService.create($event, menu);
+    
+    // Add events via jquery
+
+  }
+
+  closeMenu(): void {
+    this.nzContextMenuService.close();
   }
 
   playSong(id: string): void{
@@ -123,6 +174,16 @@ export class AlbumListComponent implements OnInit {
 
   pauseSong(): void{
     this.rxjstorageService.setIsSongPlaylingState(false);
+  }
+
+  updateDashBoard(): void{
+    var currenState = false;
+    this.rxjstorageService.updateDashboardBoolean$.subscribe((val) =>{
+      currenState = val;
+    })
+
+    // Update value in rxjs so the dashboard gets updated
+    this.rxjstorageService.setUpdateDashboardBoolean(!currenState);
   }
 
   scrollEvent(event : any): void{  
@@ -170,6 +231,14 @@ export class AlbumListComponent implements OnInit {
 
   public get IsSongPlaying(): boolean{
     return this.isSongPlaying;
+  }
+
+  public get ModifieablePlaylists(): GuidNameModel[]{
+    return this.modifieablePlaylists;
+  }
+
+  public get SelectedTableItem(): AlbumModel{
+    return this.selectedTableItem;
   }
 
 }

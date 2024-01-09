@@ -78,6 +78,28 @@ namespace MusicServer.Controllers
         }
 
         [HttpGet]
+        [Route(ApiRoutes.Queue.AddAlbumToQueue)]
+        public async Task<IActionResult> AddAlbumToQueue([FromRoute, Required] Guid albumId)
+        {
+            var albumSongCount = await this.songService.GetSongCountOfAlbumAsync(albumId);
+            var albumSongs = await this.songService.GetSongsInAlbumAsync(albumId, 0, albumSongCount);
+            await this.queueService.AddSongsToQueueAsync(albumSongs.Songs.Select(x => x.Id).ToArray());
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route(ApiRoutes.Queue.AddPlaylistToQueue)]
+        public async Task<IActionResult> AddPlaylistToQueue([FromRoute, Required] Guid playlistId)
+        {
+            var playlistSongCount = await this.playlistService.GetPlaylistSongCountAsync(playlistId);
+            var playlistSongs = await this.playlistService.GetSongsInPlaylistAsync(playlistId, 0, playlistSongCount, "name", true, null);
+            await this.queueService.AddSongsToQueueAsync(playlistSongs.Songs.Select(x => x.Id).ToArray());
+            return Ok();
+        }
+
+
+
+        [HttpGet]
         [Route(ApiRoutes.Queue.Default)]
         public async Task<IActionResult> GetCurrentQueue()
         {
@@ -151,6 +173,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Queue.RandomizeQueue)]
         public async Task<IActionResult> RandomizeQueue([FromQuery]Guid playlistId, [FromQuery] Guid albumId, [FromQuery] Guid songId, [FromQuery, Required] string loopMode)
         {
+            // TODO: Change this so that the actual queue gets randomized
             if (playlistId == Guid.Empty && albumId == Guid.Empty && songId == Guid.Empty)
             {
                 // Get favroites

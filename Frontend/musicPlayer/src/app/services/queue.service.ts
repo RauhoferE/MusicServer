@@ -37,6 +37,18 @@ export class QueueService {
     })
   }
 
+  public AddAlbumToQueue(albumId: string): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.queue}/add/album/${albumId}`,{
+      withCredentials: true
+    })
+  }
+
+  public AddPlaylistToQueue(playlistId: string): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.queue}/add/playlist/${playlistId}`,{
+      withCredentials: true
+    })
+  }
+
   public RandomizeQueueFromAlbum(albumId: string, loopMode: string,): Observable<PlaylistSongModel>{
     return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/randomize?albumId=${albumId}&loopMode=${loopMode}`,{
       withCredentials: true

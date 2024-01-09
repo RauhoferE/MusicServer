@@ -1,6 +1,6 @@
 <div style="margin-bottom: 5em;">
       <div class="demo-infinite-container" (scroll)="scrollEvent($event)">
-        <div *ngFor="let item of this.Albums; trackBy: trackByFn">
+        <div *ngFor="let item of this.Albums; trackBy: trackByFn" (contextmenu)="contextMenu($event, menu, item)">
             <div nz-row class="album-item">
                 <img nz-col [src]="getAlbumCoverSrc(item.id)" style="width: 150px; height: 150px;" class="album-image"/>
                 <div style="font-size: xx-large;" class="album-item-button">
@@ -21,5 +21,16 @@
             </div>
         </div>
       </div>
+      <nz-dropdown-menu #menu="nzDropdownMenu">
+        <ul nz-menu>
+            <li nz-submenu nzTitle="Add to playlist" id="add-pl">
+                <ul>
+                    <li nz-menu-item *ngFor="let data of this.ModifieablePlaylists" (click)="addAlbumToPlaylist(data.id, this.SelectedTableItem)">{{data.name}}</li>
+                </ul>
+            </li>
+            <li nz-menu-item id="add-queue" (click)="addAlbumToQueue(this.SelectedTableItem)">Add to queue</li>
+        </ul>
+    </nz-dropdown-menu>
+
 
 </div>

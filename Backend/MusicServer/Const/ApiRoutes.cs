@@ -93,6 +93,8 @@
             public const string SkipBack = "prev";
             public const string RemoveSongsFromQueue = "remove";
             public const string AddSongsToQueue = "add";
+            public const string AddAlbumToQueue = "add/album/{albumId}";
+            public const string AddPlaylistToQueue = "add/playlist/{playlistId}";
             public const string PushSongInQueue = "push";
             public const string CurrentSong = "playing-item";
             public const string RandomizeQueue = "randomize";
