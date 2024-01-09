@@ -149,4 +149,8 @@ export class ArtistDetailsComponent implements OnInit {
     return this.artistModel;
   }
 
+  public get ArtistId(): string{
+    return this.artistId;
+  }
+
 }

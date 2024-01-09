@@ -1,0 +1,25 @@
+<div style="margin-bottom: 5em;">
+      <div class="demo-infinite-container" (scroll)="scrollEvent($event)">
+        <div *ngFor="let item of this.Albums; trackBy: trackByFn">
+            <div nz-row class="album-item">
+                <img nz-col [src]="getAlbumCoverSrc(item.id)" style="width: 150px; height: 150px;" class="album-image"/>
+                <div style="font-size: xx-large;" class="album-item-button">
+                    <span *ngIf="this.CurrentPlayingAlbumId != item.id || !this.IsSongPlaying"
+                     nz-icon nzType="play-circle" nzTheme="outline" class="clickable" (click)="playSong(item.id)"></span>
+                     <span *ngIf="this.IsSongPlaying && this.CurrentPlayingAlbumId == item.id"
+                     nz-icon nzType="pause-circle" nzTheme="outline" class="clickable" (click)="pauseSong()"></span>
+                </div>
+                <div nz-col class="album-item-text">
+                    <h3 nz-row >
+                        {{item.name}}
+                    </h3>
+    
+                    <div nz-row>
+                        {{getYear(item.release)}}
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+
+</div>

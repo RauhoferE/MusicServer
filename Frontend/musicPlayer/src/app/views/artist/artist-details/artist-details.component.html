@@ -19,12 +19,10 @@
             </button>
         </div>
         <p >
-            {{this.ArtistModel.description == ''}}
+            {{this.ArtistModel.description == null ? 'No description' : this.ArtistModel.description}}
         </p>
     </div>
-    <div>
-        Album component here
-    </div>
+    <app-album-list [artistId]="this.ArtistId"/>
 
     <!-- Put album list here -->
 </div>

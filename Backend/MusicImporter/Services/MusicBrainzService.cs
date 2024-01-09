@@ -39,7 +39,7 @@ namespace MusicImporter.Services
 
             // Get MBID
             //https://musicbrainz.org/ws/2/release?query=No%20grave%20But%20the%20Sea%20(deluxe%20edition)&limit=1&fmt=json
-            var mbidResp = await client.GetAsync($"https://musicbrainz.org/ws/2/release?query={WebUtility.UrlEncode(albumName)}&limit=20&fmt=json");
+            var mbidResp = await client.GetAsync($"https://musicbrainz.org/ws/2/release?query={WebUtility.UrlEncode(albumName)}%20AND%20{WebUtility.UrlEncode(artistName)}&limit=20&fmt=json");
 
             if (mbidResp.StatusCode != HttpStatusCode.OK)
             {

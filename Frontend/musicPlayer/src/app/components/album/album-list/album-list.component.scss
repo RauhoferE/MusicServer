@@ -1,0 +1,20 @@
+.demo-infinite-container {
+    height: 290px;
+    width: 50%;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    overflow-y: auto;
+  }
+
+.album-item{
+    padding: 10px;
+}
+.album-item-text{
+    align-self: center;
+    margin-left: 1em;
+}
+
+.album-item-button{
+    align-self: center;
+    margin-left: 0.5em;
+}
