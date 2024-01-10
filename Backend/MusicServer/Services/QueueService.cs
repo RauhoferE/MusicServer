@@ -30,7 +30,7 @@ namespace MusicServer.Services
         {
             var userId = this.activeUserService.Id;
 
-            var queue = this.dbContext.Queues.Where(x => (x.UserId == userId && !x.AddedManualy) || x.Order == 0);
+            var queue = this.dbContext.Queues.Where(x => x.UserId == userId && !x.AddedManualy);
             //var queuData = this.dbContext.QueueData.Where(x => x.UserId == userId);
             this.dbContext.Queues.RemoveRange(queue);
             //this.dbContext.QueueData.RemoveRange(queuData);
@@ -584,14 +584,16 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artists)
                 .ThenInclude(x => x.Artist)
                 .Include(x => x.Song.Album)
-                .Where(x => x.UserId == userId && x.Order > 0);
+                .Where(x => x.UserId == userId && x.Order > 0 && !x.AddedManualy);
 
             foreach (var item in queue)
             {
                 item.Order = item.Order + songIds.Length;
             }
 
-            int order = 1;
+            var manuallyAddedSongCount = this.dbContext.Queues.Count(x => x.UserId == userId && x.Order > 0 && x.AddedManualy);
+
+            int order = 1 + manuallyAddedSongCount;
             foreach (var songId in songIds)
             {
                 var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == songId) ?? throw new SongNotFoundException();
@@ -599,7 +601,8 @@ namespace MusicServer.Services
                 {
                     Order = order,
                     Song = song,
-                    UserId = userId
+                    UserId = userId,
+                    AddedManualy = true
                 });
                 order = order + 1;
             }
