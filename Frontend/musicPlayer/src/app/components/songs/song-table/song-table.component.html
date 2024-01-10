@@ -21,6 +21,7 @@
     [nzPageIndex]="PageIndex"
     (nzQueryParams)="onQueryParamsChange($event)"
     [nzShowPagination]="displayPagination"
+    [nzShowSizeChanger]="showPageSizeChanger"
     >
         <thead >
             <tr *ngIf="displayHeader">

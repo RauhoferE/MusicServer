@@ -29,6 +29,7 @@ export class SongQueueComponent implements OnInit {
 
   ngOnInit(): void {
     this.rxjsStorageService.updateQueueBoolean$.subscribe(x => {
+      console.log("Update queue")
       this.onQueueTablePaginationUpdated();
     });
 
@@ -41,9 +42,18 @@ export class SongQueueComponent implements OnInit {
     })
 
     this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
+      console.log("Update queue and table")
       this.onQueueTablePaginationUpdated();
       this.onCurrentSongPaginationUpdated();
     });
+
+    this.rxjsStorageService.setCurrentPaginationSongModel({
+      asc: true,
+      page: 1,
+      query: '',
+      sortAfter: 'order',
+      take: 30
+    })
   }
   
   async onQueueTablePaginationUpdated() {

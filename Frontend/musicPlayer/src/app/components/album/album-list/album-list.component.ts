@@ -107,7 +107,7 @@ export class AlbumListComponent implements OnInit {
   addAlbumToQueue(params: AlbumModel): void{
     this.queueService.AddAlbumToQueue(params.id).subscribe({
       next: ()=>{
-        this.updateDashBoard();
+        //this.updateDashBoard();
 
       },
       error: (error)=>{

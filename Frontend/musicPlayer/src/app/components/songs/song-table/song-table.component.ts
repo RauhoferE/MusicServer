@@ -77,6 +77,8 @@ export class SongTableComponent implements OnInit {
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
+  @Input() showPageSizeChanger: boolean = true;
+
 
   /**
    *
