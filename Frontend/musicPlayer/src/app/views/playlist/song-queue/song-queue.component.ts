@@ -31,6 +31,7 @@ export class SongQueueComponent implements OnInit {
     this.rxjsStorageService.updateQueueBoolean$.subscribe(x => {
       console.log("Update queue")
       this.onQueueTablePaginationUpdated();
+      this.onCurrentSongPaginationUpdated();
     });
 
     this.rxjsStorageService.currentPlayingSong.subscribe(x => {
@@ -41,11 +42,11 @@ export class SongQueueComponent implements OnInit {
       this.isSongPlaying = x;
     })
 
-    this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
-      console.log("Update queue and table")
-      this.onQueueTablePaginationUpdated();
-      this.onCurrentSongPaginationUpdated();
-    });
+    // this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
+    //   console.log("Update queue and table")
+    //   this.onQueueTablePaginationUpdated();
+    //   this.onCurrentSongPaginationUpdated();
+    // });
 
     this.rxjsStorageService.setCurrentPaginationSongModel({
       asc: true,

@@ -145,6 +145,7 @@ export class MediaplayerComponent implements OnInit {
         currentSong.isInFavorites = false;
         this.rxjsService.setCurrentPlayingSong(currentSong);
         this.updateDashBoardAndSongTable();
+        this.updateQueue();
       }
     });
 
@@ -158,6 +159,7 @@ export class MediaplayerComponent implements OnInit {
         currentSong.isInFavorites = true;
         this.rxjsService.setCurrentPlayingSong(currentSong);
         this.updateDashBoardAndSongTable();
+        this.updateQueue();
       }
 
 
@@ -192,6 +194,7 @@ export class MediaplayerComponent implements OnInit {
           this.rxjsService.setCurrentPlayingSong(song);
           // Update possible queue view
           this.updateSongTable();
+          this.updateQueue();
         },
         error:(error: any)=>{
           //this.message.error("Error when getting queue.");
@@ -214,6 +217,7 @@ export class MediaplayerComponent implements OnInit {
           this.rxjsService.setCurrentPlayingSong(song);
           // Update possible queue view
           this.updateSongTable();
+          this.updateQueue();
         },
         error:(error: any)=>{
           //this.message.error("Error when getting queue.");
@@ -236,6 +240,7 @@ export class MediaplayerComponent implements OnInit {
           this.rxjsService.setCurrentPlayingSong(song);
           // Update possible queue view
           this.updateSongTable();
+          this.updateQueue();
         },
         error:(error: any)=>{
           //this.message.error("Error when getting queue.");
@@ -258,6 +263,7 @@ export class MediaplayerComponent implements OnInit {
           this.rxjsService.setCurrentPlayingSong(song);
           // Update possible queue view
           this.updateSongTable();
+          this.updateQueue();
         },
         error:(error: any)=>{
           //this.message.error("Error when getting queue.");
