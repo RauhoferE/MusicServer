@@ -38,6 +38,8 @@ namespace MusicServer.Interfaces
 
         public Task ClearQueueAsync();
 
+        public Task ClearManuallyAddedQueueAsync();
+
         public Task<PlaylistSongDto[]> RemoveSongsWithIndexFromQueueAsync(int[] indices);
 
         public Task<PlaylistSongDto[]> PushSongToIndexAsync(int srcIndex, int targetIndex);

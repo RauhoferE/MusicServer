@@ -15,5 +15,7 @@ namespace DataAccess.Entities
         public long UserId { get; set; }
 
         public Song Song { get; set; }
+
+        public bool AddedManualy { get; set; }
     }
 }
