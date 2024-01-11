@@ -257,7 +257,6 @@ namespace MusicServer.Services
             return mappedSong;
         }
 
-        // TODO: Test me
         public async Task<PlaylistSongDto> SkipForwardInQueueAsync()
         {
             var userId = this.activeUserService.Id;
@@ -341,7 +340,6 @@ namespace MusicServer.Services
             return await this.GetCurrentSongInQueueAsync();
         }
 
-        // TODO: Test me
         public async Task<PlaylistSongDto> SkipBackInQueueAsync()
         {
             var userId = this.activeUserService.Id;
@@ -378,7 +376,7 @@ namespace MusicServer.Services
                 // If the current song wasnt manually added put them at the end of the manually added songs
                 if (queueEntity.Order == 0 && !queueEntity.AddedManualy && manuallyAddedSongCount > 0)
                 {
-                    queueEntity.Order = queueEntity.Order + addToOrder + manuallyAddedSongCount;
+                    queueEntity.Order = addToOrder + manuallyAddedSongCount;
                     continue;
                 }
 
