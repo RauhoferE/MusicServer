@@ -405,6 +405,10 @@ namespace MusicServer.Services
             var oldSongOrder = songToMove.Order;
             songToMove.Order = targetIndex;
 
+            // If the song gets moved to the manually added ones mark it as manually added
+            // If the song gets moved out of the manually added ones mark it as not manually added so it will disapear when you reshuffle the queue.
+            songToMove.AddedManualy = targetPlace.AddedManualy;
+
             var queueToTraverse = this.dbContext.Queues.Where(x => x.Order <= targetIndex && x.Id != songToMove.Id && x.Order > oldSongOrder && x.UserId == userId);
 
             if (oldSongOrder > targetIndex)
