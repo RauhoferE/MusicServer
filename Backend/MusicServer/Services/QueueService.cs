@@ -25,7 +25,6 @@ namespace MusicServer.Services
             this.mapper = mapper;
         }
 
-        // TODO: Test me
         public async Task ClearQueueAsync()
         {
             var userId = this.activeUserService.Id;
@@ -59,7 +58,6 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        // TODO: Test me
         public async Task<PlaylistSongDto> CreateQueueAsync(PlaylistSongDto[] songs, bool orderRandom, int playFromOrder)
         {
             var rnd = new Random();
@@ -111,14 +109,17 @@ namespace MusicServer.Services
                 });
             }
 
-            var nextSongCount = this.dbContext.Queues.Count(x => x.UserId == userId && x.AddedManualy);
+            var lastManuallyAddedSong = this.dbContext.Queues.Where(x => x.UserId == userId && x.AddedManualy).OrderByDescending(x => x.Order).FirstOrDefault();
+
+            var lastOrder = lastManuallyAddedSong == null ? 0 : lastManuallyAddedSong.Order;
 
             for (int i = lastStop; i < songs.Length; i++)
             {
+                lastOrder++;
                 var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == songs[i].Id) ?? throw new SongNotFoundException();
                 this.dbContext.Queues.Add(new QueueEntity()
                 {
-                    Order = i + nextSongCount,
+                    Order = lastOrder,
                     Song = song,
                     UserId = userId,
                     AddedManualy = false
@@ -131,7 +132,6 @@ namespace MusicServer.Services
             return await this.GetCurrentSongInQueueAsync();
         }
 
-        // TODO: Test me
         public async Task<PlaylistSongDto> CreateQueueAsync(SongDto[] songs, bool orderRandom, int playFromOrder)
         {
             var rnd = new Random();
@@ -180,14 +180,17 @@ namespace MusicServer.Services
                 });
             }
 
-            var nextSongCount = this.dbContext.Queues.Count(x => x.UserId == userId && x.AddedManualy);
+            var lastManuallyAddedSong = this.dbContext.Queues.Where(x => x.UserId == userId && x.AddedManualy).OrderByDescending(x => x.Order).FirstOrDefault();
+
+            var lastOrder = lastManuallyAddedSong == null ? 0 : lastManuallyAddedSong.Order;
 
             for (int i = lastStop; i < songs.Length; i++)
             {
+                lastOrder++;
                 var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == songs[i].Id) ?? throw new SongNotFoundException();
                 this.dbContext.Queues.Add(new QueueEntity()
                 {
-                    Order = i + nextSongCount,
+                    Order = lastOrder,
                     Song = song,
                     UserId = userId,
                     AddedManualy = false
@@ -301,7 +304,6 @@ namespace MusicServer.Services
             return await this.GetCurrentSongInQueueAsync();
         }
 
-        // TODO: Test me
         public async Task<PlaylistSongDto> SkipForwardInQueueAsync(int index)
         {
             var userId = this.activeUserService.Id;
@@ -310,23 +312,29 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artists)
                 .ThenInclude(x => x.Artist)
                 .Include(x => x.Song.Album)
-                .Where(x => x.UserId == userId);
+                .Where(x => x.UserId == userId)
+                .OrderByDescending(x => x.Order);
 
-            var targetSong = this.dbContext.Queues.Where(x => x.UserId == userId && x.Order == index) ?? throw new SongNotFoundException();
+            var targetSong = this.dbContext.Queues.FirstOrDefault(x => x.UserId == userId && x.Order == index) ?? throw new SongNotFoundException();
 
             var subtractValue = 0 - index;
+
+            List<QueueEntity> toRemove = new List<QueueEntity>();
 
             foreach (var queueEntity in queue)
             {
                 if (queueEntity.Order + (subtractValue) < 0 && queueEntity.AddedManualy)
                 {
                     // Remove song from list
-                    subtractValue = subtractValue + -1;
+                    toRemove.Add(queueEntity);
+                    subtractValue = subtractValue + 1;
                     continue;
                 }
 
                 queueEntity.Order = queueEntity.Order + (subtractValue);
             }
+
+            this.dbContext.RemoveRange(toRemove);
 
             await this.dbContext.SaveChangesAsync();
             //TODO: If there is no next song call get current queue from frontend
