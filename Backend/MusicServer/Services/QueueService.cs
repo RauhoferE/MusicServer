@@ -203,8 +203,7 @@ namespace MusicServer.Services
         }
 
         // TODO: Test me
-        //TODO: Change return type or add function to get next songs
-        public async Task<PlaylistSongDto[]> GetCurrentQueueAsync()
+        public async Task<QueueSongDto[]> GetCurrentQueueAsync()
         {
             var userId = this.activeUserService.Id;
             // Only return the current and next songs in the queue
@@ -217,10 +216,10 @@ namespace MusicServer.Services
 
             if (queue.Count() == 0)
             {
-                return new PlaylistSongDto[0];
+                return new QueueSongDto[0];
             }
 
-            var mappedSongs = this.mapper.Map<PlaylistSongDto[]>(
+            var mappedSongs = this.mapper.Map<QueueSongDto[]>(
                 queue.OrderBy(x => x.Order).Take(30).ToArray()
                 );
 
@@ -393,7 +392,7 @@ namespace MusicServer.Services
             return await this.GetCurrentSongInQueueAsync();
         }
 
-        public async Task<PlaylistSongDto[]> PushSongToIndexAsync(int srcIndex, int targetIndex)
+        public async Task<QueueSongDto[]> PushSongToIndexAsync(int srcIndex, int targetIndex)
         {
             var userId = this.activeUserService.Id;
             var songToMove = this.dbContext.Queues.FirstOrDefault(x => x.Order == srcIndex && x.UserId == userId)
