@@ -457,6 +457,8 @@ namespace MusicServer.Services
             return await this.GetCurrentQueueAsync();
         }
 
+        // TODO: Chjange and test me
+        // The manually added songs should stay in the position where they are
         public async Task<PlaylistSongDto> RandomizeQueueAsync(PlaylistSongDto[] songs)
         {
             var userId = this.activeUserService.Id;
@@ -506,6 +508,8 @@ namespace MusicServer.Services
             return songs[0];
         }
 
+        // TODO: Chjange and test me
+        // The manually added songs should stay in the position where they are
         public async Task<PlaylistSongDto> RandomizeQueueAsync(SongDto[] songs)
         {
             var userId = this.activeUserService.Id;

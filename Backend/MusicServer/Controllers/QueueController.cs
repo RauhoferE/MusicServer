@@ -117,7 +117,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Queue.Default)]
         public async Task<IActionResult> ClearCurrentQueue()
         {
-            await this.queueService.ClearQueueAsync();
+            await this.queueService.ClearManuallyAddedQueueAsync();
             return Ok();
         }
 
