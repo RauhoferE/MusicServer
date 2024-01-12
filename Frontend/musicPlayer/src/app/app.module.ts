@@ -58,6 +58,7 @@ import { AudioLoopComponent } from './components/svg/audio-loop/audio-loop.compo
 import { AudioLoopOneComponent } from './components/svg/audio-loop-one/audio-loop-one.component';
 import { ArtistDetailsComponent } from './views/artist/artist-details/artist-details.component';
 import { AlbumListComponent } from './components/album/album-list/album-list.component';
+import { QueueTableComponent } from './components/songs/queue-table/queue-table.component';
 
 
 
@@ -89,7 +90,8 @@ registerLocaleData(en);
     AudioLoopComponent,
     AudioLoopOneComponent,
     ArtistDetailsComponent,
-    AlbumListComponent
+    AlbumListComponent,
+    QueueTableComponent
   ],
   imports: [
     BrowserModule,
