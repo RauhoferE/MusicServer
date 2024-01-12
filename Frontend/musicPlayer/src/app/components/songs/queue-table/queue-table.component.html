@@ -1,1 +1,83 @@
-<p>queue-table works!</p>
+<div>
+    <nz-table
+    nzShowSizeChanger
+    [nzData]="songs.songs"
+    [nzFrontPagination]="false"
+    [nzLoading]="(IsLoading | async)"
+    [nzTotal]="songs.totalCount"
+    [nzPageSize]="PageSize"
+    [nzPageIndex]="PageIndex"
+    (nzQueryParams)="onQueryParamsChange($event)"
+    [nzShowPagination]="false"
+    [nzShowSizeChanger]="false"
+    >
+        <thead >
+        </thead>
+        <tbody cdkDropList (cdkDropListDropped)="drop($event)" class="drag-boundry">
+            <tr *ngFor="let data of songs.songs;let indexOfelement=index;" (contextmenu)="contextMenu($event, menu, data, indexOfelement)"
+            class="song-item" cdkDrag [cdkDragDisabled]="false" cdkDragBoundary=".drag-boundry" cdkDragLockAxis="y" (cdkDragStarted)="drag($event)"
+            >
+                <td
+                *ngIf="ShowCheckbox"
+                [(nzChecked)]="data.checked"
+                (nzCheckedChange)="refreshTableHeader()"
+              ></td>
+                <td style="width: 5em;">
+                    <span id="order-id" >{{data.order}}</span>
+
+                    <span
+                    id="play-song-button" nz-icon nzType="play-circle" nzTheme="outline" class="clickable" (click)="playSong(data, indexOfelement)"></span>
+
+                    <!-- <span *ngIf="this.IsSongPlaying && this.CurrentPlayingSong && this.CurrentPlayingSong.id == data.id && this.showSongMediaControls"
+                     nz-icon nzType="pause-circle" nzTheme="outline" class="clickable" (click)="pauseSong()"></span> -->
+                </td>
+                <td>
+                    <div *cdkDragPreview class="dragable-item">
+                        <img [src]="getAlbumCoverSrc(data.album.id)" style="width: 50px; height: 50px;"/>
+                        {{data.name}} * {{getArtistsNamesAsList(data.artists)}}
+                    </div>
+                    <img [src]="getAlbumCoverSrc(data.album.id)" style="width: 50px; height: 50px;"/>
+                    {{data.name}}
+
+                </td>
+                <td><a [routerLink]="['/album', data.album.id]">{{data.album.name}}</a></td>
+                <td>{{data.created | date:'longDate' }}</td>
+                <td>
+                    <span *ngIf="data.isInFavorites" nz-icon nzType="heart" 
+                    nzTheme="fill" class="clickable" (click)="removeSongFromFavorites(data.id)"></span>
+                    <span *ngIf="!data.isInFavorites" nz-icon nzType="heart" 
+                    nzTheme="outline" class="clickable" (click)="addSongToFavorites(data.id)"></span>
+                </td>
+                <td>{{data.duration | secondsToMinute}}</td>
+
+
+            </tr>
+
+        </tbody>
+    </nz-table>
+    <nz-dropdown-menu #menu="nzDropdownMenu">
+        <ul nz-menu>
+            <li nz-menu-item id="add-fav" (click)="addSongToFavorites(this.SelectedTableItem.id)" *ngIf="!this.SelectedTableItem.isInFavorites">Add to favorites</li>
+            <li nz-menu-item id="rm-fav" (click)="removeSongFromFavorites(this.SelectedTableItem.id)" *ngIf="this.SelectedTableItem.isInFavorites">Remove from favorites</li>
+            <li nz-menu-item id="add-all-fav" (click)="addSelectedSongsToFavorites()" *ngIf="this.Indeterminate || this.AllChecked">Add selected to favorites</li>
+            <li nz-menu-item id="rm-all-fav" (click)="removeSelectedSongsFromFavorites()" *ngIf="this.Indeterminate || this.AllChecked">Remove selected from favorites</li>
+            <li nz-submenu nzTitle="Add to playlist" id="add-pl">
+                <ul>
+                    <li nz-menu-item *ngFor="let data of this.ModifieablePlaylists" (click)="addSongToPlaylist(data.id)">{{data.name}}</li>
+                </ul>
+            </li>
+            <li nz-submenu nzTitle="Add selected to playlist" id="add-all-pl" *ngIf="this.Indeterminate || this.AllChecked">
+                <ul>
+                    <li nz-menu-item *ngFor="let data of this.ModifieablePlaylists" (click)="addSelectedSongsToPlaylist(data.id)">{{data.name}}</li>
+                </ul>
+            </li>
+            <li nz-menu-item id="add-queue" (click)="addSongToQueue(this.SelectedTableItem)">Add to queue</li>
+            <li nz-menu-item id="remove-queue" (click)="removeSongFromQueue(this.SelectedTableItem.id, this.SelectedTableItem.order)">Remove from queue</li>
+            <li nz-menu-item id="add-all-queue" (click)="addSelectedSongsToQueue()" *ngIf="this.Indeterminate || this.AllChecked">Add selected to queue</li>
+            <li nz-menu-item id="rm-all-queue" (click)="removeSelectedSongsFromQueue()" *ngIf="this.Indeterminate || this.AllChecked">Remove selected from queue</li>
+        </ul>
+    </nz-dropdown-menu>
+
+
+</div>
+
