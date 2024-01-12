@@ -173,7 +173,6 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Queue.RandomizeQueue)]
         public async Task<IActionResult> RandomizeQueue([FromQuery]Guid playlistId, [FromQuery] Guid albumId, [FromQuery] Guid songId, [FromQuery, Required] string loopMode)
         {
-            // TODO: Change this so that the actual queue gets randomized
             if (playlistId == Guid.Empty && albumId == Guid.Empty && songId == Guid.Empty)
             {
                 // Get favroites
