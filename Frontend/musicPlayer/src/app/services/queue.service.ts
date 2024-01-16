@@ -122,8 +122,8 @@ export class QueueService {
     })
   }
 
-  public RemoveSongsFromQueue(indexList: number[]): Observable<QueueSongModel[]>{
-    return this.httpClient.post<QueueSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/remove`, {
+  public RemoveSongsFromQueue(indexList: number[]): Observable<object>{
+    return this.httpClient.post<object>(`${environment.apiUrl}/${APIROUTES.queue}/remove`, {
       OrderIds: indexList
     },{
       withCredentials: true

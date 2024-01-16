@@ -4,12 +4,8 @@ using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using MusicServer.Core.Const;
 using MusicServer.Entities.DTOs;
-using MusicServer.Entities.Requests.Song;
-using MusicServer.Entities.Requests.User;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
-using System.Collections.Generic;
-using static MusicServer.Const.ApiRoutes;
 
 namespace MusicServer.Services
 {
@@ -37,7 +33,6 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        // TODO: Test me
         public async Task ClearManuallyAddedQueueAsync()
         {
             var userId = this.activeUserService.Id;
@@ -300,7 +295,6 @@ namespace MusicServer.Services
             }
 
             await this.dbContext.SaveChangesAsync();
-            //TODO: If there is no next song call get current queue from frontend
             return await this.GetCurrentSongInQueueAsync();
         }
 
@@ -337,7 +331,6 @@ namespace MusicServer.Services
             this.dbContext.RemoveRange(toRemove);
 
             await this.dbContext.SaveChangesAsync();
-            //TODO: If there is no next song call get current queue from frontend
             return await this.GetCurrentSongInQueueAsync();
         }
 
@@ -442,7 +435,7 @@ namespace MusicServer.Services
             return await this.GetCurrentQueueAsync();
         }
 
-        public async Task<QueueSongDto[]> RemoveSongsWithIndexFromQueueAsync(int[] indices)
+        public async Task RemoveSongsWithIndexFromQueueAsync(int[] indices)
         {
             var userId = this.activeUserService.Id;
             
@@ -465,7 +458,6 @@ namespace MusicServer.Services
             }
 
             await this.dbContext.SaveChangesAsync();
-            return await this.GetCurrentQueueAsync();
         }
 
         public async Task<PlaylistSongDto> RandomizeQueueAsync(PlaylistSongDto[] songs)
