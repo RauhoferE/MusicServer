@@ -22,7 +22,9 @@ import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-dr
   styleUrls: ['./queue-table.component.scss']
 })
 export class QueueTableComponent {
-  @Input() songs: SongPaginationModel = {songs: [], totalCount : 0} as SongPaginationModel;
+  @Input() queue: SongPaginationModel = {songs: [], totalCount : 0} as SongPaginationModel;
+
+  @Input() nextSongs: SongPaginationModel = {songs: [], totalCount : 0} as SongPaginationModel;
 
   private pagination: PaginationModel = {} as PaginationModel;
 
@@ -87,7 +89,7 @@ export class QueueTableComponent {
 
     console.log("Set pag")
     this.pagination = pModel;
-    console.log(this.songs);
+    console.log(this.queue);
     // this.isSongPlaying = isSongPlaying;
     // this.currentPlayingSong = currentPlayingSong;
   }
@@ -97,7 +99,7 @@ export class QueueTableComponent {
     this.paginationUpdated.emit();
   }
 
-  removeSongFromQueue(songId: string, index: number) {
+  removeSongFromQueue(songId: string, index: number): void {
 
     this.queueService.RemoveSongsFromQueue([index]).subscribe({
       next: ()=>{
@@ -109,7 +111,7 @@ export class QueueTableComponent {
     });
   }
 
-  addSongToQueue(song: PlaylistSongModel) {
+  addSongToQueue(song: PlaylistSongModel): void {
     this.queueService.AddSongsToQueue([song.id]).subscribe({
       next: ()=>{
         this.updateQueue();
@@ -122,8 +124,8 @@ export class QueueTableComponent {
   }
 
   // This method is only used when the queue is displayed
-  removeSelectedSongsFromQueue() {
-    var checkedSongs = this.songs.songs.filter(x => x.checked);
+  removeSelectedSongsFromQueue(): void {
+    var checkedSongs = this.queue.songs.filter(x => x.checked);
 
     this.queueService.RemoveSongsFromQueue(checkedSongs.map(x => x.order)).subscribe({
       next: ()=>{
@@ -140,8 +142,8 @@ export class QueueTableComponent {
     //this.checkAll(false);
   }
 
-  addSelectedSongsToQueue() {
-    var checkedSongs = this.songs.songs.filter(x => x.checked);
+  addSelectedSongsToQueue(): void {
+    var checkedSongs = this.queue.songs.filter(x => x.checked);
 
     this.queueService.AddSongsToQueue(checkedSongs.map(x => x.id)).subscribe({
       next: ()=>{
@@ -155,6 +157,18 @@ export class QueueTableComponent {
       }
     });
     // this.checkAll(false);
+  }
+
+  clearQueue(): void{
+    this.queueService.ClearQueue().subscribe({
+      next: () => {
+        this.paginationUpdated.emit();
+      },
+      error: (error) => {
+        console.log(error);
+      }
+
+    })
   }
 
   onQueryParamsChange(event: any): void{
@@ -223,7 +237,7 @@ export class QueueTableComponent {
   }
 
   checkAll(value: boolean): void {
-    this.songs.songs.forEach(data => {
+    this.queue.songs.forEach(data => {
       data.checked = value;
     });
 
@@ -231,8 +245,8 @@ export class QueueTableComponent {
   }
 
   refreshTableHeader(): void{
-    const allChecked = this.songs.songs.length > 0 && this.songs.songs.every(value => value.checked === true);
-    const allUnChecked = this.songs.songs.every(value => !value.checked);
+    const allChecked = this.queue.songs.length > 0 && this.queue.songs.every(value => value.checked === true);
+    const allUnChecked = this.queue.songs.every(value => !value.checked);
     this.AllChecked = allChecked;
     this.Indeterminate = !allChecked && !allUnChecked;
   }
@@ -253,7 +267,7 @@ export class QueueTableComponent {
   }
 
   addSelectedSongsToPlaylist(playlistId: string): void{
-    var checkedSongIds = this.songs.songs.filter(x => x.checked).map(x => x.id);
+    var checkedSongIds = this.queue.songs.filter(x => x.checked).map(x => x.id);
     this.addSongsToPlaylist(checkedSongIds, playlistId);
   }
 
@@ -278,7 +292,7 @@ export class QueueTableComponent {
   }
 
   addSelectedSongsToFavorites(): void{
-    var checkedSongIds = this.songs.songs.filter(x => x.checked && !x.isInFavorites).map(x => x.id);
+    var checkedSongIds = this.queue.songs.filter(x => x.checked && !x.isInFavorites).map(x => x.id);
 
     if (checkedSongIds.length == 0) {
       return;
@@ -288,7 +302,7 @@ export class QueueTableComponent {
   }
 
   removeSelectedSongsFromFavorites(): void{
-    var checkedSongIds = this.songs.songs.filter(x => x.checked && x.isInFavorites).map(x => x.id);
+    var checkedSongIds = this.queue.songs.filter(x => x.checked && x.isInFavorites).map(x => x.id);
 
     if (checkedSongIds.length == 0) {
       return;
@@ -349,7 +363,7 @@ export class QueueTableComponent {
     })
   }
 
-  showRemoveSongsFromFavoritesModal(songIds: string[]){
+  showRemoveSongsFromFavoritesModal(songIds: string[]): void{
     this.modal.confirm({
       nzTitle: 'Delete Favorites?',
       nzContent: '<b class="error-color">Are you sure you want to delete the songs from your favorites</b>',
@@ -445,16 +459,36 @@ export class QueueTableComponent {
     console.log("drop")
     this.doc.body.classList.remove('inheritCursors');
     this.doc.body.style.cursor = 'unset'; 
+    console.log(event)
 
-    if (event.currentIndex == event.previousIndex) {
+    if (event.currentIndex == event.previousIndex && event.container.id == event.previousContainer.id) {
       return;
     }
 
-    const srcSong = this.songs.songs[event.previousIndex];
+    let srcSong = this.queue.songs[event.previousIndex];
 
-    const destSong = this.songs.songs[event.currentIndex];
+    let destSong = this.queue.songs[event.currentIndex];
+
+    if (event.currentIndex >= this.queue.totalCount) {
+      destSong = this.queue.songs[this.queue.totalCount - 1];
+    }
+
+    if (event.container.id == 'next-song-list' && event.currentIndex < this.nextSongs.totalCount) {
+      destSong = this.nextSongs.songs[event.currentIndex];
+    }
+
+    if (event.container.id == 'next-song-list' && event.currentIndex >= this.nextSongs.totalCount) {
+      destSong = this.nextSongs.songs[this.nextSongs.totalCount - 1];
+    }
+
+    if (event.previousContainer.id == 'next-song-list') {
+      srcSong = this.nextSongs.songs[event.previousIndex];
+    }
 
     if (!srcSong || !destSong) {
+      console.log("Return because song is undefined")
+      console.log(srcSong)
+      console.log(destSong)
       return;
     }
 

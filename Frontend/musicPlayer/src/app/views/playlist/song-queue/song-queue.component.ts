@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
-import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
+import { PlaylistSongModel, QueueSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
@@ -14,7 +14,9 @@ import { SongService } from 'src/app/services/song.service';
 })
 export class SongQueueComponent implements OnInit {
 
-  private songsModel: SongPaginationModel = {} as SongPaginationModel;
+  private queueModel: SongPaginationModel = {} as SongPaginationModel;
+
+  private nextSongsModel: SongPaginationModel = {} as SongPaginationModel;
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
@@ -62,11 +64,16 @@ export class SongQueueComponent implements OnInit {
 
     // this.rxjsStorageService.setSongQueue(songsList);
     this.queueService.GetCurrentQueue().subscribe({
-      next: (songs: PlaylistSongModel[]) => {
+      next: (songs: QueueSongModel[]) => {
         songs.splice(0,1);
-        this.songsModel = {
-          songs: songs,
-          totalCount: songs.length
+        this.queueModel = {
+          songs: songs.filter(x => !x.addedManualy),
+          totalCount: songs.filter(x => !x.addedManualy).length
+        };
+
+        this.nextSongsModel = {
+          songs: songs.filter(x => x.addedManualy),
+          totalCount: songs.filter(x => x.addedManualy).length
         };
 
       },
@@ -135,13 +142,19 @@ export class SongQueueComponent implements OnInit {
 
   changeSongPosition(event: DragDropSongParams) {
     this.rxjsStorageService.setSongTableLoadingState(true);
-
+    console.log(event)
+    
     this.queueService.PushSongInQueue(event.srcSong.order, event.destSong.order).subscribe({
-      next: (songs: PlaylistSongModel[])=>{
+      next: (songs: QueueSongModel[])=>{
         songs.splice(0,1);
-        this.songsModel = {
-          songs: songs,
-          totalCount: songs.length
+        this.queueModel = {
+          songs: songs.filter(x => !x.addedManualy),
+          totalCount: songs.filter(x => !x.addedManualy).length
+        };
+
+        this.nextSongsModel = {
+          songs: songs.filter(x => x.addedManualy),
+          totalCount: songs.filter(x => x.addedManualy).length
         };
       },
       complete: ()=>{
@@ -152,8 +165,12 @@ export class SongQueueComponent implements OnInit {
     
   }
 
-  get SongsModel(): SongPaginationModel{
-    return this.songsModel;
+  get QueueModel(): SongPaginationModel{
+    return this.queueModel;
+  }
+
+  get NextSongsModel(): SongPaginationModel{
+    return this.nextSongsModel;
   }
 
   get CurrentPlayingSongModel(): SongPaginationModel{

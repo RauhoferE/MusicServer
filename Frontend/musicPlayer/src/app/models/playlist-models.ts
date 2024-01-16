@@ -26,6 +26,10 @@ export interface PlaylistSongModel{
     isInFavorites: boolean;
 }
 
+export interface QueueSongModel extends PlaylistSongModel{
+    addedManualy: boolean;
+}
+
 export interface GuidNameModel{
     id: string;
     name: string;

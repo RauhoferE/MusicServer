@@ -120,7 +120,7 @@ export class SongTableComponent implements OnInit {
     this.paginationUpdated.emit();
   }
 
-  removeSongFromQueue(songId: string, index: number) {
+  removeSongFromQueue(songId: string, index: number): void {
 
     this.queueService.RemoveSongsFromQueue([index]).subscribe({
       next: ()=>{
@@ -132,7 +132,7 @@ export class SongTableComponent implements OnInit {
     });
   }
 
-  addSongToQueue(song: PlaylistSongModel) {
+  addSongToQueue(song: PlaylistSongModel): void {
     this.queueService.AddSongsToQueue([song.id]).subscribe({
       next: ()=>{
         this.updateQueue();
@@ -145,7 +145,7 @@ export class SongTableComponent implements OnInit {
   }
 
   // This method is only used when the queue is displayed
-  removeSelectedSongsFromQueue() {
+  removeSelectedSongsFromQueue(): void {
     var checkedSongs = this.songs.songs.filter(x => x.checked);
 
     this.queueService.RemoveSongsFromQueue(checkedSongs.map(x => x.order)).subscribe({
@@ -163,7 +163,7 @@ export class SongTableComponent implements OnInit {
     //this.checkAll(false);
   }
 
-  addSelectedSongsToQueue() {
+  addSelectedSongsToQueue(): void {
     var checkedSongs = this.songs.songs.filter(x => x.checked);
 
     this.queueService.AddSongsToQueue(checkedSongs.map(x => x.id)).subscribe({
@@ -393,7 +393,7 @@ export class SongTableComponent implements OnInit {
     })
   }
 
-  showRemoveSongsFromFavoritesModal(songIds: string[]){
+  showRemoveSongsFromFavoritesModal(songIds: string[]): void{
     this.modal.confirm({
       nzTitle: 'Delete Favorites?',
       nzContent: '<b class="error-color">Are you sure you want to delete the songs from your favorites</b>',

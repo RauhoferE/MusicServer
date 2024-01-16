@@ -46,12 +46,14 @@ namespace MusicServer.Services
             //var queuData = this.dbContext.QueueData.Where(x => x.UserId == userId);
             this.dbContext.Queues.RemoveRange(queue);
 
+            await this.dbContext.SaveChangesAsync();
+
             // Reorder rest of elements
-            var otherqueue = this.dbContext.Queues.Where(x => x.UserId == userId && x.Order > 0);
+            var otherqueue = this.dbContext.Queues.Where(x => x.UserId == userId && x.Order > 0).ToArray();
 
             for (int i = 0; i < otherqueue.Count(); i++)
             {
-                var entity = otherqueue.ElementAt(i);
+                var entity = otherqueue[i];
                 entity.Order = i + 1;
             }
 
@@ -430,7 +432,7 @@ namespace MusicServer.Services
             return await this.GetCurrentQueueAsync();
         }
 
-        public async Task<PlaylistSongDto[]> RemoveSongsWithIndexFromQueueAsync(int[] indices)
+        public async Task<QueueSongDto[]> RemoveSongsWithIndexFromQueueAsync(int[] indices)
         {
             var userId = this.activeUserService.Id;
             

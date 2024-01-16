@@ -1,0 +1,30 @@
+.song-item:hover #order-id{
+    display: none;
+}
+
+.song-item #order-id{
+    display: block;
+}
+
+.song-item:hover #play-song-button{
+    display: block;
+    text-align: start;
+}
+
+.song-item #play-song-button{
+    display: none;
+}
+
+
+::ng-deep .cdk-drag-placeholder >.first-td >span {
+    display: none;
+}
+
+
+::ng-deep .cdk-drag-placeholder {
+    background: #ccc;
+    //border: dotted 3px #999;
+    // min-height: 60px;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    opacity: 0.5;
+  }

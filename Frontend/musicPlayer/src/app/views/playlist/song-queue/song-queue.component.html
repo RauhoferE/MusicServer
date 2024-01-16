@@ -14,7 +14,14 @@
 
     </div>
     <div>
-        <h2>
+        <app-queue-table 
+        [nextSongs]="this.NextSongsModel"
+        [queue]="this.QueueModel"
+        (paginationUpdated)="onQueueTablePaginationUpdated()"
+        (playSongClicked)="onPlaySongClicked($event)"
+        (songDropped)="changeSongPosition($event)"
+        ></app-queue-table>
+        <!-- <h2>
             Next Songs
         </h2>
         <app-song-table
@@ -27,7 +34,7 @@
          [displaySearch]="false"
          [showSongMediaControls]="false"
          [showPageSizeChanger]="false"
-         ></app-song-table>
+         ></app-song-table> -->
 
     </div>
 </div>

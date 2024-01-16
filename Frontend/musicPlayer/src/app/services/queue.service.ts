@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlaylistSongModel } from '../models/playlist-models';
+import { PlaylistSongModel, QueueSongModel } from '../models/playlist-models';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { APIROUTES } from '../constants/api-routes';
@@ -79,8 +79,8 @@ export class QueueService {
     })
   }
 
-  public GetCurrentQueue(): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}`,{
+  public GetCurrentQueue(): Observable<QueueSongModel[]>{
+    return this.httpClient.get<QueueSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}`,{
       withCredentials: true
     })
   }
@@ -122,8 +122,8 @@ export class QueueService {
     })
   }
 
-  public RemoveSongsFromQueue(indexList: number[]): Observable<PlaylistSongModel[]>{
-    return this.httpClient.post<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/remove`, {
+  public RemoveSongsFromQueue(indexList: number[]): Observable<QueueSongModel[]>{
+    return this.httpClient.post<QueueSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/remove`, {
       OrderIds: indexList
     },{
       withCredentials: true
@@ -138,8 +138,8 @@ export class QueueService {
     })
   }
 
-  public PushSongInQueue(srcIndex: number, targetIndex: number): Observable<PlaylistSongModel[]>{
-    return this.httpClient.get<PlaylistSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/push?srcIndex=${srcIndex}&targetIndex=${targetIndex}`,{
+  public PushSongInQueue(srcIndex: number, targetIndex: number): Observable<QueueSongModel[]>{
+    return this.httpClient.get<QueueSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/push?srcIndex=${srcIndex}&targetIndex=${targetIndex}`,{
       withCredentials: true
     })
   }
