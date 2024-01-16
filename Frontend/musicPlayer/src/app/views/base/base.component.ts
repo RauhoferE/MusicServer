@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { ArtistShortModel } from 'src/app/models/artist-models';
 import { FollowedPlaylistModel, PlaylistSongModel } from 'src/app/models/playlist-models';
@@ -16,7 +16,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './base.component.html',
   styleUrls: ['./base.component.scss']
 })
-export class BaseComponent implements OnInit {
+export class BaseComponent implements OnInit, OnDestroy {
 
   private followedEntities: AllFollowedEntitiesModel = {
 
@@ -30,6 +30,8 @@ export class BaseComponent implements OnInit {
 
   private currentPlayingSong: PlaylistSongModel = {} as PlaylistSongModel;
 
+  private destroy:Subject<any> = new Subject();
+
   /**
    *
    */
@@ -38,10 +40,14 @@ export class BaseComponent implements OnInit {
     
   }
 
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+  }
+
   async ngOnInit(): Promise<void> {
     this.userName = this.jwtService.getUserName();
 
-    this.rxjsService.currentPlayingSong.subscribe(x => {
+    this.rxjsService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.currentPlayingSong = x;
     });
 
@@ -70,7 +76,7 @@ export class BaseComponent implements OnInit {
   }
 
   getFollowedEntities(): void{
-    this.userService.GetFollowedEntities(this.filterName,this.search).subscribe({
+    this.userService.GetFollowedEntities(this.filterName,this.search).pipe(takeUntil(this.destroy)).subscribe({
       next: (element: AllFollowedEntitiesModel)=> {
         this.followedEntities = element;
       },

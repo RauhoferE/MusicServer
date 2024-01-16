@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { Subject, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { ArtistShortModel } from 'src/app/models/artist-models';
 import { QueueModel } from 'src/app/models/storage';
@@ -14,7 +15,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './artist-details.component.html',
   styleUrls: ['./artist-details.component.scss']
 })
-export class ArtistDetailsComponent implements OnInit {
+export class ArtistDetailsComponent implements OnInit, OnDestroy {
 
   private artistId: string = '';
 
@@ -25,6 +26,8 @@ export class ArtistDetailsComponent implements OnInit {
   private isSongPlaying: boolean = false;
 
   private queueModel: QueueModel = undefined as any;
+
+  private destroy:Subject<any> = new Subject();
 
   /**
    *
@@ -41,19 +44,23 @@ export class ArtistDetailsComponent implements OnInit {
       this.artistId = this.route.snapshot.paramMap.get('artistId') as string;
       this.getArtistDetails();
   }
+  
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+  }
 
   ngOnInit(): void {
-    this.rxjsService.isSongPlayingState.subscribe(x => {
+    this.rxjsService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.isSongPlaying = x;
     });
 
-    this.rxjsService.currentQueueFilterAndPagination.subscribe(x => {
+    this.rxjsService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.queueModel = x;
     });
   }
 
   getArtistDetails(): void{
-    this.songService.GetArtistDetails(this.artistId).subscribe({
+    this.songService.GetArtistDetails(this.artistId).pipe(takeUntil(this.destroy)).subscribe({
       next:(artistModel: ArtistShortModel)=>{
         this.artistModel = artistModel;
       },

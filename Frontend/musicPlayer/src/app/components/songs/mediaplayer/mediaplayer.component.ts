@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { firstValueFrom, lastValueFrom } from 'rxjs';
+import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subject, firstValueFrom, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
@@ -16,7 +16,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './mediaplayer.component.html',
   styleUrls: ['./mediaplayer.component.scss']
 })
-export class MediaplayerComponent implements OnInit {
+export class MediaplayerComponent implements OnInit, OnDestroy {
 
   private currentPlayingSong: PlaylistSongModel = {} as PlaylistSongModel;
 
@@ -38,6 +38,8 @@ export class MediaplayerComponent implements OnInit {
 
   private audioElement = new Audio();
 
+  private destroy:Subject<any> = new Subject();
+
   constructor(private rxjsService: RxjsStorageService, private playlistService: PlaylistService, private queueService: QueueService) {
     this.audioElement.autoplay = false;
     
@@ -55,9 +57,11 @@ export class MediaplayerComponent implements OnInit {
 
   }
 
+
+
   async ngOnInit(): Promise<void> {
 
-    this.rxjsService.isSongPlayingState.subscribe(x => {
+    this.rxjsService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.isSongPlaying = x;
 
       if (this.isSongPlaying) {
@@ -70,7 +74,7 @@ export class MediaplayerComponent implements OnInit {
     });
     
     // Get values from storage
-    this.rxjsService.currentPlayingSong.subscribe(x => {
+    this.rxjsService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x => {
       let oldPlayingSong = JSON.parse(JSON.stringify(this.currentPlayingSong)) as PlaylistSongModel;
       this.currentPlayingSong = x;
 
@@ -95,11 +99,11 @@ export class MediaplayerComponent implements OnInit {
       
     });
 
-    this.rxjsService.updateReplaySongState.subscribe(x => {
+    this.rxjsService.updateReplaySongState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.audioElement.currentTime = 0;
     })
 
-    this.rxjsService.currentQueueFilterAndPagination.subscribe(x => {
+    this.rxjsService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.queueModel = x;
     })
 
@@ -120,6 +124,10 @@ export class MediaplayerComponent implements OnInit {
       console.log("Set loop")
     }
 
+  }
+
+  ngOnDestroy(): void {
+    this.destroy.next(true);
   }
 
   public onDurationChanged(value: any){
@@ -150,6 +158,7 @@ export class MediaplayerComponent implements OnInit {
     });
 
   }
+  
 
   public addSongToFavorites(): void{
     this.playlistService.AddSongsToFavorites([this.currentPlayingSong.id]).subscribe({

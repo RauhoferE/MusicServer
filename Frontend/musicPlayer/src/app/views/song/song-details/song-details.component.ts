@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { Subject, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
@@ -16,7 +17,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './song-details.component.html',
   styleUrls: ['./song-details.component.scss']
 })
-export class SongDetailsComponent implements OnInit {
+export class SongDetailsComponent implements OnInit, OnDestroy {
   private songId: string = '';
 
   private songModel: PlaylistSongModel = {
@@ -31,6 +32,9 @@ export class SongDetailsComponent implements OnInit {
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
+  private destroy:Subject<any> = new Subject();
+
+
   /**
    *
    */
@@ -44,7 +48,7 @@ export class SongDetailsComponent implements OnInit {
       }
   
       this.songId = this.route.snapshot.paramMap.get('songId') as string;
-      this.songService.GetSongDetails(this.songId).subscribe({
+      this.songService.GetSongDetails(this.songId).pipe(takeUntil(this.destroy)).subscribe({
         next:(songModel: PlaylistSongModel)=>{
           this.songModel = songModel;
         },
@@ -54,20 +58,24 @@ export class SongDetailsComponent implements OnInit {
       })
   }
 
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+  }
+
   ngOnInit(): void {
-    this.rxjsStorageService.isSongPlayingState.subscribe(x => {
+    this.rxjsStorageService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.isSongPlaying = x;
     });
 
-    this.rxjsStorageService.currentPlayingSong.subscribe(x => {
+    this.rxjsStorageService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.currentPlayingSong = x;
     });
 
-    this.rxjsStorageService.currentQueueFilterAndPagination.subscribe(x => {
+    this.rxjsStorageService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.queueModel = x;
     });
 
-    this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
+    this.rxjsStorageService.updateCurrentTableBoolean$.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.updateSong();
     });
   }

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { DragDropQueueParams, DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, QueueSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
@@ -12,7 +12,7 @@ import { SongService } from 'src/app/services/song.service';
   templateUrl: './song-queue.component.html',
   styleUrls: ['./song-queue.component.scss']
 })
-export class SongQueueComponent implements OnInit {
+export class SongQueueComponent implements OnInit, OnDestroy {
 
   private queueModel: SongPaginationModel = {} as SongPaginationModel;
 
@@ -22,6 +22,8 @@ export class SongQueueComponent implements OnInit {
 
   private isSongPlaying: boolean = false;
 
+  private destroy:Subject<any> = new Subject();
+
   /**
    *
    */
@@ -29,19 +31,23 @@ export class SongQueueComponent implements OnInit {
 
   }
 
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+  }
+
   ngOnInit(): void {
     // TOOD: When changing site the subscribe gets called more often
-    this.rxjsStorageService.updateQueueBoolean$.subscribe(x => {
+    this.rxjsStorageService.updateQueueBoolean$.pipe(takeUntil(this.destroy)).subscribe(x => {
       console.log("Update queue")
       this.onQueueTablePaginationUpdated();
       this.onCurrentSongPaginationUpdated();
     });
 
-    this.rxjsStorageService.currentPlayingSong.subscribe(x => {
+    this.rxjsStorageService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.currentPlayingSong = x;
     });
 
-    this.rxjsStorageService.isSongPlayingState.subscribe(x => {
+    this.rxjsStorageService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.isSongPlaying = x;
     })
 

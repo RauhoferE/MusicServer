@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { Observable, every } from 'rxjs';
+import { Observable, Subject, every, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { AlbumArtistModel, ArtistShortModel } from 'src/app/models/artist-models';
 import { DragDropSongParams, PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
@@ -22,7 +22,7 @@ import { QueueService } from 'src/app/services/queue.service';
   templateUrl: './song-table.component.html',
   styleUrls: ['./song-table.component.scss']
 })
-export class SongTableComponent implements OnInit {
+export class SongTableComponent implements OnInit, OnDestroy {
 
   @Input() songs: SongPaginationModel = {songs: [], totalCount : 0} as SongPaginationModel;
   
@@ -73,6 +73,8 @@ export class SongTableComponent implements OnInit {
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
+  private destroy:Subject<any> = new Subject();
+
 
   /**
    *
@@ -84,21 +86,25 @@ export class SongTableComponent implements OnInit {
     console.log("Construct")
     this.IsLoading = this.rxjsStorageService.currentSongTableLoading$;
   }
+  
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+  }
 
   ngOnInit(): void {
     let pModel = {} as PaginationModel;
     let isSongPlaying = false;
     let currentPlayingSong: PlaylistSongModel = undefined as any;
-    this.rxjsStorageService.currentPaginationSongModel$.subscribe((val) => {
+    this.rxjsStorageService.currentPaginationSongModel$.pipe(takeUntil(this.destroy)).subscribe((val) => {
       
       pModel = val as PaginationModel;
     });
 
-    this.rxjsStorageService.isSongPlayingState.subscribe(x => {
+    this.rxjsStorageService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.isSongPlaying = x;
     });
 
-    this.rxjsStorageService.currentPlayingSong.subscribe(x => {
+    this.rxjsStorageService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.currentPlayingSong = x;
     });
 

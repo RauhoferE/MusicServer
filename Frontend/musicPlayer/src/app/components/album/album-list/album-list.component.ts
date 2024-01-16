@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SongService } from 'src/app/services/song.service';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
@@ -13,13 +13,14 @@ import { GuidNameModel, PlaylistSongModel } from 'src/app/models/playlist-models
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { PlaylistService } from 'src/app/services/playlist.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-album-list',
   templateUrl: './album-list.component.html',
   styleUrls: ['./album-list.component.scss']
 })
-export class AlbumListComponent implements OnInit {
+export class AlbumListComponent implements OnInit, OnDestroy {
 
   @Input() artistId!: string;
 
@@ -41,6 +42,8 @@ export class AlbumListComponent implements OnInit {
 
   private selectedTableItem: AlbumModel = {
   } as AlbumModel;
+
+  private destroy:Subject<any> = new Subject();
   
   /**
    *
@@ -51,6 +54,9 @@ export class AlbumListComponent implements OnInit {
     
     
   }
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+  }
 
   ngOnInit(): void {
     if (!this.artistId) {
@@ -58,11 +64,11 @@ export class AlbumListComponent implements OnInit {
       return;
     }
 
-    this.rxjstorageService.currentQueueFilterAndPagination.subscribe(x=>{
+    this.rxjstorageService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x=>{
       this.queueModel = x;
     })
 
-    this.rxjstorageService.isSongPlayingState.subscribe(x =>{
+    this.rxjstorageService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x =>{
       this.isSongPlaying = x;
     })
 
@@ -72,7 +78,7 @@ export class AlbumListComponent implements OnInit {
 
   getNextAlbums(): void{
     console.log("Get albums")
-    this.songService.GetArtistAlbums(this.artistId, this.albumPage, this.take).subscribe({
+    this.songService.GetArtistAlbums(this.artistId, this.albumPage, this.take).pipe(takeUntil(this.destroy)).subscribe({
       next: (albumModel: AlbumPaginationModel) =>{
         this.totalAlbums = albumModel.totalCount;
 

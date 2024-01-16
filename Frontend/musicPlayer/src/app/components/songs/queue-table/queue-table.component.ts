@@ -1,9 +1,9 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { Observable } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { ArtistShortModel } from 'src/app/models/artist-models';
 import { DragDropQueueParams, DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
@@ -21,7 +21,7 @@ import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-dr
   templateUrl: './queue-table.component.html',
   styleUrls: ['./queue-table.component.scss']
 })
-export class QueueTableComponent {
+export class QueueTableComponent implements OnInit, OnDestroy{
   @Input() queue: SongPaginationModel = {songs: [], totalCount : 0} as SongPaginationModel;
 
   @Input() nextSongs: SongPaginationModel = {songs: [], totalCount : 0} as SongPaginationModel;
@@ -56,6 +56,8 @@ export class QueueTableComponent {
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
+  private destroy:Subject<any> = new Subject();
+
 
   /**
    *
@@ -67,13 +69,16 @@ export class QueueTableComponent {
     console.log("Construct")
     this.IsLoading = this.rxjsStorageService.currentSongTableLoading$;
   }
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+  }
 
   ngOnInit(): void {
-    this.rxjsStorageService.isSongPlayingState.subscribe(x => {
+    this.rxjsStorageService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.isSongPlaying = x;
     });
 
-    this.rxjsStorageService.currentPlayingSong.subscribe(x => {
+    this.rxjsStorageService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.currentPlayingSong = x;
     });
 

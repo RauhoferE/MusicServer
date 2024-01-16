@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { Subject, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
@@ -19,7 +20,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './album-details.component.html',
   styleUrls: ['./album-details.component.scss']
 })
-export class AlbumDetailsComponent implements OnInit {
+export class AlbumDetailsComponent implements OnInit, OnDestroy {
 
   private albumId: string = '';
 
@@ -45,6 +46,8 @@ export class AlbumDetailsComponent implements OnInit {
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
+  private destroy:Subject<any> = new Subject();
+
   /**
    *
    */
@@ -61,7 +64,7 @@ export class AlbumDetailsComponent implements OnInit {
     }
 
     this.albumId = this.route.snapshot.paramMap.get('albumId') as string;
-    this.songService.GetAlbumDetails(this.albumId).subscribe({
+    this.songService.GetAlbumDetails(this.albumId).pipe(takeUntil(this.destroy)).subscribe({
       next:(albumModel: AlbumModel)=>{
         this.albumModel = albumModel;
         console.log(new Date(this.albumModel.release))
@@ -71,21 +74,25 @@ export class AlbumDetailsComponent implements OnInit {
       }
     })
   }
+  
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+  }
 
   ngOnInit(): void {
-    this.rxjsService.isSongPlayingState.subscribe(x => {
+    this.rxjsService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.isSongPlaying = x;
     });
 
-    this.rxjsService.currentQueueFilterAndPagination.subscribe(x => {
+    this.rxjsService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.queueModel = x;
     });
 
-    this.rxjsService.currentPlayingSong.subscribe(x => {
+    this.rxjsService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.currentPlayingSong = x;
     });
 
-    this.rxjsService.updateCurrentTableBoolean$.subscribe(x => {
+    this.rxjsService.updateCurrentTableBoolean$.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.onPaginationUpdated();
     });
   }

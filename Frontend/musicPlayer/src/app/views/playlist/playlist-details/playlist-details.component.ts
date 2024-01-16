@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { firstValueFrom } from 'rxjs';
+import { Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
@@ -20,7 +20,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './playlist-details.component.html',
   styleUrls: ['./playlist-details.component.scss']
 })
-export class PlaylistDetailsComponent implements OnInit {
+export class PlaylistDetailsComponent implements OnInit, OnDestroy {
 
   private playlistId: string = '';
 
@@ -45,6 +45,9 @@ export class PlaylistDetailsComponent implements OnInit {
   private queueModel: QueueModel = undefined as any;
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
+
+  private destroy:Subject<any> = new Subject();
+
 
   /**
    *
@@ -72,7 +75,7 @@ export class PlaylistDetailsComponent implements OnInit {
 
     this.playlistId = this.route.snapshot.paramMap.get('playlistId') as string;
     console.log(this.playlistId)
-    this.playlistService.GetPlaylistInfo(this.playlistId).subscribe({
+    this.playlistService.GetPlaylistInfo(this.playlistId).pipe(takeUntil(this.destroy)).subscribe({
       next:(playlistModel: PlaylistUserShortModel)=>{
         this.playlistModel = playlistModel;
       },
@@ -82,20 +85,24 @@ export class PlaylistDetailsComponent implements OnInit {
     })
   }
 
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+  }
+
   ngOnInit(): void {
-    this.rxjsStorageService.isSongPlayingState.subscribe(x => {
+    this.rxjsStorageService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.isSongPlaying = x;
     });
 
-    this.rxjsStorageService.currentQueueFilterAndPagination.subscribe(x => {
+    this.rxjsStorageService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.queueModel = x;
     });
 
-    this.rxjsStorageService.currentPlayingSong.subscribe(x => {
+    this.rxjsStorageService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.currentPlayingSong = x;
     });
 
-    this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
+    this.rxjsStorageService.updateCurrentTableBoolean$.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.onPaginationUpdated();
     });
     
