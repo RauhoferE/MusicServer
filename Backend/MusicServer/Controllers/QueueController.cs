@@ -151,7 +151,8 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Queue.RemoveSongsFromQueue)]
         public async Task<IActionResult> RemoveSongsInQueue([FromBody, Required] SongsToRemove request)
         {
-            return Ok(await this.queueService.RemoveSongsWithIndexFromQueueAsync(request.OrderIds));
+            await this.queueService.RemoveSongsWithIndexFromQueueAsync(request.OrderIds);
+            return Ok();
         }
 
         [HttpPost]

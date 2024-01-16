@@ -26,8 +26,6 @@ export class QueueTableComponent {
 
   @Input() nextSongs: SongPaginationModel = {songs: [], totalCount : 0} as SongPaginationModel;
 
-  private pagination: PaginationModel = {} as PaginationModel;
-
   @Output() paginationUpdated: EventEmitter<void> = new EventEmitter<void>();
   
   @Output() playSongClicked: EventEmitter<PlaylistSongModelParams> = new EventEmitter<PlaylistSongModelParams>();
@@ -71,14 +69,6 @@ export class QueueTableComponent {
   }
 
   ngOnInit(): void {
-    let pModel = {} as PaginationModel;
-    let isSongPlaying = false;
-    let currentPlayingSong: PlaylistSongModel = undefined as any;
-    this.rxjsStorageService.currentPaginationSongModel$.subscribe((val) => {
-      
-      pModel = val as PaginationModel;
-    });
-
     this.rxjsStorageService.isSongPlayingState.subscribe(x => {
       this.isSongPlaying = x;
     });
@@ -88,15 +78,9 @@ export class QueueTableComponent {
     });
 
     console.log("Set pag")
-    this.pagination = pModel;
     console.log(this.queue);
     // this.isSongPlaying = isSongPlaying;
     // this.currentPlayingSong = currentPlayingSong;
-  }
-
-  onSearchQueryInput(): void{
-    this.rxjsStorageService.setCurrentPaginationSongModel(this.pagination);
-    this.paginationUpdated.emit();
   }
 
   removeSongFromQueue(songId: string, index: number): void {
@@ -174,33 +158,6 @@ export class QueueTableComponent {
   onQueryParamsChange(event: any): void{
     console.log("Query Changed")
 
-    var sortAfter = event.sort.find((x: any) => x.value);
-
-    if (!sortAfter) {
-      sortAfter = {
-        key: '',
-        value: 'ascend'
-      }
-    }
-
-    let newPagModel: PaginationModel = {
-      query :this.pagination.query,
-      page : event.pageIndex,
-      take: event.pageSize,
-      sortAfter: sortAfter.key,
-      asc: sortAfter.value == 'ascend' ? true: false
-    }
-
-    // This is done because otherwise the event would be called again when the data of the table changes
-    if (JSON.stringify(newPagModel) == JSON.stringify(this.pagination)) {
-      return;
-    }
-
-    this.AllChecked = false;
-    this.Indeterminate = false;
-
-    this.rxjsStorageService.setCurrentPaginationSongModel(newPagModel);
-
     this.paginationUpdated.emit();
   }
 
@@ -222,18 +179,6 @@ export class QueueTableComponent {
 
   getAlbumCoverSrc(id: string): string{
     return `${environment.apiUrl}/${APIROUTES.file}/album/${id}`;
-  }
-
-  getHeaderSortOrder(sortOrder: string): string | null{
-    if (this.pagination.sortAfter == sortOrder && this.pagination.asc) {
-      return 'ascend';
-    }
-
-    if (this.pagination.sortAfter == sortOrder && !this.pagination.asc) {
-      return 'descend';
-    }
-
-    return null;
   }
 
   checkAll(value: boolean): void {
@@ -521,21 +466,6 @@ export class QueueTableComponent {
 
   public get CurrentPlayingSong(): PlaylistSongModel{
     return this.currentPlayingSong;
-  }
-
-  public get PageSize(): number{
-    return this.pagination.take;
-  }
-
-  public get PageIndex(): number{
-    return this.pagination.page;
-  }
-
-  public get SearchString(): string {
-    return this.pagination.query;
-  }
-  public set SearchString(value: string) {
-    this.pagination.query = value;
   }
 
   public get ShowCheckbox(): boolean{
