@@ -18,3 +18,10 @@ export interface DragDropSongParams{
     srcIndex: number;
     destIndex: number;
 }
+
+export interface DragDropQueueParams extends DragDropSongParams{
+    // -1 for automaitc
+    // 0 mark as false
+    // 1 mark as true
+    markAsManuallyAdded: number;
+}

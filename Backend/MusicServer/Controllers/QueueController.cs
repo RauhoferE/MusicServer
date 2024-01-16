@@ -164,9 +164,9 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Queue.PushSongInQueue)]
-        public async Task<IActionResult> PushSongsInQueue([FromQuery, Required] int srcIndex, [FromQuery, Required] int targetIndex)
+        public async Task<IActionResult> PushSongsInQueue([FromQuery, Required] int srcIndex, [FromQuery, Required] int targetIndex, [FromQuery] int markAsManuallyAdded = -1)
         {
-            return Ok(await this.queueService.PushSongToIndexAsync(srcIndex, targetIndex));
+            return Ok(await this.queueService.PushSongToIndexAsync(srcIndex, targetIndex, markAsManuallyAdded));
         }
 
         [HttpGet]

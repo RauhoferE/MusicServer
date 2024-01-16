@@ -6,7 +6,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { Observable } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { ArtistShortModel } from 'src/app/models/artist-models';
-import { DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
+import { DragDropQueueParams, DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { GuidNameModel, PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { PlaylistService } from 'src/app/services/playlist.service';
@@ -32,7 +32,7 @@ export class QueueTableComponent {
   
   @Output() playSongClicked: EventEmitter<PlaylistSongModelParams> = new EventEmitter<PlaylistSongModelParams>();
 
-  @Output() songDropped: EventEmitter<DragDropSongParams> = new EventEmitter<DragDropSongParams>();
+  @Output() songDropped: EventEmitter<DragDropQueueParams> = new EventEmitter<DragDropQueueParams>();
 
   public IsLoading: Observable<boolean> = new Observable();
 
@@ -469,20 +469,36 @@ export class QueueTableComponent {
 
     let destSong = this.queue.songs[event.currentIndex];
 
-    if (event.currentIndex >= this.queue.totalCount) {
-      destSong = this.queue.songs[this.queue.totalCount - 1];
-    }
+    let markAsManuallyAdded = -1;
+
+
 
     if (event.container.id == 'next-song-list' && event.currentIndex < this.nextSongs.totalCount) {
       destSong = this.nextSongs.songs[event.currentIndex];
     }
 
-    if (event.container.id == 'next-song-list' && event.currentIndex >= this.nextSongs.totalCount) {
-      destSong = this.nextSongs.songs[this.nextSongs.totalCount - 1];
-    }
-
     if (event.previousContainer.id == 'next-song-list') {
       srcSong = this.nextSongs.songs[event.previousIndex];
+    }
+
+    if (event.container.id == 'queue-song-list' &&
+      event.previousContainer.id == 'next-song-list' &&
+      event.currentIndex == 0) {
+      markAsManuallyAdded = 0;
+      destSong = this.nextSongs.songs[this.nextSongs.totalCount - 1]; 
+    }
+
+    if (event.container.id == 'queue-song-list' &&
+    event.previousContainer.id == 'next-song-list' &&
+    event.currentIndex >= this.queue.totalCount) {
+    destSong = this.queue.songs[this.queue.totalCount - 1]; 
+  }
+
+    if (event.previousContainer.id == 'queue-song-list' &&
+      event.container.id == 'next-song-list' &&
+      event.currentIndex >= this.nextSongs.totalCount) {
+      markAsManuallyAdded = 1;
+      destSong = this.queue.songs[0];
     }
 
     if (!srcSong || !destSong) {
@@ -492,7 +508,7 @@ export class QueueTableComponent {
       return;
     }
 
-    this.songDropped.emit({ srcSong: srcSong, destSong: destSong, srcIndex: event.previousIndex, destIndex: event.currentIndex});
+    this.songDropped.emit({ srcSong: srcSong, destSong: destSong, srcIndex: event.previousIndex, destIndex: event.currentIndex, markAsManuallyAdded: markAsManuallyAdded});
   }
 
   drag(event: CdkDragStart<any>) {

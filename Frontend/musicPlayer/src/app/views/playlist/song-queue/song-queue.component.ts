@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
-import { DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
+import { DragDropQueueParams, DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, QueueSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { QueueService } from 'src/app/services/queue.service';
@@ -140,11 +140,11 @@ export class SongQueueComponent implements OnInit {
     
   }
 
-  changeSongPosition(event: DragDropSongParams) {
+  changeSongPosition(event: DragDropQueueParams) {
     this.rxjsStorageService.setSongTableLoadingState(true);
     console.log(event)
-    
-    this.queueService.PushSongInQueue(event.srcSong.order, event.destSong.order).subscribe({
+
+    this.queueService.PushSongInQueue(event.srcSong.order, event.destSong.order, event.markAsManuallyAdded).subscribe({
       next: (songs: QueueSongModel[])=>{
         songs.splice(0,1);
         this.queueModel = {

@@ -394,7 +394,7 @@ namespace MusicServer.Services
             return await this.GetCurrentSongInQueueAsync();
         }
 
-        public async Task<QueueSongDto[]> PushSongToIndexAsync(int srcIndex, int targetIndex)
+        public async Task<QueueSongDto[]> PushSongToIndexAsync(int srcIndex, int targetIndex, int markAsAddedManually)
         {
             var userId = this.activeUserService.Id;
             var songToMove = this.dbContext.Queues.FirstOrDefault(x => x.Order == srcIndex && x.UserId == userId)
@@ -409,6 +409,16 @@ namespace MusicServer.Services
             // If the song gets moved to the manually added ones mark it as manually added
             // If the song gets moved out of the manually added ones mark it as not manually added so it will disapear when you reshuffle the queue.
             songToMove.AddedManualy = targetPlace.AddedManualy;
+            if (markAsAddedManually == 0)
+            {
+                songToMove.AddedManualy = false;
+            }
+
+            if (markAsAddedManually == 1)
+            {
+                songToMove.AddedManualy = true;
+            }
+
 
             var queueToTraverse = this.dbContext.Queues.Where(x => x.Order <= targetIndex && x.Id != songToMove.Id && x.Order > oldSongOrder && x.UserId == userId);
 

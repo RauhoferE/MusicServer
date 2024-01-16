@@ -138,8 +138,8 @@ export class QueueService {
     })
   }
 
-  public PushSongInQueue(srcIndex: number, targetIndex: number): Observable<QueueSongModel[]>{
-    return this.httpClient.get<QueueSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/push?srcIndex=${srcIndex}&targetIndex=${targetIndex}`,{
+  public PushSongInQueue(srcIndex: number, targetIndex: number, markAsManuallyAdded: number): Observable<QueueSongModel[]>{
+    return this.httpClient.get<QueueSongModel[]>(`${environment.apiUrl}/${APIROUTES.queue}/push?srcIndex=${srcIndex}&targetIndex=${targetIndex}&markAsManuallyAdded=${markAsManuallyAdded}`,{
       withCredentials: true
     })
   }
