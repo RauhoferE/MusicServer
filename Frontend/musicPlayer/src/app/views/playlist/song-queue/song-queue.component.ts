@@ -26,10 +26,11 @@ export class SongQueueComponent implements OnInit {
    *
    */
   constructor(private rxjsStorageService: RxjsStorageService, private songService: SongService, private queueService: QueueService) {
-    
+
   }
 
   ngOnInit(): void {
+    // TOOD: When changing site the subscribe gets called more often
     this.rxjsStorageService.updateQueueBoolean$.subscribe(x => {
       console.log("Update queue")
       this.onQueueTablePaginationUpdated();

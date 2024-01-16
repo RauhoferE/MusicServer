@@ -186,97 +186,19 @@ export class MediaplayerComponent implements OnInit {
 
     this.queueModel.random = this.randomizePlay;
     this.rxjsService.setQueueFilterAndPagination(this.queueModel);
-    if (this.queueModel.target == QUEUETYPES.favorites && this.randomizePlay) {
-      // Randomize favorite queue
-      this.queueService.RandomizeQueueFromFavorites(this.queueModel.loopMode).subscribe({
-        next:(song: PlaylistSongModel)=>{
-          console.log(song)
-          this.rxjsService.setCurrentPlayingSong(song);
-          // Update possible queue view
-          this.updateSongTable();
-          this.updateQueue();
-        },
-        error:(error: any)=>{
-          //this.message.error("Error when getting queue.");
-        },
-        complete: () => {
-        }
-      });
-    }
-
-    if (this.queueModel.target == QUEUETYPES.favorites && !this.randomizePlay) {
-      // Randomize favorite queue
-      await this.startFavoriteQueueFromStart();
-    }
-
-    if (this.queueModel.target == QUEUETYPES.playlist && this.randomizePlay) {
-      // Randomize playlist queue
-      this.queueService.RandomizeQueueFromPlaylist(this.queueModel.itemId, this.queueModel.loopMode).subscribe({
-        next:(song: PlaylistSongModel)=>{
-          console.log(song)
-          this.rxjsService.setCurrentPlayingSong(song);
-          // Update possible queue view
-          this.updateSongTable();
-          this.updateQueue();
-        },
-        error:(error: any)=>{
-          //this.message.error("Error when getting queue.");
-        },
-        complete: () => {
-        }
-      });
-    }
-
-    if (this.queueModel.target == QUEUETYPES.playlist && !this.randomizePlay) {
-      // Randomize favorite queue
-      await this.startPlaylistQueueFromStart();
-    }
-
-    if (this.queueModel.target == QUEUETYPES.album && this.randomizePlay) {
-      // Randomize playlist queue
-      this.queueService.RandomizeQueueFromAlbum(this.queueModel.itemId, this.queueModel.loopMode).subscribe({
-        next:(song: PlaylistSongModel)=>{
-          console.log(song)
-          this.rxjsService.setCurrentPlayingSong(song);
-          // Update possible queue view
-          this.updateSongTable();
-          this.updateQueue();
-        },
-        error:(error: any)=>{
-          //this.message.error("Error when getting queue.");
-        },
-        complete: () => {
-        }
-      });
-    }
-
-    if (this.queueModel.target == QUEUETYPES.album && !this.randomizePlay) {
-      // Randomize favorite queue
-      await this.startAlbumQueueFromStart();
-    }
-
-    if (this.queueModel.target == QUEUETYPES.song && this.randomizePlay) {
-      // Randomize playlist queue
-      this.queueService.RandomizeQueueFromSingleSong(this.queueModel.itemId, this.queueModel.loopMode).subscribe({
-        next:(song: PlaylistSongModel)=>{
-          console.log(song)
-          this.rxjsService.setCurrentPlayingSong(song);
-          // Update possible queue view
-          this.updateSongTable();
-          this.updateQueue();
-        },
-        error:(error: any)=>{
-          //this.message.error("Error when getting queue.");
-        },
-        complete: () => {
-        }
-      });
-    }
-
-    if (this.queueModel.target == QUEUETYPES.song && !this.randomizePlay) {
-      // Randomize favorite queue
-      await this.startSingleSongQueueFromStart();
-    }
+    this.queueService.ChangeQueue(this.randomizePlay).subscribe({
+      next: (song: PlaylistSongModel) => {
+        this.rxjsService.setCurrentPlayingSong(song);
+        console.log("Ranomdize queue")
+        // Update possible queue view
+        this.updateSongTable();
+        this.updateQueue();
+      },
+      error: (error) => {
+        console.log(error)
+      }
+    })
+    
 
 
   }

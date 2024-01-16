@@ -460,7 +460,7 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        public async Task<PlaylistSongDto> RandomizeQueueAsync(PlaylistSongDto[] songs)
+        public async Task<PlaylistSongDto> ChangeQueueAsync(PlaylistSongDto[] songs, bool randomize)
         {
             var userId = this.activeUserService.Id;
             var rnd = new Random();
@@ -479,8 +479,12 @@ namespace MusicServer.Services
                 songs = songs.OrderByDescending(x => x.Id == currentSong.Song.Id).Skip(1).ToArray();
             }
 
+            if (randomize)
+            {
                 // Order items random
-            songs = songs.OrderBy(x => rnd.Next()).ToArray();
+                songs = songs.OrderBy(x => rnd.Next()).ToArray();
+            }
+
 
             // Add First song back
             var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == currentSong.Song.Id) ?? throw new SongNotFoundException();
@@ -515,7 +519,7 @@ namespace MusicServer.Services
             return await this.GetCurrentSongInQueueAsync();
         }
 
-        public async Task<PlaylistSongDto> RandomizeQueueAsync(SongDto[] songs)
+        public async Task<PlaylistSongDto> ChangeQueueAsync(SongDto[] songs, bool randomize)
         {
             var userId = this.activeUserService.Id;
             var rnd = new Random();
@@ -534,8 +538,12 @@ namespace MusicServer.Services
                 songs = songs.OrderByDescending(x => x.Id == currentSong.Song.Id).Skip(1).ToArray();
             }
 
-            // Order items random
-            songs = songs.OrderBy(x => rnd.Next()).ToArray();
+            if (randomize)
+            {
+                // Order items random
+                songs = songs.OrderBy(x => rnd.Next()).ToArray();
+            }
+
 
             // Add First song back
             var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == currentSong.Song.Id) ?? throw new SongNotFoundException();
