@@ -113,7 +113,7 @@ export class AlbumDetailsComponent implements OnInit {
     });
   }
 
-  public onPaginationUpdated(){
+  public onPaginationUpdated(): void{
     console.log("Get Elements")
 
     let pModel = {} as PaginationModel;
@@ -167,7 +167,7 @@ export class AlbumDetailsComponent implements OnInit {
     });
   }
 
-  public pauseSongs() {
+  public pauseSongs(): void {
     // Stop playing of song
     this.rxjsService.setIsSongPlaylingState(false);
   }

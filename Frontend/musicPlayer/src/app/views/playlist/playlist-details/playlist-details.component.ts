@@ -121,7 +121,7 @@ export class PlaylistDetailsComponent implements OnInit {
     });
   }
 
-  public onPaginationUpdated(){
+  public onPaginationUpdated(): void{
     console.log("Get Elements")
 
     let pModel = {} as PaginationModel;
@@ -176,7 +176,7 @@ export class PlaylistDetailsComponent implements OnInit {
     });
   }
 
-  public pauseSongs() {
+  public pauseSongs(): void {
     // Stop playing of song
     this.rxjsStorageService.setIsSongPlaylingState(false);
   }
@@ -229,7 +229,7 @@ export class PlaylistDetailsComponent implements OnInit {
     });
   }
 
-  changeSongPosition(event: DragDropSongParams) {
+  changeSongPosition(event: DragDropSongParams): void {
     // TODO: Change so the query doesnt matter
     this.playlistService.ChangeOrderOfSongInPlaylist(this.playlistId, event.srcIndex, event.destIndex).subscribe({
       next:()=>{

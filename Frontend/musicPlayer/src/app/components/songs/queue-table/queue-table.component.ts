@@ -455,7 +455,7 @@ export class QueueTableComponent {
 
   }
 
-  drop(event: CdkDragDrop<string[]>) {
+  drop(event: CdkDragDrop<string[]>): void {
     console.log("drop")
     this.doc.body.classList.remove('inheritCursors');
     this.doc.body.style.cursor = 'unset'; 
@@ -502,16 +502,13 @@ export class QueueTableComponent {
     }
 
     if (!srcSong || !destSong) {
-      console.log("Return because song is undefined")
-      console.log(srcSong)
-      console.log(destSong)
       return;
     }
 
     this.songDropped.emit({ srcSong: srcSong, destSong: destSong, srcIndex: event.previousIndex, destIndex: event.currentIndex, markAsManuallyAdded: markAsManuallyAdded});
   }
 
-  drag(event: CdkDragStart<any>) {
+  drag(event: CdkDragStart<any>): void {
     console.log("drag")
     this.doc.body.classList.add('inheritCursors');
     this.doc.body.style.cursor = 'grabbing'; 

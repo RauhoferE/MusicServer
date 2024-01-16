@@ -99,7 +99,7 @@ export class FavoritesComponent implements OnInit{
     });
   }
 
-  public onPaginationUpdated(){
+  public onPaginationUpdated(): void{
     console.log("Get Elements")
 
     let pModel = {} as PaginationModel;
@@ -153,7 +153,7 @@ export class FavoritesComponent implements OnInit{
     });
   }
 
-  public pauseSongs() {
+  public pauseSongs(): void {
     // Stop playing of song
     this.rxjsStorageService.setIsSongPlaylingState(false);
   }
@@ -207,7 +207,7 @@ export class FavoritesComponent implements OnInit{
     });
   }
 
-  changeSongPosition(event: DragDropSongParams) {
+  changeSongPosition(event: DragDropSongParams): void {
     this.playlistService.ChangeOrderOfSongInFavorites(event.srcIndex, event.destIndex).subscribe({
       next:()=>{
         this.onPaginationUpdated();

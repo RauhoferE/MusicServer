@@ -28,8 +28,6 @@ export class SongTableComponent implements OnInit {
   
   @Input() sortingEnabled: boolean = true;
 
-  @Input() displayRemoveFromQueueOption: boolean = false;
-
   @Input() displayHeader: boolean = true;
 
   @Input() displayPagination: boolean = true;
@@ -39,8 +37,6 @@ export class SongTableComponent implements OnInit {
   @Input() displayAlbum: boolean = true;
 
   @Input() disableDragDrop: boolean = false;
-
-  @Input() showSongMediaControls: boolean = true; 
 
   private pagination: PaginationModel = {} as PaginationModel;
 
@@ -76,8 +72,6 @@ export class SongTableComponent implements OnInit {
   private isSongPlaying: boolean = false;
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
-
-  @Input() showPageSizeChanger: boolean = true;
 
 
   /**
@@ -485,7 +479,7 @@ export class SongTableComponent implements OnInit {
 
   }
 
-  drop(event: CdkDragDrop<string[]>) {
+  drop(event: CdkDragDrop<string[]>): void {
     console.log("drop")
     this.doc.body.classList.remove('inheritCursors');
     this.doc.body.style.cursor = 'unset'; 
@@ -505,7 +499,7 @@ export class SongTableComponent implements OnInit {
     this.songDropped.emit({ srcSong: srcSong, destSong: destSong, srcIndex: event.previousIndex, destIndex: event.currentIndex});
   }
 
-  drag(event: CdkDragStart<any>) {
+  drag(event: CdkDragStart<any>): void {
     console.log("drag")
     this.doc.body.classList.add('inheritCursors');
     this.doc.body.style.cursor = 'grabbing'; 

@@ -109,7 +109,7 @@ export class SongDetailsComponent implements OnInit {
     });
   }
 
-  public pauseSongs() {
+  public pauseSongs(): void {
     // Stop playing of song
     this.rxjsStorageService.setIsSongPlaylingState(false);
   }

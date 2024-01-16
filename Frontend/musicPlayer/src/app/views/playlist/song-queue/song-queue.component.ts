@@ -59,7 +59,7 @@ export class SongQueueComponent implements OnInit {
     })
   }
   
-  async onQueueTablePaginationUpdated() {
+  async onQueueTablePaginationUpdated(): Promise<void> {
     this.rxjsStorageService.setSongTableLoadingState(true);
 
     // this.rxjsStorageService.setSongQueue(songsList);
@@ -140,7 +140,7 @@ export class SongQueueComponent implements OnInit {
     
   }
 
-  changeSongPosition(event: DragDropQueueParams) {
+  changeSongPosition(event: DragDropQueueParams): void {
     this.rxjsStorageService.setSongTableLoadingState(true);
     console.log(event)
 
