@@ -11,13 +11,13 @@ import { ResetPasswordComponent } from './views/user/reset-password/reset-passwo
 import { ForgetPasswordComponent } from './views/user/forget-password/forget-password.component';
 import { HomeComponent } from './views/home/home.component';
 import { BaseComponent } from './views/base/base.component';
-import { PlaylistOverviewComponent } from './views/playlist/playlist-overview/playlist-overview.component';
 import { PlaylistDetailsComponent } from './views/playlist/playlist-details/playlist-details.component';
 import { FavoritesComponent } from './views/favorites/favorites.component';
 import { SongQueueComponent } from './views/playlist/song-queue/song-queue.component';
 import { AlbumDetailsComponent } from './views/album/album-details/album-details.component';
 import { SongDetailsComponent } from './views/song/song-details/song-details.component';
 import { ArtistDetailsComponent } from './views/artist/artist-details/artist-details.component';
+import { UserDetailsComponent } from './views/user/user-details/user-details.component';
 
 const routes: Routes = [
   { 
@@ -76,8 +76,12 @@ const routes: Routes = [
         component: ArtistDetailsComponent
       },
       {
-        path: 'playlists',
-        component: PlaylistOverviewComponent
+        path: 'user/:userId',
+        component: UserDetailsComponent
+      },
+      {
+        path: 'user',
+        component: UserDetailsComponent
       },
       {
         path: 'playlist/:playlistId',

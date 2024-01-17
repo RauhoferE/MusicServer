@@ -129,6 +129,7 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
       pModel = val as PaginationModel;
     })
 
+    // TODO: Remove
     this.sessionStorage.SaveLastPaginationOfPlaylist(pModel);
     this.onGetSongs(pModel.page, pModel.take, pModel.sortAfter, 
       pModel.asc, pModel.query);

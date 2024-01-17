@@ -10,6 +10,8 @@ namespace MusicServer.Interfaces
 
         public Task UpdatePlaylistAsync(Guid playlistId, string name, string description, bool isPublic, bool receiveNotifications);
 
+        public Task SetNotifications(Guid playlistId);
+
         public Task DeletePlaylistAsync(Guid playlistId);
 
         public Task AddSongsToPlaylistAsync(Guid playlistId, List<Guid> songIds);

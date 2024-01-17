@@ -42,6 +42,7 @@ export interface ModifieablePlaylistModel{
 }
 
 export interface PlaylistUserShortModel{
+    checked: boolean;
     id: string;
     name: string;
     songCount: number;
@@ -55,4 +56,9 @@ export interface PlaylistUserShortModel{
     users: UserModel[];
     
 
+}
+
+export interface PlaylistPaginationModel{
+    totalCount: number;
+    playlists: PlaylistUserShortModel[];
 }

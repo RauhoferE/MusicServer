@@ -1,0 +1,75 @@
+<div>
+    <div nz-row style="margin-bottom: 2em;">        
+        <nz-input-group nz-col [nzPrefix]="prefixIconSearch" style="align-self: center;">
+            <input type="text" nz-input placeholder="Search for playlist" [(ngModel)]="SearchString" (keyup.enter)="onSearchQueryInput()"/>
+        </nz-input-group>
+        <ng-template #prefixIconSearch>
+        <span nz-icon nzType="search"></span>
+        </ng-template>
+        
+    </div>
+    <button *ngIf="!ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Show Selector</button>
+    <button *ngIf="ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Hide Selector</button>
+    <nz-table
+    nzShowSizeChanger
+    [nzData]="playlistModel.playlists"
+    [nzFrontPagination]="false"
+    [nzLoading]="(IsLoading | async)"
+    [nzTotal]="playlistModel.totalCount"
+    [nzPageSize]="PageSize"
+    [nzPageIndex]="PageIndex"
+    (nzQueryParams)="onQueryParamsChange($event)"
+    >
+    <thead >
+        <tr>
+            <th             
+            *ngIf="ShowCheckbox"
+            nzWidth="60px"
+            [(nzChecked)]="AllChecked"
+            [nzIndeterminate]="Indeterminate"
+            (nzCheckedChange)="checkAll($event)"></th>
+            <th nzColumnKey="order" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
+            <th nzColumnKey="name" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
+            <th nzColumnKey="creator" [nzSortFn]="false">Creator</th>
+            <th nzColumnKey="songCount" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('songCount')">Songs</th>
+            <th nzColumnKey="created" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('created')">Created</th>
+            <th nzColumnKey="actions">Actions</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        <tr *ngFor="let data of playlistModel.playlists;let indexOfelement=index;"
+        class="song-item" 
+        >
+        <td
+        *ngIf="ShowCheckbox"
+        [(nzChecked)]="data.checked"
+        (nzCheckedChange)="refreshTableHeader()"
+      ></td>
+      <td>
+        <img [src]="getPlaylistCoverSrc(data.id)" style="width: 50px; height: 50px;"/>
+      </td>
+      <td>
+        {{data.name}}
+      </td>
+      <td>
+        {{this.getPlaylistCreator(data.users)}}
+      </td>
+      <td>
+        {{data.songCount}} Songs
+      </td>
+      <td>
+        {{data.created| date:'longDate' }}
+      </td>
+      <td>
+        <span *ngIf="!data.receiveNotifications" nz-icon nzType="mail" nzTheme="outline" class="clickable" (click)="receiveNotifications(data.id)"></span>
+        <span *ngIf="data.receiveNotifications" nz-icon nzType="mail" nzTheme="outline" class="clickable success-color" (click)="receiveNotifications(data.id)"></span>
+        <span *ngIf="data.isModifieable && !data.isPublic" nz-icon nzType="send" nzTheme="outline" class="clickable" (click)="setPublic(data.id)"></span>
+        <span *ngIf="data.isModifieable && data.isPublic" nz-icon nzType="send" nzTheme="outline" class="clickable success-color" (click)="setPublic(data.id)"></span>
+        <span *ngIf="!data.isModifieable" aria-disabled="true" nz-icon nzType="send" nzTheme="outline" (click)="setPublic(data.id)"></span>
+      </td>
+        </tr>
+    </tbody>
+    </nz-table>
+
+</div>

@@ -887,5 +887,18 @@ namespace MusicServer.Services
             var userId = this.activeUserService.Id;
             return this.dBContext.FavoriteSongs.Count(x => x.User.Id == userId);
         }
+
+        public async Task SetNotifications(Guid playlistId)
+        {
+            var user = this.dBContext.Users
+.Include(x => x.Playlists)
+.ThenInclude(x => x.Playlist)
+.FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
+            var playlist = user.Playlists.FirstOrDefault(x => x.Playlist.Id == playlistId) ?? throw new PlaylistNotFoundException();
+
+            playlist.ReceiveNotifications = !playlist.ReceiveNotifications;
+            await this.dBContext.SaveChangesAsync();
+        }
     }
 }

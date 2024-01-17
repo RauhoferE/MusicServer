@@ -121,6 +121,14 @@ namespace MusicServer.Controllers
             return NoContent();
         }
 
+        [HttpGet]
+        [Route(ApiRoutes.Playlist.PlaylistNotification)]
+        public async Task<IActionResult> SetNotifications([FromRoute, Required] Guid playlistId)
+        {
+            await this.playlistService.SetNotifications(playlistId);
+            return NoContent();
+        }
+
 
         [HttpDelete]
         [Route(ApiRoutes.Playlist.PlaylistShare)]

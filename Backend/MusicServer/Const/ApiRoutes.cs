@@ -63,6 +63,7 @@
             public const string PublicPlaylist = "public";
             public const string PlaylistAlbum = "album/{playlistId}";
             public const string PlaylistShare = "share/{playlistId}";
+            public const string PlaylistNotification = "notification/{playlistId}";
             public const string PlaylistCopy = "copy/{playlistId}";
             public const string PlaylistAddToLibrary = "add/{playlistId}";
             public const string Favorite = "favorites";

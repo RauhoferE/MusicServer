@@ -43,7 +43,6 @@ import { ResetPasswordComponent } from './views/user/reset-password/reset-passwo
 import { ForgetPasswordComponent } from './views/user/forget-password/forget-password.component';
 import { BaseComponent } from './views/base/base.component';
 import { HomeComponent } from './views/home/home.component';
-import { PlaylistOverviewComponent } from './views/playlist/playlist-overview/playlist-overview.component';
 import { PlaylistDetailsComponent } from './views/playlist/playlist-details/playlist-details.component';
 import { SongTableComponent } from './components/songs/song-table/song-table.component';
 import { FavoritesComponent } from './views/favorites/favorites.component';
@@ -59,6 +58,8 @@ import { AudioLoopOneComponent } from './components/svg/audio-loop-one/audio-loo
 import { ArtistDetailsComponent } from './views/artist/artist-details/artist-details.component';
 import { AlbumListComponent } from './components/album/album-list/album-list.component';
 import { QueueTableComponent } from './components/songs/queue-table/queue-table.component';
+import { PlaylistListComponent } from './components/playlist/playlist-list/playlist-list.component';
+import { UserDetailsComponent } from './views/user/user-details/user-details.component';
 
 
 
@@ -76,7 +77,6 @@ registerLocaleData(en);
     ForgetPasswordComponent,
     BaseComponent,
     HomeComponent,
-    PlaylistOverviewComponent,
     PlaylistDetailsComponent,
     SongTableComponent,
     FavoritesComponent,
@@ -91,7 +91,9 @@ registerLocaleData(en);
     AudioLoopOneComponent,
     ArtistDetailsComponent,
     AlbumListComponent,
-    QueueTableComponent
+    QueueTableComponent,
+    PlaylistListComponent,
+    UserDetailsComponent
   ],
   imports: [
     BrowserModule,

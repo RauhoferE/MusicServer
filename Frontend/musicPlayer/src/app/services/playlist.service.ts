@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ModifieablePlaylistModel, SongPaginationModel, PlaylistUserShortModel } from '../models/playlist-models';
+import { ModifieablePlaylistModel, SongPaginationModel, PlaylistUserShortModel, PlaylistPaginationModel } from '../models/playlist-models';
 import { environment } from 'src/environments/environment';
 import { APIROUTES } from '../constants/api-routes';
 
@@ -92,6 +92,18 @@ export class PlaylistService {
 
   public ChangeOrderOfSongInPlaylist(playlistId: string, oldOrder: number, newOrder: number): Observable<Object>{
     return this.httpClient.get(`${environment.apiUrl}/${APIROUTES.playlist}/order/song?playlistId=${playlistId}&oldOrder=${oldOrder}&newOrder=${newOrder}`,{
+      withCredentials: true
+    })
+  }
+
+  public GetPlaylists(userId: string, page: number, take: number, query: string, sortAfter: string, asc: boolean): Observable<PlaylistPaginationModel>{
+    return this.httpClient.get<PlaylistPaginationModel>(`${environment.apiUrl}/${APIROUTES.playlist}/playlists?userId=${userId}&page=${page}&take=${take}&query=${query}&sortAfter=${sortAfter}&asc=${asc}`,{
+      withCredentials: true
+    })
+  }
+
+  public SetPlaylistNotifications(playlistId: string): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.playlist}/notification/${playlistId}`,{
       withCredentials: true
     })
   }
