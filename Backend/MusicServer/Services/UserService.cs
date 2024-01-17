@@ -30,16 +30,16 @@ namespace MusicServer.Services
             this.mapper = mapper;
         }
 
-        public async Task<GuidNamePaginationResponse> GetFollowedArtistsAsync(int page, int take, string query, bool asc)
+        public async Task<GuidNamePaginationResponse> GetFollowedArtistsAsync(string query)
         {
             var targetUser = this.dBContext.Users
                 .Include(x => x.FollowedArtists)
                 .ThenInclude(x => x.Artist)
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            var followedArtists = SortingHelpers.SortSearchFollowedArtists(targetUser.FollowedArtists.AsQueryable(), asc, query);
+            var followedArtists = SortingHelpers.SortSearchFollowedArtists(targetUser.FollowedArtists.AsQueryable(), query);
 
-            var mappedArtists = this.mapper.Map<GuidNameDto[]>(targetUser.FollowedArtists.Skip((page - 1) * take).Take(take).ToArray());
+            var mappedArtists = this.mapper.Map<GuidNameDto[]>(targetUser.FollowedArtists.ToArray());
 
             foreach (var artist in mappedArtists)
             {
@@ -53,16 +53,16 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<UserDtoPaginationResponse> GetFollowedUsersAsync(int page, int take, string query, bool asc)
+        public async Task<UserDtoPaginationResponse> GetFollowedUsersAsync(string query)
         {
             var targetUser = this.dBContext.Users
                 .Include(x => x.FollowedUsers)
                 .ThenInclude(x => x.FollowedUser)
                 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            var followedUsers = SortingHelpers.SortSearchFollowedUsers(targetUser.FollowedUsers.AsQueryable(), asc, query);
+            var followedUsers = SortingHelpers.SortSearchFollowedUsers(targetUser.FollowedUsers.AsQueryable(), query);
 
-            var mappedUsers = this.mapper.Map<UserDto[]>(targetUser.FollowedUsers.Skip((page - 1) * take).Take(take).ToArray());
+            var mappedUsers = this.mapper.Map<UserDto[]>(targetUser.FollowedUsers.ToArray());
 
             return new UserDtoPaginationResponse
             {

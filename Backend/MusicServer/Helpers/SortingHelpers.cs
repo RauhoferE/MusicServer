@@ -245,7 +245,7 @@ namespace MusicServer.Helpers
             return artists.OrderByDescending(x => x.Name).ThenBy(x => x.Id);
         }
 
-        public static IQueryable<UserArtist> SortSearchFollowedArtists(IQueryable<UserArtist> artists, bool asc, string query)
+        public static IQueryable<UserArtist> SortSearchFollowedArtists(IQueryable<UserArtist> artists, string query)
         {
             if (query != null)
             {
@@ -254,12 +254,7 @@ namespace MusicServer.Helpers
                   .Where(x => x.Artist.Name.ToLower().Contains(query));
             }
 
-            if (asc)
-            {
-                return artists.OrderBy(x => x.Artist.Name).ThenBy(x => x.Id);
-            }
-
-            return artists.OrderByDescending(x => x.Artist.Name).ThenBy(x => x.Id);
+            return artists.OrderBy(x => x.Artist.Name).ThenBy(x => x.Id);
         }
 
         public static IQueryable<User> SortSearchUsers(IQueryable<User> users, bool asc, string query)
@@ -278,7 +273,7 @@ namespace MusicServer.Helpers
             return users.OrderByDescending(x => x.UserName).ThenBy(x => x.Id);
         }
 
-        public static IQueryable<UserUser> SortSearchFollowedUsers(IQueryable<UserUser> users, bool asc, string query)
+        public static IQueryable<UserUser> SortSearchFollowedUsers(IQueryable<UserUser> users, string query)
         {
             if (query != null)
             {
@@ -287,12 +282,7 @@ namespace MusicServer.Helpers
                   .Where(x => x.FollowedUser.UserName.ToLower().Contains(query) || x.FollowedUser.Email.Contains(query));
             }
 
-            if (asc)
-            {
-                return users.OrderBy(x => x.FollowedUser.UserName).ThenBy(x => x.Id);
-            }
-
-            return users.OrderByDescending(x => x.FollowedUser.UserName).ThenBy(x => x.Id);
+            return users.OrderBy(x => x.FollowedUser.UserName).ThenBy(x => x.Id);
         }
 
         public static IQueryable<Song> SortSearchAllSongs(IQueryable<Song> songs, bool asc, string query, string sortAfter)
