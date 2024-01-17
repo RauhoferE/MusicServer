@@ -81,16 +81,16 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.User.GetFollowedArtists)]
-        public async Task<IActionResult> GetSubscribedArtists([FromQuery, Required] string query)
+        public async Task<IActionResult> GetSubscribedArtists([FromRoute, Required] long userId, [FromQuery, Required] string query)
         {
-            return Ok(await this.userService.GetFollowedArtistsAsync(query));
+            return Ok(await this.userService.GetFollowedArtistsAsync(userId, query));
         }
 
         [HttpGet]
         [Route(ApiRoutes.User.GetFollowedUsers)]
-        public async Task<IActionResult> GetSubscribedUsers([FromQuery, Required] string query)
+        public async Task<IActionResult> GetSubscribedUsers([FromRoute, Required] long userId, [FromQuery, Required] string query)
         {
-            return Ok(await this.userService.GetFollowedUsersAsync(query));
+            return Ok(await this.userService.GetFollowedUsersAsync(userId, query));
         }
 
         [HttpGet]

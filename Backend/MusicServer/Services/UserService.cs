@@ -30,8 +30,9 @@ namespace MusicServer.Services
             this.mapper = mapper;
         }
 
-        public async Task<GuidNamePaginationResponse> GetFollowedArtistsAsync(string query)
+        public async Task<GuidNameDto[]> GetFollowedArtistsAsync(long userId, string query)
         {
+            //TODO: Change so that if the userid != -1 it should mark the followed by user for the user requesting the info
             var targetUser = this.dBContext.Users
                 .Include(x => x.FollowedArtists)
                 .ThenInclude(x => x.Artist)
@@ -46,15 +47,12 @@ namespace MusicServer.Services
                 artist.FollowedByUser = true;
             }
 
-            return new GuidNamePaginationResponse
-            {
-                Items = mappedArtists,
-                TotalCount = followedArtists.Count()
-            };
+            return mappedArtists;
         }
 
-        public async Task<UserDtoPaginationResponse> GetFollowedUsersAsync(string query)
+        public async Task<GuidNameDto[]> GetFollowedUsersAsync(long userId, string query)
         {
+            //TODO: Change so that if the userid != -1 it should mark the followed by user for the user requesting the info
             var targetUser = this.dBContext.Users
                 .Include(x => x.FollowedUsers)
                 .ThenInclude(x => x.FollowedUser)
@@ -62,13 +60,7 @@ namespace MusicServer.Services
 
             var followedUsers = SortingHelpers.SortSearchFollowedUsers(targetUser.FollowedUsers.AsQueryable(), query);
 
-            var mappedUsers = this.mapper.Map<UserDto[]>(targetUser.FollowedUsers.ToArray());
-
-            return new UserDtoPaginationResponse
-            {
-                Users = mappedUsers,
-                TotalCount = followedUsers.Count()
-            };
+            return this.mapper.Map<GuidNameDto[]>(targetUser.FollowedUsers.ToArray());
         }
 
         public async Task<UserDetailsDto> GetUserAsync(long userId)
