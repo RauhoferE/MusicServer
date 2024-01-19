@@ -363,5 +363,45 @@ namespace MusicServer.Services
             followedArtist.ReceiveNotifications = false;
             await this.dBContext.SaveChangesAsync();
         }
+
+        public async Task ActivateNotificationsFromUserAsync(long userId)
+        {
+            var followedUser = this.dBContext.FollowedUsers
+.Include(x => x.User)
+.Include(x => x.FollowedUser)
+.FirstOrDefault(x => x.User.Id == this.activeUserService.Id && x.FollowedUser.Id == userId);
+
+            // IF player already follows user
+            if (followedUser != null)
+            {
+                followedUser.ReceiveNotifications = true;
+                await this.dBContext.SaveChangesAsync();
+                return;
+            }
+
+            var userToFollow = this.dBContext.Users.FirstOrDefault(x => x.Id == userId) ?? throw new ArtistNotFoundException();
+
+            var user = this.dBContext.Users.FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+
+            this.dBContext.FollowedUsers.Add(new UserUser()
+            {
+                FollowedUser = userToFollow,
+                User = user,
+                ReceiveNotifications = true
+            });
+
+            await this.dBContext.SaveChangesAsync();
+        }
+
+        public async Task DeactivateNotificationsFromUserAsync(long userId)
+        {
+            var followedUser = this.dBContext.FollowedUsers
+.Include(x => x.User)
+.Include(x => x.FollowedUser)
+.FirstOrDefault(x => x.User.Id == this.activeUserService.Id && x.FollowedUser.Id == userId) ?? throw new DataNotFoundException();
+
+            followedUser.ReceiveNotifications = false;
+            await this.dBContext.SaveChangesAsync();
+        }
     }
 }

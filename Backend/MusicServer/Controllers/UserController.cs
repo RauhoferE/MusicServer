@@ -80,6 +80,22 @@ namespace MusicServer.Controllers
         }
 
         [HttpGet]
+        [Route(ApiRoutes.User.ReceiveNotificationsUser)]
+        public async Task<IActionResult> ReceiveNotificationsFromUser([FromRoute, Required] long userId)
+        {
+            await this.userService.ActivateNotificationsFromUserAsync(userId);
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route(ApiRoutes.User.ReceiveNotificationsUser)]
+        public async Task<IActionResult> RemoveNotificationsFromUser([FromRoute, Required] long userId)
+        {
+            await this.userService.DeactivateNotificationsFromUserAsync(userId);
+            return NoContent();
+        }
+
+        [HttpGet]
         [Route(ApiRoutes.User.GetFollowedArtists)]
         public async Task<IActionResult> GetSubscribedArtists([FromRoute, Required] long userId, [FromQuery, Required] string query)
         {

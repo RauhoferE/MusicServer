@@ -23,6 +23,7 @@
             public const string SubscribeUser = "subscribe/user/{userId}";
             public const string SubscribeArtist = "subscribe/artist/{artistId}";
             public const string ReceiveNotificationsArtist = "notifications/artist/{artistId}";
+            public const string ReceiveNotificationsUser = "notifications/user/{userId}";
             public const string GetFollowedArtists = "followed/artists/{userId}";
             public const string GetFollowedUsers = "followed/users/{userId}";
             public const string GetUsers = "all/users";

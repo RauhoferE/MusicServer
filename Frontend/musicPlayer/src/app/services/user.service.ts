@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { AllFollowedEntitiesModel } from '../models/user-models';
 import { environment } from 'src/environments/environment';
 import { APIROUTES } from '../constants/api-routes';
+import { GuidNameModel } from '../models/playlist-models';
 
 @Injectable({
   providedIn: 'root'
@@ -53,4 +54,42 @@ export class UserService {
       withCredentials: true
     })
   }
+
+  public GetSubscribedArtists(userId: number, query: string): Observable<GuidNameModel[]>{
+    return this.httpClient.get<GuidNameModel[]>(`${environment.apiUrl}/${APIROUTES.user}/followed/artists/${userId}?query=${query}`,{
+      withCredentials: true
+    })
+  }
+
+  public GetSubscribedUsers(userId: number, query: string): Observable<GuidNameModel[]>{
+    return this.httpClient.get<GuidNameModel[]>(`${environment.apiUrl}/${APIROUTES.user}/followed/users/${userId}?query=${query}`,{
+      withCredentials: true
+    })
+  }
+
+  public SubscribeToUser(userId: number): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.user}/subscribe/user/${userId}`,{
+      withCredentials: true
+    })
+  }
+
+  public UnSubscribeFromUser(userId: number): Observable<object>{
+    return this.httpClient.delete<object>(`${environment.apiUrl}/${APIROUTES.user}/subscribe/user/${userId}`,{
+      withCredentials: true
+    })
+  }
+
+  public ReceiveNotficationsFromUser(userId: string): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.user}/notifications/user/${userId}`,{
+      withCredentials: true
+    })
+  }
+
+  public RemoveNotficationsFromUser(userId: string): Observable<object>{
+    return this.httpClient.delete<object>(`${environment.apiUrl}/${APIROUTES.user}/notifications/user/${userId}`,{
+      withCredentials: true
+    })
+  }
+
+
 }

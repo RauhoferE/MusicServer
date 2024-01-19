@@ -16,6 +16,10 @@ namespace MusicServer.Interfaces
 
         public Task UnsubscribeFromArtistAsync(Guid artistId);
 
+        public Task ActivateNotificationsFromUserAsync(long userId);
+
+        public Task DeactivateNotificationsFromUserAsync(long userId);
+
         public Task ActivateNotificationsFromArtistAsync(Guid artistId);
 
         public Task DeactivateNotificationsFromArtistAsync(Guid artistId);
