@@ -53,11 +53,14 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     if (!this.route.snapshot.paramMap.has('userId')) {
       console.log("userId id not found");
       this.userId = '-1';
-      this.userModel.userName = this.jwtService.getUserName();
     }
 
     if (this.route.snapshot.paramMap.has('userId')) {
       this.userId = this.route.snapshot.paramMap.get('userId') as string;
+    }
+
+    if (this.userId == '-1') {
+      this.userModel.userName = this.jwtService.getUserName();
     }
 
     this.rxjsStorageService.setCurrentPaginationSongModel(this.playlistsPaginationModel);    

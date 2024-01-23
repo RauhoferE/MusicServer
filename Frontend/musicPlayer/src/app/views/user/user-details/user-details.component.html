@@ -26,8 +26,9 @@
             </span>
 
         </div>
-        <h2>Followed Artists</h2>
-        <cdk-virtual-scroll-viewport itemSize="50" class="list-view">
+        <h2 *ngIf="FollowedArtists.length == 0">No Followed Artists</h2>
+        <h2 *ngIf="FollowedArtists.length > 0">Followed Artists</h2>
+        <cdk-virtual-scroll-viewport *ngIf="FollowedArtists.length > 0" itemSize="50" class="list-view">
             <div *cdkVirtualFor="let artist of FollowedArtists" class="list-item" nz-row>
                 <div nz-col>
                     <img [src]="getArtistPicSrc(artist.id)" style="width: 150px; height: 150px;">
@@ -48,15 +49,16 @@
                 </div>
             </div>
           </cdk-virtual-scroll-viewport>
-          <h2>Followed Users</h2>     
-          <cdk-virtual-scroll-viewport itemSize="50" class="list-view">
+          <h2 *ngIf="FollowedUsers.length == 0">No Followed Users</h2> 
+          <h2 *ngIf="FollowedUsers.length > 0">Followed Users</h2>     
+          <cdk-virtual-scroll-viewport *ngIf="FollowedUsers.length > 0" itemSize="50" class="list-view">
             <div *cdkVirtualFor="let user of FollowedUsers" class="list-item" nz-row>
                 <div nz-col>
                     <img [src]="getProfilePicSrc(user.id)" style="width: 150px; height: 150px;">
                 </div>
                 <div nz-col class="list-item-actions">
                     <h2><a [routerLink]="['/user', user.id]">{{user.userName}}</a></h2>
-                    <div>
+                    <div *ngIf="user.id != -1">
                         <button *ngIf="!user.isFollowedByUser" nz-col nz-button nzType="default" class="clickable-button" (click)="subscribeToUser(user)">Follow</button>
                         <button *ngIf="user.isFollowedByUser" nz-col nz-button nzType="default" class="clickable-button success-color" (click)="subscribeToUser(user)">Unfollow</button>
                         <button *ngIf="!user.receiveNotifications" nz-col nz-button nzType="default" class="clickable-button" nzShape="circle" (click)="activateNotificationsForUser(user)">

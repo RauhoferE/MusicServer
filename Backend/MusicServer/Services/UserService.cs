@@ -94,6 +94,12 @@ namespace MusicServer.Services
             foreach (var user in mappedUsers)
             {
                 var userFollowEntity = ownFollows.FollowedUsers.FirstOrDefault(x => x.FollowedUser.Id == user.Id);
+
+                if (user.Id == this.activeUserService.Id)
+                {
+                    user.Id = -1;
+                }
+
                 if (userFollowEntity != null)
                 {
                     user.IsFollowedByUser = true;
