@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import {ScrollingModule} from '@angular/cdk/scrolling';
 
 // NG-Zorro Imports
 import { NZ_I18N } from 'ng-zorro-antd/i18n';
@@ -105,6 +106,7 @@ registerLocaleData(en);
     BrowserAnimationsModule,
     ReactiveFormsModule,
     DragDropModule,
+    ScrollingModule,
 
     // Ng-zorro
     NzMessageModule,

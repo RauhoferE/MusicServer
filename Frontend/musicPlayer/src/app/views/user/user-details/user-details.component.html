@@ -26,6 +26,27 @@
             </span>
 
         </div>
+        <cdk-virtual-scroll-viewport itemSize="50" class="example-viewport">
+            <div *cdkVirtualFor="let artist of FollowedArtists" class="example-item" nz-row>
+                <div nz-col>
+                    <img [src]="getArtistPicSrc(artist.id)">
+                </div>
+                <div nz-col>
+                    <span>{{artist.name}}</span>
+                    <div>
+                        <button *ngIf="!artist.followedByUser" nz-col nz-button nzType="default" class="clickable-button" (click)="subscribeToArtist(artist)">Follow</button>
+                        <button *ngIf="artist.followedByUser" nz-col nz-button nzType="default" class="clickable-button success-color" (click)="subscribeToArtist(artist)">Unfollow</button>
+                        <button *ngIf="!artist.receiveNotifications" nz-col nz-button nzType="default" class="clickable-button" nzShape="circle" (click)="activateNotificationsForArtist(artist)">
+                            <span nz-icon nzType="mail" nzTheme="outline"></span>
+                        </button>
+                        <button *ngIf="artist.receiveNotifications" nz-col nz-button nzType="default" class="clickable-button success-color" nzShape="circle" (click)="activateNotificationsForArtist(artist)">
+                            <span nz-icon nzType="mail" nzTheme="outline"></span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+          </cdk-virtual-scroll-viewport>          
         Subscribed Artists
         Subscribed Users
         Playlists

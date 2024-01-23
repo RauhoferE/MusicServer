@@ -56,15 +56,29 @@ export class UserService {
   }
 
   public GetSubscribedArtists(userId: string, query: string): Observable<GuidNameModel[]>{
+
+    if (query == '') {
+      return this.httpClient.get<GuidNameModel[]>(`${environment.apiUrl}/${APIROUTES.user}/followed/artists/${userId}`,{
+        withCredentials: true
+      });
+    }
+
     return this.httpClient.get<GuidNameModel[]>(`${environment.apiUrl}/${APIROUTES.user}/followed/artists/${userId}?query=${query}`,{
       withCredentials: true
-    })
+    });
   }
 
-  public GetSubscribedUsers(userId: string, query: string): Observable<GuidNameModel[]>{
-    return this.httpClient.get<GuidNameModel[]>(`${environment.apiUrl}/${APIROUTES.user}/followed/users/${userId}?query=${query}`,{
+  public GetSubscribedUsers(userId: string, query: string): Observable<UserModel[]>{
+
+    if (query == '') {
+      return this.httpClient.get<UserModel[]>(`${environment.apiUrl}/${APIROUTES.user}/followed/users/${userId}`,{
+        withCredentials: true
+      });
+    }
+
+    return this.httpClient.get<UserModel[]>(`${environment.apiUrl}/${APIROUTES.user}/followed/users/${userId}?query=${query}`,{
       withCredentials: true
-    })
+    });
   }
 
   public SubscribeToUser(userId: string): Observable<object>{

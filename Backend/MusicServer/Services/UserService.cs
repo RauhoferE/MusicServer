@@ -32,35 +32,83 @@ namespace MusicServer.Services
 
         public async Task<GuidNameDto[]> GetFollowedArtistsAsync(long userId, string query)
         {
-            //TODO: Change so that if the userid != -1 it should mark the followed by user for the user requesting the info
-            var targetUser = this.dBContext.Users
-                .Include(x => x.FollowedArtists)
-                .ThenInclude(x => x.Artist)
-                .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+            var targetUserFollows = this.dBContext.Users
+                    .Include(x => x.FollowedArtists)
+                    .ThenInclude(x => x.Artist)
+                    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            var followedArtists = SortingHelpers.SortSearchFollowedArtists(targetUser.FollowedArtists.AsQueryable(), query);
+            var ownFollows = this.dBContext.Users
+                    .Include(x => x.FollowedArtists)
+                    .ThenInclude(x => x.Artist)
+                    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            var mappedArtists = this.mapper.Map<GuidNameDto[]>(targetUser.FollowedArtists.ToArray());
+            if (userId != -1)
+            {
+                targetUserFollows = this.dBContext.Users
+                    .Include(x => x.FollowedArtists)
+                    .ThenInclude(x => x.Artist)
+                    .FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
+            }
+
+
+            var followedArtists = SortingHelpers.SortSearchFollowedArtists(targetUserFollows.FollowedArtists.AsQueryable(), query);
+
+            var mappedArtists = this.mapper.Map<GuidNameDto[]>(followedArtists.ToArray());
 
             foreach (var artist in mappedArtists)
             {
-                artist.FollowedByUser = true;
+                var artistFollowEntity = ownFollows.FollowedArtists.FirstOrDefault(x => x.Artist.Id == artist.Id);
+                if (artistFollowEntity != null)
+                {
+                    artist.FollowedByUser = true;
+                    artist.ReceiveNotifications = artistFollowEntity.ReceiveNotifications;
+                    continue;
+                }
+
+                artist.FollowedByUser = false;
+                artist.ReceiveNotifications = false;
+                
             }
 
             return mappedArtists;
         }
 
-        public async Task<GuidNameDto[]> GetFollowedUsersAsync(long userId, string query)
+        public async Task<UserDto[]> GetFollowedUsersAsync(long userId, string query)
         {
-            //TODO: Change so that if the userid != -1 it should mark the followed by user for the user requesting the info
-            var targetUser = this.dBContext.Users
-                .Include(x => x.FollowedUsers)
-                .ThenInclude(x => x.FollowedUser)
-                .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+            var targetUserFollows = this.dBContext.Users
+        .Include(x => x.FollowedUsers)
+        .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            var followedUsers = SortingHelpers.SortSearchFollowedUsers(targetUser.FollowedUsers.AsQueryable(), query);
+            var ownFollows = this.dBContext.Users
+                    .Include(x => x.FollowedUsers)
+                    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            return this.mapper.Map<GuidNameDto[]>(targetUser.FollowedUsers.ToArray());
+            if (userId != -1)
+            {
+                targetUserFollows = this.dBContext.Users
+                    .Include(x => x.FollowedUsers)
+                    .FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
+            }
+
+            var followedUsers = SortingHelpers.SortSearchFollowedUsers(targetUserFollows.FollowedUsers.AsQueryable(), query);
+
+            var mappedUsers = this.mapper.Map<UserDto[]>(followedUsers.ToArray());
+
+            foreach (var user in mappedUsers)
+            {
+                var userFollowEntity = ownFollows.FollowedUsers.FirstOrDefault(x => x.FollowedUser.Id == user.Id);
+                if (userFollowEntity != null)
+                {
+                    user.IsFollowedByUser = true;
+                    user.ReceiveNotifications = userFollowEntity.ReceiveNotifications;
+                    continue;
+                }
+
+                user.IsFollowedByUser = false;
+                user.ReceiveNotifications = false;
+            }
+
+            return mappedUsers;
         }
 
         public async Task<UserDetailsDto> GetUserAsync(long userId)

@@ -7,6 +7,7 @@ import { GuidNameModel, PlaylistPaginationModel } from 'src/app/models/playlist-
 import { PaginationModel } from 'src/app/models/storage';
 import { UserModel } from 'src/app/models/user-models';
 import { FileService } from 'src/app/services/file.service';
+import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { UserService } from 'src/app/services/user.service';
@@ -31,7 +32,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   private destroy:Subject<any> = new Subject();
   private playlistsModel: PlaylistPaginationModel = {} as PlaylistPaginationModel;
   private artists: GuidNameModel[] = [];
-  private users: GuidNameModel[] = [];
+  private users: UserModel[] = [];
   public newProfilePic: File = {} as File;
   private fileError: string = '';
 
@@ -47,10 +48,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
    */ 
   constructor(private route: ActivatedRoute, private message: NzMessageService, 
     private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService, private userService: UserService,
-    private fileService: FileService) {
+    private fileService: FileService, private jwtService: JwtService) {
     if (!this.route.snapshot.paramMap.has('userId')) {
       console.log("userId id not found");
       this.userId = '-1';
+      this.userModel.userName = this.jwtService.getUserName();
     }
 
     if (this.route.snapshot.paramMap.has('userId')) {
@@ -66,28 +68,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
 
     this.onPaginationUpdated();
-
-    this.userService.GetSubscribedArtists(this.userId, '').pipe(takeUntil(this.destroy)).subscribe({
-      next: (artists: GuidNameModel[])=>{
-        this.artists = artists;
-
-      },
-      error: (error)=>{
-        console.log(error);
-      }
-
-    })
-
-    this.userService.GetSubscribedUsers(this.userId, '').pipe(takeUntil(this.destroy)).subscribe({
-      next: (users: GuidNameModel[])=>{
-        this.users = users;
-
-      },
-      error: (error)=>{
-        console.log(error);
-      }
-
-    })
+    this.getFollowedArtists();
+    this.getFollowedUsers();
   }
 
   ngOnDestroy(): void {
@@ -208,13 +190,85 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private updateProfilePicInBase(): void{
-    let updateBoolean = false;
-    this.rxjsStorageService.updateProfilePicBoolean$.subscribe(x =>{
-      updateBoolean = x;
-    })
+  public subscribeToArtist(artist: GuidNameModel) {
+    if (artist.followedByUser) {
+      this.userService.UnSuscribeFromArtist(artist.id).subscribe({
+        next: ()=>{
+          this.getFollowedArtists();
+          this.updateDashBoard();
+          
+        },
+        error: (error)=>{
+          console.log(error);
+        }
+      });
 
-    this.rxjsStorageService.setProfilePicBoolean(!updateBoolean);
+      return;
+    }
+
+    this.userService.SuscribeToArtist(artist.id).subscribe({
+      next: ()=>{
+        this.getFollowedArtists();
+        this.updateDashBoard();
+        
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    });
+  }
+
+  public activateNotificationsForArtist(artist: GuidNameModel) {
+    if (artist.receiveNotifications) {
+      this.userService.RemoveNotficationsFromArtist(artist.id).subscribe({
+        next: ()=>{
+          this.getFollowedArtists();
+          
+        },
+        error: (error)=>{
+          console.log(error);
+        }
+      });
+
+      return;
+    }
+
+    this.userService.ReceiveNotficationsFromArtist(artist.id).subscribe({
+      next: ()=>{
+        this.getFollowedArtists();
+        this.updateDashBoard();
+        
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    });
+  }
+
+  public getFollowedArtists(): void{
+    this.userService.GetSubscribedArtists(this.userId, '').subscribe({
+      next: (artists: GuidNameModel[])=>{
+        this.artists = artists;
+
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+
+    });
+  }
+
+  public getFollowedUsers(): void{
+    this.userService.GetSubscribedUsers(this.userId, '').subscribe({
+      next: (users: UserModel[])=>{
+        this.users = users;
+
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+
+    });
   }
 
   public onGetPlaylists(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
@@ -259,8 +313,21 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.rxjsStorageService.setUpdateDashboardBoolean(!currenState);
   }
 
+  public getArtistPicSrc(id: number): string{
+    return `${environment.apiUrl}/${APIROUTES.file}/artist/${id}`
+  }
+
   public getUserCoverSrc(): string{
     return `${environment.apiUrl}/${APIROUTES.file}/user/${this.userId}?${this.timeStamp.getTime()}`
+  }
+
+  private updateProfilePicInBase(): void{
+    let updateBoolean = false;
+    this.rxjsStorageService.updateProfilePicBoolean$.subscribe(x =>{
+      updateBoolean = x;
+    })
+
+    this.rxjsStorageService.setProfilePicBoolean(!updateBoolean);
   }
 
   public get UserModel(): UserModel{
@@ -269,6 +336,14 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   public get FileError(): string{
     return this.fileError;
+  }
+
+  public get FollowedArtists(): GuidNameModel[]{
+    return this.artists;
+  }
+
+  public get FollowedUsers(): UserModel[]{
+    return this.users;
   }
 
 
