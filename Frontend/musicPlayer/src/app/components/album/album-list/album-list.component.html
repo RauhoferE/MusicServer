@@ -11,7 +11,7 @@
                 </div>
                 <div nz-col class="album-item-text">
                     <h3 nz-row >
-                        {{item.name}}
+                        <a [routerLink]="['/album', item.id]">{{item.name}}</a>
                     </h3>
     
                     <div nz-row>

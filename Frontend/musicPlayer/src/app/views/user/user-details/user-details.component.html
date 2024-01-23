@@ -26,8 +26,8 @@
             </span>
 
         </div>
-        <h2 *ngIf="FollowedArtists.length == 0">No Followed Artists</h2>
-        <h2 *ngIf="FollowedArtists.length > 0">Followed Artists</h2>
+        <h2 style="margin-top: 2em;" *ngIf="FollowedArtists.length == 0">No Followed Artists</h2>
+        <h2 style="margin-top: 2em;" *ngIf="FollowedArtists.length > 0">Followed Artists</h2>
         <cdk-virtual-scroll-viewport *ngIf="FollowedArtists.length > 0" itemSize="50" class="list-view">
             <div *cdkVirtualFor="let artist of FollowedArtists" class="list-item" nz-row>
                 <div nz-col>
@@ -49,8 +49,8 @@
                 </div>
             </div>
           </cdk-virtual-scroll-viewport>
-          <h2 *ngIf="FollowedUsers.length == 0">No Followed Users</h2> 
-          <h2 *ngIf="FollowedUsers.length > 0">Followed Users</h2>     
+          <h2 style="margin-top: 2em;" *ngIf="FollowedUsers.length == 0">No Followed Users</h2> 
+          <h2 style="margin-top: 2em;" *ngIf="FollowedUsers.length > 0">Followed Users</h2>     
           <cdk-virtual-scroll-viewport *ngIf="FollowedUsers.length > 0" itemSize="50" class="list-view">
             <div *cdkVirtualFor="let user of FollowedUsers" class="list-item" nz-row>
                 <div nz-col>
@@ -71,9 +71,8 @@
 
                 </div>
             </div>
-          </cdk-virtual-scroll-viewport>        
-          <div>
-            Followed Playlists
-          </div>
+          </cdk-virtual-scroll-viewport> 
+          <h2 style="margin-top: 2em;">User Playlists</h2>         
+          <app-playlist-list [draggable]="true" [playlistModel]="this.PlaylistsModel" (paginationUpdated)="onPaginationUpdated"></app-playlist-list>
     </div>
 </div>

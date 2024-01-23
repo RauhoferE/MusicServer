@@ -401,6 +401,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     return this.users;
   }
 
+  public get PlaylistsModel(): PlaylistPaginationModel{
+    return this.playlistsModel;
+  }
+
 
 
 }
