@@ -37,6 +37,9 @@ export class RxjsStorageService {
   private replaySongState$ = new BehaviorSubject<any>({});
   updateReplaySongState = this.replaySongState$.asObservable();
 
+  private updateProfilePicState$ = new BehaviorSubject<any>({});
+  updateProfilePicBoolean$ = this.updateProfilePicState$.asObservable();
+
 
   constructor() { }
 
@@ -56,6 +59,10 @@ export class RxjsStorageService {
 
   setUpdateDashboardBoolean(val: boolean){
     this.updateDashboardState$.next(val);
+  }
+
+  setProfilePicBoolean(val: boolean){
+    this.updateProfilePicState$.next(val);
   }
 
   setUpdateCurrentTableBoolean(val: boolean){

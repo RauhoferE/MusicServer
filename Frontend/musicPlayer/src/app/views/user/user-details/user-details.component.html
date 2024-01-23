@@ -20,7 +20,7 @@
         <div *ngIf="this.UserModel.id == -1" style="margin-top: 2em;">
             <span nz-row>Upload new profile picture</span>
 
-            <input nz-row type="file" accept=".png" (input)="uploadNewCover()" style="margin-top: 1em;"/>
+            <input nz-row type="file" accept=".png" (change)="uploadNewCover($event)" style="margin-top: 1em;"/>
             <span *ngIf="FileError != ''" nz-row class="error-color">
                 {{this.FileError}}
             </span>

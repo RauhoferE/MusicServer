@@ -32,6 +32,8 @@ export class BaseComponent implements OnInit, OnDestroy {
 
   private destroy:Subject<any> = new Subject();
 
+  private timeStamp: Date = new Date();
+
   /**
    *
    */
@@ -49,6 +51,10 @@ export class BaseComponent implements OnInit, OnDestroy {
 
     this.rxjsService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.currentPlayingSong = x;
+    });
+
+    this.rxjsService.updateProfilePicBoolean$.pipe(takeUntil(this.destroy)).subscribe(x => {
+      this.updateProfileSrc();
     });
 
     this.getFollowedEntities();
@@ -104,6 +110,10 @@ export class BaseComponent implements OnInit, OnDestroy {
     this.getFollowedEntities();
   }
 
+  updateProfileSrc(): void{   
+    this.timeStamp = new Date();
+  }
+
   getArtistCoverSrc(id: string): string{
     return `${environment.apiUrl}/${APIROUTES.file}/artist/${id}`;
   }
@@ -117,7 +127,7 @@ export class BaseComponent implements OnInit, OnDestroy {
   }
 
   getOwnAvatar(): string{
-    return `${environment.apiUrl}/${APIROUTES.file}/user/-1`;
+    return `${environment.apiUrl}/${APIROUTES.file}/user/-1?${this.timeStamp.getTime()}`;
   }
 
   public get CurrentPlayingSong(): PlaylistSongModel{

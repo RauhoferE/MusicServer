@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, takeUntil } from 'rxjs';
@@ -6,6 +6,7 @@ import { APIROUTES } from 'src/app/constants/api-routes';
 import { GuidNameModel, PlaylistPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { UserModel } from 'src/app/models/user-models';
+import { FileService } from 'src/app/services/file.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { UserService } from 'src/app/services/user.service';
@@ -31,7 +32,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   private playlistsModel: PlaylistPaginationModel = {} as PlaylistPaginationModel;
   private artists: GuidNameModel[] = [];
   private users: GuidNameModel[] = [];
-  private newProfilePic: File = {} as File;
+  public newProfilePic: File = {} as File;
   private fileError: string = '';
 
   private userModel: UserModel = {
@@ -39,11 +40,14 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   } as UserModel;
 
+  private timeStamp = new Date();
+
   /**
    *
    */ 
   constructor(private route: ActivatedRoute, private message: NzMessageService, 
-    private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService, private userService: UserService) {
+    private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService, private userService: UserService,
+    private fileService: FileService) {
     if (!this.route.snapshot.paramMap.has('userId')) {
       console.log("userId id not found");
       this.userId = '-1';
@@ -162,11 +166,55 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     })
   }
 
-  public uploadNewCover(): void{
+  public uploadNewCover(fileEvent: Event): void{
+    const input = fileEvent.target as HTMLInputElement;
+
+    if (input.files == null || input.files.length == 0) {
+      return;
+    }
+
     console.log("Upload Picture");
-    console.log(this.newProfilePic)
-    // TODO: Test and then upload the new picture
-    // Reload the previous picture and set the file as empty
+    console.log(input.files[0]);
+
+    const targetFile = input.files[0];
+
+    if (this.userId != '-1') {
+      return;
+    }
+
+    if (targetFile.name.slice((targetFile.name.lastIndexOf(".") - 1 >>> 0) + 2) != 'png') {
+      this.fileError = 'Only png files are accepted!';
+      return;
+    }
+
+    if (targetFile.size > 1000000) {
+      this.fileError = 'Max file size is 1 mb!';
+      return;
+    }
+
+    this.fileError = '';
+
+    this.fileService.ChangeProfilePicture(targetFile).subscribe({
+      next: ()=>{
+          // Clear the input
+          input.value = '';
+        this.timeStamp = new Date();
+        this.updateProfilePicInBase();
+      },
+      error: (error)=>{
+        console.log(error);
+        this.fileError = error.message;
+      }
+    });
+  }
+
+  private updateProfilePicInBase(): void{
+    let updateBoolean = false;
+    this.rxjsStorageService.updateProfilePicBoolean$.subscribe(x =>{
+      updateBoolean = x;
+    })
+
+    this.rxjsStorageService.setProfilePicBoolean(!updateBoolean);
   }
 
   public onGetPlaylists(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
@@ -212,7 +260,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   public getUserCoverSrc(): string{
-    return `${environment.apiUrl}/${APIROUTES.file}/user/${this.userId}`
+    return `${environment.apiUrl}/${APIROUTES.file}/user/${this.userId}?${this.timeStamp.getTime()}`
   }
 
   public get UserModel(): UserModel{
