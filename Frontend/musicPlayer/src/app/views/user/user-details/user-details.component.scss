@@ -1,0 +1,17 @@
+.list-view {
+    height: 290px;
+    width: 50%;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    overflow-y: auto;
+  }
+
+  .list-item {
+    padding: 10px;
+    
+
+  }
+  .list-item-actions{
+    align-self: center;
+    padding-left: 10px;
+  }

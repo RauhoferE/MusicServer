@@ -37,10 +37,7 @@ namespace MusicServer.Services
                     .ThenInclude(x => x.Artist)
                     .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            var ownFollows = this.dBContext.Users
-                    .Include(x => x.FollowedArtists)
-                    .ThenInclude(x => x.Artist)
-                    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+            var ownFollows = targetUserFollows ?? throw new UserNotFoundException();
 
             if (userId != -1)
             {
@@ -77,16 +74,16 @@ namespace MusicServer.Services
         {
             var targetUserFollows = this.dBContext.Users
         .Include(x => x.FollowedUsers)
+        .ThenInclude(x => x.FollowedUser)
         .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            var ownFollows = this.dBContext.Users
-                    .Include(x => x.FollowedUsers)
-                    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+            var ownFollows = targetUserFollows ?? throw new UserNotFoundException();
 
             if (userId != -1)
             {
                 targetUserFollows = this.dBContext.Users
                     .Include(x => x.FollowedUsers)
+                    .ThenInclude(x => x.FollowedUser)
                     .FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
             }
 

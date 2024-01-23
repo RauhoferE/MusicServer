@@ -19,6 +19,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./user-details.component.scss']
 })
 export class UserDetailsComponent implements OnInit, OnDestroy {
+
   private userId: string = '';
 
   private playlistsPaginationModel: PaginationModel = {
@@ -104,34 +105,81 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  subscribeToUser(): void {
-    if (this.userId == '-1') {
+  subscribeToUser(user: UserModel): void {
+    if (user.id == -1) {
       return;
     }
 
-    if (this.userModel.isFollowedByUser) {
-      this.userService.SuscribeToUser(this.userId).subscribe({
+    if (user.isFollowedByUser) {
+      this.userService.UnSubscribeFromUser(user.id.toString()).subscribe({
         error: (error)=>{
           console.log(error);
         },
         complete: ()=>{
-          this.getUserModel();
+
+          if (user.id == this.userModel.id) {
+            this.getUserModel();
+          }else{
+            this.getFollowedUsers();
+          }
+          
           this.updateDashBoard();
         }
       });
       return;
     }
 
-    this.userService.UnSubscribeFromUser(this.userId).subscribe({
+    this.userService.SubscribeToUser(user.id.toString()).subscribe({
       error: (error)=>{
         console.log(error);
       },
       complete: ()=>{
-        this.getUserModel();
+        if (user.id == this.userModel.id) {
+          this.getUserModel();
+        }else{
+          this.getFollowedUsers();
+        }
+
         this.updateDashBoard();
       }
     });
   }
+
+  public activateNotificationsForUser(user: UserModel): void {
+    if (user.id == -1) {
+      return;
+    }
+
+    if (user.receiveNotifications) {
+      this.userService.RemoveNotficationsFromUser(user.id.toString()).subscribe({
+        error: (error)=>{
+          console.log(error);
+        },
+        complete: ()=>{
+                  if (user.id == this.userModel.id) {
+          this.getUserModel();
+        }else{
+          this.getFollowedUsers();
+        }
+        }
+      });
+      return;
+    }
+
+    this.userService.ReceiveNotficationsFromUser(user.id.toString()).subscribe({
+      error: (error)=>{
+        console.log(error);
+      },
+      complete: ()=>{
+        if (user.id == this.userModel.id) {
+          this.getUserModel();
+        }else{
+          this.getFollowedUsers();
+        }
+        this.updateDashBoard();
+      }
+    });
+    }
 
   public getUserModel(): void{
     if (this.userId == '-1') {
@@ -315,6 +363,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   public getArtistPicSrc(id: number): string{
     return `${environment.apiUrl}/${APIROUTES.file}/artist/${id}`
+  }
+
+  public getProfilePicSrc(id: number): string{
+    return `${environment.apiUrl}/${APIROUTES.file}/user/${id}`
   }
 
   public getUserCoverSrc(): string{
