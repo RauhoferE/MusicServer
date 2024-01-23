@@ -403,5 +403,28 @@ namespace MusicServer.Services
             followedUser.ReceiveNotifications = false;
             await this.dBContext.SaveChangesAsync();
         }
+
+        public async Task<UserDto> GetUserSubscribeInfo(long userId)
+        {
+            var targetUser = this.dBContext.Users.FirstOrDefault(x => x.Id == userId) ?? throw new UserNotFoundException();
+            var followedUser = this.dBContext.FollowedUsers
+                .Include(x => x.User)
+                .Include(x => x.FollowedUser)
+                .FirstOrDefault(x => x.FollowedUser.Id == userId && x.User.Id == this.activeUserService.Id);
+
+            if (followedUser == null)
+            {
+                return new UserDto()
+                {
+                    Id = targetUser.Id,
+                    IsFollowedByUser = false,
+                    ReceiveNotifications = false,
+                    UserName = targetUser.UserName
+
+                };
+            }
+
+            return this.mapper.Map<UserDto>(followedUser);
+        }
     }
 }

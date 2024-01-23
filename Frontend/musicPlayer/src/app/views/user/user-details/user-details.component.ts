@@ -2,10 +2,14 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, takeUntil } from 'rxjs';
-import { PlaylistPaginationModel } from 'src/app/models/playlist-models';
+import { APIROUTES } from 'src/app/constants/api-routes';
+import { GuidNameModel, PlaylistPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
+import { UserModel } from 'src/app/models/user-models';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
+import { UserService } from 'src/app/services/user.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-user-details',
@@ -25,13 +29,21 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   private destroy:Subject<any> = new Subject();
   private playlistsModel: PlaylistPaginationModel = {} as PlaylistPaginationModel;
-  //TODO: Get followed users and artists
+  private artists: GuidNameModel[] = [];
+  private users: GuidNameModel[] = [];
+  private newProfilePic: File = {} as File;
+  private fileError: string = '';
+
+  private userModel: UserModel = {
+    id: -1
+
+  } as UserModel;
 
   /**
    *
-   */
+   */ 
   constructor(private route: ActivatedRoute, private message: NzMessageService, 
-    private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService) {
+    private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService, private userService: UserService) {
     if (!this.route.snapshot.paramMap.has('userId')) {
       console.log("userId id not found");
       this.userId = '-1';
@@ -45,15 +57,120 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
-  }
-  ngOnDestroy(): void {
-    throw new Error('Method not implemented.');
+    if (this.userId != '-1') {
+      this.getUserModel();
+    }
+
+    this.onPaginationUpdated();
+
+    this.userService.GetSubscribedArtists(this.userId, '').pipe(takeUntil(this.destroy)).subscribe({
+      next: (artists: GuidNameModel[])=>{
+        this.artists = artists;
+
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+
+    })
+
+    this.userService.GetSubscribedUsers(this.userId, '').pipe(takeUntil(this.destroy)).subscribe({
+      next: (users: GuidNameModel[])=>{
+        this.users = users;
+
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+
+    })
   }
 
-  public onGetSongs(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+  }
+
+  activateNotifications(): void {
+    if (this.userId == '-1') {
+      return;
+    }
+
+    if (this.userModel.receiveNotifications) {
+      this.userService.RemoveNotficationsFromUser(this.userId).subscribe({
+        error: (error)=>{
+          console.log(error);
+        },
+        complete: ()=>{
+          this.getUserModel();
+        }
+      });
+      return;
+    }
+
+    this.userService.ReceiveNotficationsFromUser(this.userId).subscribe({
+      error: (error)=>{
+        console.log(error);
+      },
+      complete: ()=>{
+        this.getUserModel();
+        this.updateDashBoard();
+      }
+    });
+  }
+
+  subscribeToUser(): void {
+    if (this.userId == '-1') {
+      return;
+    }
+
+    if (this.userModel.isFollowedByUser) {
+      this.userService.SuscribeToUser(this.userId).subscribe({
+        error: (error)=>{
+          console.log(error);
+        },
+        complete: ()=>{
+          this.getUserModel();
+          this.updateDashBoard();
+        }
+      });
+      return;
+    }
+
+    this.userService.UnSubscribeFromUser(this.userId).subscribe({
+      error: (error)=>{
+        console.log(error);
+      },
+      complete: ()=>{
+        this.getUserModel();
+        this.updateDashBoard();
+      }
+    });
+  }
+
+  public getUserModel(): void{
+    if (this.userId == '-1') {
+      return;
+    }
+
+    this.userService.SubscribeUserInfo(this.userId).subscribe({
+      next: (model: UserModel)=>{
+        this.userModel = model;
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    })
+  }
+
+  public uploadNewCover(): void{
+    console.log("Upload Picture");
+    console.log(this.newProfilePic)
+    // TODO: Test and then upload the new picture
+    // Reload the previous picture and set the file as empty
+  }
+
+  public onGetPlaylists(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
     console.log("Get Playlists")
-    const skipSongs = (page - 1) * take;
     this.rxjsStorageService.setSongTableLoadingState(true);
     this.playlistService.GetPlaylists(this.userId, this.playlistsPaginationModel.page, this.playlistsPaginationModel.take, this.playlistsPaginationModel.query, this.playlistsPaginationModel.sortAfter, this.playlistsPaginationModel.asc).subscribe({
       next:(playlistModel: PlaylistPaginationModel)=>{
@@ -80,8 +197,30 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       pModel = val as PaginationModel;
     })
 
-    this.onGetSongs(pModel.page, pModel.take, pModel.sortAfter, 
+    this.onGetPlaylists(pModel.page, pModel.take, pModel.sortAfter, 
       pModel.asc, pModel.query);
+  }
+
+  updateDashBoard(): void{
+    var currenState = false;
+    this.rxjsStorageService.updateDashboardBoolean$.subscribe((val) =>{
+      currenState = val;
+    })
+
+    // Update value in rxjs so the dashboard gets updated
+    this.rxjsStorageService.setUpdateDashboardBoolean(!currenState);
+  }
+
+  public getUserCoverSrc(): string{
+    return `${environment.apiUrl}/${APIROUTES.file}/user/${this.userId}`
+  }
+
+  public get UserModel(): UserModel{
+    return this.userModel;
+  }
+
+  public get FileError(): string{
+    return this.fileError;
   }
 
 

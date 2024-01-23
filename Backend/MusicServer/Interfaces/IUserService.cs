@@ -34,6 +34,8 @@ namespace MusicServer.Interfaces
 
         public Task<UserDetailsDto> GetUserAsync(long userId);
 
+        public Task<UserDto> GetUserSubscribeInfo(long userId);
+
         public Task ModifyUserAsync(long userId, EditUser userRequest);
 
         public Task AddRoleToUserAsync(long userId, long roleId);

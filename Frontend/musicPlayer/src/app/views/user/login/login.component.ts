@@ -54,7 +54,7 @@ export class LoginComponent {
 
     this.authservice.login(this.email?.value, this.password?.value).subscribe({
       next: () => {
-        this.router.navigate(['/playlists']);
+        this.router.navigate(['/']);
       },
       error: (error) => {
         Object.values(this.loginForm.controls).forEach(control => {

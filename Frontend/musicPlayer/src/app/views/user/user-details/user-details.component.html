@@ -1,1 +1,33 @@
-<p>user-details works!</p>
+<div>
+    <div>
+        <div nz-row>
+            <img nz-col [src]="getUserCoverSrc()" style="width: 300px; height: 300px;"/>
+
+            <h1 nz-col style="align-self: center;">
+                {{this.UserModel.userName}}
+            </h1>
+        </div>
+        <div *ngIf="this.UserModel.id != -1" style="margin-top: 2em;" nz-row>
+            <button *ngIf="!this.UserModel.isFollowedByUser" nz-col nz-button nzType="default" class="clickable-button" (click)="subscribeToUser()">Follow</button>
+            <button *ngIf="this.UserModel.isFollowedByUser" nz-col nz-button nzType="default" class="clickable-button success-color" (click)="subscribeToUser()">Unfollow</button>
+            <button *ngIf="!this.UserModel.receiveNotifications" nz-col nz-button nzType="default" class="clickable-button" nzShape="circle" (click)="activateNotifications()">
+                <span nz-icon nzType="mail" nzTheme="outline"></span>
+            </button>
+            <button *ngIf="this.UserModel.receiveNotifications" nz-col nz-button nzType="default" class="clickable-button success-color" nzShape="circle" (click)="activateNotifications()">
+                <span nz-icon nzType="mail" nzTheme="outline"></span>
+            </button>
+        </div>
+        <div *ngIf="this.UserModel.id == -1" style="margin-top: 2em;">
+            <span nz-row>Upload new profile picture</span>
+
+            <input nz-row type="file" accept=".png" (input)="uploadNewCover()" style="margin-top: 1em;"/>
+            <span *ngIf="FileError != ''" nz-row class="error-color">
+                {{this.FileError}}
+            </span>
+
+        </div>
+        Subscribed Artists
+        Subscribed Users
+        Playlists
+    </div>
+</div>

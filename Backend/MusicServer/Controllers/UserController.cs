@@ -123,6 +123,13 @@ namespace MusicServer.Controllers
             return Ok(await this.userService.GetUserAsync(userId));
         }
 
+        [HttpGet]
+        [Route(ApiRoutes.User.SubscribeUserInfo)]
+        public async Task<IActionResult> GetSubscribeInfo([FromRoute, Required] long userId)
+        {
+            return Ok(await this.userService.GetUserSubscribeInfo(userId));
+        }
+
         [HttpPost]
         [Route(ApiRoutes.User.GetUser)]
         public async Task<IActionResult> EditUser([FromRoute, Required] long userId, [FromBody, Required] EditUser request)

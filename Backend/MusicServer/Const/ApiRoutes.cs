@@ -21,6 +21,7 @@
         public static class User
         {
             public const string SubscribeUser = "subscribe/user/{userId}";
+            public const string SubscribeUserInfo = "subscribe/user/info/{userId}";
             public const string SubscribeArtist = "subscribe/artist/{artistId}";
             public const string ReceiveNotificationsArtist = "notifications/artist/{artistId}";
             public const string ReceiveNotificationsUser = "notifications/user/{userId}";

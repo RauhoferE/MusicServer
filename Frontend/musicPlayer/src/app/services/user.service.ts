@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AllFollowedEntitiesModel } from '../models/user-models';
+import { AllFollowedEntitiesModel, UserModel } from '../models/user-models';
 import { environment } from 'src/environments/environment';
 import { APIROUTES } from '../constants/api-routes';
 import { GuidNameModel } from '../models/playlist-models';
@@ -55,25 +55,25 @@ export class UserService {
     })
   }
 
-  public GetSubscribedArtists(userId: number, query: string): Observable<GuidNameModel[]>{
+  public GetSubscribedArtists(userId: string, query: string): Observable<GuidNameModel[]>{
     return this.httpClient.get<GuidNameModel[]>(`${environment.apiUrl}/${APIROUTES.user}/followed/artists/${userId}?query=${query}`,{
       withCredentials: true
     })
   }
 
-  public GetSubscribedUsers(userId: number, query: string): Observable<GuidNameModel[]>{
+  public GetSubscribedUsers(userId: string, query: string): Observable<GuidNameModel[]>{
     return this.httpClient.get<GuidNameModel[]>(`${environment.apiUrl}/${APIROUTES.user}/followed/users/${userId}?query=${query}`,{
       withCredentials: true
     })
   }
 
-  public SubscribeToUser(userId: number): Observable<object>{
+  public SubscribeToUser(userId: string): Observable<object>{
     return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.user}/subscribe/user/${userId}`,{
       withCredentials: true
     })
   }
 
-  public UnSubscribeFromUser(userId: number): Observable<object>{
+  public UnSubscribeFromUser(userId: string): Observable<object>{
     return this.httpClient.delete<object>(`${environment.apiUrl}/${APIROUTES.user}/subscribe/user/${userId}`,{
       withCredentials: true
     })
@@ -87,6 +87,12 @@ export class UserService {
 
   public RemoveNotficationsFromUser(userId: string): Observable<object>{
     return this.httpClient.delete<object>(`${environment.apiUrl}/${APIROUTES.user}/notifications/user/${userId}`,{
+      withCredentials: true
+    })
+  }
+
+  public SubscribeUserInfo(userId: string): Observable<UserModel>{
+    return this.httpClient.get<UserModel>(`${environment.apiUrl}/${APIROUTES.user}/subscribe/user/info/${userId}`,{
       withCredentials: true
     })
   }
