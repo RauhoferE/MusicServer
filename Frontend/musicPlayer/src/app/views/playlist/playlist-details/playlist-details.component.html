@@ -6,6 +6,9 @@
             {{this.PlaylistModel.name}}
         </h1>
         <p>
+            {{this.PlaylistModel.description}}
+        </p>
+        <p>
             <a [routerLink]="[getUserHref()]">{{getCreatorName()}}</a> / {{this.TotalSongCount}} Songs
         </p>
     </div>

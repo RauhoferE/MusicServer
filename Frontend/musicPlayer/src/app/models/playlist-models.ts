@@ -54,6 +54,7 @@ export interface PlaylistUserShortModel{
     created: Date;
     LastListened: Date;
     users: UserModel[];
+    description: string;
     
 
 }
