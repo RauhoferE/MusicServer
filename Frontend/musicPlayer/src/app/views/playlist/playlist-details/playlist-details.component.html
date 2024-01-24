@@ -3,11 +3,14 @@
         <img [src]="getPlaylistCoverSrc()" style="width: 300px; height: 300px;"/>
 
         <h1>
+            TODO: Allow Chaning of name
             {{this.PlaylistModel.name}}
         </h1>
         <p>
+            TODO: Allow Chaning of description
             {{this.PlaylistModel.description}}
         </p>
+        TODO: add button for public and notifications
         <p>
             <a [routerLink]="[getUserHref()]">{{getCreatorName()}}</a> / {{this.TotalSongCount}} Songs
         </p>

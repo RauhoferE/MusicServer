@@ -17,6 +17,12 @@ export interface PlaylistModelParams{
     playlistModel: PlaylistUserShortModel;
 }
 
+export interface EditPlaylistModalParams{
+    playlistModel: PlaylistUserShortModel;
+    newCoverFile: File |undefined;
+
+}
+
 export interface DragDropSongParams{
     srcSong: PlaylistSongModel;
     destSong: PlaylistSongModel;

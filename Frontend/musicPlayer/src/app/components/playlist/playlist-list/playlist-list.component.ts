@@ -1,12 +1,14 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
-import { PlaylistModelParams, PlaylistSongModelParams } from 'src/app/models/events';
+import { EditPlaylistModalParams, PlaylistModelParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { GuidNameModel, PlaylistPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { UserModel } from 'src/app/models/user-models';
+import { FileService } from 'src/app/services/file.service';
+import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { environment } from 'src/environments/environment';
@@ -22,7 +24,9 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
   @Input() draggable: boolean = false;
 
-  @Input() playlistDeletable: boolean = false;
+  @Input() playlistEditable: boolean = false;
+
+  @Input() addCopyPlaylistAction: boolean = false;
 
   @Output() paginationUpdated: EventEmitter<void> = new EventEmitter<void>();
 
@@ -44,14 +48,19 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     },
     index : -1
   } as PlaylistModelParams;
+
+  private currentUserId: string = '-1';
+
+  private showPlaylistEditModal: boolean = false;
   
 
   /**
    *
    */
   constructor(private playlistService: PlaylistService, private rxjsService: RxjsStorageService, private modal: NzModalService,
-    private nzContextMenuService: NzContextMenuService) {
+    private nzContextMenuService: NzContextMenuService, private jwtService: JwtService, private fileService: FileService) {
     this.IsLoading = this.rxjsService.currentSongTableLoading$;
+    this.currentUserId = jwtService.getUserId();
     
   }
 
@@ -73,38 +82,105 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     this.pagination = pModel;
   }
 
-  contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: PlaylistUserShortModel, index: number): void {
+  public contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: PlaylistUserShortModel, index: number): void {
     this.selectedTableItem = { index: index, playlistModel: item};
-    this.playlistService.GetModifieablePlaylists(-1).subscribe((val)=>{
-      this.modifieablePlaylists = val.playlists;
-
-      if (item.id != undefined) {
-        this.modifieablePlaylists = val.playlists.filter(x => x.id != item.id);
-      }
-    })
 
     this.nzContextMenuService.create($event, menu);
     
     // Add events via jquery
 
   }
-  addSongToPlaylist(arg0: string) {
-    throw new Error('Method not implemented.');
-    }
-    DeletePlaylist() {
-    throw new Error('Method not implemented.');
-    }
-    AddPlaylistToLibrary() {
-    throw new Error('Method not implemented.');
-    }
-    addPlaylistToQueue() {
-    throw new Error('Method not implemented.');
-    }
-    addPlaylistToFavorites() {
-    throw new Error('Method not implemented.');
+
+  public deletePlaylist(itemId: string, playlistName: string): void {
+    this.modal.confirm({
+      nzTitle: `<b class="error-color">You really want to delete ${playlistName}?</b>`,
+      nzOkText: 'Yes',
+      nzCancelText: 'No',
+      nzOnOk: ()=>{
+        this.playlistService.DeletePlaylist(itemId).subscribe({
+          next: ()=>{
+            this.paginationUpdated.emit();
+          },
+          error: (error)=>{
+            console.log(error);
+          }
+        })
+      }
+    })
+
+
+  }
+
+  public addPlaylistToLibrary(): void {
+    if (this.selectedTableItem.index == -1 || this.selectedTableItem.playlistModel.id == undefined) {
+      return;
     }
 
-  onQueryParamsChange(event: any): void{
+
+    this.playlistService.AddPlaylistToLibrary(this.selectedTableItem.playlistModel.id).subscribe({
+      next: ()=>{
+        this.paginationUpdated.emit();
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    })
+  }
+
+  public addPlaylistToQueue(): void {
+    // TODO: 
+  throw new Error('Method not implemented.');
+  }
+
+  public async savePlaylist(event: EditPlaylistModalParams): Promise<void> {
+    console.log(event)
+    this.modifyPlaylist(event.playlistModel);
+
+    if (event.newCoverFile) {
+      await lastValueFrom(this.fileService.ChangePlaylistCover(event.newCoverFile, event.playlistModel.id));
+    }
+    this.ShowPlaylistEditModal = false;
+    this.selectedTableItem = {index: -1} as PlaylistModelParams;
+    
+  }
+
+  private modifyPlaylist(playlist: PlaylistUserShortModel): void{
+    this.playlistService.ModifyPlaylistInfo(playlist.id, playlist.name, playlist.description, !playlist.isPublic, playlist.receiveNotifications).subscribe({
+      complete: ()=>{
+        this.paginationUpdated.emit();
+        this.updateDashBoard();
+      },
+      error: (error) =>{
+        console.log(error);
+      }
+    })
+  }
+
+  public canPlaylistAddedToLibrary(): boolean {
+    if (this.selectedTableItem.index == -1) {
+      return false;
+    }
+
+    return this.selectedTableItem.playlistModel.users.findIndex(x => x.id == parseInt(this.currentUserId)) == -1;
+  }
+
+  public copyPlaylistToLibrary(): void {
+    if (this.selectedTableItem.index == -1 || this.selectedTableItem.playlistModel.id == undefined) {
+      return;
+    }
+
+
+    this.playlistService.CopyPlaylistToLibrary(this.selectedTableItem.playlistModel.id).subscribe({
+      next: ()=>{
+        this.paginationUpdated.emit();
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    })
+  }
+
+  public onQueryParamsChange(event: any): void{
     console.log("Query Changed")
 
     var sortAfter = event.sort.find((x: any) => x.value);
@@ -134,20 +210,12 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     this.paginationUpdated.emit();
   }
 
-  getPlaylistCoverSrc(id: string) {
-    return `${environment.apiUrl}/${APIROUTES.file}/playlist/${id}`;
-  }
-
-  getPlaylistCreator(users: UserModel[]) {
-    return users.find(x => x.isCreator)?.userName;
-  }
-
-  setPublic(id: string) {
-    throw new Error();
+  public setPublic(playlist: PlaylistUserShortModel): void {
+    this.modifyPlaylist(playlist);
 
   }
 
-  receiveNotifications(id: string) {
+  public receiveNotifications(id: string): void {
     this.playlistService.SetPlaylistNotifications(id).subscribe({
       complete: ()=>{
         this.paginationUpdated.emit();
@@ -158,7 +226,15 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     })
   }
 
-  getHeaderSortOrder(sortOrder: string): string | null{
+  public getPlaylistCoverSrc(id: string): string {
+    return `${environment.apiUrl}/${APIROUTES.file}/playlist/${id}`;
+  }
+
+  public getPlaylistCreator(users: UserModel[]): UserModel | undefined {
+    return users.find(x => x.isCreator);
+  }
+
+  public getHeaderSortOrder(sortOrder: string): string | null{
     if (this.pagination.sortAfter == sortOrder && this.pagination.asc) {
       return 'ascend';
     }
@@ -170,12 +246,12 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  onSearchQueryInput(): void{
+  public onSearchQueryInput(): void{
     this.rxjsService.setCurrentPaginationSongModel(this.pagination);
     this.paginationUpdated.emit();
   }
 
-  updateDashBoard(): void{
+  private updateDashBoard(): void{
     var currenState = false;
     this.rxjsService.updateDashboardBoolean$.subscribe((val) =>{
       currenState = val;
@@ -185,7 +261,7 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     this.rxjsService.setUpdateDashboardBoolean(!currenState);
   }
 
-  public updateQueue(): void{
+  private updateQueue(): void{
     let queueBool = false;
     this.rxjsService.updateQueueBoolean$.subscribe(x => {
       queueBool = x;
@@ -223,6 +299,14 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
   public get SelectedTableItem(): PlaylistModelParams{
     return this.selectedTableItem;
+  }
+
+  public get ShowPlaylistEditModal(): boolean{
+    return this.showPlaylistEditModal;
+  }
+
+  public set ShowPlaylistEditModal(val: boolean){
+    this.showPlaylistEditModal = val;
   }
 
 }

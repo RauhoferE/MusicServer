@@ -39,6 +39,15 @@
     color: #ffffff;
 }
 
+.clickable-danger{
+    cursor: pointer;
+}
+
+.clickable-danger:hover{
+    color: #ff4d4f;
+    cursor: pointer;
+}
+
 .clickable{
     cursor: pointer;
 }

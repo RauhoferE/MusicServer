@@ -108,5 +108,57 @@ export class PlaylistService {
     })
   }
 
+  public ModifyPlaylistInfo(playlistId: string, name:string, description: string, isPublic: boolean, receiveNotifications: boolean): Observable<object>{
+    return this.httpClient.patch<object>(`${environment.apiUrl}/${APIROUTES.playlist}?playlistId=${playlistId}`,
+    {
+      description: description,
+      name: name,
+      isPublic: isPublic,
+      receiveNotifications: receiveNotifications
+    },
+    {
+      withCredentials: true
+    })
+  }
+
+  public DeletePlaylist(playlistId: string): Observable<object>{
+    return this.httpClient.delete<object>(`${environment.apiUrl}/${APIROUTES.playlist}?playlistId=${playlistId}`,{
+      withCredentials: true
+    })
+  }
+
+  public AddPlaylistToLibrary(playlistId: string): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.playlist}/add/${playlistId}`,{
+      withCredentials: true
+    })
+  }
+
+  public CopyPlaylistToLibrary(playlistId: string): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.playlist}/copy/${playlistId}`,{
+      withCredentials: true
+    })
+  }
+
+  public ChangeOrderOfPlaylist(playlistId: string, newIndex: number): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.playlist}/order/playlist?playlistId=${playlistId}&order=${newIndex}`,{
+      withCredentials: true
+    })
+  }
+
+  public CreatePlaylist(name:string, description: string, isPublic: boolean, receiveNotifications: boolean): Observable<string>{
+    return this.httpClient.post<string>(`${environment.apiUrl}/${APIROUTES.playlist}`,
+    {
+      description: description,
+      name: name,
+      isPublic: isPublic,
+      receiveNotifications: receiveNotifications
+    },
+    {
+      withCredentials: true
+    })
+  }
+
+
+
 
 }

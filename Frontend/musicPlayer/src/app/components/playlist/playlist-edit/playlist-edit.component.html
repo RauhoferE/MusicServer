@@ -1,0 +1,49 @@
+<nz-modal [(nzVisible)]="visible" (nzOnCancel)="canceled()" (nzOnOk)="savePlaylist()"
+[nzTitle]="modalTitle"
+[nzContent]="modalContent"
+[nzFooter]="modalFooter">
+  <ng-template #modalTitle>Edit playlist</ng-template>
+
+  <ng-template #modalContent>
+    <div *ngIf="this.playlistDetails" nz-row>
+        <div nz-col>
+            <img nz-row *ngIf="this.playlistDetails.id != '-1' || this.newCoverFile" [src]="getPlaylistCoverSrc(this.playlistDetails.id)" style="width: 100px; height: 100px;"/>
+            <button style="width: 100%;"  nz-button nzType="default" class="clickable-button" (click)="this.fileUpload.click()">
+                <span nz-icon nzType="upload" nzTheme="outline"></span>
+            </button>
+            <input #fileUpload style="display: none;" type="file" (change)="setNewCoverfile($event)" />
+        </div>
+      
+      <div nz-col [nzSpan]="18" style="margin-left: 1em;">
+        <input nz-row nz-input [(ngModel)]="this.playlistDetails.name" >
+        <textarea nz-row nz-input [(ngModel)]="this.playlistDetails.description" style="margin-top: 1em;"></textarea>
+        <div nz-row style="margin-top: 1em;">
+          <button *ngIf="!this.playlistDetails.receiveNotifications" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button" (click)="this.playlistDetails.receiveNotifications = !this.playlistDetails.receiveNotifications">
+            <span nz-icon nzType="mail" nzTheme="outline"></span>
+          </button>
+          <button *ngIf="this.playlistDetails.receiveNotifications" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button success-color"  (click)="this.playlistDetails.receiveNotifications = !this.playlistDetails.receiveNotifications">
+            <span nz-icon nzType="mail" nzTheme="outline" ></span>
+          </button>
+          <button *ngIf="!this.playlistDetails.isPublic" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button"  (click)="this.playlistDetails.isPublic = !this.playlistDetails.isPublic">
+            <span nz-icon nzType="send" nzTheme="outline" ></span>
+          </button>
+          <button *ngIf="this.playlistDetails.isPublic" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button success-color" (click)="this.playlistDetails.isPublic = !this.playlistDetails.isPublic">
+            <span nz-icon nzType="send" nzTheme="outline" ></span>
+          </button>
+
+        </div>
+        <div *ngIf="this.FileError != ''" nz-row style="margin-top: 1em;" class="error-color">
+            {{this.FileError}}
+        </div>
+      </div>
+
+
+
+    </div>
+  </ng-template>
+
+  <ng-template #modalFooter>
+    <button nz-button nzType="default" (click)="canceled()">Cancel</button>
+    <button nz-button nzType="primary" (click)="savePlaylist()">Save</button>
+  </ng-template>
+</nz-modal>

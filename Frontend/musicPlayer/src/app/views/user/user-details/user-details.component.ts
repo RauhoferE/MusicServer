@@ -1,8 +1,9 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
+import { EditPlaylistModalParams } from 'src/app/models/events';
 import { GuidNameModel, PlaylistPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { UserModel } from 'src/app/models/user-models';
@@ -43,6 +44,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   } as UserModel;
 
   private timeStamp = new Date();
+
+  private showPlaylistEditModal: boolean = false;
 
   /**
    *
@@ -359,7 +362,31 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       pModel.asc, pModel.query);
   }
 
-  updateDashBoard(): void{
+  public async createPlaylist(event: EditPlaylistModalParams): Promise<void> {
+    this.ShowPlaylistEditModal = false;
+
+    try {
+      var playlistId = await lastValueFrom(this.playlistService.CreatePlaylist(event.playlistModel.name, event.playlistModel.description, event.playlistModel.isPublic,
+        event.playlistModel.receiveNotifications));
+  
+        if (event.newCoverFile) {
+          await lastValueFrom(this.fileService.ChangePlaylistCover(event.newCoverFile, playlistId));
+        }
+
+        this.onPaginationUpdated();
+        this.updateDashBoard();
+    } catch (error) {
+      console.log(error);
+      this.message.error("Error when creating playlist");
+      
+    }
+
+
+    
+
+  }
+
+  private updateDashBoard(): void{
     var currenState = false;
     this.rxjsStorageService.updateDashboardBoolean$.subscribe((val) =>{
       currenState = val;
@@ -408,6 +435,18 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   public get PlaylistsModel(): PlaylistPaginationModel{
     return this.playlistsModel;
+  }
+
+  public get IsOwnUser(): boolean{
+    return this.userId == '-1';
+  }
+
+  public get ShowPlaylistEditModal(): boolean{
+    return this.showPlaylistEditModal;
+  }
+
+  public set ShowPlaylistEditModal(val: boolean){
+    this.showPlaylistEditModal = val;
   }
 
 

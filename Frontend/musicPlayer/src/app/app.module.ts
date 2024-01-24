@@ -61,6 +61,7 @@ import { AlbumListComponent } from './components/album/album-list/album-list.com
 import { QueueTableComponent } from './components/songs/queue-table/queue-table.component';
 import { PlaylistListComponent } from './components/playlist/playlist-list/playlist-list.component';
 import { UserDetailsComponent } from './views/user/user-details/user-details.component';
+import { PlaylistEditComponent } from './components/playlist/playlist-edit/playlist-edit.component';
 
 
 
@@ -94,7 +95,8 @@ registerLocaleData(en);
     AlbumListComponent,
     QueueTableComponent,
     PlaylistListComponent,
-    UserDetailsComponent
+    UserDetailsComponent,
+    PlaylistEditComponent
   ],
   imports: [
     BrowserModule,

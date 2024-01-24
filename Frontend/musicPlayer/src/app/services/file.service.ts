@@ -21,4 +21,15 @@ export class FileService {
       withCredentials: true,
     })
   }
+
+  public ChangePlaylistCover(file: File, playlistId: string): Observable<object>{
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.httpClient.post<object>(`${environment.apiUrl}/${APIROUTES.file}/playlist/${playlistId}`,
+    formData,
+    {
+      withCredentials: true,
+    })
+  }
 }

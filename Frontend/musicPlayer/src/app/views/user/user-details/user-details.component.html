@@ -72,7 +72,11 @@
                 </div>
             </div>
           </cdk-virtual-scroll-viewport> 
-          <h2 style="margin-top: 2em;">User Playlists</h2>         
-          <app-playlist-list [draggable]="true" [playlistModel]="this.PlaylistsModel" (paginationUpdated)="onPaginationUpdated"></app-playlist-list>
+          <h2 style="margin-top: 2em;">User Playlists</h2>
+          <button nz-button nzType="default" class="clickable-button" (click)="this.ShowPlaylistEditModal = true">
+            Create new playlist
+          </button>         
+          <app-playlist-list [playlistEditable]="this.IsOwnUser" [draggable]="true" [playlistModel]="this.PlaylistsModel" (paginationUpdated)="onPaginationUpdated()"></app-playlist-list>
+          <app-playlist-edit *ngIf="this.ShowPlaylistEditModal" [visible]="this.ShowPlaylistEditModal" (onCancleModal)="this.ShowPlaylistEditModal = false" (onSaveModal)="createPlaylist($event)"></app-playlist-edit>
     </div>
 </div>
