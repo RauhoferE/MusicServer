@@ -40,4 +40,13 @@ export class JwtService {
 
     return [jwt['roles'] as string];
   }
+
+  getUserId(): string{
+    if (!this.cookieService.check(CLAIMS_COOKIE_NAME)) {
+      return 'NOT_FOUND';
+    }
+
+    var jwt: any = jwtDecode(this.cookieService.get(CLAIMS_COOKIE_NAME));
+    return jwt['id'] as string
+  }
 }

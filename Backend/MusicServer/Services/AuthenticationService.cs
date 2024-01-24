@@ -123,6 +123,7 @@ namespace MusicServer.Services
             {
                 new("email", user.Email),
                 new("name", user.UserName),
+                new("id", user.Id.ToString())
             };
 
             // Create rolesList

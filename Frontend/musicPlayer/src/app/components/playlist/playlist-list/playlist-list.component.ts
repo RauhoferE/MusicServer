@@ -1,6 +1,9 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
+import { PlaylistModelParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { GuidNameModel, PlaylistPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { UserModel } from 'src/app/models/user-models';
@@ -14,9 +17,12 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./playlist-list.component.scss']
 })
 export class PlaylistListComponent implements OnInit, OnDestroy {
+
   @Input() playlistModel: PlaylistPaginationModel = {} as PlaylistPaginationModel;
 
   @Input() draggable: boolean = false;
+
+  @Input() playlistDeletable: boolean = false;
 
   @Output() paginationUpdated: EventEmitter<void> = new EventEmitter<void>();
 
@@ -28,21 +34,23 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
   public IsLoading: Observable<boolean> = new Observable();
 
-  private showCheckbox: boolean = false;
-
-  private allChecked: boolean = false;
-
-  private indeterminate: boolean = false;
-
   private destroy:Subject<any> = new Subject();
 
   private pagination: PaginationModel = {} as PaginationModel;
+
+  private selectedTableItem: PlaylistModelParams = {
+    playlistModel: {
+
+    },
+    index : -1
+  } as PlaylistModelParams;
   
 
   /**
    *
    */
-  constructor(private playlistService: PlaylistService, private rxjsService: RxjsStorageService) {
+  constructor(private playlistService: PlaylistService, private rxjsService: RxjsStorageService, private modal: NzModalService,
+    private nzContextMenuService: NzContextMenuService) {
     this.IsLoading = this.rxjsService.currentSongTableLoading$;
     
   }
@@ -64,6 +72,37 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
     this.pagination = pModel;
   }
+
+  contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: PlaylistUserShortModel, index: number): void {
+    this.selectedTableItem = { index: index, playlistModel: item};
+    this.playlistService.GetModifieablePlaylists(-1).subscribe((val)=>{
+      this.modifieablePlaylists = val.playlists;
+
+      if (item.id != undefined) {
+        this.modifieablePlaylists = val.playlists.filter(x => x.id != item.id);
+      }
+    })
+
+    this.nzContextMenuService.create($event, menu);
+    
+    // Add events via jquery
+
+  }
+  addSongToPlaylist(arg0: string) {
+    throw new Error('Method not implemented.');
+    }
+    DeletePlaylist() {
+    throw new Error('Method not implemented.');
+    }
+    AddPlaylistToLibrary() {
+    throw new Error('Method not implemented.');
+    }
+    addPlaylistToQueue() {
+    throw new Error('Method not implemented.');
+    }
+    addPlaylistToFavorites() {
+    throw new Error('Method not implemented.');
+    }
 
   onQueryParamsChange(event: any): void{
     console.log("Query Changed")
@@ -89,9 +128,6 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     if (JSON.stringify(newPagModel) == JSON.stringify(this.pagination)) {
       return;
     }
-
-    this.AllChecked = false;
-    this.Indeterminate = false;
 
     this.rxjsService.setCurrentPaginationSongModel(newPagModel);
 
@@ -120,21 +156,6 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
         console.log(error);
       }
     })
-  }
-
-  checkAll(value: boolean): void {
-    this.playlistModel.playlists.forEach(data => {
-      data.checked = value;
-    });
-
-    this.refreshTableHeader();
-  }
-
-  refreshTableHeader(): void{
-    const allChecked = this.playlistModel.playlists.length > 0 && this.playlistModel.playlists.every(value => value.checked === true);
-    const allUnChecked = this.playlistModel.playlists.every(value => !value.checked);
-    this.AllChecked = allChecked;
-    this.Indeterminate = !allChecked && !allUnChecked;
   }
 
   getHeaderSortOrder(sortOrder: string): string | null{
@@ -196,32 +217,12 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     this.pagination.query = value;
   }
 
-  public get ShowCheckbox(): boolean{
-    return this.showCheckbox;
-  }
-
-  public set ShowCheckbox(val: boolean){
-    this.showCheckbox = val;
-  }
-
-  public get AllChecked(): boolean{
-    return this.allChecked;
-  }
-
-  public set AllChecked(val: boolean){
-    this.allChecked = val;
-  }
-
-  public get Indeterminate(): boolean{
-    return this.indeterminate;
-  }
-
-  public set Indeterminate(val: boolean){
-    this.indeterminate = val;
-  }
-
   public get ModifieablePlaylists(): GuidNameModel[]{
     return this.modifieablePlaylists;
+  }
+
+  public get SelectedTableItem(): PlaylistModelParams{
+    return this.selectedTableItem;
   }
 
 }

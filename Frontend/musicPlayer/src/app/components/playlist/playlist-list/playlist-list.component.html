@@ -8,8 +8,6 @@
         </ng-template>
         
     </div>
-    <button *ngIf="!ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Show Selector</button>
-    <button *ngIf="ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Hide Selector</button>
     <nz-table
     nzShowSizeChanger
     [nzData]="playlistModel.playlists"
@@ -22,12 +20,6 @@
     >
     <thead >
         <tr>
-            <th             
-            *ngIf="ShowCheckbox"
-            nzWidth="60px"
-            [(nzChecked)]="AllChecked"
-            [nzIndeterminate]="Indeterminate"
-            (nzCheckedChange)="checkAll($event)"></th>
             <th nzColumnKey="order" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
             <th nzColumnKey="name" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
             <th nzColumnKey="creator" [nzSortFn]="false">Creator</th>
@@ -38,14 +30,9 @@
 
     </thead>
     <tbody>
-        <tr *ngFor="let data of playlistModel.playlists;let indexOfelement=index;"
+        <tr *ngFor="let data of playlistModel.playlists;let indexOfelement=index;" (contextmenu)="contextMenu($event, menu, data, indexOfelement)"
         class="song-item" 
         >
-        <td
-        *ngIf="ShowCheckbox"
-        [(nzChecked)]="data.checked"
-        (nzCheckedChange)="refreshTableHeader()"
-      ></td>
       <td>
         <img [src]="getPlaylistCoverSrc(data.id)" style="width: 50px; height: 50px;"/>
       </td>
@@ -71,5 +58,23 @@
         </tr>
     </tbody>
     </nz-table>
+    <nz-dropdown-menu #menu="nzDropdownMenu">
+      <ul nz-menu>
+          <li nz-menu-item id="add-fav" (click)="addPlaylistToFavorites()">Add contained songs to favorites</li>
+          <li nz-menu-item id="add-queue" (click)="addPlaylistToQueue()">Add playlist to queue</li>
+          <li nz-menu-item id="copy" (click)="AddPlaylistToLibrary()">Add playlist to library</li>
+          <li nz-menu-item id="copy" (click)="AddPlaylistToLibrary()">Copy playlist to library</li>
+          <li nz-menu-item *ngIf="playlistDeletable" id="delete" (click)="DeletePlaylist()">Delete playlist</li>
+          <li nz-menu-item *ngIf="this.SelectedTableItem.index > -1 && !this.SelectedTableItem.playlistModel.isPublic" id="set-public" (click)="setPublic(this.SelectedTableItem.playlistModel.id)">Set public</li>
+          <li nz-menu-item *ngIf="this.SelectedTableItem.index > -1 && this.SelectedTableItem.playlistModel.isPublic" id="set-private" (click)="setPublic(this.SelectedTableItem.playlistModel.id)">Set private</li>
+          <li nz-menu-item *ngIf="this.SelectedTableItem.index > -1 && !this.SelectedTableItem.playlistModel.receiveNotifications" id="rec-not" (click)="receiveNotifications(this.SelectedTableItem.playlistModel.id)">Receive notifications</li>
+          <li nz-menu-item *ngIf="this.SelectedTableItem.index > -1 && this.SelectedTableItem.playlistModel.receiveNotifications" id="stop-not" (click)="receiveNotifications(this.SelectedTableItem.playlistModel.id)">Stop notifications</li>
+          <li nz-submenu nzTitle="Add contained songs to playlist" id="add-pl">
+              <ul>
+                  <li nz-menu-item *ngFor="let data of this.ModifieablePlaylists" (click)="addSongToPlaylist(data.id)">{{data.name}}</li>
+              </ul>
+          </li>
+      </ul>
+  </nz-dropdown-menu>
 
 </div>

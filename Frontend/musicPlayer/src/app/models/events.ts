@@ -1,5 +1,5 @@
 import { NzTableQueryParams } from "ng-zorro-antd/table";
-import { PlaylistSongModel } from "./playlist-models";
+import { GuidNameModel, PlaylistSongModel, PlaylistUserShortModel } from "./playlist-models";
 import { AlbumModel } from "./artist-models";
 
 export interface TableQuery{
@@ -10,6 +10,11 @@ export interface TableQuery{
 export interface PlaylistSongModelParams{
     index: number;
     songModel: PlaylistSongModel;
+}
+
+export interface PlaylistModelParams{
+    index: number;
+    playlistModel: PlaylistUserShortModel;
 }
 
 export interface DragDropSongParams{

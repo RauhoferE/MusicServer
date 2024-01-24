@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
@@ -49,7 +49,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
    */ 
   constructor(private route: ActivatedRoute, private message: NzMessageService, 
     private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService, private userService: UserService,
-    private fileService: FileService, private jwtService: JwtService) {
+    private fileService: FileService, private jwtService: JwtService, private router: Router) {
     if (!this.route.snapshot.paramMap.has('userId')) {
       console.log("userId id not found");
       this.userId = '-1';
@@ -57,6 +57,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
     if (this.route.snapshot.paramMap.has('userId')) {
       this.userId = this.route.snapshot.paramMap.get('userId') as string;
+    }
+
+    if (this.route.snapshot.paramMap.has('userId') && (this.route.snapshot.paramMap.get('userId') == '-1' || this.jwtService.getUserId() == this.route.snapshot.paramMap.get('userId'))) {
+      this.router.navigate(['/user']);
+      return;
     }
 
     if (this.userId == '-1') {
