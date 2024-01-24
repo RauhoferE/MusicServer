@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { EditPlaylistModalParams } from 'src/app/models/events';
 import { PlaylistUserShortModel } from 'src/app/models/playlist-models';
@@ -25,6 +26,19 @@ export class PlaylistEditComponent {
 
   private fileError: string = '';
 
+  public playlistForm: FormGroup;
+
+  /**
+   *
+   */
+  constructor(private fb: FormBuilder) {
+    this.playlistForm = this.fb.group({
+      name: [this.playlistDetails.name, [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
+      description: [this.playlistDetails.description, [Validators.maxLength(1024)]]
+    });
+    
+  }
+
   public getPlaylistCoverSrc(id: string): string {
     if (this.possibleFileSrc) {
       return this.possibleFileSrc;
@@ -33,7 +47,23 @@ export class PlaylistEditComponent {
     return `${environment.apiUrl}/${APIROUTES.file}/playlist/${id}`;
   }
 
-  public savePlaylist(): void {
+  public savePlaylist(event: SubmitEvent): void {
+    event.preventDefault();
+
+    if (this.playlistForm.invalid) {
+      return;
+    }
+
+    this.onSaveModal.emit({playlistModel: this.playlistDetails, newCoverFile: this.newCoverFile});
+  }
+
+  public savePlaylistEmpty(): void {
+    
+
+    if (this.playlistForm.invalid) {
+      return;
+    }
+
     this.onSaveModal.emit({playlistModel: this.playlistDetails, newCoverFile: this.newCoverFile});
   }
 
@@ -76,6 +106,14 @@ export class PlaylistEditComponent {
 
   public get FileError(): string{
     return this.fileError;
+  }
+
+  get Name(): AbstractControl<any, any> | null{
+    return this.playlistForm.get('name');
+  }
+
+  get Description(): AbstractControl<any, any> | null{
+    return this.playlistForm.get('description');
   }
 
 }

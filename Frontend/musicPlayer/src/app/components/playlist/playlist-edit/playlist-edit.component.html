@@ -1,11 +1,13 @@
-<nz-modal [(nzVisible)]="visible" (nzOnCancel)="canceled()" (nzOnOk)="savePlaylist()"
+<nz-modal [(nzVisible)]="visible" (nzOnCancel)="canceled()" (nzOnOk)="savePlaylistEmpty()"
 [nzTitle]="modalTitle"
 [nzContent]="modalContent"
 [nzFooter]="modalFooter">
-  <ng-template #modalTitle>Edit playlist</ng-template>
+  <ng-template #modalTitle>{{this.playlistDetails.id == '-1'? "Create new Playlist": "Edit playlist" }}</ng-template>
 
   <ng-template #modalContent>
-    <div *ngIf="this.playlistDetails" nz-row>
+    <form nz-form [formGroup]="playlistForm" class="register-form" (ngSubmit)="savePlaylist($event)">
+    
+    <div nz-row>
         <div nz-col>
             <img nz-row *ngIf="this.playlistDetails.id != '-1' || this.newCoverFile" [src]="getPlaylistCoverSrc(this.playlistDetails.id)" style="width: 100px; height: 100px;"/>
             <button style="width: 100%;"  nz-button nzType="default" class="clickable-button" (click)="this.fileUpload.click()">
@@ -15,19 +17,55 @@
         </div>
       
       <div nz-col [nzSpan]="18" style="margin-left: 1em;">
-        <input nz-row nz-input [(ngModel)]="this.playlistDetails.name" >
-        <textarea nz-row nz-input [(ngModel)]="this.playlistDetails.description" style="margin-top: 1em;"></textarea>
+        <nz-form-item>
+          <nz-form-control nzHasFeedback [nzErrorTip]="nameError">
+            <nz-input-group [nzSize]="'large'">
+                <input type="text" nz-input formControlName="name" placeholder="Playlist name" />
+                <ng-template #nameError let-control>
+                    <ng-container *ngIf="control.hasError('required')">
+                        <div class="my-1">
+                            Please input a name for the playlist!
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="control.hasError('minlength')">
+                        <div class="my-1">
+                            Playlist name has to be at least 3 characters long!
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="control.hasError('maxlength')">
+                        <div class="my-1">
+                          Playlist name can't be over 255 characters!
+                        </div>
+                    </ng-container>
+                </ng-template>
+            </nz-input-group>
+        </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-control nzHasFeedback [nzErrorTip]="descriptionError">
+                <textarea nz-input formControlName="description" placeholder="Description" >
+                </textarea>
+                <ng-template #descriptionError let-control>
+                    <ng-container *ngIf="control.hasError('maxlength')">
+                        <div class="my-1">
+                          Playlist name can't be over 255 characters!
+                        </div>
+                    </ng-container>
+                </ng-template>
+
+        </nz-form-control>
+        </nz-form-item>
         <div nz-row style="margin-top: 1em;">
-          <button *ngIf="!this.playlistDetails.receiveNotifications" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button" (click)="this.playlistDetails.receiveNotifications = !this.playlistDetails.receiveNotifications">
+          <button type="button" *ngIf="!this.playlistDetails.receiveNotifications" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button" (click)="this.playlistDetails.receiveNotifications = !this.playlistDetails.receiveNotifications">
             <span nz-icon nzType="mail" nzTheme="outline"></span>
           </button>
-          <button *ngIf="this.playlistDetails.receiveNotifications" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button success-color"  (click)="this.playlistDetails.receiveNotifications = !this.playlistDetails.receiveNotifications">
+          <button type="button" *ngIf="this.playlistDetails.receiveNotifications" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button success-color"  (click)="this.playlistDetails.receiveNotifications = !this.playlistDetails.receiveNotifications">
             <span nz-icon nzType="mail" nzTheme="outline" ></span>
           </button>
-          <button *ngIf="!this.playlistDetails.isPublic" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button"  (click)="this.playlistDetails.isPublic = !this.playlistDetails.isPublic">
+          <button type="button" *ngIf="!this.playlistDetails.isPublic" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button"  (click)="this.playlistDetails.isPublic = !this.playlistDetails.isPublic">
             <span nz-icon nzType="send" nzTheme="outline" ></span>
           </button>
-          <button *ngIf="this.playlistDetails.isPublic" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button success-color" (click)="this.playlistDetails.isPublic = !this.playlistDetails.isPublic">
+          <button type="button" *ngIf="this.playlistDetails.isPublic" nz-col [nzSpan]="12" nz-button nzType="default" class="clickable-button success-color" (click)="this.playlistDetails.isPublic = !this.playlistDetails.isPublic">
             <span nz-icon nzType="send" nzTheme="outline" ></span>
           </button>
 
@@ -40,10 +78,11 @@
 
 
     </div>
+  </form>
   </ng-template>
 
   <ng-template #modalFooter>
     <button nz-button nzType="default" (click)="canceled()">Cancel</button>
-    <button nz-button nzType="primary" (click)="savePlaylist()">Save</button>
+    <button nz-button nzType="primary" (click)="savePlaylistEmpty()">Save</button>
   </ng-template>
 </nz-modal>
