@@ -3,10 +3,10 @@ import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dro
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { Observable, Subject, every, takeUntil } from 'rxjs';
+import { Observable, Subject, every, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { AlbumArtistModel, ArtistShortModel } from 'src/app/models/artist-models';
-import { DragDropSongParams, PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
+import { DragDropSongParams, EditPlaylistModalParams, PlaylistSongModelParams, TableQuery } from 'src/app/models/events';
 import { GuidNameModel, PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { PlaylistService } from 'src/app/services/playlist.service';
@@ -16,6 +16,7 @@ import { environment } from 'src/environments/environment';
 import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DOCUMENT } from '@angular/common';
 import { QueueService } from 'src/app/services/queue.service';
+import { FileService } from 'src/app/services/file.service';
 
 @Component({
   selector: 'app-song-table',
@@ -73,6 +74,8 @@ export class SongTableComponent implements OnInit, OnDestroy {
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
+  private showPlaylistCreateModal: boolean = false;
+
   private destroy:Subject<any> = new Subject();
 
 
@@ -81,7 +84,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
    */
   constructor(private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService,
     private message: NzMessageService, private modal: NzModalService, private nzContextMenuService: NzContextMenuService, private songService: SongService,
-    private queueService: QueueService,
+    private queueService: QueueService, private fileService: FileService,
      @Inject(DOCUMENT) private doc: Document) {
     console.log("Construct")
     this.IsLoading = this.rxjsStorageService.currentSongTableLoading$;
@@ -215,18 +218,42 @@ export class SongTableComponent implements OnInit, OnDestroy {
 
   contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: PlaylistSongModel, index: number): void {
     this.selectedTableItem = { index: index, songModel: item};
+    this.getPlaylists();
+
+    this.nzContextMenuService.create($event, menu);
+    
+    // Add events via jquery
+
+  }
+
+  public getPlaylists(): void{
     this.playlistService.GetModifieablePlaylists(-1).subscribe((val)=>{
       this.modifieablePlaylists = val.playlists;
 
       if (this.playlistId != undefined) {
         this.modifieablePlaylists = val.playlists.filter(x => x.id != this.playlistId);
       }
-    })
+    });
+  }
 
-    this.nzContextMenuService.create($event, menu);
-    
-    // Add events via jquery
+  public async createPlaylist(event: EditPlaylistModalParams): Promise<void> {
+    this.ShowPlaylistCreateModal = false;
 
+    try {
+      var playlistId = await lastValueFrom(this.playlistService.CreatePlaylist(event.playlistModel.name, event.playlistModel.description, event.playlistModel.isPublic,
+        event.playlistModel.receiveNotifications));
+  
+        if (event.newCoverFile) {
+          await lastValueFrom(this.fileService.ChangePlaylistCover(event.newCoverFile, playlistId));
+        }
+
+        this.getPlaylists();
+        this.updateDashBoard();
+    } catch (error) {
+      console.log(error);
+      this.message.error("Error when creating playlist");
+      
+    }
   }
 
   closeMenu(): void {
@@ -569,6 +596,14 @@ export class SongTableComponent implements OnInit, OnDestroy {
 
   public get ModifieablePlaylists(): GuidNameModel[]{
     return this.modifieablePlaylists;
+  }
+
+  public get ShowPlaylistCreateModal(): boolean{
+    return this.showPlaylistCreateModal;
+  }
+
+  public set ShowPlaylistCreateModal(val: boolean){
+    this.showPlaylistCreateModal = val;
   }
 
 }
