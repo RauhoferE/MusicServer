@@ -40,6 +40,9 @@ export class RxjsStorageService {
   private updateProfilePicState$ = new BehaviorSubject<any>({});
   updateProfilePicBoolean$ = this.updateProfilePicState$.asObservable();
 
+  private updatePlaylistViewState$ = new BehaviorSubject<any>({});
+  updatePlaylistViewBoolean = this.updatePlaylistViewState$.asObservable();
+
 
   constructor() { }
 
@@ -73,6 +76,10 @@ export class RxjsStorageService {
     this.updateQueueState$.next(val);
   }
 
+  setUpdatePlaylistViewBoolean(val: boolean){
+    this.updatePlaylistViewState$.next(val);
+  }
+
   setIsSongPlaylingState(isPlayling: boolean){
     this.isSongPlayingChangedState$.next(isPlayling);
   }
@@ -85,50 +92,9 @@ export class RxjsStorageService {
     this.currentPlaylingSongModel$.next(song);
   }
 
-  checkFoReplaceingCurrentPlayingSong(songs: PlaylistSongModel[]){
-
-    const currentPlayingSong = this.currentPlaylingSongModel$.getValue() as PlaylistSongModel;
-
-    if (!currentPlayingSong) {
-      return;
-    }
-
-    for (let index = 0; index < songs.length; index++) {
-      if (currentPlayingSong.id == songs[index].id) {
-        this.currentPlaylingSongModel$.next(songs[index]);
-      }
-    }
-  }
-
   // This is used for getting the songs for the queue
   setQueueFilterAndPagination(model: QueueModel){
     this.queueFilterAndPagination$.next(model);
-  }
-
-  incrementSongsInQueueFilter(){
-    let queuePagination = this.queueFilterAndPagination$.getValue() as QueueModel;
-
-    if (!queuePagination) {
-      return;
-    }
-
-    queuePagination.page = queuePagination.page + 1;
-    this.queueFilterAndPagination$.next(queuePagination);
-  }
-
-  decrementSongsInQueueFilter(){
-    let queuePagination = this.queueFilterAndPagination$.getValue() as QueueModel;
-
-    if (!queuePagination) {
-      return;
-    }
-
-    if (queuePagination.page == 0) {
-      return;
-    }
-
-    queuePagination.page = queuePagination.page - 1;
-    this.queueFilterAndPagination$.next(queuePagination);
   }
 
 

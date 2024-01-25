@@ -59,6 +59,16 @@
                     </nz-list-item-meta-title>
                 </nz-list-item-meta>
             </nz-list-item>
+            <nz-list-item class="clickable" (click)="ShowPlaylistCreate = true">
+                <nz-list-item-meta>
+                    <nz-list-item-meta-avatar >
+                        <span nz-icon nzType="plus" nzTheme="outline" style="font-size: 50px;"></span>
+                    </nz-list-item-meta-avatar>
+                    <nz-list-item-meta-title>
+                    <span>Create a new playlist</span>
+                    </nz-list-item-meta-title>
+                </nz-list-item-meta>
+            </nz-list-item>
             <nz-list-item *ngFor="let artist of this.FollowedArtists">
                 <nz-list-item-meta>
                     <nz-list-item-meta-avatar >
@@ -113,5 +123,6 @@
       
     </nz-layout>
     <!-- <app-mediaplayer style="position: fixed; bottom: 0; z-index: 100; width: 100%; height: 20%;"></app-mediaplayer> -->
+    <app-playlist-edit *ngIf="this.ShowPlaylistCreate" [visible]="this.ShowPlaylistCreate" (onSaveModal)="createPlaylist($event)" (onCancleModal)="this.ShowPlaylistCreate = false"></app-playlist-edit>
     
   </nz-layout>

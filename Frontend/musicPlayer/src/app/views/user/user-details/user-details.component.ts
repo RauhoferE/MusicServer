@@ -79,7 +79,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.getUserModel();
     }
 
-    this.onPaginationUpdated();
+    this.rxjsStorageService.updatePlaylistViewBoolean.pipe(takeUntil(this.destroy)).subscribe(x =>{
+      this.onPaginationUpdated();
+    });
+
+    //this.onPaginationUpdated();
     this.getFollowedArtists();
     this.getFollowedUsers();
   }
@@ -333,7 +337,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public onGetPlaylists(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
     console.log("Get Playlists")
     this.rxjsStorageService.setSongTableLoadingState(true);
-    this.playlistService.GetPlaylists(this.userId, this.playlistsPaginationModel.page, this.playlistsPaginationModel.take, this.playlistsPaginationModel.query, this.playlistsPaginationModel.sortAfter, this.playlistsPaginationModel.asc).subscribe({
+    this.playlistService.GetPlaylists(this.userId, page, take, query, sortAfter, asc).subscribe({
       next:(playlistModel: PlaylistPaginationModel)=>{
         playlistModel.playlists.forEach(element => {
           element.checked = false;
@@ -380,10 +384,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.message.error("Error when creating playlist");
       
     }
-
-
-    
-
   }
 
   private updateDashBoard(): void{

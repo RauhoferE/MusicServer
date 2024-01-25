@@ -1,11 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { ArtistShortModel } from 'src/app/models/artist-models';
+import { EditPlaylistModalParams } from 'src/app/models/events';
 import { FollowedPlaylistModel, PlaylistSongModel } from 'src/app/models/playlist-models';
 import { QueueModel } from 'src/app/models/storage';
 import { AllFollowedEntitiesModel, UserModel } from 'src/app/models/user-models';
+import { FileService } from 'src/app/services/file.service';
 import { JwtService } from 'src/app/services/jwt.service';
+import { PlaylistService } from 'src/app/services/playlist.service';
 import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { UserService } from 'src/app/services/user.service';
@@ -17,7 +21,6 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./base.component.scss']
 })
 export class BaseComponent implements OnInit, OnDestroy {
-
   private followedEntities: AllFollowedEntitiesModel = {
 
   } as AllFollowedEntitiesModel;
@@ -34,10 +37,14 @@ export class BaseComponent implements OnInit, OnDestroy {
 
   private timeStamp: Date = new Date();
 
+  private showPlaylistCreate: boolean = false;
+
   /**
    *
    */
-  constructor(private userService: UserService, private jwtService: JwtService, private rxjsService: RxjsStorageService, private queueService: QueueService) {
+  constructor(private userService: UserService, private jwtService: JwtService, private rxjsService: RxjsStorageService, 
+    private queueService: QueueService, private playlistService: PlaylistService, private fileService: FileService,
+    private message: NzMessageService) {
     this.rxjsService.updateDashboardBoolean$.subscribe((val) => this.getFollowedEntities());
     
   }
@@ -110,6 +117,26 @@ export class BaseComponent implements OnInit, OnDestroy {
     this.getFollowedEntities();
   }
 
+  public async createPlaylist(event: EditPlaylistModalParams): Promise<void> {
+    this.showPlaylistCreate = false;
+
+    try {
+      var playlistId = await lastValueFrom(this.playlistService.CreatePlaylist(event.playlistModel.name, event.playlistModel.description, event.playlistModel.isPublic,
+        event.playlistModel.receiveNotifications));
+  
+        if (event.newCoverFile) {
+          await lastValueFrom(this.fileService.ChangePlaylistCover(event.newCoverFile, playlistId));
+        }
+
+        this.updatePlaylistView();
+        this.getFollowedEntities();
+    } catch (error) {
+      console.log(error);
+      this.message.error("Error when creating playlist");
+      
+    }
+  }
+
   updateProfileSrc(): void{   
     this.timeStamp = new Date();
   }
@@ -128,6 +155,16 @@ export class BaseComponent implements OnInit, OnDestroy {
 
   getOwnAvatar(): string{
     return `${environment.apiUrl}/${APIROUTES.file}/user/-1?${this.timeStamp.getTime()}`;
+  }
+
+  private updatePlaylistView(): void{
+    var last = false;
+
+    this.rxjsService.updatePlaylistViewBoolean.subscribe(x =>{
+      last = x;
+    });
+
+    this.rxjsService.setUpdatePlaylistViewBoolean(!last);
   }
 
   public get CurrentPlayingSong(): PlaylistSongModel{
@@ -156,5 +193,13 @@ export class BaseComponent implements OnInit, OnDestroy {
 
   public get FilterName(): string{
     return this.filterName;
+  }
+
+  public get ShowPlaylistCreate(): boolean{
+    return this.showPlaylistCreate;
+  }
+
+  public set ShowPlaylistCreate(val: boolean){
+    this.showPlaylistCreate = val;
   }
 }

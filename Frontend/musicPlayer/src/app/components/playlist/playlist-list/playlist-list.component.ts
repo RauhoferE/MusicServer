@@ -202,6 +202,7 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
     // This is done because otherwise the event would be called again when the data of the table changes
     if (JSON.stringify(newPagModel) == JSON.stringify(this.pagination)) {
+      console.log("Model same")
       return;
     }
 
