@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
@@ -17,7 +17,7 @@ import { environment } from 'src/environments/environment';
 })
 export class ArtistDetailsComponent implements OnInit, OnDestroy {
 
-  private artistId: string = '';
+  public artistId: string = '';
 
   private artistModel: ArtistShortModel = {
 
@@ -35,14 +35,24 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private rxjsService: RxjsStorageService, private songService: SongService,
     private userService: UserService,
     private message: NzMessageService ) {
+
+      this.route.paramMap.pipe(takeUntil(this.destroy)).subscribe((params: ParamMap) => {
+        if (!params.has('artistId')) {
+          console.log("Artist id not found");
+          return;
+        }
     
-      if (!this.route.snapshot.paramMap.has('artistId')) {
-        console.log("Artist id not found");
-        return;
-      }
-  
-      this.artistId = this.route.snapshot.paramMap.get('artistId') as string;
-      this.getArtistDetails();
+        this.artistId = params.get('artistId') as string;
+        this.getArtistDetails();
+
+        this.rxjsService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
+          this.isSongPlaying = x;
+        });
+    
+        this.rxjsService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x => {
+          this.queueModel = x;
+        });
+      });
   }
   
   ngOnDestroy(): void {
@@ -50,13 +60,7 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.rxjsService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
-      this.isSongPlaying = x;
-    });
 
-    this.rxjsService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x => {
-      this.queueModel = x;
-    });
   }
 
   getArtistDetails(): void{

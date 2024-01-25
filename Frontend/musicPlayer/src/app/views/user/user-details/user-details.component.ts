@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
@@ -19,7 +19,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './user-details.component.html',
   styleUrls: ['./user-details.component.scss']
 })
-export class UserDetailsComponent implements OnInit, OnDestroy {
+export class UserDetailsComponent implements OnDestroy {
 
   private userId: string = '';
 
@@ -53,39 +53,45 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private message: NzMessageService, 
     private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService, private userService: UserService,
     private fileService: FileService, private jwtService: JwtService, private router: Router) {
-    if (!this.route.snapshot.paramMap.has('userId')) {
-      console.log("userId id not found");
-      this.userId = '-1';
-    }
 
-    if (this.route.snapshot.paramMap.has('userId')) {
-      this.userId = this.route.snapshot.paramMap.get('userId') as string;
-    }
+      this.rxjsStorageService.setCurrentPaginationSongModel(this.playlistsPaginationModel); 
 
-    if (this.route.snapshot.paramMap.has('userId') && (this.route.snapshot.paramMap.get('userId') == '-1' || this.jwtService.getUserId() == this.route.snapshot.paramMap.get('userId'))) {
-      this.router.navigate(['/user']);
-      return;
-    }
+    this.route.paramMap.pipe(takeUntil(this.destroy)).subscribe((params: ParamMap) => {
 
-    if (this.userId == '-1') {
-      this.userModel.userName = this.jwtService.getUserName();
-    }
+      if (!params.has('userId')) {
+        console.log("userId id not found");
+        this.userId = '-1';
+      }
 
-    this.rxjsStorageService.setCurrentPaginationSongModel(this.playlistsPaginationModel);    
-  }
+      if (params.has('userId')) {
+        console.log("userId id not found");
+        this.userId = params.get('userId') as string;
+      }
 
-  ngOnInit(): void {
-    if (this.userId != '-1') {
-      this.getUserModel();
-    }
+      if (params.has('userId') && (params.get('userId') == '-1' || this.jwtService.getUserId() == params.get('userId'))) {
+        this.router.navigate(['/user']);
+        return;
+      }
 
-    this.rxjsStorageService.updatePlaylistViewBoolean.pipe(takeUntil(this.destroy)).subscribe(x =>{
-      this.onPaginationUpdated();
-    });
+      if (this.userId == '-1') {
+        this.userModel.userName = this.jwtService.getUserName();
+      }
 
-    //this.onPaginationUpdated();
-    this.getFollowedArtists();
-    this.getFollowedUsers();
+      if (this.userId != '-1') {
+        this.getUserModel();
+      }
+
+         
+  
+      this.rxjsStorageService.updatePlaylistViewBoolean.pipe(takeUntil(this.destroy)).subscribe(x =>{
+        this.onPaginationUpdated();
+      });
+  
+      //this.onPaginationUpdated();
+      this.getFollowedArtists();
+      this.getFollowedUsers();
+      
+    })    
   }
 
   ngOnDestroy(): void {

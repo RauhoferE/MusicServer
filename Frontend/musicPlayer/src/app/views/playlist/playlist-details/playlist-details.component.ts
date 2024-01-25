@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { Subject, firstValueFrom, lastValueFrom, takeUntil } from 'rxjs';
@@ -22,7 +22,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './playlist-details.component.html',
   styleUrls: ['./playlist-details.component.scss']
 })
-export class PlaylistDetailsComponent implements OnInit, OnDestroy {
+export class PlaylistDetailsComponent implements OnDestroy {
   private playlistId: string = '';
 
   private songsModel: SongPaginationModel = {} as SongPaginationModel;
@@ -74,39 +74,41 @@ export class PlaylistDetailsComponent implements OnInit, OnDestroy {
 
     this.rxjsStorageService.setCurrentPaginationSongModel(this.paginationModel);
 
-    if (!this.route.snapshot.paramMap.has('playlistId')) {
-      console.log("Playlist id not found");
-      return;
-    }
+    this.route.paramMap.pipe(takeUntil(this.destroy)).subscribe((params: ParamMap) => {
+
+      if (!params.has('playlistId')) {
+        return;
+      }
+
+      this.playlistId = params.get('playlistId') as string;
+      console.log(this.playlistId)
+      this.getPlaylistInfo();
+
+      this.rxjsStorageService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
+        this.isSongPlaying = x;
+      });
+  
+      this.rxjsStorageService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x => {
+        this.queueModel = x;
+      });
+  
+      this.rxjsStorageService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x => {
+        this.currentPlayingSong = x;
+      });
+  
+      this.rxjsStorageService.updateCurrentTableBoolean$.pipe(takeUntil(this.destroy)).subscribe(x => {
+        this.onPaginationUpdated();
+      });
+
+    })
 
     this.userId = this.jwtService.getUserId();
 
-    this.playlistId = this.route.snapshot.paramMap.get('playlistId') as string;
-    console.log(this.playlistId)
-    this.getPlaylistInfo();
+
   }
 
   ngOnDestroy(): void {
     this.destroy.next(true);
-  }
-
-  ngOnInit(): void {
-    this.rxjsStorageService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
-      this.isSongPlaying = x;
-    });
-
-    this.rxjsStorageService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x => {
-      this.queueModel = x;
-    });
-
-    this.rxjsStorageService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x => {
-      this.currentPlayingSong = x;
-    });
-
-    this.rxjsStorageService.updateCurrentTableBoolean$.pipe(takeUntil(this.destroy)).subscribe(x => {
-      this.onPaginationUpdated();
-    });
-    
   }
 
   public onGetSongs(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
