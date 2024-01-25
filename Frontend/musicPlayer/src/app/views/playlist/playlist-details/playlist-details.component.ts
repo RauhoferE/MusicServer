@@ -1,13 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { Subject, firstValueFrom, takeUntil } from 'rxjs';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { Subject, firstValueFrom, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
-import { DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
+import { DragDropSongParams, EditPlaylistModalParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, SongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
+import { FileService } from 'src/app/services/file.service';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { QueueService } from 'src/app/services/queue.service';
@@ -21,7 +23,6 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./playlist-details.component.scss']
 })
 export class PlaylistDetailsComponent implements OnInit, OnDestroy {
-
   private playlistId: string = '';
 
   private songsModel: SongPaginationModel = {} as SongPaginationModel;
@@ -46,6 +47,10 @@ export class PlaylistDetailsComponent implements OnInit, OnDestroy {
 
   private currentPlayingSong: PlaylistSongModel = undefined as any;
 
+  private showPlaylistCreateModal: boolean = false;
+
+  private userId: string = '-1';
+
   private destroy:Subject<any> = new Subject();
 
 
@@ -56,7 +61,8 @@ export class PlaylistDetailsComponent implements OnInit, OnDestroy {
     private playlistService: PlaylistService, private message: NzMessageService, 
     private sessionStorage: SessionStorageService, private jwtService: JwtService,
     private rxjsStorageService: RxjsStorageService,
-    private queueService: QueueService) {
+    private queueService: QueueService, private fileService: FileService, private router: Router,
+    private modal: NzModalService) {
     let savedPagination = this.sessionStorage.GetLastPaginationOfPlaylist();
   
     if (savedPagination) {
@@ -73,16 +79,11 @@ export class PlaylistDetailsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.userId = this.jwtService.getUserId();
+
     this.playlistId = this.route.snapshot.paramMap.get('playlistId') as string;
     console.log(this.playlistId)
-    this.playlistService.GetPlaylistInfo(this.playlistId).pipe(takeUntil(this.destroy)).subscribe({
-      next:(playlistModel: PlaylistUserShortModel)=>{
-        this.playlistModel = playlistModel;
-      },
-      error:(error: any)=>{
-        this.message.error("Error when getting playlist.");
-      }
-    })
+    this.getPlaylistInfo();
   }
 
   ngOnDestroy(): void {
@@ -250,6 +251,108 @@ export class PlaylistDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  public async createPlaylist(event: EditPlaylistModalParams): Promise<void> {
+    this.ShowPlaylistCreateModal = false;
+
+    try {
+      var playlistId = await lastValueFrom(this.playlistService.CreatePlaylist(event.playlistModel.name, event.playlistModel.description, event.playlistModel.isPublic,
+        event.playlistModel.receiveNotifications));
+  
+        if (event.newCoverFile) {
+          await lastValueFrom(this.fileService.ChangePlaylistCover(event.newCoverFile, playlistId));
+        }
+
+        this.getPlaylistInfo();
+        this.updateDashBoard();
+    } catch (error) {
+      console.log(error);
+      this.message.error("Error when creating playlist");
+      
+    }
+  }
+
+  public addToLibrary(): void {
+    this.playlistService.AddPlaylistToLibrary(this.playlistId).subscribe({
+      next: ()=>{
+        this.updateDashBoard();
+        this.getPlaylistInfo();
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    })
+  }
+
+  public copyToLibrary(): void {
+    this.playlistService.CopyPlaylistToLibrary(this.playlistId).subscribe({
+      next: ()=>{
+        this.updateDashBoard();
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    });
+  }
+
+  public setPublic(): void {
+    this.playlistService.ModifyPlaylistInfo(this.playlistId, this.playlistModel.name, this.playlistModel.description, !this.playlistModel.isPublic, this.playlistModel.receiveNotifications).subscribe({
+      next: ()=>{
+        this.updateDashBoard();
+        this.getPlaylistInfo();
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    });
+  }
+
+  public activateNotifications(): void {
+    this.playlistService.SetPlaylistNotifications(this.playlistId).subscribe({
+      complete: ()=>{
+        this.updateDashBoard();
+        this.getPlaylistInfo();
+      },
+      error: (error) =>{
+        console.log(error);
+      }
+    })
+  }
+
+  public deletePlaylist(): void {
+    this.modal.confirm({
+      nzTitle: `<b class="error-color">You really want to delete ${this.playlistModel.name}?</b>`,
+      nzOkText: 'Yes',
+      nzCancelText: 'No',
+      nzOnOk: ()=>{
+        this.playlistService.DeletePlaylist(this.playlistId).subscribe({
+          next: ()=>{
+            this.updateDashBoard();
+            if (this.playlistModel.isCreator) {
+              this.router.navigate(['/user']);
+              return;
+            }
+              this.getPlaylistInfo();
+            
+          },
+          error: (error)=>{
+            console.log(error);
+          }
+        })
+      }
+    });
+  }
+
+  private getPlaylistInfo(): void{
+    this.playlistService.GetPlaylistInfo(this.playlistId).pipe(takeUntil(this.destroy)).subscribe({
+      next:(playlistModel: PlaylistUserShortModel)=>{
+        this.playlistModel = playlistModel;
+      },
+      error:(error: any)=>{
+        this.message.error("Error when getting playlist.");
+      }
+    })
+  }
+
   private async getCurrentPaginationModel(): Promise<PaginationModel>{
     let pModel = {} as PaginationModel;
 
@@ -260,6 +363,16 @@ export class PlaylistDetailsComponent implements OnInit, OnDestroy {
     }
 
     return pModel;
+  }
+
+  private updateDashBoard(): void{
+    var currenState = false;
+    this.rxjsStorageService.updateDashboardBoolean$.subscribe((val) =>{
+      currenState = val;
+    })
+
+    // Update value in rxjs so the dashboard gets updated
+    this.rxjsStorageService.setUpdateDashboardBoolean(!currenState);
   }
 
   public getCreatorName(): string{
@@ -281,6 +394,14 @@ export class PlaylistDetailsComponent implements OnInit, OnDestroy {
 
   public getPlaylistCoverSrc(): string{
     return `${environment.apiUrl}/${APIROUTES.file}/playlist/${this.playlistId}`
+  }
+
+  public isUserPartOfPlaylist(): boolean{
+    if (!this.playlistModel || !this.playlistModel.users) {
+      return false;
+    }
+    
+    return (this.playlistModel.users.findIndex(x => x.id == parseInt(this.userId)) > -1)
   }
 
   public get IsSongPlaying(): boolean{
@@ -313,6 +434,14 @@ export class PlaylistDetailsComponent implements OnInit, OnDestroy {
 
   public get PlaylistModel(): PlaylistUserShortModel{
     return this.playlistModel;
+  }
+
+  public get ShowPlaylistCreateModal(): boolean{
+    return this.showPlaylistCreateModal;
+  }
+
+  public set ShowPlaylistCreateModal(val: boolean){
+    this.showPlaylistCreateModal = val;
   }
 
 

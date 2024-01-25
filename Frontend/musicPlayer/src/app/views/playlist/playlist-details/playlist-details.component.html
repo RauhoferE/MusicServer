@@ -1,16 +1,36 @@
 <div>
     <div>
-        <img [src]="getPlaylistCoverSrc()" style="width: 300px; height: 300px;"/>
+        <img [src]="getPlaylistCoverSrc()" style="width: 300px; height: 300px;" (click)="this.ShowPlaylistCreateModal = true"/>
 
-        <h1>
-            TODO: Allow Chaning of name
+        <h1 (click)="this.ShowPlaylistCreateModal = true" style="cursor: pointer;">
             {{this.PlaylistModel.name}}
         </h1>
-        <p>
-            TODO: Allow Chaning of description
+        <p (click)="this.ShowPlaylistCreateModal = true" style="cursor: pointer;">
             {{this.PlaylistModel.description}}
         </p>
-        TODO: add button for public and notifications
+        <div nz-row>
+            <button *ngIf="!this.isUserPartOfPlaylist() && !this.PlaylistModel.isCreator" nz-col nz-button nzType="default" class="clickable-button" (click)="addToLibrary()">Add to library</button>
+            <button *ngIf="!this.PlaylistModel.isCreator" nz-col nz-button nzType="default" class="clickable-button" (click)="copyToLibrary()">Copy to library</button>
+
+            <button *ngIf="!this.PlaylistModel.isPublic" [disabled]="!this.PlaylistModel.isCreator" nz-col nz-button nzType="default" class="clickable-button" nzShape="circle" (click)="setPublic()">
+                <span nz-icon nzType="send" nzTheme="outline"></span>
+            </button>
+            <button *ngIf="this.PlaylistModel.isPublic" [disabled]="!this.PlaylistModel.isCreator" nz-col nz-button nzType="default" class="clickable-button success-color" nzShape="circle" (click)="setPublic()">
+                <span nz-icon nzType="send" nzTheme="outline"></span>
+            </button>
+
+            <button *ngIf="!this.PlaylistModel.receiveNotifications" nz-col nz-button nzType="default" class="clickable-button" nzShape="circle" (click)="activateNotifications()">
+                <span nz-icon nzType="mail" nzTheme="outline"></span>
+            </button>
+            <button *ngIf="this.PlaylistModel.receiveNotifications" nz-col nz-button nzType="default" class="clickable-button success-color" nzShape="circle" (click)="activateNotifications()">
+                <span nz-icon nzType="mail" nzTheme="outline"></span>
+            </button>
+
+            <button nz-col nz-button nzType="default" [disabled]="!this.PlaylistModel.isCreator && !this.isUserPartOfPlaylist()" class="clickable-button-danger" nzShape="circle" (click)="deletePlaylist()">
+                <span nz-icon nzType="delete" nzTheme="outline"></span>
+            </button>
+
+        </div>
         <p>
             <a [routerLink]="[getUserHref()]">{{getCreatorName()}}</a> / {{this.TotalSongCount}} Songs
         </p>
@@ -24,4 +44,6 @@
 
     <app-song-table [songs]="this.SongsModel" [playlistId]="this.PlaylistModel.id"
      (paginationUpdated)="onPaginationUpdated()" (playSongClicked)="onPlaySongClicked($event)" (songDropped)="changeSongPosition($event)"></app-song-table>
+     <app-playlist-edit *ngIf="this.ShowPlaylistCreateModal" [visible]="this.ShowPlaylistCreateModal" 
+     [playlistDetails]="this.PlaylistModel" (onCancleModal)="this.ShowPlaylistCreateModal = false" (onSaveModal)="this.createPlaylist($event)"></app-playlist-edit>
 </div>

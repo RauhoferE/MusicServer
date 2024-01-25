@@ -895,7 +895,17 @@ namespace MusicServer.Services
 .ThenInclude(x => x.Playlist)
 .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
 
-            var playlist = user.Playlists.FirstOrDefault(x => x.Playlist.Id == playlistId) ?? throw new PlaylistNotFoundException();
+            var playlist = user.Playlists.FirstOrDefault(x => x.Playlist.Id == playlistId);
+
+            if (playlist == null)
+            {
+                await this.AddPlaylistToLibraryAsync(playlistId);
+                user = this.dBContext.Users
+                    .Include(x => x.Playlists)
+                    .ThenInclude(x => x.Playlist)
+                    .FirstOrDefault(x => x.Id == this.activeUserService.Id) ?? throw new UserNotFoundException();
+                playlist = user.Playlists.FirstOrDefault(x => x.Playlist.Id == playlistId);
+            }
 
             playlist.ReceiveNotifications = !playlist.ReceiveNotifications;
             await this.dBContext.SaveChangesAsync();

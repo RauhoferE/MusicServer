@@ -67,6 +67,16 @@
     border-color: #52c41a;
 }
 
+.clickable-button-danger{
+    cursor: pointer;
+}
+
+.clickable-button-danger:hover{
+    color: #ff4d4f;
+    cursor: pointer;
+    border-color: #ff4d4f;
+}
+
 /*Bootstrap Shenanigans*/
 
 .mt-1{
