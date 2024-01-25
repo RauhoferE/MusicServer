@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './playlist-edit.component.html',
   styleUrls: ['./playlist-edit.component.scss']
 })
-export class PlaylistEditComponent {
+export class PlaylistEditComponent implements OnInit {
 
   @Input() playlistDetails: PlaylistUserShortModel = {id: '-1', name: '', description: '', isPublic: false, receiveNotifications: false} as PlaylistUserShortModel;
 
@@ -33,10 +33,15 @@ export class PlaylistEditComponent {
    */
   constructor(private fb: FormBuilder) {
     this.playlistForm = this.fb.group({
-      name: [this.playlistDetails.name, [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
-      description: [this.playlistDetails.description, [Validators.maxLength(1024)]]
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
+      description: ['', [Validators.maxLength(1024)]]
     });
     
+  }
+
+  ngOnInit(): void {
+    this.Name?.setValue(this.playlistDetails.name);
+    this.Description?.setValue(this.playlistDetails.description);
   }
 
   public getPlaylistCoverSrc(id: string): string {
@@ -54,6 +59,10 @@ export class PlaylistEditComponent {
       return;
     }
 
+    this.playlistDetails.name = this.Name?.value;
+    this.playlistDetails.description = this.Description?.value;
+
+
     this.onSaveModal.emit({playlistModel: this.playlistDetails, newCoverFile: this.newCoverFile});
   }
 
@@ -63,6 +72,9 @@ export class PlaylistEditComponent {
     if (this.playlistForm.invalid) {
       return;
     }
+
+    this.playlistDetails.name = this.Name?.value;
+    this.playlistDetails.description = this.Description?.value;
 
     this.onSaveModal.emit({playlistModel: this.playlistDetails, newCoverFile: this.newCoverFile});
   }
