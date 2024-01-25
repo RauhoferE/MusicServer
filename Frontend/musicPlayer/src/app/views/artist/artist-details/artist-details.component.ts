@@ -3,7 +3,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
-import { ArtistShortModel } from 'src/app/models/artist-models';
+import { AlbumModel, ArtistShortModel } from 'src/app/models/artist-models';
 import { QueueModel } from 'src/app/models/storage';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SongService } from 'src/app/services/song.service';
@@ -22,6 +22,8 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
   private artistModel: ArtistShortModel = {
 
   } as ArtistShortModel;
+
+  private albums: AlbumModel[] = [];
 
   private isSongPlaying: boolean = false;
 
@@ -44,6 +46,7 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
     
         this.artistId = params.get('artistId') as string;
         this.getArtistDetails();
+        this.getAlbumsOfArtist();
 
         this.rxjsService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
           this.isSongPlaying = x;
@@ -63,6 +66,17 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
 
   }
 
+  private getAlbumsOfArtist(): void{
+    this.songService.GetArtistAlbums(this.artistId).pipe(takeUntil(this.destroy)).subscribe({
+      next:(albums: AlbumModel[])=>{
+        this.albums = albums;
+      },
+      error:(error: any)=>{
+        this.message.error("Error when getting artists.");
+      }
+    })
+  }
+
   getArtistDetails(): void{
     this.songService.GetArtistDetails(this.artistId).pipe(takeUntil(this.destroy)).subscribe({
       next:(artistModel: ArtistShortModel)=>{
@@ -74,7 +88,7 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
     })
   }
 
-  activateNotifications(): void{
+  public activateNotifications(): void{
 
     if (this.artistModel.receiveNotifications) {
       this.userService.RemoveNotficationsFromArtist(this.artistId).subscribe({
@@ -103,7 +117,7 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
 
   }
 
-  subscribeToArtist(): void{
+  public subscribeToArtist(): void{
 
     if (this.artistModel.followedByUser) {
       this.userService.UnSuscribeFromArtist(this.artistId).subscribe({
@@ -134,7 +148,7 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
 
   }
 
-  updateDashBoard(): void{
+  private updateDashBoard(): void{
     var currenState = false;
     this.rxjsService.updateDashboardBoolean$.subscribe((val) =>{
       currenState = val;
@@ -144,7 +158,7 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
     this.rxjsService.setUpdateDashboardBoolean(!currenState);
   }
 
-  getAlbumCoverSrc(): string{
+  public getAlbumCoverSrc(): string{
     return `${environment.apiUrl}/${APIROUTES.file}/artist/${this.artistId}`
   }
 
@@ -162,6 +176,10 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
 
   public get ArtistId(): string{
     return this.artistId;
+  }
+
+  public get Albums(): AlbumModel[]{
+    return this.albums;
   }
 
 }

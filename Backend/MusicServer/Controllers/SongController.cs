@@ -29,9 +29,9 @@ namespace MusicServer.Controllers
 
         [HttpGet]
         [Route(ApiRoutes.Song.ArtistAlbums)]
-        public async Task<IActionResult> GetAlbumsOfArtists([FromRoute, Required] Guid artistId, [FromQuery, Required] QueryPaginationSearchRequest request)
+        public async Task<IActionResult> GetAlbumsOfArtists([FromRoute, Required] Guid artistId)
         {
-            return Ok(await this.songService.GetAlbumsOfArtistAsync(artistId, request.Page, request.Take));
+            return Ok(await this.songService.GetAlbumsOfArtistAsync(artistId));
         }
 
         [HttpGet]

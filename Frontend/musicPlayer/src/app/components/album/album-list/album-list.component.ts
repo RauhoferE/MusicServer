@@ -22,17 +22,7 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class AlbumListComponent implements OnInit, OnDestroy {
 
-  @Input() artistId!: string;
-
-  public albums: AlbumModel[] = [];
-
-  private albumPage: number = 1;
-
-  private take: number = 2;
-
-  private isLoading: boolean = false;
-
-  private totalAlbums: number = 0;
+  @Input() albums: AlbumModel[] = [];
 
   private queueModel: QueueModel = {} as any;
 
@@ -48,7 +38,7 @@ export class AlbumListComponent implements OnInit, OnDestroy {
   /**
    *
    */
-  constructor(private songService: SongService, private queueService: QueueService, 
+  constructor(private queueService: QueueService, 
     private playlistService: PlaylistService,private nzContextMenuService: NzContextMenuService,
     private message: NzMessageService,  private rxjstorageService: RxjsStorageService) {
     
@@ -59,11 +49,6 @@ export class AlbumListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (!this.artistId) {
-      console.log("artist id not found")
-      return;
-    }
-
     this.rxjstorageService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x=>{
       this.queueModel = x;
     })
@@ -72,29 +57,8 @@ export class AlbumListComponent implements OnInit, OnDestroy {
       this.isSongPlaying = x;
     })
 
-    
-    this.getNextAlbums();
   }
 
-  getNextAlbums(): void{
-    console.log("Get albums")
-    this.songService.GetArtistAlbums(this.artistId, this.albumPage, this.take).pipe(takeUntil(this.destroy)).subscribe({
-      next: (albumModel: AlbumPaginationModel) =>{
-        this.totalAlbums = albumModel.totalCount;
-
-        if (albumModel.albums.length == 0) {
-          return;
-        }
-
-        for (let index = 0; index < albumModel.albums.length; index++) {
-          this.albums.push(albumModel.albums[index])
-        }
-      },
-      error: (error)=>{
-        console.log(error);
-      }
-    })
-  }
 
   addAlbumToPlaylist(id: string, params: AlbumModel): void{
 
@@ -192,20 +156,6 @@ export class AlbumListComponent implements OnInit, OnDestroy {
     this.rxjstorageService.setUpdateDashboardBoolean(!currenState);
   }
 
-  scrollEvent(event : any): void{  
-    // Check if the user scrolled to the bottom and load the next page of albums
-    if ((Math.abs(event.srcElement.scrollTop - (event.srcElement.scrollHeight - event.srcElement.offsetHeight)) < 5) &&
-    this.totalAlbums > this.albums.length
-    ) {
-      this.albumPage++;
-      this.getNextAlbums();
-    }
-  }
-
-  trackByFn(index: number, item: AlbumModel) {
-    return item.id; // or item.id
-  }
-
   getAlbumCoverSrc(albumId: string): string{
     if (!albumId) {
       return '';
@@ -221,10 +171,6 @@ export class AlbumListComponent implements OnInit, OnDestroy {
 
   public get Albums(): AlbumModel[]{
     return this.albums;
-  }
-
-  public get IsLoading(): boolean{
-    return this.isLoading;
   }
 
   public get CurrentPlayingAlbumId(): string{

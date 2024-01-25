@@ -1,6 +1,6 @@
 <div style="margin-bottom: 5em;">
-      <div class="demo-infinite-container" (scroll)="scrollEvent($event)">
-        <div *ngFor="let item of this.Albums; trackBy: trackByFn" (contextmenu)="contextMenu($event, menu, item)">
+      <div class="demo-infinite-container">
+        <div *ngFor="let item of this.Albums" (contextmenu)="contextMenu($event, menu, item)">
             <div nz-row class="album-item">
                 <img nz-col [src]="getAlbumCoverSrc(item.id)" style="width: 150px; height: 150px;" class="album-image"/>
                 <div style="font-size: xx-large;" class="album-item-button">

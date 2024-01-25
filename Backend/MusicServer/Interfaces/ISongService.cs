@@ -7,7 +7,7 @@ namespace MusicServer.Interfaces
     {
         public Task<ArtistDto> GetArtistAsync(Guid artistId);
 
-        public Task<AlbumPaginationResponse> GetAlbumsOfArtistAsync(Guid artistId, int page, int take);
+        public Task<AlbumDto[]> GetAlbumsOfArtistAsync(Guid artistId);
 
         public Task<AlbumDto> GetAlbumInformationAsync(Guid albumId);
 

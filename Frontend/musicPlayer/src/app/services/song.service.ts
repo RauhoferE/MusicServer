@@ -37,8 +37,8 @@ export class SongService {
     })
   }
 
-  public GetArtistAlbums(id: string, page:number, take: number): Observable<AlbumPaginationModel>{
-    return this.httpClient.get<AlbumPaginationModel>(`${environment.apiUrl}/${APIROUTES.song}/artist/${id}/albums?page=${page}&take=${take}`,{
+  public GetArtistAlbums(id: string): Observable<AlbumModel[]>{
+    return this.httpClient.get<AlbumModel[]>(`${environment.apiUrl}/${APIROUTES.song}/artist/${id}/albums`,{
       withCredentials: true
     })
   }
