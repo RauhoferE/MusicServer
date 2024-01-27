@@ -123,18 +123,6 @@ export class SongTableComponent implements OnInit, OnDestroy {
     this.paginationUpdated.emit();
   }
 
-  removeSongFromQueue(songId: string, index: number): void {
-
-    this.queueService.RemoveSongsFromQueue([index]).subscribe({
-      next: ()=>{
-        this.updateQueue();
-      },
-      error: (error)=>{
-        console.log("Error when removing song to queue");
-      }
-    });
-  }
-
   addSongToQueue(song: PlaylistSongModel): void {
     this.queueService.AddSongsToQueue([song.id]).subscribe({
       next: ()=>{
@@ -145,25 +133,6 @@ export class SongTableComponent implements OnInit, OnDestroy {
       }
     });
     
-  }
-
-  // This method is only used when the queue is displayed
-  removeSelectedSongsFromQueue(): void {
-    var checkedSongs = this.songs.songs.filter(x => x.checked);
-
-    this.queueService.RemoveSongsFromQueue(checkedSongs.map(x => x.order)).subscribe({
-      next: ()=>{
-        this.updateQueue();
-      },
-      error: (error)=>{
-        console.log("Error when removing songs to queue");
-      },
-      complete: ()=>{
-        this.checkAll(false);
-      }
-    });
-
-    //this.checkAll(false);
   }
 
   addSelectedSongsToQueue(): void {

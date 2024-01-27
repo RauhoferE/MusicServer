@@ -108,8 +108,8 @@
                     <li nz-menu-item *ngFor="let data of this.ModifieablePlaylists" (click)="addSelectedSongsToPlaylist(data.id)">{{data.name}}</li>
                 </ul>
             </li>
-            <li nz-menu-item id="add-queue" (click)="addSongToQueue(this.SelectedTableItem)">Add to queue</li>
-            <li nz-menu-item id="add-all-queue" (click)="addSelectedSongsToQueue()" *ngIf="this.Indeterminate || this.AllChecked">Add selected to queue</li>
+            <li *ngIf="this.CurrentPlayingSong.id" nz-menu-item id="add-queue" (click)="addSongToQueue(this.SelectedTableItem)">Add to queue</li>
+            <li *ngIf="(this.Indeterminate || this.AllChecked) && this.CurrentPlayingSong.id" nz-menu-item id="add-all-queue" (click)="addSelectedSongsToQueue()">Add selected to queue</li>
         </ul>
     </nz-dropdown-menu>
     <app-playlist-edit *ngIf="this.ShowPlaylistCreateModal" [visible]="this.ShowPlaylistCreateModal" 

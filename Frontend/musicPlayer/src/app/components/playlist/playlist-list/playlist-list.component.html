@@ -68,7 +68,7 @@
     </nz-table>
     <nz-dropdown-menu #menu="nzDropdownMenu">
       <ul nz-menu>
-          <li nz-menu-item id="add-queue" (click)="addPlaylistToQueue()">Add playlist to queue</li>
+          <li *ngIf="this.CurrentPlayingSong.id" nz-menu-item id="add-queue" (click)="addPlaylistToQueue()">Add playlist to queue</li>
           <li nz-menu-item *ngIf="!isUserPartOfPlaylist()" id="add" (click)="addPlaylistToLibrary()">Add playlist to library</li>
           <li nz-menu-item *ngIf="!playlistsEditable" id="copy" (click)="copyPlaylistToLibrary()">Copy playlist to library</li>
           <li nz-menu-item *ngIf="playlistsEditable" id="edit" (click)="this.ShowPlaylistEditModal = true">Edit details</li>

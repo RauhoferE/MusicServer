@@ -6,12 +6,13 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { Observable, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { DragDropPlaylistParams, EditPlaylistModalParams, PlaylistModelParams, PlaylistSongModelParams } from 'src/app/models/events';
-import { GuidNameModel, PlaylistPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
+import { GuidNameModel, PlaylistPaginationModel, PlaylistSongModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { UserModel } from 'src/app/models/user-models';
 import { FileService } from 'src/app/services/file.service';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
+import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { environment } from 'src/environments/environment';
 
@@ -31,6 +32,8 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
   @Output() playlistDropped: EventEmitter<DragDropPlaylistParams> = new EventEmitter<DragDropPlaylistParams>();
 
   private isSongPlaying: boolean = false;
+
+  private currentPlayingSong: PlaylistSongModel = undefined as any;
 
   private queueModel: QueueModel = undefined as any;
 
@@ -58,7 +61,8 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
    *
    */
   constructor(private playlistService: PlaylistService, private rxjsService: RxjsStorageService, private modal: NzModalService,
-    private nzContextMenuService: NzContextMenuService, private jwtService: JwtService, private fileService: FileService, @Inject(DOCUMENT) private doc: Document) {
+    private nzContextMenuService: NzContextMenuService, private jwtService: JwtService, private fileService: FileService, 
+    @Inject(DOCUMENT) private doc: Document, private queueService: QueueService) {
     this.IsLoading = this.rxjsService.currentSongTableLoading$;
     this.currentUserId = jwtService.getUserId();
     
@@ -77,6 +81,10 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
     this.rxjsService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.isSongPlaying = x;
+    });
+
+    this.rxjsService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x =>{
+      this.currentPlayingSong = x;
     });
 
     this.pagination = pModel;
@@ -129,8 +137,15 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
   }
 
   public addPlaylistToQueue(): void {
-    // TODO: 
-  throw new Error('Method not implemented.');
+    this.queueService.AddPlaylistToQueue(this.selectedTableItem.playlistModel.id).subscribe({
+      next: ()=>{
+        //this.updateDashBoard();
+
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    })
   }
 
   public async savePlaylist(event: EditPlaylistModalParams): Promise<void> {
@@ -363,6 +378,10 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
   public set ShowPlaylistEditModal(val: boolean){
     this.showPlaylistEditModal = val;
+  }
+
+  public get CurrentPlayingSong(): PlaylistSongModel{
+    return this.currentPlayingSong;
   }
 
 }

@@ -33,6 +33,8 @@ export class AlbumListComponent implements OnInit, OnDestroy {
   private selectedTableItem: AlbumModel = {
   } as AlbumModel;
 
+  private currentPlayingSong: PlaylistSongModel = undefined as any;
+
   private destroy:Subject<any> = new Subject();
   
   /**
@@ -51,11 +53,15 @@ export class AlbumListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.rxjstorageService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x=>{
       this.queueModel = x;
-    })
+    });
 
     this.rxjstorageService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x =>{
       this.isSongPlaying = x;
-    })
+    });
+
+    this.rxjstorageService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x =>{
+      this.currentPlayingSong = x;
+    });
 
   }
 
@@ -191,6 +197,10 @@ export class AlbumListComponent implements OnInit, OnDestroy {
 
   public get SelectedTableItem(): AlbumModel{
     return this.selectedTableItem;
+  }
+
+  public get CurrentPlayingSong(): PlaylistSongModel{
+    return this.currentPlayingSong;
   }
 
 }

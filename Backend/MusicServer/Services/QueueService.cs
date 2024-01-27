@@ -613,6 +613,11 @@ namespace MusicServer.Services
                 .Include(x => x.Song.Album)
                 .Where(x => x.UserId == userId && x.Order > 0 && !x.AddedManualy);
 
+            if (this.dbContext.QueueData.FirstOrDefault(x => x.UserId == userId) == null)
+            {
+                throw new DataNotFoundException();
+            }
+
             foreach (var item in queue)
             {
                 item.Order = item.Order + songIds.Length;
