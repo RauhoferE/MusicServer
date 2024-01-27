@@ -1,3 +1,20 @@
+.playlist-item:hover #order-id{
+  display: none;
+}
+
+.playlist-item #order-id{
+  display: block;
+}
+
+.playlist-item:hover #play-button{
+  display: block;
+  text-align: start;
+}
+
+.playlist-item #play-button{
+  display: none;
+}
+
 ::ng-deep .cdk-drag-placeholder >.first-td >span {
     display: none;
 }

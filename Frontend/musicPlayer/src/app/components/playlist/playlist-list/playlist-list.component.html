@@ -30,23 +30,29 @@
 
     </thead>
     <tbody cdkDropList (cdkDropListDropped)="drop($event)" class="drag-boundry" >
-        <tr *ngFor="let data of playlistModel.playlists;let indexOfelement=index;" (contextmenu)="contextMenu($event, menu, data, indexOfelement)"
+        <tr *ngFor="let data of playlistModel.playlists;let indexOfelement=index;" class="playlist-item" (contextmenu)="contextMenu($event, menu, data, indexOfelement)"
         cdkDrag [cdkDragDisabled]="!playlistsEditable" cdkDragBoundary=".drag-boundry" cdkDragLockAxis="y" (cdkDragStarted)="drag($event)"
         >
       <td>
-        <img [src]="getPlaylistCoverSrc(data.id)" style="width: 50px; height: 50px;"/>
+        <span id="order-id" *ngIf="(this.CurrentPlayingSong.id && this.QueueModel.itemId != data.id) || 
+        (!this.IsSongPlaying && this.CurrentPlayingSong && this.QueueModel.itemId == data.id && this.QueueModel.target == this.QueueTypePlaylist)">{{data.order}}</span>
+
+        <span *ngIf="(this.CurrentPlayingSong.id && this.QueueModel.itemId != data.id) || !this.IsSongPlaying"
+        id="play-button" nz-icon nzType="play-circle" nzTheme="outline" class="clickable" (click)="playPlaylist(data.id, data.songCount)"></span>
+
+        <span *ngIf="this.IsSongPlaying && this.CurrentPlayingSong.id && this.QueueModel.itemId == data.id && this.QueueModel.target == this.QueueTypePlaylist"
+         nz-icon nzType="pause-circle" nzTheme="outline" class="clickable" (click)="pausePlaylist()"></span>
       </td>
       <td>
+        <img [src]="getPlaylistCoverSrc(data.id)" style="width: 50px; height: 50px;"/>
         <a [routerLink]="['/playlist', data.id]">
           {{data.name}}
         </a>
-        
       </td>
       <td>
         <a [routerLink]="['/playlist', this.getPlaylistCreator(data.users)?.id]">
           {{this.getPlaylistCreator(data.users)?.userName}}
         </a>
-        
       </td>
       <td>
         {{data.songCount}} Songs

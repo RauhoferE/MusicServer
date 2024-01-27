@@ -2,9 +2,12 @@ import { CdkDragDrop, CdkDragStart } from '@angular/cdk/drag-drop';
 import { DOCUMENT } from '@angular/common';
 import { Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { Observable, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
+import { LOOPMODES } from 'src/app/constants/loop-modes';
+import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { DragDropPlaylistParams, EditPlaylistModalParams, PlaylistModelParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { GuidNameModel, PlaylistPaginationModel, PlaylistSongModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
@@ -62,7 +65,7 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
    */
   constructor(private playlistService: PlaylistService, private rxjsService: RxjsStorageService, private modal: NzModalService,
     private nzContextMenuService: NzContextMenuService, private jwtService: JwtService, private fileService: FileService, 
-    @Inject(DOCUMENT) private doc: Document, private queueService: QueueService) {
+    @Inject(DOCUMENT) private doc: Document, private queueService: QueueService, private message: NzMessageService) {
     this.IsLoading = this.rxjsService.currentSongTableLoading$;
     this.currentUserId = jwtService.getUserId();
     
@@ -85,6 +88,10 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
     this.rxjsService.currentPlayingSong.pipe(takeUntil(this.destroy)).subscribe(x =>{
       this.currentPlayingSong = x;
+    });
+
+    this.rxjsService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x => {
+      this.queueModel = x;
     });
 
     this.pagination = pModel;
@@ -137,6 +144,12 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
   }
 
   public addPlaylistToQueue(): void {
+
+    if (this.selectedTableItem.playlistModel.songCount == 0) {
+      this.message.error("Playlist needs to have songs to be played!");
+      return;
+    }
+    
     this.queueService.AddPlaylistToQueue(this.selectedTableItem.playlistModel.id).subscribe({
       next: ()=>{
         //this.updateDashBoard();
@@ -217,6 +230,56 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     this.rxjsService.setCurrentPaginationSongModel(newPagModel);
 
     this.paginationUpdated.emit();
+  }
+
+  public async playPlaylist(playlistId: string, songCount: number): Promise<void>{
+    console.log("Play playlist")
+
+    if (songCount == 0) {
+      this.message.error("Playlist needs to have songs to be played!");
+      return;
+    }
+
+    // If the user previously clicked stop and wants to resume the playlist with the same queue
+    if (this.QueueModel &&
+      this.QueueModel.target == QUEUETYPES.playlist && 
+      this.QueueModel.itemId == playlistId) {
+      this.rxjsService.setIsSongPlaylingState(true);
+      return;
+    }
+
+    this.rxjsService.setQueueFilterAndPagination({
+      asc : this.pagination.asc,
+      page : 0,
+      take : 0,
+      query : '',
+      sortAfter : this.pagination.sortAfter,
+      itemId : playlistId,
+      target : QUEUETYPES.playlist,
+      loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
+      random: this.queueModel.random == undefined ? false: this.queueModel.random
+    });
+
+    this.queueService.CreateQueueFromPlaylist(playlistId, this.queueModel.random, this.queueModel.loopMode, this.pagination.sortAfter, this.pagination.asc, -1).subscribe({
+      next:async (song: PlaylistSongModel)=>{
+        console.log(song)
+        
+        this.rxjsService.setCurrentPlayingSong(song);
+        await this.rxjsService.setUpdateSongState();
+        this.rxjsService.setIsSongPlaylingState(true);
+        this.rxjsService.showMediaPlayer(true);
+      },
+      error:(error: any)=>{
+        this.message.error("Error when getting queue.");
+      },
+      complete: () => {
+      }
+    });
+  }
+
+  public pausePlaylist(): void {
+    // Stop playing of song
+    this.rxjsService.setIsSongPlaylingState(false);
   }
 
   public setPublic(playlist: PlaylistUserShortModel): void {
@@ -382,6 +445,10 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
   public get CurrentPlayingSong(): PlaylistSongModel{
     return this.currentPlayingSong;
+  }
+
+  public get QueueTypePlaylist(): string{
+    return QUEUETYPES.playlist;
   }
 
 }

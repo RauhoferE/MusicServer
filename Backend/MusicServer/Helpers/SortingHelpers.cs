@@ -170,7 +170,7 @@ namespace MusicServer.Helpers
                     case SortingElementsOwnPlaylists.Custom:
                         return playlists.OrderBy(x => x.Order).ThenBy(x => x.Id);
                     default:
-                        return playlists.OrderBy(x => x.Playlist.Name).ThenBy(x => x.Id);
+                        return playlists.OrderBy(x => x.Order).ThenBy(x => x.Id);
                 }
             }
 
@@ -185,7 +185,7 @@ namespace MusicServer.Helpers
                 case SortingElementsOwnPlaylists.Custom:
                     return playlists.OrderByDescending(x => x.Order).ThenBy(x => x.Id);
                 default:
-                    return playlists.OrderByDescending(x => x.Playlist.Name).ThenBy(x => x.Id);
+                    return playlists.OrderByDescending(x => x.Order).ThenBy(x => x.Id);
             }
         }
 
