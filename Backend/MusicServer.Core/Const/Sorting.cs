@@ -8,10 +8,10 @@ namespace MusicServer.Core.Const
 {
     public static class SortingElementsOwnPlaylists
     {
-        public const string Name = "Name";
-        public const string DateCreated = "DateCreated";
-        public const string NumberOfSongs = "NumberOfSongs";
-        public const string Custom = "Custom";
+        public const string Name = "name";
+        public const string DateCreated = "created";
+        public const string NumberOfSongs = "songCount";
+        public const string Custom = "order";
 
 
         // Return all constants in a list

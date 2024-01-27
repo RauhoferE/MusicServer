@@ -1,9 +1,11 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { CdkDragDrop, CdkDragStart } from '@angular/cdk/drag-drop';
+import { DOCUMENT } from '@angular/common';
+import { Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { Observable, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
-import { EditPlaylistModalParams, PlaylistModelParams, PlaylistSongModelParams } from 'src/app/models/events';
+import { DragDropPlaylistParams, EditPlaylistModalParams, PlaylistModelParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { GuidNameModel, PlaylistPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { UserModel } from 'src/app/models/user-models';
@@ -22,13 +24,11 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
   @Input() playlistModel: PlaylistPaginationModel = {} as PlaylistPaginationModel;
 
-  @Input() draggable: boolean = false;
-
-  @Input() playlistEditable: boolean = false;
-
-  @Input() addCopyPlaylistAction: boolean = false;
+  @Input() playlistsEditable: boolean = false;
 
   @Output() paginationUpdated: EventEmitter<void> = new EventEmitter<void>();
+
+  @Output() playlistDropped: EventEmitter<DragDropPlaylistParams> = new EventEmitter<DragDropPlaylistParams>();
 
   private isSongPlaying: boolean = false;
 
@@ -58,7 +58,7 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
    *
    */
   constructor(private playlistService: PlaylistService, private rxjsService: RxjsStorageService, private modal: NzModalService,
-    private nzContextMenuService: NzContextMenuService, private jwtService: JwtService, private fileService: FileService) {
+    private nzContextMenuService: NzContextMenuService, private jwtService: JwtService, private fileService: FileService, @Inject(DOCUMENT) private doc: Document) {
     this.IsLoading = this.rxjsService.currentSongTableLoading$;
     this.currentUserId = jwtService.getUserId();
     
@@ -120,6 +120,7 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     this.playlistService.AddPlaylistToLibrary(this.selectedTableItem.playlistModel.id).subscribe({
       next: ()=>{
         this.paginationUpdated.emit();
+        this.updateDashBoard();
       },
       error: (error)=>{
         console.log(error);
@@ -154,14 +155,6 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
         console.log(error);
       }
     })
-  }
-
-  public canPlaylistAddedToLibrary(): boolean {
-    if (this.selectedTableItem.index == -1) {
-      return false;
-    }
-
-    return this.selectedTableItem.playlistModel.users.findIndex(x => x.id == parseInt(this.currentUserId)) == -1;
   }
 
   public copyPlaylistToLibrary(): void {
@@ -216,6 +209,28 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
   }
 
+  public addToLibrary(): void {
+    this.playlistService.AddPlaylistToLibrary(this.selectedTableItem.playlistModel.id).subscribe({
+      next: ()=>{
+        this.updateDashBoard();
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    })
+  }
+
+  public copyToLibrary(): void {
+    this.playlistService.CopyPlaylistToLibrary(this.selectedTableItem.playlistModel.id).subscribe({
+      next: ()=>{
+        this.updateDashBoard();
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    });
+  }
+
   public receiveNotifications(id: string): void {
     this.playlistService.SetPlaylistNotifications(id).subscribe({
       complete: ()=>{
@@ -235,6 +250,16 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     return users.find(x => x.isCreator);
   }
 
+  public isUserPartOfPlaylist(): boolean{
+    if (!this.selectedTableItem.playlistModel || !this.selectedTableItem.playlistModel.users) {
+      return false;
+    }
+
+    const users = this.selectedTableItem.playlistModel.users;
+    
+    return (users.findIndex(x => x.id == parseInt(this.currentUserId)) > -1)
+  }
+
   public getHeaderSortOrder(sortOrder: string): string | null{
     if (this.pagination.sortAfter == sortOrder && this.pagination.asc) {
       return 'ascend';
@@ -250,6 +275,36 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
   public onSearchQueryInput(): void{
     this.rxjsService.setCurrentPaginationSongModel(this.pagination);
     this.paginationUpdated.emit();
+  }
+
+  public drop(event: CdkDragDrop<string[]>): void {
+    console.log("drop")
+    this.doc.body.classList.remove('inheritCursors');
+    this.doc.body.style.cursor = 'unset'; 
+
+    if (event.currentIndex == event.previousIndex) {
+      return;
+    }
+
+    const srcPlaylist = this.playlistModel.playlists[event.previousIndex];
+
+    const destPlaylist = this.playlistModel.playlists[event.currentIndex];
+
+    if (!srcPlaylist || !destPlaylist) {
+      return;
+    }
+
+    console.log(srcPlaylist.order)
+    console.log(destPlaylist.order)
+
+    this.playlistDropped.emit({ srcPlaylist: srcPlaylist, destPlaylist: destPlaylist, srcIndex: event.previousIndex, destIndex: event.currentIndex});
+  }
+
+  public drag(event: CdkDragStart<any>): void {
+    console.log("drag")
+    this.doc.body.classList.add('inheritCursors');
+    this.doc.body.style.cursor = 'grabbing'; 
+
   }
 
   private updateDashBoard(): void{

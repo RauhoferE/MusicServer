@@ -69,10 +69,6 @@
                      nz-icon nzType="pause-circle" nzTheme="outline" class="clickable" (click)="pauseSong()"></span>
                 </td>
                 <td>
-                    <div *cdkDragPreview class="dragable-item">
-                        <img [src]="getAlbumCoverSrc(data.album.id)" style="width: 50px; height: 50px;"/>
-                        {{data.name}} * {{getArtistsNamesAsList(data.artists)}}
-                    </div>
                     <img [src]="getAlbumCoverSrc(data.album.id)" style="width: 50px; height: 50px;"/>
                     {{data.name}}
 

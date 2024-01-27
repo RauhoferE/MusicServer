@@ -30,6 +30,13 @@ export interface DragDropSongParams{
     destIndex: number;
 }
 
+export interface DragDropPlaylistParams{
+    srcPlaylist: PlaylistUserShortModel;
+    destPlaylist: PlaylistUserShortModel;
+    srcIndex: number;
+    destIndex: number;
+}
+
 export interface DragDropQueueParams extends DragDropSongParams{
     // -1 for automaitc
     // 0 mark as false

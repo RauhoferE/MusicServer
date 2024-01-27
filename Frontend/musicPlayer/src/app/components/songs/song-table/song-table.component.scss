@@ -29,13 +29,7 @@
     opacity: 0.5;
   }
 
-// Unused
-.dragable-item{
-    border: 1px solid #353536;
-    border-radius: 10px;
-    background-color: #353536;
-    padding: 5px;
-    color: white;
-    opacity: 0.5;
+::ng-deep .cdk-drag-preview{
     display: none;
-}
+
+  }

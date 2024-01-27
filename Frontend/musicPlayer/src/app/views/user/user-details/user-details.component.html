@@ -76,7 +76,7 @@
           <button *ngIf="this.UserModel.id == -1" nz-button nzType="default" class="clickable-button" style="margin-top: 1em; margin-bottom: 1em;" (click)="this.ShowPlaylistEditModal = true">
             Create new playlist
           </button>         
-          <app-playlist-list [playlistEditable]="this.IsOwnUser" [draggable]="true" [playlistModel]="this.PlaylistsModel" (paginationUpdated)="onPaginationUpdated()"></app-playlist-list>
+          <app-playlist-list [playlistsEditable]="this.IsOwnUser" [draggable]="true" [playlistModel]="this.PlaylistsModel" (paginationUpdated)="onPaginationUpdated()" (playlistDropped)="onPlaylistDropped($event)"></app-playlist-list>
           <app-playlist-edit *ngIf="this.ShowPlaylistEditModal" [visible]="this.ShowPlaylistEditModal" (onCancleModal)="this.ShowPlaylistEditModal = false" (onSaveModal)="createPlaylist($event)"></app-playlist-edit>
     </div>
 </div>

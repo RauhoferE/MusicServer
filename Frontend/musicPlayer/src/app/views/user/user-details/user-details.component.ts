@@ -3,7 +3,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
-import { EditPlaylistModalParams } from 'src/app/models/events';
+import { DragDropPlaylistParams, EditPlaylistModalParams } from 'src/app/models/events';
 import { GuidNameModel, PlaylistPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel } from 'src/app/models/storage';
 import { UserModel } from 'src/app/models/user-models';
@@ -20,7 +20,6 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./user-details.component.scss']
 })
 export class UserDetailsComponent implements OnDestroy {
-
   private userId: string = '';
 
   private playlistsPaginationModel: PaginationModel = {
@@ -390,6 +389,19 @@ export class UserDetailsComponent implements OnDestroy {
       this.message.error("Error when creating playlist");
       
     }
+  }
+
+  public onPlaylistDropped(event: DragDropPlaylistParams) {
+    console.log(event.srcPlaylist.order)
+    console.log(event.destPlaylist.order)
+    this.playlistService.ChangeOrderOfPlaylist(event.srcPlaylist.id, event.destPlaylist.order).subscribe({
+      next: ()=>{
+        this.onPaginationUpdated();
+      },
+      error: (error)=>{
+        console.log(error);
+      }
+    })
   }
 
   private updateDashBoard(): void{

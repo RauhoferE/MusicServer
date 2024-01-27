@@ -29,9 +29,9 @@
         </tr>
 
     </thead>
-    <tbody>
+    <tbody cdkDropList (cdkDropListDropped)="drop($event)" class="drag-boundry" >
         <tr *ngFor="let data of playlistModel.playlists;let indexOfelement=index;" (contextmenu)="contextMenu($event, menu, data, indexOfelement)"
-        class="song-item" 
+        cdkDrag [cdkDragDisabled]="!playlistsEditable" cdkDragBoundary=".drag-boundry" cdkDragLockAxis="y" (cdkDragStarted)="drag($event)"
         >
       <td>
         <img [src]="getPlaylistCoverSrc(data.id)" style="width: 50px; height: 50px;"/>
@@ -60,8 +60,8 @@
         <span *ngIf="data.isModifieable && !data.isPublic" nz-icon nzType="send" nzTheme="outline" class="clickable" (click)="setPublic(data)"></span>
         <span *ngIf="data.isModifieable && data.isPublic" nz-icon nzType="send" nzTheme="outline" class="clickable success-color" (click)="setPublic(data)"></span>
         <span *ngIf="!data.isModifieable" aria-disabled="true" nz-icon nzType="send" nzTheme="outline" (click)="setPublic(data)"></span>
-        <span *ngIf="data.isModifieable" nz-icon nzType="delete" nzTheme="outline" class="clickable-danger" (click)="deletePlaylist(data.id, data.name)"></span>
-        <span *ngIf="!data.isModifieable" aria-disabled="true" nz-icon nzType="delete" nzTheme="outline" ></span>
+        <span *ngIf="playlistsEditable" nz-icon nzType="delete" nzTheme="outline" class="clickable-danger" (click)="deletePlaylist(data.id, data.name)"></span>
+        <span *ngIf="!playlistsEditable" aria-disabled="true" nz-icon nzType="delete" nzTheme="outline" ></span>
       </td>
         </tr>
     </tbody>
@@ -69,12 +69,12 @@
     <nz-dropdown-menu #menu="nzDropdownMenu">
       <ul nz-menu>
           <li nz-menu-item id="add-queue" (click)="addPlaylistToQueue()">Add playlist to queue</li>
-          <li nz-menu-item *ngIf="canPlaylistAddedToLibrary() && addCopyPlaylistAction" id="copy" (click)="addPlaylistToLibrary()">Add playlist to library</li>
-          <li nz-menu-item *ngIf="addCopyPlaylistAction" id="copy" (click)="copyPlaylistToLibrary()">Copy playlist to library</li>
-          <li nz-menu-item *ngIf="playlistEditable" id="edit" (click)="this.ShowPlaylistEditModal = true">Edit details</li>
-          <li nz-menu-item *ngIf="playlistEditable" id="delete" (click)="deletePlaylist(this.SelectedTableItem.playlistModel.id, this.SelectedTableItem.playlistModel.name)">Delete playlist</li>
-          <li nz-menu-item *ngIf="this.SelectedTableItem.index > -1 && !this.SelectedTableItem.playlistModel.isPublic" id="set-public" (click)="setPublic(this.SelectedTableItem.playlistModel)">Set public</li>
-          <li nz-menu-item *ngIf="this.SelectedTableItem.index > -1 && this.SelectedTableItem.playlistModel.isPublic" id="set-private" (click)="setPublic(this.SelectedTableItem.playlistModel)">Set private</li>
+          <li nz-menu-item *ngIf="!isUserPartOfPlaylist()" id="add" (click)="addPlaylistToLibrary()">Add playlist to library</li>
+          <li nz-menu-item *ngIf="!playlistsEditable" id="copy" (click)="copyPlaylistToLibrary()">Copy playlist to library</li>
+          <li nz-menu-item *ngIf="playlistsEditable" id="edit" (click)="this.ShowPlaylistEditModal = true">Edit details</li>
+          <li nz-menu-item *ngIf="playlistsEditable" id="delete" (click)="deletePlaylist(this.SelectedTableItem.playlistModel.id, this.SelectedTableItem.playlistModel.name)">Delete playlist</li>
+          <li nz-menu-item *ngIf="playlistsEditable && this.SelectedTableItem.index > -1 && !this.SelectedTableItem.playlistModel.isPublic" id="set-public" (click)="setPublic(this.SelectedTableItem.playlistModel)">Set public</li>
+          <li nz-menu-item *ngIf="playlistsEditable && this.SelectedTableItem.index > -1 && this.SelectedTableItem.playlistModel.isPublic" id="set-private" (click)="setPublic(this.SelectedTableItem.playlistModel)">Set private</li>
           <li nz-menu-item *ngIf="this.SelectedTableItem.index > -1 && !this.SelectedTableItem.playlistModel.receiveNotifications" id="rec-not" (click)="receiveNotifications(this.SelectedTableItem.playlistModel.id)">Receive notifications</li>
           <li nz-menu-item *ngIf="this.SelectedTableItem.index > -1 && this.SelectedTableItem.playlistModel.receiveNotifications" id="stop-not" (click)="receiveNotifications(this.SelectedTableItem.playlistModel.id)">Stop notifications</li>
       </ul>
