@@ -12,8 +12,10 @@
     <div>
         <span *ngIf="this.IsSongPlaying  && this.QueueModel && this.QueueModel.target == 'favorites'"
         nz-col nz-icon nzType="pause-circle" nzTheme="outline" style="font-size: 150px;" class="clickable" (click)="pauseSongs()"></span>
-        <span *ngIf="!this.IsSongPlaying || !this.QueueModel || (this.QueueModel && this.QueueModel.target != 'favorites')" nz-col
+        <span *ngIf="(!this.IsSongPlaying || !this.QueueModel || (this.QueueModel && this.QueueModel.target != 'favorites')) && this.SongsModel.totalCount > 0" nz-col
          nz-icon nzType="play-circle" nzTheme="outline" style="font-size: 150px;" class="clickable" (click)="playSongs()"></span>
+         <span *ngIf="(!this.IsSongPlaying || !this.QueueModel || (this.QueueModel && this.QueueModel.target != 'favorites')) && this.SongsModel.totalCount == 0" nz-col
+         nz-icon nzType="play-circle" nzTheme="outline" style="font-size: 150px;" class="clickable" aria-disabled="true"></span>
     </div>
 
 

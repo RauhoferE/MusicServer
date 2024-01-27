@@ -4,8 +4,10 @@
             <div nz-row class="album-item">
                 <img nz-col [src]="getAlbumCoverSrc(item.id)" style="width: 150px; height: 150px;" class="album-image"/>
                 <div style="font-size: xx-large;" class="album-item-button">
-                    <span *ngIf="this.CurrentPlayingAlbumId != item.id || !this.IsSongPlaying"
+                    <span *ngIf="(this.CurrentPlayingAlbumId != item.id || !this.IsSongPlaying) && item.songCount > 0"
                      nz-icon nzType="play-circle" nzTheme="outline" class="clickable" (click)="playSong(item.id)"></span>
+                     <span *ngIf="(this.CurrentPlayingAlbumId != item.id || !this.IsSongPlaying) && item.songCount == 0"
+                     nz-icon nzType="play-circle" nzTheme="outline" class="clickable" aria-disabled="true"></span>
                      <span *ngIf="this.IsSongPlaying && this.CurrentPlayingAlbumId == item.id"
                      nz-icon nzType="pause-circle" nzTheme="outline" class="clickable" (click)="pauseSong()"></span>
                 </div>

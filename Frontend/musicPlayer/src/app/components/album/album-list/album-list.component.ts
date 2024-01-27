@@ -81,6 +81,11 @@ export class AlbumListComponent implements OnInit, OnDestroy {
   }
 
   addAlbumToQueue(params: AlbumModel): void{
+    if (params.songCount == 0) {
+      this.message.error("Album doesnt have songs!");
+      return;
+    }
+
     this.queueService.AddAlbumToQueue(params.id).subscribe({
       next: ()=>{
         //this.updateDashBoard();

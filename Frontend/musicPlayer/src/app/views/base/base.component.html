@@ -4,7 +4,7 @@
         <img src="assets/logo.png" class="logo"/>
       
       <ul nz-menu nzTheme="dark" nzMode="horizontal" class="header-menu" [nzSelectable]="false">
-        <li nz-menu-item> 
+        <li nz-menu-item [routerLink]="['/user']"> 
             <nz-avatar nzSize="large" nzIcon="user" [nzSrc]="getOwnAvatar()"></nz-avatar>
             <!-- <span nz-icon nzType="user" nzTheme="outline" style="font-size: 20px;"></span> -->
             <span> {{this.UserName}}</span>
