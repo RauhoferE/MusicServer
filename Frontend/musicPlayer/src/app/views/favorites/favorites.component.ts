@@ -214,7 +214,7 @@ export class FavoritesComponent implements OnInit, OnDestroy{
   }
 
   changeSongPosition(event: DragDropSongParams): void {
-    this.playlistService.ChangeOrderOfSongInFavorites(event.srcIndex, event.destIndex).subscribe({
+    this.playlistService.ChangeOrderOfSongInFavorites(event.srcSong.order, event.destSong.order).subscribe({
       next:()=>{
         this.onPaginationUpdated();
       },

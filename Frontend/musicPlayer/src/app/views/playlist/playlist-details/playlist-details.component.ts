@@ -241,7 +241,7 @@ export class PlaylistDetailsComponent implements OnDestroy {
 
   changeSongPosition(event: DragDropSongParams): void {
     // TODO: Change so the query doesnt matter
-    this.playlistService.ChangeOrderOfSongInPlaylist(this.playlistId, event.srcIndex, event.destIndex).subscribe({
+    this.playlistService.ChangeOrderOfSongInPlaylist(this.playlistId, event.srcSong.order, event.destSong.order).subscribe({
       next:()=>{
         this.onPaginationUpdated();
       },
