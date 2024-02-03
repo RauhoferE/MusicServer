@@ -1,5 +1,11 @@
 <div>
-    <div *ngIf="displaySearch" nz-row style="margin-bottom: 2em;">        
+    <div *ngIf="IsInitialTableEmpty">
+        <h1>
+            No songs have been added yet!
+        </h1>
+
+    </div>
+    <div *ngIf="displaySearch  && !IsInitialTableEmpty" nz-row style="margin-bottom: 2em;">        
         <nz-input-group nz-col [nzPrefix]="prefixIconSearch" style="align-self: center;">
             <input type="text" nz-input placeholder="Search for song" [(ngModel)]="SearchString" (keyup.enter)="onSearchQueryInput()"/>
         </nz-input-group>
@@ -9,9 +15,10 @@
         
     </div>
 
-    <button *ngIf="displayHeader && !ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Show Selector</button>
-    <button *ngIf="displayHeader && ShowCheckbox" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Hide Selector</button>
+    <button *ngIf="displayHeader && !ShowCheckbox  && !IsInitialTableEmpty" [disabled]="IsSongTableEmpty" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Show Selector</button>
+    <button *ngIf="displayHeader && ShowCheckbox  && !IsInitialTableEmpty" [disabled]="IsSongTableEmpty" nz-button nzType="default" (click)="ShowCheckbox = !ShowCheckbox">Hide Selector</button>
     <nz-table
+    *ngIf="!IsInitialTableEmpty"
     nzShowSizeChanger
     [nzData]="songs.songs"
     [nzFrontPagination]="false"
@@ -30,12 +37,12 @@
                 [(nzChecked)]="AllChecked"
                 [nzIndeterminate]="Indeterminate"
                 (nzCheckedChange)="checkAll($event)"></th>
-                <th nzColumnKey="order" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
-                <th nzColumnKey="name" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
-                <th *ngIf="displayAlbum" nzColumnKey="album" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('album')">Album</th>
-                <th nzColumnKey="created" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('created')">Date added</th>
+                <th nzColumnKey="order" [nzShowSort]="sortingEnabled && !IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
+                <th nzColumnKey="name" [nzShowSort]="sortingEnabled && !IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
+                <th *ngIf="displayAlbum" nzColumnKey="album" [nzShowSort]="sortingEnabled&& !IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('album')">Album</th>
+                <th nzColumnKey="created" [nzShowSort]="sortingEnabled && !IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('created')">Date added</th>
                 <th nzColumnKey="isInFavorites">Favorite</th>
-                <th nzColumnKey="duration" [nzShowSort]="sortingEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('duration')">Duration</th>
+                <th nzColumnKey="duration" [nzShowSort]="sortingEnabled && !IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('duration')">Duration</th>
             </tr>
 
         </thead>

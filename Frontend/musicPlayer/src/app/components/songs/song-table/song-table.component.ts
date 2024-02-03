@@ -76,6 +76,8 @@ export class SongTableComponent implements OnInit, OnDestroy {
 
   private showPlaylistCreateModal: boolean = false;
 
+  private searchString: string = '';
+
   private destroy:Subject<any> = new Subject();
 
 
@@ -119,6 +121,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
   }
 
   onSearchQueryInput(): void{
+    this.pagination.query = this.SearchString;
     this.rxjsStorageService.setCurrentPaginationSongModel(this.pagination);
     this.paginationUpdated.emit();
   }
@@ -163,9 +166,12 @@ export class SongTableComponent implements OnInit, OnDestroy {
         value: 'ascend'
       }
     }
+    console.log(this.searchString)
+
+    this.pagination.query = this.SearchString;
 
     let newPagModel: PaginationModel = {
-      query :this.pagination.query,
+      query :this.SearchString,
       page : event.pageIndex,
       take: event.pageSize,
       sortAfter: sortAfter.key,
@@ -525,10 +531,10 @@ export class SongTableComponent implements OnInit, OnDestroy {
   }
 
   public get SearchString(): string {
-    return this.pagination.query;
+    return this.searchString;
   }
   public set SearchString(value: string) {
-    this.pagination.query = value;
+    this.searchString = value;
   }
 
   public get ShowCheckbox(): boolean{
@@ -573,6 +579,14 @@ export class SongTableComponent implements OnInit, OnDestroy {
 
   public set ShowPlaylistCreateModal(val: boolean){
     this.showPlaylistCreateModal = val;
+  }
+
+  public get IsInitialTableEmpty(): boolean{
+    return this.songs.totalCount == 0 && this.pagination.query == '';
+  }
+
+  public get IsSongTableEmpty(): boolean{
+    return this.songs.totalCount == 0;
   }
 
 }
