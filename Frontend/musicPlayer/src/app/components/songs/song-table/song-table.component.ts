@@ -78,6 +78,8 @@ export class SongTableComponent implements OnInit, OnDestroy {
 
   private searchString: string = '';
 
+  private songRearangeEnabled: boolean = false;
+
   private destroy:Subject<any> = new Subject();
 
 
@@ -166,7 +168,8 @@ export class SongTableComponent implements OnInit, OnDestroy {
         value: 'ascend'
       }
     }
-    console.log(this.searchString)
+    console.log(event)
+    console.log(this.SearchString)
 
     this.pagination.query = this.SearchString;
 
@@ -189,6 +192,23 @@ export class SongTableComponent implements OnInit, OnDestroy {
     this.rxjsStorageService.setCurrentPaginationSongModel(newPagModel);
 
     this.paginationUpdated.emit();
+  }
+
+  public enableSongRearange(): void {
+    this.songRearangeEnabled = !this.songRearangeEnabled;
+
+    if (this.songRearangeEnabled) {
+      // rearange songs
+      this.showCheckbox = false;
+      this.onQueryParamsChange({
+        pageIndex:1,
+        pageSize: this.pagination.take,
+        sort:[
+
+          {key:'order', value:'ascend'}
+        
+      ]});
+    }
   }
 
   contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: PlaylistSongModel, index: number): void {
@@ -587,6 +607,14 @@ export class SongTableComponent implements OnInit, OnDestroy {
 
   public get IsSongTableEmpty(): boolean{
     return this.songs.totalCount == 0;
+  }
+
+  public get SongRearangeEnabled(): boolean{
+    return this.songRearangeEnabled;
+  }
+
+  public set SongRearangeEnabled(val: boolean){
+    this.songRearangeEnabled = val;
   }
 
 }

@@ -6,7 +6,7 @@
     
 
   </div>
-    <div *ngIf="!IsInitialTableEmpty" nz-row style="margin-bottom: 2em;">        
+    <div *ngIf="!IsInitialTableEmpty" nz-row style="margin-bottom: 1em;">        
         <nz-input-group nz-col [nzPrefix]="prefixIconSearch" style="align-self: center;">
             <input type="text" nz-input placeholder="Search for playlist" [(ngModel)]="SearchString" (keyup.enter)="onSearchQueryInput()"/>
         </nz-input-group>
@@ -15,6 +15,8 @@
         </ng-template>
         
     </div>
+    <button *ngIf="!SongRearangeEnabled" nz-col [disabled]="IsSongTableEmpty ||  !playlistsEditable" nz-button nzType="default" class="clickable-button" (click)="enableSongRearange()">Rearange Songs</button>
+    <button *ngIf="SongRearangeEnabled" nz-col [disabled]="IsSongTableEmpty  ||  !playlistsEditable" nz-button nzType="default" class="clicked-color clickable-button" (click)="enableSongRearange()">Rearange Songs</button>
     <nz-table
     *ngIf="!IsInitialTableEmpty"
     nzShowSizeChanger
@@ -25,21 +27,22 @@
     [nzPageSize]="PageSize"
     [nzPageIndex]="PageIndex"
     (nzQueryParams)="onQueryParamsChange($event)"
+    style="margin-top: 2em;"
     >
     <thead >
         <tr>
-            <th nzColumnKey="order" [nzShowSort]="!IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
-            <th nzColumnKey="name" [nzShowSort]="!IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
-            <th nzColumnKey="creator" [nzShowSort]="!IsSongTableEmpty" [nzSortFn]="false">Creator</th>
-            <th nzColumnKey="songCount" [nzShowSort]="!IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('songCount')">Songs</th>
-            <th nzColumnKey="created" [nzShowSort]="!IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('created')">Created</th>
+            <th nzColumnKey="order" [nzShowSort]="!IsSongTableEmpty && !SongRearangeEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
+            <th nzColumnKey="name" [nzShowSort]="!IsSongTableEmpty && !SongRearangeEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
+            <th nzColumnKey="creator" [nzShowSort]="!IsSongTableEmpty && !SongRearangeEnabled" [nzSortFn]="false">Creator</th>
+            <th nzColumnKey="songCount" [nzShowSort]="!IsSongTableEmpty && !SongRearangeEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('songCount')">Songs</th>
+            <th nzColumnKey="created" [nzShowSort]="!IsSongTableEmpty && !SongRearangeEnabled" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('created')">Created</th>
             <th nzColumnKey="actions">Actions</th>
         </tr>
 
     </thead>
     <tbody cdkDropList (cdkDropListDropped)="drop($event)" class="drag-boundry" >
         <tr *ngFor="let data of playlistModel.playlists;let indexOfelement=index;" class="playlist-item" (contextmenu)="contextMenu($event, menu, data, indexOfelement)"
-        cdkDrag [cdkDragDisabled]="!playlistsEditable" cdkDragBoundary=".drag-boundry" cdkDragLockAxis="y" (cdkDragStarted)="drag($event)"
+        cdkDrag [cdkDragDisabled]="!playlistsEditable || !SongRearangeEnabled" cdkDragBoundary=".drag-boundry" cdkDragLockAxis="y" (cdkDragStarted)="drag($event)"
         >
       <td>
         <span id="order-id" *ngIf="(this.CurrentPlayingSong.id && this.QueueModel.itemId != data.id) || 

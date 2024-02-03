@@ -60,6 +60,8 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
   private showPlaylistEditModal: boolean = false;
 
   private searchstring: string = '';
+
+  private songRearangeEnabled: boolean = false;
   
 
   /**
@@ -234,6 +236,22 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     this.rxjsService.setCurrentPaginationSongModel(newPagModel);
 
     this.paginationUpdated.emit();
+  }
+
+  public enableSongRearange(): void {
+    this.songRearangeEnabled = !this.songRearangeEnabled;
+
+    if (this.songRearangeEnabled) {
+      // rearange songs
+      this.onQueryParamsChange({
+        pageIndex:1,
+        pageSize: this.pagination.take,
+        sort:[
+
+          {key:'order', value:'ascend'}
+        
+      ]});
+    }
   }
 
   public async playPlaylist(playlistId: string, songCount: number): Promise<void>{
@@ -462,6 +480,14 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
   public get IsSongTableEmpty(): boolean{
     return this.playlistModel.totalCount == 0;
+  }
+
+  public get SongRearangeEnabled(): boolean{
+    return this.songRearangeEnabled;
+  }
+
+  public set SongRearangeEnabled(val: boolean){
+    this.songRearangeEnabled = val;
   }
 
 }
