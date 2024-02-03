@@ -1,5 +1,12 @@
 <div>
-    <div nz-row style="margin-bottom: 2em;">        
+  <div *ngIf="IsInitialTableEmpty">
+    <h3>
+      No playlists have been added yet!
+    </h3>
+    
+
+  </div>
+    <div *ngIf="!IsInitialTableEmpty" nz-row style="margin-bottom: 2em;">        
         <nz-input-group nz-col [nzPrefix]="prefixIconSearch" style="align-self: center;">
             <input type="text" nz-input placeholder="Search for playlist" [(ngModel)]="SearchString" (keyup.enter)="onSearchQueryInput()"/>
         </nz-input-group>
@@ -9,6 +16,7 @@
         
     </div>
     <nz-table
+    *ngIf="!IsInitialTableEmpty"
     nzShowSizeChanger
     [nzData]="playlistModel.playlists"
     [nzFrontPagination]="false"
@@ -20,11 +28,11 @@
     >
     <thead >
         <tr>
-            <th nzColumnKey="order" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
-            <th nzColumnKey="name" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
-            <th nzColumnKey="creator" [nzSortFn]="false">Creator</th>
-            <th nzColumnKey="songCount" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('songCount')">Songs</th>
-            <th nzColumnKey="created" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('created')">Created</th>
+            <th nzColumnKey="order" [nzShowSort]="!IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('order')">#</th>
+            <th nzColumnKey="name" [nzShowSort]="!IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('name')">Title</th>
+            <th nzColumnKey="creator" [nzShowSort]="!IsSongTableEmpty" [nzSortFn]="false">Creator</th>
+            <th nzColumnKey="songCount" [nzShowSort]="!IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('songCount')">Songs</th>
+            <th nzColumnKey="created" [nzShowSort]="!IsSongTableEmpty" [nzSortFn]="true" [nzSortOrder]="getHeaderSortOrder('created')">Created</th>
             <th nzColumnKey="actions">Actions</th>
         </tr>
 

@@ -58,6 +58,8 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
   private currentUserId: string = '-1';
 
   private showPlaylistEditModal: boolean = false;
+
+  private searchstring: string = '';
   
 
   /**
@@ -213,8 +215,10 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
       }
     }
 
+    this.pagination.query = this.searchstring;
+
     let newPagModel: PaginationModel = {
-      query :this.pagination.query,
+      query :this.searchstring,
       page : event.pageIndex,
       take: event.pageSize,
       sortAfter: sortAfter.key,
@@ -351,6 +355,7 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
   }
 
   public onSearchQueryInput(): void{
+    this.pagination.query = this.searchstring;
     this.rxjsService.setCurrentPaginationSongModel(this.pagination);
     this.paginationUpdated.emit();
   }
@@ -421,10 +426,10 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
   }
 
   public get SearchString(): string {
-    return this.pagination.query;
+    return this.searchstring;
   }
   public set SearchString(value: string) {
-    this.pagination.query = value;
+    this.searchstring = value;
   }
 
   public get ModifieablePlaylists(): GuidNameModel[]{
@@ -449,6 +454,14 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
 
   public get QueueTypePlaylist(): string{
     return QUEUETYPES.playlist;
+  }
+
+  public get IsInitialTableEmpty(): boolean{
+    return this.playlistModel.totalCount == 0 && this.pagination.query == '';
+  }
+
+  public get IsSongTableEmpty(): boolean{
+    return this.playlistModel.totalCount == 0;
   }
 
 }
