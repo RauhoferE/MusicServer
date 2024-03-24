@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(MusicServerDBContext))]
-    partial class MusicServerDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240324140512_AddedGroupsAsDBEntity")]
+    partial class AddedGroupsAsDBEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,9 +135,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<string>("ConnectionId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("GroupName")
                         .HasColumnType("uniqueidentifier");
@@ -346,43 +345,43 @@ namespace DataAccess.Migrations
                         new
                         {
                             Id = 1L,
-                            Created = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5784),
-                            Modified = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5793),
+                            Created = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8440),
+                            Modified = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8452),
                             Name = "PlaylistAdded"
                         },
                         new
                         {
                             Id = 2L,
-                            Created = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5807),
-                            Modified = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5809),
+                            Created = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8535),
+                            Modified = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8537),
                             Name = "PlaylistSongsAdded"
                         },
                         new
                         {
                             Id = 3L,
-                            Created = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5814),
-                            Modified = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5815),
+                            Created = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8542),
+                            Modified = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8544),
                             Name = "PlaylistShared"
                         },
                         new
                         {
                             Id = 4L,
-                            Created = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5819),
-                            Modified = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5821),
+                            Created = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8548),
+                            Modified = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8550),
                             Name = "PlaylistShareRemoved"
                         },
                         new
                         {
                             Id = 5L,
-                            Created = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5825),
-                            Modified = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5827),
+                            Created = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8553),
+                            Modified = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8556),
                             Name = "ArtistTracksAdded"
                         },
                         new
                         {
                             Id = 6L,
-                            Created = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5832),
-                            Modified = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5834),
+                            Created = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8559),
+                            Modified = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(8562),
                             Name = "ArtistAdded"
                         });
                 });
@@ -572,8 +571,8 @@ namespace DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("19525417-ce9d-4e54-9861-3a6ce6801483"),
-                            CreatedDate = new DateTime(2024, 3, 24, 15, 22, 20, 827, DateTimeKind.Local).AddTicks(4962)
+                            Id = new Guid("ba9b90b6-9a4a-48ce-a21e-f96747b70bdf"),
+                            CreatedDate = new DateTime(2024, 3, 24, 15, 5, 11, 511, DateTimeKind.Local).AddTicks(4142)
                         });
                 });
 
@@ -621,18 +620,18 @@ namespace DataAccess.Migrations
                         new
                         {
                             Id = 1L,
-                            ConcurrencyStamp = "80ac9e86-a93c-412e-b33d-592a806b9fd4",
-                            Created = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5009),
-                            Modified = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5056),
+                            ConcurrencyStamp = "a1365807-8bc3-4a76-8474-751ec4e02cbf",
+                            Created = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(7339),
+                            Modified = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(7381),
                             Name = "Root",
                             NormalizedName = "ROOT"
                         },
                         new
                         {
                             Id = 2L,
-                            ConcurrencyStamp = "d09791a9-0519-4067-8123-6410a815d5a5",
-                            Created = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5164),
-                            Modified = new DateTime(2024, 3, 24, 15, 22, 20, 824, DateTimeKind.Local).AddTicks(5167),
+                            ConcurrencyStamp = "83f07292-5c69-4ae9-a876-6369a54a4ee3",
+                            Created = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(7576),
+                            Modified = new DateTime(2024, 3, 24, 15, 5, 11, 507, DateTimeKind.Local).AddTicks(7579),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

@@ -57,6 +57,8 @@ namespace DataAccess
 
         public DbSet<LovQueueTarget> LovQueueTargets { get; set; }
 
+        public DbSet<Group> Groups { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -451,6 +453,12 @@ namespace DataAccess
                 entity.HasOne(e => e.SortAfter).WithMany();
                 entity.HasOne(e => e.LoopMode).WithMany();
                 entity.HasOne(e => e.Target).WithMany();
+            });
+
+            builder.Entity<Group>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
             });
         }
     }
