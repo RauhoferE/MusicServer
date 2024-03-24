@@ -3,6 +3,7 @@ using MusicServer.Entities.Requests.Song;
 
 namespace MusicServer.Interfaces
 {
+    // TODO: Refactor this to contain less cloned code.
     public interface IQueueService
     {
         // -1, -2, -3 -> Previous played songs
@@ -17,19 +18,33 @@ namespace MusicServer.Interfaces
 
         public Task<PlaylistSongDto> SkipForwardInQueueAsync();
 
+        public Task<PlaylistSongDto> SkipForwardInQueueOfUserAsync(long userId);
+
         public Task AddSongsToQueueAsync(Guid[] songIds);
+
+        public Task AddSongsToQueueOfUserAsync(Guid[] songIds, long userId);
 
         public Task<PlaylistSongDto> SkipForwardInQueueAsync(int index);
 
+        public Task<PlaylistSongDto> SkipForwardInQueueOfUserAsync(long userId, int index);
+
         public Task<PlaylistSongDto> GetCurrentSongInQueueAsync();
+
+        public Task<PlaylistSongDto> GetCurrentSongInQueueOfUserAsync(long userId);
 
         public Task<PlaylistSongDto> GetSongInQueueWithIndexAsync(int index);
 
         public Task<PlaylistSongDto> SkipBackInQueueAsync();
 
+        public Task<PlaylistSongDto> SkipBackInQueueOfUserAsync(long userId);
+
         public Task<QueueSongDto[]> GetCurrentQueueAsync();
 
+        public Task<QueueSongDto[]> GetQueueOfUserAsync(long userId);
+
         public Task ClearQueueAsync();
+
+        public Task ClearQueueOfUserAsync(long userId);
 
         public Task ClearManuallyAddedQueueAsync();
 

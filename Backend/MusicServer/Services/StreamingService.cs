@@ -14,14 +14,14 @@ namespace MusicServer.Services
                 
         }
 
-        public async Task<bool> CreateGroupAsync(Guid id, string userId)
+        public async Task<bool> CreateGroupAsync(Guid id, string userId, string connectionId)
         {
             if (await this.IsUserAlreadyInGroupAsync(userId))
             {
                 return false;
             }
 
-            if (!(await this.GroupExistsAsync(id.ToString())))
+            if ((await this.GroupExistsAsync(id.ToString())))
             {
                 return false;
             }
@@ -30,7 +30,8 @@ namespace MusicServer.Services
             {
                 GroupName = id,
                 IsMaster = true,
-                UserId = long.Parse(userId)
+                UserId = long.Parse(userId),
+                ConnectionId = connectionId
             });
 
             await this.dBContext.SaveChangesAsync();
@@ -99,6 +100,29 @@ namespace MusicServer.Services
         {
             var group = this.dBContext.Groups.FirstOrDefault(x => x.UserId == long.Parse(userId));
             return group != null;
+        }
+
+        public async Task<bool> JoinGroup(Guid id, string connectionId, string userId)
+        {
+            if (await this.IsUserAlreadyInGroupAsync(userId))
+            {
+                return false;
+            }
+
+            if (!(await this.GroupExistsAsync(id.ToString())))
+            {
+                return false;
+            }
+
+            this.dBContext.Groups.Add(new DataAccess.Entities.Group()
+            {
+                GroupName = id,
+                UserId = long.Parse(userId),
+                ConnectionId = connectionId
+            });
+
+            await this.dBContext.SaveChangesAsync();
+            return true;
         }
     }
 }

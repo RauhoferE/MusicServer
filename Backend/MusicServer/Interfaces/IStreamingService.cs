@@ -2,7 +2,9 @@
 {
     public interface IStreamingService
     {
-        public Task<bool> CreateGroupAsync(Guid id, string userId);
+        public Task<bool> CreateGroupAsync(Guid id, string userId, string connectionId);
+
+        public Task<bool> JoinGroup(Guid id, string userId, string connectionId);
 
         public Task<bool> IsUserAlreadyInGroupAsync(string userId);
 
