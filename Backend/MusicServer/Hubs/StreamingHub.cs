@@ -22,22 +22,6 @@ namespace MusicServer.Hubs
             this.queueService = queueService;
         }
 
-        // Returns to the user who created it a unique Id
-        //public Task CreateSession();
-
-        //// This is done via a unique session Id
-        //// The host is asced for current song data
-        //// Then the current queue and song data is sent ot the joined user
-        //public Task JoinSession(Guid sessionId);
-
-        //public Task SkipBackInQueue();
-
-        //public Task SkipForwardInQueue(int index = 0);
-
-        //public Task AddSongsToQueue(SongsToPlaylist request);
-
-        //public Task ClearQueue();
-
         //public Task RemoveSongsInQueue(SongsToRemove request);
 
         // Creates a session and returns the sessionID aka the group name to the creator
@@ -131,7 +115,7 @@ namespace MusicServer.Hubs
             await this.Clients.Group(groupId).GetQueue(queue);
         }
 
-        public async Task SkipForwardInQueue(string groupId, int index)
+        public async Task SkipForwardInQueue(string groupId, int index = 0)
         {
             if (!(await this.streamingService.GroupExistsAsync(groupId)))
             {
