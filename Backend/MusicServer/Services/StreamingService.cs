@@ -1,6 +1,9 @@
 ﻿using DataAccess;
+using DataAccess.Entities;
+using MusicServer.Entities.HubEntities;
 using MusicServer.Exceptions;
 using MusicServer.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace MusicServer.Services
 {
@@ -12,6 +15,12 @@ namespace MusicServer.Services
         {
             this.dBContext = dBContext;
                 
+        }
+
+        public async Task<bool> CanUserJoinGroup(string userId)
+        {
+            var group = this.dBContext.Groups.Where(x => x.UserId == long.Parse(userId));
+            return group.Count() < 2;
         }
 
         public async Task<bool> CreateGroupAsync(Guid id, string userId, string connectionId)
@@ -38,15 +47,32 @@ namespace MusicServer.Services
             return true;
         }
 
-        public async Task DeleteGroupAsync(string id)
+        public async Task<string[]> DeleteGroupAsync(string id)
         {
             var groups = this.dBContext.Groups.Where(x => x.GroupName == Guid.Parse(id));
 
             if (groups.Count() > 0)
             {
+                var connectionIds = groups.Select(x => x.ConnectionId).ToArray();
                 this.dBContext.Groups.RemoveRange(groups);
                 await this.dBContext.SaveChangesAsync();
+                return connectionIds;
             }
+
+            return new string[0];
+        }
+
+        public async Task<RemoveUserResponse> DeleteUser(string userId)
+        {
+            var group = this.dBContext.Groups.FirstOrDefault(x => x.UserId == long.Parse(userId));
+
+            this.dBContext.Groups.Remove(group);
+            await this.dBContext.SaveChangesAsync();
+            return new RemoveUserResponse()
+            {
+                Email = this.dBContext.Users.First(x => x.Id == group.UserId).Email,
+                IsMaster = group.IsMaster
+            };
         }
 
         public async Task DeleteUserFromGroup(string userId)
@@ -68,6 +94,19 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
         }
 
+        public async Task<RemoveUserResponse> DeleteUserWithConnectionId(string connectionId)
+        {
+            var group = this.dBContext.Groups.FirstOrDefault(x => x.ConnectionId == connectionId);
+
+            this.dBContext.Groups.Remove(group);
+            await this.dBContext.SaveChangesAsync();
+            return new RemoveUserResponse()
+            {
+                Email = this.dBContext.Users.First(x => x.Id == group.UserId).Email,
+                IsMaster = group.IsMaster
+            };
+        }
+
         public async Task<string> GetConnectionIdOfMaster(string groupId)
         {
             if (!(await this.GroupExistsAsync(groupId)))
@@ -77,6 +116,18 @@ namespace MusicServer.Services
 
             var group = this.dBContext.Groups.FirstOrDefault(x => x.GroupName == Guid.Parse(groupId) && x.IsMaster);
             return group?.ConnectionId;
+        }
+
+        public async Task<string> GetGroupName(string connectionId)
+        {
+            var group = this.dBContext.Groups.FirstOrDefault(x => x.ConnectionId == connectionId);
+
+            if (group == null)
+            {
+                return string.Empty;
+            }
+
+            return group.GroupName.ToString();
         }
 
         public async Task<long> GetIdOfMaster(string groupId)
@@ -104,7 +155,7 @@ namespace MusicServer.Services
 
         public async Task<bool> JoinGroup(Guid id, string connectionId, string userId)
         {
-            if (await this.IsUserAlreadyInGroupAsync(userId))
+            if (!(await this.CanUserJoinGroup(userId)))
             {
                 return false;
             }

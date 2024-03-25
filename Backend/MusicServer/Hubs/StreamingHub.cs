@@ -4,6 +4,7 @@ using MusicServer.Entities.HubEntities;
 using MusicServer.Entities.Requests.Song;
 using MusicServer.Interfaces;
 using Org.BouncyCastle.Asn1.Ocsp;
+using Serilog;
 
 namespace MusicServer.Hubs
 {
@@ -23,25 +24,16 @@ namespace MusicServer.Hubs
             this.queueService = queueService;
         }
 
-        //public Task RemoveSongsInQueue(SongsToRemove request);
-
         // Creates a session and returns the sessionID aka the group name to the creator
-        public async Task CreateSession()
-        {
-            var newGuid = Guid.NewGuid();
+        //public async Task CreateSession()
+        //{
+        // Moved to onconnection
 
-            if (!(await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId)))
-            {
-                newGuid = Guid.NewGuid();
-                await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId);
-            }
-
-            await this.Groups.AddToGroupAsync(Context.ConnectionId, newGuid.ToString());
-            await this.Clients.Caller.GetSessionId(newGuid);
-        }
+        //}
 
         public async Task JoinSession(string groupId)
         {
+            // Put this check in every method
             var g = Guid.Empty;
             if (!Guid.TryParse(groupId, out g))
             {
@@ -205,6 +197,99 @@ namespace MusicServer.Hubs
             }
 
             await this.Clients.GroupExcept(groupId, this.Context.ConnectionId).GetPlayerData(playerData);
+        }
+
+        //public async Task Disconnect(string groupId)
+        //{
+        //    // Moved to ondisconnect
+        //    //if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    //{
+        //    //    throw new HubException("Error group doesnt exist.");
+        //    //}
+
+        //    //// Remove User from group
+        //    //var resp = await this.streamingService.DeleteUserWithConnectionId(this.Context.ConnectionId);
+        //    //await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, groupId);
+
+        //    //// Send info that user disconnected
+        //    //await this.Clients.Group(groupId).UserDisconnected(resp.Email);
+
+        //    //if (!resp.IsMaster)
+        //    //{
+        //    //    return;
+        //    //}
+
+        //    //// If User is master remove all other users from group
+        //    //// And send notification that the group has been deleted
+        //    //var connectionIds = await this.streamingService.DeleteGroupAsync(groupId);
+
+        //    //await this.Clients.Group(groupId).GroupDeleted();
+        //    //foreach (var id in connectionIds)
+        //    //{
+        //    //    await this.Groups.RemoveFromGroupAsync(id, groupId);
+        //    //}
+        //}
+
+        public override async Task OnConnectedAsync()
+        {
+            Log.Information($"User connected {this.Context.ConnectionId}");
+            var newGuid = Guid.NewGuid();
+
+            if (!(await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId)))
+            {
+                newGuid = Guid.NewGuid();
+                await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId);
+            }
+
+            await this.Groups.AddToGroupAsync(Context.ConnectionId, newGuid.ToString());
+            await this.Clients.Caller.GetSessionId(newGuid);
+            await base.OnConnectedAsync();
+        }
+
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            Log.Information($"User disconnected {this.Context.ConnectionId}");
+
+            if (exception == null)
+            {
+                Log.Warning($"User disconnected unexpectatly {this.Context.ConnectionId}");
+            }
+
+            var groupId = await this.streamingService.GetGroupName(this.Context.ConnectionId);
+
+            // IF the user didn't had a group just return
+            if (string.IsNullOrEmpty(groupId))
+            {
+                await base.OnDisconnectedAsync(exception);
+                return;
+            }
+
+            // Remove User from group
+            var resp = await this.streamingService.DeleteUserWithConnectionId(this.Context.ConnectionId);
+            await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, groupId);
+
+            // Send info that user disconnected
+            await this.Clients.Group(groupId).UserDisconnected(resp.Email);
+
+            if (!resp.IsMaster)
+            {
+                await base.OnDisconnectedAsync(exception);
+                return;
+            }
+
+            // If User is master remove all other users from group
+            // And send notification that the group has been deleted
+            var connectionIds = await this.streamingService.DeleteGroupAsync(groupId);
+
+            await this.Clients.Group(groupId).GroupDeleted();
+            foreach (var id in connectionIds)
+            {
+                await this.Groups.RemoveFromGroupAsync(id, groupId);
+            }
+
+
+            await base.OnDisconnectedAsync(exception);
+            return;
         }
 
 

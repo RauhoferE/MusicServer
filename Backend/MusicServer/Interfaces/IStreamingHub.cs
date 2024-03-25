@@ -13,6 +13,10 @@ namespace MusicServer.Interfaces
 
         public Task UserJoinedSession(string email);
 
+        public Task UserDisconnected(string email);
+
+        public Task GroupDeleted();
+
         public Task GetPlayerData(CurrentPlayerData playerData);
 
         public Task GetQueue(QueueSongDto[] songs);
