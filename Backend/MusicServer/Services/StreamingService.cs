@@ -30,7 +30,7 @@ namespace MusicServer.Services
                 return false;
             }
 
-            if ((await this.GroupExistsAsync(id.ToString())))
+            if ((await this.GroupExistsAsync(id)))
             {
                 return false;
             }
@@ -47,9 +47,9 @@ namespace MusicServer.Services
             return true;
         }
 
-        public async Task<string[]> DeleteGroupAsync(string id)
+        public async Task<string[]> DeleteGroupAsync(Guid id)
         {
-            var groups = this.dBContext.Groups.Where(x => x.GroupName == Guid.Parse(id));
+            var groups = this.dBContext.Groups.Where(x => x.GroupName == id);
 
             if (groups.Count() > 0)
             {
@@ -86,7 +86,7 @@ namespace MusicServer.Services
 
             if (group.IsMaster)
             {
-                await this.DeleteGroupAsync(group.GroupName.ToString());
+                await this.DeleteGroupAsync(group.GroupName);
                 return;
             }
 
@@ -107,14 +107,14 @@ namespace MusicServer.Services
             };
         }
 
-        public async Task<string> GetConnectionIdOfMaster(string groupId)
+        public async Task<string> GetConnectionIdOfMaster(Guid groupId)
         {
             if (!(await this.GroupExistsAsync(groupId)))
             {
                 throw new GroupNotFoundException($"Group with id: {groupId} not found!");
             }
 
-            var group = this.dBContext.Groups.FirstOrDefault(x => x.GroupName == Guid.Parse(groupId) && x.IsMaster);
+            var group = this.dBContext.Groups.FirstOrDefault(x => x.GroupName == groupId && x.IsMaster);
             return group?.ConnectionId;
         }
 
@@ -130,20 +130,20 @@ namespace MusicServer.Services
             return group.GroupName.ToString();
         }
 
-        public async Task<long> GetIdOfMaster(string groupId)
+        public async Task<long> GetIdOfMaster(Guid groupId)
         {
             if (!(await this.GroupExistsAsync(groupId)))
             {
                 throw new GroupNotFoundException($"Group with id: {groupId} not found!");
             }
 
-            var group = this.dBContext.Groups.FirstOrDefault(x => x.GroupName == Guid.Parse(groupId) && x.IsMaster);
+            var group = this.dBContext.Groups.FirstOrDefault(x => x.GroupName == groupId && x.IsMaster);
             return group.UserId;
         }
 
-        public async Task<bool> GroupExistsAsync(string id)
+        public async Task<bool> GroupExistsAsync(Guid id)
         {
-            var group = this.dBContext.Groups.FirstOrDefault(x => x.GroupName == Guid.Parse(id) && x.IsMaster);
+            var group = this.dBContext.Groups.FirstOrDefault(x => x.GroupName == id && x.IsMaster);
             return group != null;
         }
 
@@ -160,7 +160,7 @@ namespace MusicServer.Services
                 return false;
             }
 
-            if (!(await this.GroupExistsAsync(id.ToString())))
+            if (!(await this.GroupExistsAsync(id)))
             {
                 return false;
             }

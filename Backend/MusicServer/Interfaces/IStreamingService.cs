@@ -14,9 +14,9 @@ namespace MusicServer.Interfaces
         // This checks if the user isnt already part of a group with atleast 1 other member
         public Task<bool> CanUserJoinGroup(string userId);
 
-        public Task<bool> GroupExistsAsync(string id);
+        public Task<bool> GroupExistsAsync(Guid groupId);
 
-        public Task<string[]> DeleteGroupAsync(string id);
+        public Task<string[]> DeleteGroupAsync(Guid groupId);
 
         public Task<string> GetGroupName(string connectionId);
 
@@ -24,8 +24,8 @@ namespace MusicServer.Interfaces
 
         public Task<RemoveUserResponse> DeleteUserWithConnectionId(string connectionId);
 
-        public Task<string> GetConnectionIdOfMaster(string groupId);
+        public Task<string> GetConnectionIdOfMaster(Guid groupId);
 
-        public Task<long> GetIdOfMaster(string groupId);
+        public Task<long> GetIdOfMaster(Guid groupId);
     }
 }
