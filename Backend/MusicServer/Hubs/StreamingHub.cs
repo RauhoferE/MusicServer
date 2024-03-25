@@ -336,7 +336,6 @@ namespace MusicServer.Hubs
 
 
             await base.OnDisconnectedAsync(exception);
-            return;
         }
 
 
