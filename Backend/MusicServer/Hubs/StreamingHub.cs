@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using MusicServer.Entities.HubEntities;
 using MusicServer.Entities.Requests.Song;
 using MusicServer.Interfaces;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace MusicServer.Hubs
 {
@@ -73,7 +74,7 @@ namespace MusicServer.Hubs
                 throw new HubException("Error user is not master.");
             }
 
-            await this.Clients.Client(joinedUserConnectionId).UpdatePlayerData(playerData);
+            await this.Clients.Client(joinedUserConnectionId).GetPlayerData(playerData);
         }
 
         public async Task GetCurrentQueue(string groupId)
@@ -96,7 +97,7 @@ namespace MusicServer.Hubs
             }
 
             var masterId = await this.streamingService.GetIdOfMaster(groupId);
-            await this.queueService.AddSongsToQueueOfUserAsync(request.SongIds, masterId);
+            await this.queueService.AddSongsToQueueOfUserAsync(masterId, request.SongIds);
             var queue = await this.queueService.GetQueueOfUserAsync(masterId);
             await this.Clients.Group(groupId).GetQueue(queue);
         }
@@ -151,9 +152,47 @@ namespace MusicServer.Hubs
             }
 
             var masterId = await this.streamingService.GetIdOfMaster(groupId);
-            await this.queueService.ClearQueueOfUserAsync(masterId);
+            await this.queueService.ClearManuallyAddedQueueOfUserAsync(masterId);
             var queue = await this.queueService.GetQueueOfUserAsync(masterId);
             await this.Clients.Group(groupId).GetQueue(queue);
+        }
+
+        public async Task RemoveSongsInQueue(string groupId, SongsToRemove request)
+        {
+            if (!(await this.streamingService.GroupExistsAsync(groupId)))
+            {
+                throw new HubException("Error group doesnt exist.");
+            }
+
+            var masterId = await this.streamingService.GetIdOfMaster(groupId);
+            await this.queueService.RemoveSongsWithIndexFromQueueOfUserAsync(masterId, request.OrderIds);
+            // This is done in case a user is in the queue view
+            var queue = await this.queueService.GetQueueOfUserAsync(masterId);
+            await this.Clients.Group(groupId).GetQueue(queue);
+        }
+
+        public async Task PushSongInQueue(string groupId, int srcIndex, int targetIndex, int markAsAddedManually = -1)
+        {
+            if (!(await this.streamingService.GroupExistsAsync(groupId)))
+            {
+                throw new HubException("Error group doesnt exist.");
+            }
+
+            var masterId = await this.streamingService.GetIdOfMaster(groupId);
+            await this.queueService.PushSongToIndexOfUserAsync(masterId, srcIndex, targetIndex, markAsAddedManually);
+            // This is done in case a user is in the queue view
+            var queue = await this.queueService.GetQueueOfUserAsync(masterId);
+            await this.Clients.Group(groupId).GetQueue(queue);
+        }
+
+        public async Task UpdatePlayerData(string groupId, CurrentPlayerData playerData)
+        {
+            if (!(await this.streamingService.GroupExistsAsync(groupId)))
+            {
+                throw new HubException("Error group doesnt exist.");
+            }
+
+            await this.Clients.GroupExcept(groupId, this.Context.ConnectionId).GetPlayerData(playerData);
         }
 
 

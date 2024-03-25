@@ -22,7 +22,7 @@ namespace MusicServer.Interfaces
 
         public Task AddSongsToQueueAsync(Guid[] songIds);
 
-        public Task AddSongsToQueueOfUserAsync(Guid[] songIds, long userId);
+        public Task AddSongsToQueueOfUserAsync(long userId, Guid[] songIds);
 
         public Task<PlaylistSongDto> SkipForwardInQueueAsync(int index);
 
@@ -48,9 +48,15 @@ namespace MusicServer.Interfaces
 
         public Task ClearManuallyAddedQueueAsync();
 
+        public Task ClearManuallyAddedQueueOfUserAsync(long userId);
+
         public Task RemoveSongsWithIndexFromQueueAsync(int[] indices);
 
+        public Task RemoveSongsWithIndexFromQueueOfUserAsync(long userId, int[] indices);
+
         public Task<QueueSongDto[]> PushSongToIndexAsync(int srcIndex, int targetIndex, int markAsAddedManually);
+
+        public Task<QueueSongDto[]> PushSongToIndexOfUserAsync(long userId, int srcIndex, int targetIndex, int markAsAddedManually);
 
         // This method is called when a song is already playing and the user wants to randomize/derandomize the rest of the queue
         public Task<PlaylistSongDto> ChangeQueueAsync(PlaylistSongDto[] songs, bool randomize);
