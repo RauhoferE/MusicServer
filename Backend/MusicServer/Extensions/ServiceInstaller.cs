@@ -45,6 +45,7 @@ namespace MusicServer.Extensions
             builder.Services.AddTransient<ISongService, SongService>();
             builder.Services.AddTransient<IFileService, FileService>();
             builder.Services.AddTransient<IQueueService, QueueService>();
+            builder.Services.AddTransient<IStreamingService, StreamingService>();
         }
 
 

@@ -124,25 +124,37 @@ namespace MusicServer.Hubs
             }
 
             var masterId = await this.streamingService.GetIdOfMaster(groupId);
-            var currentSong = await this.queueService.SkipForwardInQueueOfUserAsync(masterId, index);
-            //await this.Clients.Group(groupId).GetCurrentPlayingSong(currentSong);
-            var queue = await this.queueService.GetQueueOfUserAsync(masterId);
-            await this.Clients.Group(groupId).GetQueue(queue);
-        }
 
-        public async Task SkipForwardInQueue(string groupId)
-        {
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
+            if (index < 1)
             {
-                throw new HubException("Error group doesnt exist.");
+                await this.queueService.SkipForwardInQueueOfUserAsync(masterId);
             }
 
-            var masterId = await this.streamingService.GetIdOfMaster(groupId);
-            var currentSong = await this.queueService.SkipForwardInQueueOfUserAsync(masterId);
-            // This is done in case a user is in the queue view
+
+            if (index > 0)
+            {
+                await this.queueService.SkipForwardInQueueOfUserAsync(masterId, index);
+            }
+
+            //await this.Clients.Group(groupId).GetCurrentPlayingSong(currentSong);
+
             var queue = await this.queueService.GetQueueOfUserAsync(masterId);
             await this.Clients.Group(groupId).GetQueue(queue);
         }
+
+        //public async Task SkipForwardInQueue(string groupId)
+        //{
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Error group doesnt exist.");
+        //    }
+
+        //    var masterId = await this.streamingService.GetIdOfMaster(groupId);
+        //    var currentSong = await this.queueService.SkipForwardInQueueOfUserAsync(masterId);
+        //    // This is done in case a user is in the queue view
+        //    var queue = await this.queueService.GetQueueOfUserAsync(masterId);
+        //    await this.Clients.Group(groupId).GetQueue(queue);
+        //}
 
         public async Task ClearQueue(string groupId)
         {
