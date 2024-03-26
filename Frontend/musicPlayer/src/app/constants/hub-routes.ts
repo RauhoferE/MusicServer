@@ -21,6 +21,7 @@ export interface HubEmits{
     getPlayerData: string;
     getQueue: string;
     getCurrentPlayingSong: string;
+    getUserList: string;
 }
 
 export const HUBINVOKES: HubInvokes = {
@@ -44,5 +45,6 @@ export const HUBEMITS: HubEmits = {
     groupDeleted: 'GroupDeleted',
     getPlayerData: 'GetPlayerData',
     getQueue: 'GetQueue',
-    getCurrentPlayingSong: 'GetCurrentPlayingSong'
+    getCurrentPlayingSong: 'GetCurrentPlayingSong',
+    getUserList: 'GetUserList'
 }

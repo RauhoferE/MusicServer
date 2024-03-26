@@ -28,21 +28,33 @@ namespace MusicServer.Hubs
 
         public async Task JoinSession(Guid groupId)
         {
-            // Remove user from old group and delete it
-            if (await this.streamingService.IsUserAlreadyInGroupAsync(this.activeUserService.Id.ToString(), false))
+            if (!(await this.streamingService.GroupExistsAsync(groupId)))
             {
-                var gName = await this.streamingService.GetGroupName(this.Context.ConnectionId);
-                await this.streamingService.DeleteGroupAsync(gName);
-                await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, gName.ToString());
+                throw new HubException("Group doesnt exist!");
             }
 
-            if (!(await this.streamingService.JoinGroup(groupId, this.activeUserService.Id.ToString(), this.Context.ConnectionId)))
+            // Check if user is already part of a group
+            if (await this.streamingService.IsUserAlreadyPartOfGroupWithOthers(this.Context.ConnectionId))
+            {
+                throw new HubException("Error user is already in a group!");
+            }
+
+            // Delete the group with only the user as client
+            var gName = await this.streamingService.GetGroupName(this.Context.ConnectionId);
+            await this.streamingService.DeleteGroupAsync(gName);
+            await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, gName.ToString());
+
+            // Join the new group
+            if (!(await this.streamingService.JoinGroup(groupId, this.activeUserService.Id, this.Context.ConnectionId, this.activeUserService.Email)))
             {
                 throw new HubException("Error when joining group");
             }
 
             await this.Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
-            var masterId = await this.streamingService.GetConnectionIdOfMaster(groupId);
+
+            var userList = await this.streamingService.GetEmailList(groupId);
+            
+            await this.Clients.Client(this.Context.ConnectionId).GetUserList(userList);
             await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).UserJoinedSession(this.activeUserService.Email);
         }
 
@@ -208,10 +220,10 @@ namespace MusicServer.Hubs
             // Create a new group with only the user
             var newGuid = Guid.NewGuid();
 
-            if (!(await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId)))
+            if (!(await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email)))
             {
                 newGuid = Guid.NewGuid();
-                await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId);
+                await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email);
             }
 
             await this.Groups.AddToGroupAsync(Context.ConnectionId, newGuid.ToString());
@@ -241,10 +253,10 @@ namespace MusicServer.Hubs
 
                 var newGuid = Guid.NewGuid();
 
-                if (!(await this.streamingService.CreateGroupAsync(newGuid, dgr.ConnectionId, dgr.ConnectionId)))
+                if (!(await this.streamingService.CreateGroupAsync(newGuid, dgr.ConnectionId, dgr.ConnectionId, dgr.Email)))
                 {
                     newGuid = Guid.NewGuid();
-                    await this.streamingService.CreateGroupAsync(newGuid, dgr.ConnectionId, dgr.ConnectionId);
+                    await this.streamingService.CreateGroupAsync(newGuid, dgr.ConnectionId, dgr.ConnectionId, dgr.Email);
                 }
                 await this.Groups.AddToGroupAsync(dgr.ConnectionId, newGuid.ToString());
                 await this.Clients.Client(dgr.ConnectionId).GetGroupName(newGuid);
@@ -256,10 +268,10 @@ namespace MusicServer.Hubs
             Log.Information($"User connected {this.Context.ConnectionId}");
             var newGuid = Guid.NewGuid();
 
-            if (!(await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId)))
+            if (!(await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email)))
             {
                 newGuid = Guid.NewGuid();
-                await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId);
+                await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email);
             }
 
             await this.Groups.AddToGroupAsync(Context.ConnectionId, newGuid.ToString());

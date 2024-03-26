@@ -15,6 +15,8 @@ namespace MusicServer.Interfaces
 
         public Task UserDisconnected(string email);
 
+        public Task GetUserList(string[] userList);
+
         public Task GroupDeleted();
 
         public Task GetPlayerData(CurrentPlayerData playerData);

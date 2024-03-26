@@ -1,1 +1,23 @@
-<p>home works!</p>
+<div>
+    <div>
+        <span>Current Group</span>
+        <span *ngIf="this.IsMaster">Master of {{this.GroupName}}</span>
+        <span *ngIf="!this.IsMaster">Slave of {{this.GroupName}}</span>
+    </div>
+    <div>
+        <span>User List</span>
+        <span *ngFor="let email of Emails">
+            {{email}}
+        </span>
+    </div>
+    <div>
+
+    </div>
+    <input nz-input [(ngModel)]="groupNameInput">
+    <button *ngIf="this.IsMaster && this.Emails.length == 0" (click)="joinSession()">
+        Join Session
+    </button>
+    <button *ngIf="this.Emails.length > 0" (click)="leaveSession()">
+        Leave Session
+    </button>
+</div>

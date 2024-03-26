@@ -5,11 +5,15 @@ namespace MusicServer.Interfaces
 {
     public interface IStreamingService
     {
-        public Task<bool> CreateGroupAsync(Guid id, string userId, string connectionId);
+        public Task<bool> CreateGroupAsync(Guid id, string userId, string connectionId, string email);
 
-        public Task<bool> JoinGroup(Guid id, string userId, string connectionId);
+        public Task<bool> JoinGroup(Guid id, long userId, string connectionId, string email);
 
         public Task<bool> IsUserAlreadyInGroupAsync(string userId, bool isMaster);
+
+        public Task<bool> IsUserAlreadyPartOfGroupWithOthers(string connectionId);
+
+        public Task<string[]> GetEmailList(Guid groupId);
 
         // This checks if the user isnt already part of a group with atleast 1 other member
         public Task<bool> CanUserJoinGroup(string userId);
