@@ -9,7 +9,7 @@ namespace MusicServer.Interfaces
     public interface IStreamingHub
     {
         // Returns to the user who created it a unique Id
-        public Task GetSessionId(Guid id);
+        public Task GetGroupName(Guid id);
 
         public Task UserJoinedSession(string email);
 

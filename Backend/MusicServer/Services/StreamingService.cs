@@ -23,13 +23,9 @@ namespace MusicServer.Services
             return group.Count() < 2;
         }
 
+        // The griup is created when a user join
         public async Task<bool> CreateGroupAsync(Guid id, string userId, string connectionId)
         {
-            if (await this.IsUserAlreadyInGroupAsync(userId))
-            {
-                return false;
-            }
-
             if ((await this.GroupExistsAsync(id)))
             {
                 return false;
@@ -47,19 +43,19 @@ namespace MusicServer.Services
             return true;
         }
 
-        public async Task<string[]> DeleteGroupAsync(Guid id)
+        public async Task<DeleteGroupResponse[]> DeleteGroupAsync(Guid id)
         {
             var groups = this.dBContext.Groups.Where(x => x.GroupName == id);
 
             if (groups.Count() > 0)
             {
-                var connectionIds = groups.Select(x => x.ConnectionId).ToArray();
+                var connectionIds = groups.Select(x => new DeleteGroupResponse() {ConnectionId = x.ConnectionId, UserId = x.UserId }).ToArray();
                 this.dBContext.Groups.RemoveRange(groups);
                 await this.dBContext.SaveChangesAsync();
                 return connectionIds;
             }
 
-            return new string[0];
+            return new DeleteGroupResponse[0];
         }
 
         public async Task<RemoveUserResponse> DeleteUser(string userId)
@@ -147,19 +143,14 @@ namespace MusicServer.Services
             return group != null;
         }
 
-        public async Task<bool> IsUserAlreadyInGroupAsync(string userId)
+        public async Task<bool> IsUserAlreadyInGroupAsync(string userId, bool isMaster)
         {
-            var group = this.dBContext.Groups.FirstOrDefault(x => x.UserId == long.Parse(userId));
+            var group = this.dBContext.Groups.FirstOrDefault(x => x.UserId == long.Parse(userId) && x.IsMaster == isMaster);
             return group != null;
         }
 
         public async Task<bool> JoinGroup(Guid id, string connectionId, string userId)
         {
-            if (!(await this.CanUserJoinGroup(userId)))
-            {
-                return false;
-            }
-
             if (!(await this.GroupExistsAsync(id)))
             {
                 return false;

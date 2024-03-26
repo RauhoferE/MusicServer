@@ -9,14 +9,14 @@ namespace MusicServer.Interfaces
 
         public Task<bool> JoinGroup(Guid id, string userId, string connectionId);
 
-        public Task<bool> IsUserAlreadyInGroupAsync(string userId);
+        public Task<bool> IsUserAlreadyInGroupAsync(string userId, bool isMaster);
 
         // This checks if the user isnt already part of a group with atleast 1 other member
         public Task<bool> CanUserJoinGroup(string userId);
 
         public Task<bool> GroupExistsAsync(Guid groupId);
 
-        public Task<string[]> DeleteGroupAsync(Guid groupId);
+        public Task<DeleteGroupResponse[]> DeleteGroupAsync(Guid groupId);
 
         public Task<string> GetGroupName(string connectionId);
 
