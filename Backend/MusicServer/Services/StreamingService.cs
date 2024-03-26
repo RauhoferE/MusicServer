@@ -126,16 +126,16 @@ namespace MusicServer.Services
             return this.dBContext.Groups.FirstOrDefault(x => x.GroupName == groupId && x.UserId == userId.Id).ConnectionId;
         }
 
-        public async Task<string> GetGroupName(string connectionId)
+        public async Task<Guid> GetGroupName(string connectionId)
         {
             var group = this.dBContext.Groups.FirstOrDefault(x => x.ConnectionId == connectionId);
 
             if (group == null)
             {
-                return string.Empty;
+                return Guid.Empty;
             }
 
-            return group.GroupName.ToString();
+            return group.GroupName;
         }
 
         public async Task<long> GetIdOfMaster(Guid groupId)

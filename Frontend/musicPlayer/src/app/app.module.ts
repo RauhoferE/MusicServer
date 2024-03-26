@@ -62,6 +62,7 @@ import { QueueTableComponent } from './components/songs/queue-table/queue-table.
 import { PlaylistListComponent } from './components/playlist/playlist-list/playlist-list.component';
 import { UserDetailsComponent } from './views/user/user-details/user-details.component';
 import { PlaylistEditComponent } from './components/playlist/playlist-edit/playlist-edit.component';
+import { StreamingClientService } from './services/streaming-client.service';
 
 
 
@@ -132,7 +133,8 @@ registerLocaleData(en);
   ],
   providers: [
     CookieService,
-    { provide: NZ_I18N, useValue: en_US }
+    { provide: NZ_I18N, useValue: en_US },
+    StreamingClientService
   ],
   bootstrap: [AppComponent]
 })

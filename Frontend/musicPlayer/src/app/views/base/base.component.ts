@@ -45,7 +45,7 @@ export class BaseComponent implements OnInit, OnDestroy {
    */
   constructor(private userService: UserService, private jwtService: JwtService, private rxjsService: RxjsStorageService, 
     private queueService: QueueService, private playlistService: PlaylistService, private fileService: FileService,
-    private message: NzMessageService, private streamingService: StreamingClientService) {
+    private message: NzMessageService) {
     this.rxjsService.updateDashboardBoolean$.subscribe((val) => this.getFollowedEntities());
     
   }

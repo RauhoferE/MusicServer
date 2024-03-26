@@ -9,6 +9,7 @@ import { QueueModel } from 'src/app/models/storage';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
+import { StreamingClientService } from 'src/app/services/streaming-client.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -40,7 +41,7 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
 
   private destroy:Subject<any> = new Subject();
 
-  constructor(private rxjsService: RxjsStorageService, private playlistService: PlaylistService, private queueService: QueueService) {
+  constructor(private rxjsService: RxjsStorageService, private playlistService: PlaylistService, private queueService: QueueService, private streamingService: StreamingClientService) {
     this.audioElement.autoplay = false;
     
     this.audioElement.addEventListener("timeupdate", (x) => {
