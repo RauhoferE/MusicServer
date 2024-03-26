@@ -2,8 +2,6 @@
 {
     public class CurrentPlayerData
     {
-        public Guid CurrentSong { get; set; }
-
         public Guid ItemId { get; set; }
 
         public bool IsPlaying { get; set; } 

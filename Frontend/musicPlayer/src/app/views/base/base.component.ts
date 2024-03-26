@@ -12,6 +12,7 @@ import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
+import { StreamingClientService } from 'src/app/services/streaming-client.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
 
@@ -44,7 +45,7 @@ export class BaseComponent implements OnInit, OnDestroy {
    */
   constructor(private userService: UserService, private jwtService: JwtService, private rxjsService: RxjsStorageService, 
     private queueService: QueueService, private playlistService: PlaylistService, private fileService: FileService,
-    private message: NzMessageService) {
+    private message: NzMessageService, private streamingService: StreamingClientService) {
     this.rxjsService.updateDashboardBoolean$.subscribe((val) => this.getFollowedEntities());
     
   }

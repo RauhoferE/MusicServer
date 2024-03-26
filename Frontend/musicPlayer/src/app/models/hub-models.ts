@@ -1,5 +1,4 @@
 export interface CurrentMediaPlayerData{
-    currentSong: string;
     itemId: string;
     isPlaying: boolean;
     secondsPlayed: number;

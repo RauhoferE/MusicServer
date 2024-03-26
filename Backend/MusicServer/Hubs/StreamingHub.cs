@@ -54,7 +54,7 @@ namespace MusicServer.Hubs
             await this.Clients.GroupExcept(groupId, this.Context.ConnectionId).UserJoinedSession(this.activeUserService.Email);
         }
 
-        public async Task SendCurrentSongToJoinedUser(string groupId, string joinedUserConnectionId, CurrentPlayerData playerData)
+        public async Task SendCurrentSongToJoinedUser(string groupId, string email, CurrentPlayerData playerData)
         {
             var g = Guid.Empty;
             if (!Guid.TryParse(groupId, out g))
@@ -75,10 +75,13 @@ namespace MusicServer.Hubs
                 throw new HubException("Error user is not master.");
             }
 
+            var joinedUserConnectionId = await this.streamingService.GetConnectionIdOfUser(email, g);
+
             var currentSong = await this.queueService.GetCurrentSongInQueueAsync();
 
-            await this.Clients.Client(joinedUserConnectionId).GetPlayerData(playerData);
             await this.Clients.Client(joinedUserConnectionId).GetCurrentPlayingSong(currentSong);
+            await this.Clients.Client(joinedUserConnectionId).GetPlayerData(playerData);
+            
         }
 
         public async Task GetCurrentQueue(string groupId)

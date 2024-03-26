@@ -18,6 +18,8 @@ namespace MusicServer.Interfaces
 
         public Task<DeleteGroupResponse[]> DeleteGroupAsync(Guid groupId);
 
+        public Task<string> GetConnectionIdOfUser(string email, Guid groupId);
+
         public Task<string> GetGroupName(string connectionId);
 
         public Task<RemoveUserResponse> DeleteUser(string userId);

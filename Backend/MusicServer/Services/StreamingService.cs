@@ -114,6 +114,18 @@ namespace MusicServer.Services
             return group?.ConnectionId;
         }
 
+        public async Task<string> GetConnectionIdOfUser(string email, Guid groupId)
+        {
+            if (!(await this.GroupExistsAsync(groupId)))
+            {
+                return string.Empty;
+            }
+
+            var userId = this.dBContext.Users.FirstOrDefault(x => x.Email == email);
+
+            return this.dBContext.Groups.FirstOrDefault(x => x.GroupName == groupId && x.UserId == userId.Id).ConnectionId;
+        }
+
         public async Task<string> GetGroupName(string connectionId)
         {
             var group = this.dBContext.Groups.FirstOrDefault(x => x.ConnectionId == connectionId);

@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { environment } from 'src/environments/environment';
 import { HUBEMITS, HUBINVOKES } from '../constants/hub-routes';
 import { CurrentMediaPlayerData } from '../models/hub-models';
-import { Observable, Subject, lastValueFrom } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, lastValueFrom } from 'rxjs';
 import { PlaylistSongModel, QueueSongModel } from '../models/playlist-models';
 
 @Injectable({
@@ -30,10 +30,12 @@ export class StreamingClientService {
   private currentPlayingSong = new Subject<PlaylistSongModel>();
   songUpdated$: Observable<PlaylistSongModel> = this.currentPlayingSong.asObservable();
 
+  private groupDeletedEvent = new EventEmitter<void>();
+
 
   constructor() { 
     this.hubConnection = new signalR.HubConnectionBuilder()
-    .withUrl(`${environment.apiUrl}`) // Replace with your SignalR hub URL
+    .withUrl(`${environment.hubUrl}`) // Replace with your SignalR hub URL
     .build();
 
     this.hubConnection
@@ -43,34 +45,46 @@ export class StreamingClientService {
 
     this.hubConnection.on(HUBEMITS.getGroupName, (groupName: string)=>{
       this.groupName.next(groupName);
+      console.log("Connected with: ", groupName);
     });
 
     this.hubConnection.on(HUBEMITS.userJoinedSession, async (email: string)=>{
+      console.log("User joined: ", email);
       var users = await lastValueFrom(this.users);
       users.push(email);
       this.users.next(users);
+      console.log("Users: ", users);
+      await this.sendCurrentSongToJoinedUser(await lastValueFrom(this.groupName), email, await lastValueFrom(this.playerData))
     });
 
     this.hubConnection.on(HUBEMITS.userDisconnected, async (email: string)=>{
+      console.log("User disconnected: ", email);
       var users = await lastValueFrom(this.users);
       users.push(email);
       this.users.next(users);
     });
 
     this.hubConnection.on(HUBEMITS.groupDeleted, ()=>{
-      // TODO: Emit event that group has been deleted
+      console.log("Group deleted: ");
+      this.groupDeletedEvent.emit();
     });
 
     this.hubConnection.on(HUBEMITS.getPlayerData, (data: CurrentMediaPlayerData)=>{
+      console.log("Receiving player data: ", data);
       this.playerData.next(data);
     });
 
     this.hubConnection.on(HUBEMITS.getQueue, (queue: QueueSongModel[])=>{
+      console.log("Get queue: ", queue);
       this.queue.next(queue);
     });
 
-    this.hubConnection.on(HUBEMITS.getCurrentPlayingSong, (song: PlaylistSongModel)=>{
+    this.hubConnection.on(HUBEMITS.getCurrentPlayingSong, async (song: PlaylistSongModel)=>{
+      console.log("Get current plaing song: ", song);
       this.currentPlayingSong.next(song);
+      var playerData = await lastValueFrom(this.playerData);
+      playerData.secondsPlayed = 0;
+      this.playerData.next(playerData);
     });
   }
 
@@ -86,8 +100,8 @@ export class StreamingClientService {
     await this.hubConnection.invoke(HUBINVOKES.joinSession, groupId);
   }
 
-  async sendCurrentSongToJoinedUser(groupId: string, joinedUserId: string, data: CurrentMediaPlayerData) {
-    await this.hubConnection.invoke(HUBINVOKES.sendCurrentSongToJoinedUser, groupId, joinedUserId, data);
+  async sendCurrentSongToJoinedUser(groupId: string, email: string, data: CurrentMediaPlayerData) {
+    await this.hubConnection.invoke(HUBINVOKES.sendCurrentSongToJoinedUser, groupId, email, data);
   }
 
   async getCurrentQueue(groupId: string) {
