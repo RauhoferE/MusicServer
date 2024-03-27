@@ -9,7 +9,6 @@ using MusicServer.Interfaces;
 
 namespace MusicServer.Services
 {
-    [Obsolete("Use IGroupQueueService Instead")]
     public class QueueService : IQueueService
     {
         private readonly MusicServerDBContext dbContext;
@@ -34,40 +33,9 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        public async Task ClearQueueOfUserAsync(long userId)
-        {
-            var queue = this.dbContext.Queues.Where(x => (x.UserId == userId && !x.AddedManualy) || (x.UserId == userId && x.Order == 0));
-            //var queuData = this.dbContext.QueueData.Where(x => x.UserId == userId);
-            this.dbContext.Queues.RemoveRange(queue);
-            //this.dbContext.QueueData.RemoveRange(queuData);
-            await this.dbContext.SaveChangesAsync();
-        }
-
         public async Task ClearManuallyAddedQueueAsync()
         {
             var userId = this.activeUserService.Id;
-            // Manually added songs disapear from the queue after being played or skiped
-            var queue = this.dbContext.Queues.Where(x => x.UserId == userId && x.AddedManualy && x.Order != 0);
-            //var queuData = this.dbContext.QueueData.Where(x => x.UserId == userId);
-            this.dbContext.Queues.RemoveRange(queue);
-
-            await this.dbContext.SaveChangesAsync();
-
-            // Reorder rest of elements
-            var otherqueue = this.dbContext.Queues.Where(x => x.UserId == userId && x.Order > 0).ToArray();
-
-            for (int i = 0; i < otherqueue.Count(); i++)
-            {
-                var entity = otherqueue[i];
-                entity.Order = i + 1;
-            }
-
-            //this.dbContext.QueueData.RemoveRange(queuData);
-            await this.dbContext.SaveChangesAsync();
-        }
-
-        public async Task ClearManuallyAddedQueueOfUserAsync(long userId)
-        {
             // Manually added songs disapear from the queue after being played or skiped
             var queue = this.dbContext.Queues.Where(x => x.UserId == userId && x.AddedManualy && x.Order != 0);
             //var queuData = this.dbContext.QueueData.Where(x => x.UserId == userId);
@@ -264,38 +232,6 @@ namespace MusicServer.Services
             return mappedSongs;
         }
 
-        public async Task<QueueSongDto[]> GetQueueOfUserAsync(long userId)
-        {
-            var activeUserId = this.activeUserService.Id;
-            // Only return the current and next songs in the queue
-            var queue = this.dbContext.Queues
-                .Include(x => x.Song)
-                .ThenInclude(x => x.Artists)
-                .ThenInclude(x => x.Artist)
-                .Include(x => x.Song.Album)
-                .Where(x => x.UserId == userId && x.Order > -1);
-
-            if (queue.Count() == 0)
-            {
-                return new QueueSongDto[0];
-            }
-
-            var mappedSongs = this.mapper.Map<QueueSongDto[]>(
-                queue.OrderBy(x => x.Order).Take(30).ToArray()
-                );
-
-            foreach (var song in mappedSongs)
-            {
-                // Check if song is in favorites
-                if (this.dbContext.FavoriteSongs.Include(x => x.User).Include(x => x.FavoriteSong).FirstOrDefault(x => x.User.Id == activeUserId && x.FavoriteSong.Id == song.Id) != null)
-                {
-                    song.IsInFavorites = true;
-                }
-            }
-
-            return mappedSongs;
-        }
-
         public async Task<PlaylistSongDto> GetCurrentSongInQueueAsync()
         {
             var userId = this.activeUserService.Id;
@@ -383,50 +319,6 @@ namespace MusicServer.Services
             return await this.GetCurrentSongInQueueAsync();
         }
 
-        public async Task<PlaylistSongDto> SkipForwardInQueueOfUserAsync(long userId)
-        {
-            var queue = this.dbContext.Queues
-                                .Include(x => x.Song)
-                .ThenInclude(x => x.Artists)
-                .ThenInclude(x => x.Artist)
-                .Include(x => x.Song.Album)
-                .Where(x => x.UserId == userId);
-
-            // IF queue is empty
-            if (queue.Count() == 0)
-            {
-                throw new SongNotFoundException();
-            }
-
-            // If there are no next songs
-            if (!queue.Any(x => x.Order > 0))
-            {
-                throw new SongNotFoundException();
-            }
-
-            QueueEntity toRemove = queue.FirstOrDefault(x => x.Order == 0);
-
-            foreach (var queueEntity in queue)
-            {
-                if (toRemove.AddedManualy && queueEntity.Order <= 0)
-                {
-                    continue;
-                }
-
-                queueEntity.Order = queueEntity.Order + (-1);
-
-            }
-
-            // Remove manually added queue item
-            if (toRemove.AddedManualy)
-            {
-                this.dbContext.Queues.Remove(toRemove);
-            }
-
-            await this.dbContext.SaveChangesAsync();
-            return await this.GetCurrentSongInQueueOfUserAsync(userId);
-        }
-
         public async Task<PlaylistSongDto> SkipForwardInQueueAsync(int index)
         {
             var userId = this.activeUserService.Id;
@@ -461,41 +353,6 @@ namespace MusicServer.Services
 
             await this.dbContext.SaveChangesAsync();
             return await this.GetCurrentSongInQueueAsync();
-        }
-
-        public async Task<PlaylistSongDto> SkipForwardInQueueOfUserAsync(long userId, int index)
-        {
-            var queue = this.dbContext.Queues
-                                .Include(x => x.Song)
-                .ThenInclude(x => x.Artists)
-                .ThenInclude(x => x.Artist)
-                .Include(x => x.Song.Album)
-                .Where(x => x.UserId == userId)
-                .OrderByDescending(x => x.Order);
-
-            var targetSong = this.dbContext.Queues.FirstOrDefault(x => x.UserId == userId && x.Order == index) ?? throw new SongNotFoundException();
-
-            var subtractValue = 0 - index;
-
-            List<QueueEntity> toRemove = new List<QueueEntity>();
-
-            foreach (var queueEntity in queue)
-            {
-                if (queueEntity.Order + (subtractValue) < 0 && queueEntity.AddedManualy)
-                {
-                    // Remove song from list
-                    toRemove.Add(queueEntity);
-                    subtractValue = subtractValue + 1;
-                    continue;
-                }
-
-                queueEntity.Order = queueEntity.Order + (subtractValue);
-            }
-
-            this.dbContext.RemoveRange(toRemove);
-
-            await this.dbContext.SaveChangesAsync();
-            return await this.GetCurrentSongInQueueOfUserAsync(userId);
         }
 
         public async Task<PlaylistSongDto> SkipBackInQueueAsync()
@@ -551,58 +408,6 @@ namespace MusicServer.Services
             return await this.GetCurrentSongInQueueAsync();
         }
 
-        public async Task<PlaylistSongDto> SkipBackInQueueOfUserAsync(long userId)
-        {
-            var queue = this.dbContext.Queues
-                                .Include(x => x.Song)
-                .ThenInclude(x => x.Artists)
-                .ThenInclude(x => x.Artist)
-                .Include(x => x.Song.Album)
-                .Where(x => x.UserId == userId);
-
-            if (!queue.Any(x => x.Order < 0))
-            {
-                // In frontend replay the current song
-                throw new SongNotFoundException();
-            }
-
-            var manuallyAddedSongCount = this.dbContext.Queues.Count(x => x.UserId == userId && x.AddedManualy && x.Order != 0);
-
-            int addToOrder = 1;
-
-            List<QueueEntity> toRemove = new List<QueueEntity>();
-
-            foreach (var queueEntity in queue)
-            {
-                // If the current song was manually added remove it
-                if (queueEntity.Order == 0 && queueEntity.AddedManualy)
-                {
-                    // Remove manually added and currently playing song
-                    addToOrder--;
-                    toRemove.Add(queueEntity);
-                    continue;
-                }
-
-                // If the current song wasnt manually added put them at the end of the manually added songs
-                if (queueEntity.Order == 0 && !queueEntity.AddedManualy && manuallyAddedSongCount > 0)
-                {
-                    queueEntity.Order = addToOrder + manuallyAddedSongCount;
-                    continue;
-                }
-
-                // Let the manually added songs where they are
-                if (queueEntity.Order > 0 && queueEntity.AddedManualy)
-                {
-                    continue;
-                }
-
-                queueEntity.Order = queueEntity.Order + addToOrder;
-            }
-
-            await this.dbContext.SaveChangesAsync();
-            return await this.GetCurrentSongInQueueOfUserAsync(userId);
-        }
-
         public async Task<QueueSongDto[]> PushSongToIndexAsync(int srcIndex, int targetIndex, int markAsAddedManually)
         {
             var userId = this.activeUserService.Id;
@@ -651,80 +456,10 @@ namespace MusicServer.Services
             return await this.GetCurrentQueueAsync();
         }
 
-        public async Task<QueueSongDto[]> PushSongToIndexOfUserAsync(long userId, int srcIndex, int targetIndex, int markAsAddedManually)
-        {
-            var songToMove = this.dbContext.Queues.FirstOrDefault(x => x.Order == srcIndex && x.UserId == userId)
-                ?? throw new SongNotFoundException();
-
-            var targetPlace = this.dbContext.Queues.FirstOrDefault(x => x.Order == targetIndex && x.UserId == userId)
-                ?? throw new SongNotFoundException();
-
-            var oldSongOrder = songToMove.Order;
-            songToMove.Order = targetIndex;
-
-            // If the song gets moved to the manually added ones mark it as manually added
-            // If the song gets moved out of the manually added ones mark it as not manually added so it will disapear when you reshuffle the queue.
-            songToMove.AddedManualy = targetPlace.AddedManualy;
-            if (markAsAddedManually == 0)
-            {
-                songToMove.AddedManualy = false;
-            }
-
-            if (markAsAddedManually == 1)
-            {
-                songToMove.AddedManualy = true;
-            }
-
-
-            var queueToTraverse = this.dbContext.Queues.Where(x => x.Order <= targetIndex && x.Id != songToMove.Id && x.Order > oldSongOrder && x.UserId == userId);
-
-            if (oldSongOrder > targetIndex)
-            {
-                queueToTraverse = this.dbContext.Queues.Where(x => x.Order >= targetIndex && x.Id != songToMove.Id && x.Order < oldSongOrder && x.UserId == userId);
-            }
-
-            foreach (var songBefore in queueToTraverse)
-            {
-                if (oldSongOrder >= targetIndex)
-                {
-                    songBefore.Order++;
-                    continue;
-                }
-
-                songBefore.Order--;
-            }
-
-            await this.dbContext.SaveChangesAsync();
-            return await this.GetQueueOfUserAsync(userId);
-        }
-
         public async Task RemoveSongsWithIndexFromQueueAsync(int[] indices)
         {
             var userId = this.activeUserService.Id;
             
-            // Remove target songs
-            foreach (var index in indices)
-            {
-                var queueEntity = this.dbContext.Queues.FirstOrDefault(x => x.Order == index && x.UserId == userId) ?? throw new SongNotFoundException();
-
-                this.dbContext.Queues.Remove(queueEntity);
-            }
-
-            // The only items that can be removed are next songs
-            var queue = this.dbContext.Queues.Where(x => x.UserId == userId && x.Order > 0).OrderBy(x => x.Order);
-            var newIndex = 1;
-            // Fix the order of the songs
-            foreach (var item in queue)
-            {
-                item.Order = newIndex;
-                newIndex++;
-            }
-
-            await this.dbContext.SaveChangesAsync();
-        }
-
-        public async Task RemoveSongsWithIndexFromQueueOfUserAsync(long userId, int[] indices)
-        {
             // Remove target songs
             foreach (var index in indices)
             {
@@ -892,44 +627,6 @@ namespace MusicServer.Services
         public async Task AddSongsToQueueAsync(Guid[] songIds)
         {
             var userId = this.activeUserService.Id;
-            var queue = this.dbContext.Queues
-                .Include(x => x.Song)
-                .ThenInclude(x => x.Artists)
-                .ThenInclude(x => x.Artist)
-                .Include(x => x.Song.Album)
-                .Where(x => x.UserId == userId && x.Order > 0 && !x.AddedManualy);
-
-            if (this.dbContext.QueueData.FirstOrDefault(x => x.UserId == userId) == null)
-            {
-                throw new DataNotFoundException();
-            }
-
-            foreach (var item in queue)
-            {
-                item.Order = item.Order + songIds.Length;
-            }
-
-            var manuallyAddedSongCount = this.dbContext.Queues.Count(x => x.UserId == userId && x.Order > 0 && x.AddedManualy);
-
-            int order = 1 + manuallyAddedSongCount;
-            foreach (var songId in songIds)
-            {
-                var song = this.dbContext.Songs.FirstOrDefault(x => x.Id == songId) ?? throw new SongNotFoundException();
-                this.dbContext.Queues.Add(new QueueEntity()
-                {
-                    Order = order,
-                    Song = song,
-                    UserId = userId,
-                    AddedManualy = true
-                });
-                order = order + 1;
-            }
-
-            await this.dbContext.SaveChangesAsync();
-        }
-
-        public async Task AddSongsToQueueOfUserAsync(long userId, Guid[] songIds)
-        {
             var queue = this.dbContext.Queues
                 .Include(x => x.Song)
                 .ThenInclude(x => x.Artists)

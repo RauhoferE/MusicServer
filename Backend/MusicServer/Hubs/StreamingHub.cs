@@ -17,13 +17,28 @@ namespace MusicServer.Hubs
 
         private readonly IActiveUserService activeUserService;
 
-        private readonly IQueueService queueService;
+        private readonly IGroupQueueService queueService;
 
-        public StreamingHub(IStreamingService streamingService, IActiveUserService activeUserService, IQueueService queueService)
+        private readonly IPlaylistService playlistService;
+
+        private readonly ISongService songService;
+
+        // This hub is strictly for listening music together
+        // The queue controller is when listing alone
+        // When a player joins a new group entitiy is created 
+        // The group data and group queue is taken from the queue data and queue entities that are beeing handled in queue service
+        // When the master disconnects the current queueu data and queue is discarded
+
+
+        public StreamingHub(IStreamingService streamingService, IActiveUserService activeUserService, 
+            IGroupQueueService queueService, IPlaylistService playlistService, ISongService songService)
         {
             this.streamingService = streamingService;
             this.activeUserService = activeUserService;
             this.queueService = queueService;
+            this.playlistService = playlistService; 
+            this.songService = songService;
+
         }
 
         //public async Task JoinSession(Guid groupId)
@@ -267,14 +282,26 @@ namespace MusicServer.Hubs
             Log.Information($"User connected {this.Context.ConnectionId}");
             var newGuid = Guid.NewGuid();
 
-            if (!(await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email)))
-            {
-                newGuid = Guid.NewGuid();
-                await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email);
-            }
+            // Check if there is a groupo whrere user with id is master
 
-            await this.Groups.AddToGroupAsync(Context.ConnectionId, newGuid.ToString());
-            await this.Clients.Caller.GetGroupName(newGuid);
+            // Yes is master
+            // Create a new entry with this groupname and and new connection id
+            // And return groupname and userlist -> id distinct && id != active.id
+            // Add new connection id to group
+
+            // No such thing exists
+            // Create a new group where user is master
+            // and return the groupname
+            // Add new connection id to group
+
+            //if (!(await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email)))
+            //{
+            //    newGuid = Guid.NewGuid();
+            //    await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email);
+            //}
+
+            //await this.Groups.AddToGroupAsync(Context.ConnectionId, newGuid.ToString());
+            //await this.Clients.Caller.GetGroupName(newGuid);
             await base.OnConnectedAsync();
         }
 
