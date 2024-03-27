@@ -17,14 +17,8 @@ namespace MusicServer.Services
                 
         }
 
-        public async Task<bool> CanUserJoinGroup(string userId)
-        {
-            var group = this.dBContext.Groups.Where(x => x.UserId == long.Parse(userId));
-            return group.Count() < 2;
-        }
-
         // The griup is created when a user join
-        public async Task<bool> CreateGroupAsync(Guid id, string userId, string connectionId, string email)
+        public async Task<bool> CreateGroupAsync(Guid id, long userId, string connectionId, string email)
         {
             if ((await this.GroupExistsAsync(id)))
             {
@@ -35,7 +29,7 @@ namespace MusicServer.Services
             {
                 GroupName = id,
                 IsMaster = true,
-                UserId = long.Parse(userId),
+                UserId = userId,
                 ConnectionId = connectionId,
                 Email = email
             });
@@ -43,6 +37,21 @@ namespace MusicServer.Services
             await this.dBContext.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> GroupExistsAsync(Guid id)
+        {
+            var group = this.dBContext.Groups.FirstOrDefault(x => x.GroupName == id && x.IsMaster);
+            return group != null;
+        }
+
+
+        public async Task<bool> CanUserJoinGroup(string userId)
+        {
+            var group = this.dBContext.Groups.Where(x => x.UserId == long.Parse(userId));
+            return group.Count() < 2;
+        }
+
+
 
         public async Task<DeleteGroupResponse[]> DeleteGroupAsync(Guid id)
         {
@@ -131,11 +140,7 @@ namespace MusicServer.Services
             return group.UserId;
         }
 
-        public async Task<bool> GroupExistsAsync(Guid id)
-        {
-            var group = this.dBContext.Groups.FirstOrDefault(x => x.GroupName == id && x.IsMaster);
-            return group != null;
-        }
+
 
         public async Task<bool> IsUserAlreadyInGroupAsync(string userId, bool isMaster)
         {

@@ -1,4 +1,5 @@
-﻿using MusicServer.Entities.DTOs;
+﻿using DataAccess.Entities;
+using MusicServer.Entities.DTOs;
 using MusicServer.Entities.Requests.Song;
 
 namespace MusicServer.Interfaces
@@ -30,6 +31,10 @@ namespace MusicServer.Interfaces
         public Task<PlaylistSongDto> SkipBackInQueueAsync();
 
         public Task<QueueSongDto[]> GetCurrentQueueAsync();
+
+        public Task<QueueEntity[]> GetAllQueueEntitiesAsync();
+
+        public Task<QueueData> GetQueueDataEntityAsync();
 
         public Task ClearQueueAsync();
 

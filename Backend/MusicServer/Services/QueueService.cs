@@ -754,6 +754,22 @@ namespace MusicServer.Services
             return this.mapper.Map<QueueDataDto>(queueData);
         }
 
+        public async Task<QueueEntity[]> GetAllQueueEntitiesAsync()
+        {
+            return this.dbContext.Queues
+                .Include(x => x.Song)
+                .Where(x => x.UserId ==  this.activeUserService.Id).ToArray();
+        }
+
+        public async Task<QueueData> GetQueueDataEntityAsync()
+        {
+            return this.dbContext.QueueData
+                .Include(x => x.SortAfter)
+                .Include(x => x.Target)
+                .Include(x => x.LoopMode)
+                .FirstOrDefault(x => x.UserId == this.activeUserService.Id);
+        }
+
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using MusicServer.Entities.DTOs;
+﻿using DataAccess.Entities;
+using MusicServer.Entities.DTOs;
 
 namespace MusicServer.Interfaces
 {
@@ -50,5 +51,9 @@ namespace MusicServer.Interfaces
         public Task UpdateQueueDataAsync(Guid groupName, Guid itemId, string loopMode, string sortAfter, string target, bool randomize, bool asc);
 
         public Task<QueueDataDto> GetQueueDataAsync(Guid groupName);
+
+        public Task SetQueueDataAsync(QueueData queueData);
+
+        public Task SetQueueEntitiesAsync(QueueEntity[] queueEntities);
     }
 }

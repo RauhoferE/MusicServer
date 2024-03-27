@@ -11,6 +11,14 @@ namespace MusicServer.Interfaces
         // Returns to the user who created it a unique Id
         public Task GetGroupName(Guid id);
 
+        public Task GetQueueData(QueueDataDto queueDataDto);
+
+        public Task GetQueueEntities(QueueSongDto[] queueDataDto);
+
+        public Task GetCurrentPlayingSong(PlaylistSongDto song);
+
+
+
         public Task UserJoinedSession(string email);
 
         public Task UserDisconnected(string email);
@@ -22,7 +30,5 @@ namespace MusicServer.Interfaces
         public Task GetPlayerData(CurrentPlayerData playerData);
 
         public Task GetQueue(QueueSongDto[] songs);
-
-        public Task GetCurrentPlayingSong(PlaylistSongDto song);
     }
 }

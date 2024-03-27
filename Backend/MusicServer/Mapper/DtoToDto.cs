@@ -10,6 +10,10 @@ namespace MusicServer.Mapper
         {
             this.CreateMap<SongDto, PlaylistSongDto>(MemberList.Destination)
               .ForMember(dest => dest.Order, opt => opt.MapFrom(ps => -1));
+
+            this.CreateMap<QueueEntity, GroupQueueEntity>(MemberList.Source);
+
+            this.CreateMap<QueueData, GroupQueueData>(MemberList.Source);
         }
     }
 }
