@@ -54,11 +54,6 @@ export class StreamingClientService {
     .withUrl(`${environment.hubUrl}`) // Replace with your SignalR hub URL
     .build();
 
-    this.hubConnection
-    .start()
-    .then(() => console.log('Connected to SignalR hub'))
-    .catch(err => console.error('Error connecting to SignalR hub:', err));
-
     this.hubConnection.on(HUBEMITS.getGroupName, (groupName: string)=>{
       this.groupName.next(groupName);
       this.users.next([]);
@@ -90,6 +85,7 @@ export class StreamingClientService {
       if (indexToRemove > -1) {
         users = users.splice(indexToRemove, 1)
       }
+      // Remove groupname
       this.users.next(users);
     });
 
@@ -167,16 +163,27 @@ export class StreamingClientService {
     })
   }
 
+  async startSession(){
+    this.hubConnection
+    .start()
+    .then(() => console.log('Connected to SignalR hub'))
+    .catch(err => console.error('Error connecting to SignalR hub:', err));
+  }
+
+  async joinSession(groupId: string) {
+    this.hubConnection
+    .start()
+    .then(() => console.log('Connected to SignalR hub'))
+    .catch(err => console.error('Error connecting to SignalR hub:', err));
+
+    await this.hubConnection.invoke(HUBINVOKES.joinSession, groupId);
+  }
+
   async disconnect(){
     this.hubConnection
     .stop()
     .then(() => console.log('Disconnected SignalR hub'))
     .catch(err => console.error('Error disconnecting SignalR hub:', err));
-  }
-
-  
-  async joinSession(groupId: string) {
-    await this.hubConnection.invoke(HUBINVOKES.joinSession, groupId);
   }
 
   async sendCurrentSongToJoinedUser(groupId: string, email: string, data: CurrentMediaPlayerData) {

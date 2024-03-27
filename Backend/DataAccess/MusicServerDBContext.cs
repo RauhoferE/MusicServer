@@ -59,6 +59,10 @@ namespace DataAccess
 
         public DbSet<Group> Groups { get; set; }
 
+        public DbSet<GroupQueueData> GroupQueueData { get; set; }
+
+        public DbSet<GroupQueueEntity> GroupQueueEntities { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -459,6 +463,24 @@ namespace DataAccess
             {
                 entity.HasKey(n => n.Id);
                 entity.Property(n => n.Id).ValueGeneratedOnAdd();
+            });
+
+            builder.Entity<GroupQueueEntity>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(e => e.Song).WithMany();
+            });
+
+            builder.Entity<GroupQueueData>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+                entity.Property(n => n.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(e => e.SortAfter).WithMany();
+                entity.HasOne(e => e.LoopMode).WithMany();
+                entity.HasOne(e => e.Target).WithMany();
             });
         }
     }
