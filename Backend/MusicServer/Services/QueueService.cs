@@ -9,6 +9,7 @@ using MusicServer.Interfaces;
 
 namespace MusicServer.Services
 {
+    [Obsolete("Use IGroupQueueService Instead")]
     public class QueueService : IQueueService
     {
         private readonly MusicServerDBContext dbContext;

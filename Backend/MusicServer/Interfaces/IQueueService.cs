@@ -3,7 +3,7 @@ using MusicServer.Entities.Requests.Song;
 
 namespace MusicServer.Interfaces
 {
-    // TODO: Refactor this to contain less cloned code.
+    [Obsolete("Use IGroupQueueService Instead")]
     public interface IQueueService
     {
         // -1, -2, -3 -> Previous played songs

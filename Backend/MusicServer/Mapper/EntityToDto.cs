@@ -180,6 +180,33 @@ namespace MusicServer.Mapper
     .ForMember(dest => dest.Target, opt => opt.MapFrom(ps => ps.Target.Name))
     .ForMember(dest => dest.LoopMode, opt => opt.MapFrom(ps => ps.LoopMode.Name))
     .ForMember(dest => dest.SortAfter, opt => opt.MapFrom(ps => ps.SortAfter.Name));
+
+            this.CreateMap<GroupQueueEntity, PlaylistSongDto>(MemberList.Destination)
+        .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Song.Id))
+    .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Song.Name))
+    .ForMember(dest => dest.Duration, opt => opt.MapFrom(ps => ps.Song.Length))
+    .ForMember(dest => dest.Modified, opt => opt.MapFrom(ps => ps.Song.Modified))
+    .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Song.Created))
+    .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Song.Created))
+    .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Song.Artists))
+    .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.Song.Album))
+.ForMember(dest => dest.Order, opt => opt.MapFrom(ps => ps.Order));
+
+            this.CreateMap<GroupQueueEntity, QueueSongDto>(MemberList.Destination)
+                                    .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Song.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(ps => ps.Song.Name))
+                .ForMember(dest => dest.Duration, opt => opt.MapFrom(ps => ps.Song.Length))
+                .ForMember(dest => dest.Modified, opt => opt.MapFrom(ps => ps.Song.Modified))
+                .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Song.Created))
+                .ForMember(dest => dest.Created, opt => opt.MapFrom(ps => ps.Song.Created))
+                .ForMember(dest => dest.Artists, opt => opt.MapFrom(ps => ps.Song.Artists))
+                .ForMember(dest => dest.Album, opt => opt.MapFrom(ps => ps.Song.Album))
+    .ForMember(dest => dest.Order, opt => opt.MapFrom(ps => ps.Order));
+
+            this.CreateMap<GroupQueueData, QueueDataDto>(MemberList.Destination)
+    .ForMember(dest => dest.Target, opt => opt.MapFrom(ps => ps.Target.Name))
+    .ForMember(dest => dest.LoopMode, opt => opt.MapFrom(ps => ps.LoopMode.Name))
+    .ForMember(dest => dest.SortAfter, opt => opt.MapFrom(ps => ps.SortAfter.Name));
         }
     }
 }

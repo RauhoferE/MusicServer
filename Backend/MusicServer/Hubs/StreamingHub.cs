@@ -26,220 +26,218 @@ namespace MusicServer.Hubs
             this.queueService = queueService;
         }
 
-        public async Task JoinSession(Guid groupId)
-        {
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
-            {
-                throw new HubException("Group doesnt exist!");
-            }
+        //public async Task JoinSession(Guid groupId)
+        //{
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Group doesnt exist!");
+        //    }
 
-            // Check if user is already part of a group
-            if (await this.streamingService.IsUserAlreadyPartOfGroupWithOthers(this.Context.ConnectionId))
-            {
-                throw new HubException("Error user is already in a group!");
-            }
+        //    // Check if user is already part of a group
+        //    if (await this.streamingService.IsUserAlreadyPartOfGroupWithOthers(this.Context.ConnectionId))
+        //    {
+        //        throw new HubException("Error user is already in a group!");
+        //    }
 
-            // Delete the group with only the user as client
-            var gName = await this.streamingService.GetGroupName(this.Context.ConnectionId);
-            await this.streamingService.DeleteGroupAsync(gName);
-            await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, gName.ToString());
+        //    // Delete the group with only the user as client
+        //    var gName = await this.streamingService.GetGroupName(this.Context.ConnectionId);
+        //    await this.streamingService.DeleteGroupAsync(gName);
+        //    await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, gName.ToString());
 
-            // Join the new group
-            if (!(await this.streamingService.JoinGroup(groupId, this.activeUserService.Id, this.Context.ConnectionId, this.activeUserService.Email)))
-            {
-                throw new HubException("Error when joining group");
-            }
+        //    // Join the new group
+        //    if (!(await this.streamingService.JoinGroup(groupId, this.activeUserService.Id, this.Context.ConnectionId, this.activeUserService.Email)))
+        //    {
+        //        throw new HubException("Error when joining group");
+        //    }
 
-            await this.Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
+        //    await this.Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
 
-            var userList = await this.streamingService.GetEmailList(groupId);
+        //    var userList = await this.streamingService.GetEmailList(groupId);
 
-            await this.Clients.Client(this.Context.ConnectionId).GetGroupName(groupId);
-            await this.Clients.Client(this.Context.ConnectionId).GetUserList(userList);
-            await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).UserJoinedSession(this.activeUserService.Email);
-        }
+        //    await this.Clients.Client(this.Context.ConnectionId).GetGroupName(groupId);
+        //    await this.Clients.Client(this.Context.ConnectionId).GetUserList(userList);
+        //    await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).UserJoinedSession(this.activeUserService.Email);
+        //}
 
-        public async Task SendCurrentSongToJoinedUser(Guid groupId, string email, CurrentPlayerData playerData)
-        {
-            // Get current song and media info and send it to all
-            // This includes
-            // Current Song, is player on random, current seconds, loopmode, isPlaying
-            // Song will only be played on host
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
-            {
-                throw new HubException("Error group doesnt exist.");
-            }
+        //public async Task SendCurrentSongToJoinedUser(Guid groupId, string email, CurrentPlayerData playerData)
+        //{
+        //    // Get current song and media info and send it to all
+        //    // This includes
+        //    // Current Song, is player on random, current seconds, loopmode, isPlaying
+        //    // Song will only be played on host
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Error group doesnt exist.");
+        //    }
 
-            if ((await this.streamingService.GetConnectionIdOfMaster(groupId)) != this.Context.ConnectionId)
-            {
-                throw new HubException("Error user is not master.");
-            }
+        //    if ((await this.streamingService.GetConnectionIdOfMaster(groupId)) != this.Context.ConnectionId)
+        //    {
+        //        throw new HubException("Error user is not master.");
+        //    }
 
-            var joinedUserConnectionId = await this.streamingService.GetConnectionIdOfUser(email, groupId);
+        //    var joinedUserConnectionId = await this.streamingService.GetConnectionIdOfUser(email, groupId);
 
-            var currentSong = await this.queueService.GetCurrentSongInQueueAsync();
+        //    var currentSong = await this.queueService.GetCurrentSongInQueueAsync();
 
-            await this.Clients.Client(joinedUserConnectionId).GetCurrentPlayingSong(currentSong);
-            await this.Clients.Client(joinedUserConnectionId).GetPlayerData(playerData);
-            
-        }
+        //    await this.Clients.Client(joinedUserConnectionId).GetCurrentPlayingSong(currentSong);
+        //    await this.Clients.Client(joinedUserConnectionId).GetPlayerData(playerData);
 
-        public async Task GetCurrentQueue(Guid groupId)
-        {
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
-            {
-                throw new HubException("Error group doesnt exist.");
-            }
+        //}
 
-            var masterId = await this.streamingService.GetIdOfMaster(groupId);
-            var queue = await this.queueService.GetQueueOfUserAsync(masterId);
-            await this.Clients.Caller.GetQueue(queue);
-        }
+        //public async Task GetCurrentQueue(Guid groupId)
+        //{
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Error group doesnt exist.");
+        //    }
 
-        public async Task AddSongsToQueue(Guid groupId, Guid[] songIds)
-        {
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
-            {
-                throw new HubException("Error group doesnt exist.");
-            }
+        //    var masterId = await this.streamingService.GetIdOfMaster(groupId);
+        //    var queue = await this.queueService.GetQueueOfUserAsync(masterId);
+        //    await this.Clients.Caller.GetQueue(queue);
+        //}
 
-            var masterId = await this.streamingService.GetIdOfMaster(groupId);
-            await this.queueService.AddSongsToQueueOfUserAsync(masterId, songIds);
-            var queue = await this.queueService.GetQueueOfUserAsync(masterId);
-            await this.Clients.Group(groupId.ToString()).GetQueue(queue);
-        }
+        //public async Task AddSongsToQueue(Guid groupId, Guid[] songIds)
+        //{
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Error group doesnt exist.");
+        //    }
 
-        public async Task SkipBackInQueue(Guid groupId)
-        {
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
-            {
-                throw new HubException("Error group doesnt exist.");
-            }
+        //    var masterId = await this.streamingService.GetIdOfMaster(groupId);
+        //    await this.queueService.AddSongsToQueueOfUserAsync(masterId, songIds);
+        //    var queue = await this.queueService.GetQueueOfUserAsync(masterId);
+        //    await this.Clients.Group(groupId.ToString()).GetQueue(queue);
+        //}
 
-            var masterId = await this.streamingService.GetIdOfMaster(groupId);
-            var currentSong = await this.queueService.SkipBackInQueueOfUserAsync(masterId);
-            //await this.Clients.Group(groupId).GetCurrentPlayingSong(currentSong);
-            var queue = await this.queueService.GetQueueOfUserAsync(masterId);
-            await this.Clients.Group(groupId.ToString()).GetQueue(queue);
-            await this.Clients.Group(groupId.ToString()).GetCurrentPlayingSong(currentSong);
-        }
+        //public async Task SkipBackInQueue(Guid groupId)
+        //{
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Error group doesnt exist.");
+        //    }
 
-        public async Task SkipForwardInQueue(Guid groupId, int index = 0)
-        {
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
-            {
-                throw new HubException("Error group doesnt exist.");
-            }
+        //    var masterId = await this.streamingService.GetIdOfMaster(groupId);
+        //    var currentSong = await this.queueService.SkipBackInQueueOfUserAsync(masterId);
+        //    //await this.Clients.Group(groupId).GetCurrentPlayingSong(currentSong);
+        //    var queue = await this.queueService.GetQueueOfUserAsync(masterId);
+        //    await this.Clients.Group(groupId.ToString()).GetQueue(queue);
+        //    await this.Clients.Group(groupId.ToString()).GetCurrentPlayingSong(currentSong);
+        //}
 
-            var masterId = await this.streamingService.GetIdOfMaster(groupId);
+        //public async Task SkipForwardInQueue(Guid groupId, int index = 0)
+        //{
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Error group doesnt exist.");
+        //    }
 
-            PlaylistSongDto currentSong = null;
+        //    var masterId = await this.streamingService.GetIdOfMaster(groupId);
 
-            if (index < 1)
-            {
-                currentSong = await this.queueService.SkipForwardInQueueOfUserAsync(masterId);
-            }
+        //    PlaylistSongDto currentSong = null;
 
-
-            if (index > 0)
-            {
-                currentSong = await this.queueService.SkipForwardInQueueOfUserAsync(masterId, index);
-            }
-
-            //await this.Clients.Group(groupId).GetCurrentPlayingSong(currentSong);
-
-            var queue = await this.queueService.GetQueueOfUserAsync(masterId);
-            await this.Clients.Group(groupId.ToString()).GetQueue(queue);
-            await this.Clients.Group(groupId.ToString()).GetCurrentPlayingSong(currentSong);
-        } 
-
-        public async Task ClearQueue(Guid groupId)
-        {
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
-            {
-                throw new HubException("Error group doesnt exist.");
-            }
-
-            var masterId = await this.streamingService.GetIdOfMaster(groupId);
-            await this.queueService.ClearManuallyAddedQueueOfUserAsync(masterId);
-            var queue = await this.queueService.GetQueueOfUserAsync(masterId);
-            await this.Clients.Group(groupId.ToString()).GetQueue(queue);
-        }
-
-        public async Task RemoveSongsInQueue(Guid groupId, int[] orderIds)
-        {
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
-            {
-                throw new HubException("Error group doesnt exist.");
-            }
-
-            var masterId = await this.streamingService.GetIdOfMaster(groupId);
-            await this.queueService.RemoveSongsWithIndexFromQueueOfUserAsync(masterId, orderIds);
-            // This is done in case a user is in the queue view
-            var queue = await this.queueService.GetQueueOfUserAsync(masterId);
-            await this.Clients.Group(groupId.ToString()).GetQueue(queue);
-        }
-
-        public async Task PushSongInQueue(Guid groupId, int srcIndex, int targetIndex, int markAsAddedManually = -1)
-        {
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
-            {
-                throw new HubException("Error group doesnt exist.");
-            }
-
-            var masterId = await this.streamingService.GetIdOfMaster(groupId);
-            await this.queueService.PushSongToIndexOfUserAsync(masterId, srcIndex, targetIndex, markAsAddedManually);
-            // This is done in case a user is in the queue view
-            var queue = await this.queueService.GetQueueOfUserAsync(masterId);
-            await this.Clients.Group(groupId.ToString()).GetQueue(queue);
-        }
-
-        public async Task UpdatePlayerData(Guid groupId, CurrentPlayerData playerData)
-        {
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
-            {
-                throw new HubException("Error group doesnt exist.");
-            }
-
-            await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).GetPlayerData(playerData);
-        }
-
-        public async Task LeaveGroup(Guid groupId)
-        {
-            if (!(await this.streamingService.GroupExistsAsync(groupId)))
-            {
-                throw new HubException("Error group doesnt exist.");
-            }
-
-            // Remove User from group
-            var resp = await this.streamingService.DeleteUserWithConnectionId(this.Context.ConnectionId);
-            await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, groupId.ToString());
-
-            // Send info that user disconnected
-            await this.Clients.Group(groupId.ToString()).UserDisconnected(resp.Email);
-
-            // Create a new group with only the user
-            var newGuid = Guid.NewGuid();
-
-            if (!(await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email)))
-            {
-                newGuid = Guid.NewGuid();
-                await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email);
-            }
-
-            await this.Groups.AddToGroupAsync(Context.ConnectionId, newGuid.ToString());
-            await this.Clients.Caller.GetGroupName(newGuid);
-
-            if (!resp.IsMaster)
-            {
-                return;
-            }
-
-            // Remove group if user was master
-            await this.RemoveGroup(groupId);
+        //    if (index < 1)
+        //    {
+        //        currentSong = await this.queueService.SkipForwardInQueueOfUserAsync(masterId);
+        //    }
 
 
-        }
+        //    if (index > 0)
+        //    {
+        //        currentSong = await this.queueService.SkipForwardInQueueOfUserAsync(masterId, index);
+        //    }
+
+        //    //await this.Clients.Group(groupId).GetCurrentPlayingSong(currentSong);
+
+        //    var queue = await this.queueService.GetQueueOfUserAsync(masterId);
+        //    await this.Clients.Group(groupId.ToString()).GetQueue(queue);
+        //    await this.Clients.Group(groupId.ToString()).GetCurrentPlayingSong(currentSong);
+        //} 
+
+        //public async Task ClearQueue(Guid groupId)
+        //{
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Error group doesnt exist.");
+        //    }
+
+        //    var masterId = await this.streamingService.GetIdOfMaster(groupId);
+        //    await this.queueService.ClearManuallyAddedQueueOfUserAsync(masterId);
+        //    var queue = await this.queueService.GetQueueOfUserAsync(masterId);
+        //    await this.Clients.Group(groupId.ToString()).GetQueue(queue);
+        //}
+
+        //public async Task RemoveSongsInQueue(Guid groupId, int[] orderIds)
+        //{
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Error group doesnt exist.");
+        //    }
+
+        //    var masterId = await this.streamingService.GetIdOfMaster(groupId);
+        //    await this.queueService.RemoveSongsWithIndexFromQueueOfUserAsync(masterId, orderIds);
+        //    // This is done in case a user is in the queue view
+        //    var queue = await this.queueService.GetQueueOfUserAsync(masterId);
+        //    await this.Clients.Group(groupId.ToString()).GetQueue(queue);
+        //}
+
+        //public async Task PushSongInQueue(Guid groupId, int srcIndex, int targetIndex, int markAsAddedManually = -1)
+        //{
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Error group doesnt exist.");
+        //    }
+
+        //    var masterId = await this.streamingService.GetIdOfMaster(groupId);
+        //    await this.queueService.PushSongToIndexOfUserAsync(masterId, srcIndex, targetIndex, markAsAddedManually);
+        //    // This is done in case a user is in the queue view
+        //    var queue = await this.queueService.GetQueueOfUserAsync(masterId);
+        //    await this.Clients.Group(groupId.ToString()).GetQueue(queue);
+        //}
+
+        //public async Task UpdatePlayerData(Guid groupId, CurrentPlayerData playerData)
+        //{
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Error group doesnt exist.");
+        //    }
+
+        //    await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).GetPlayerData(playerData);
+        //}
+
+        //public async Task LeaveGroup(Guid groupId)
+        //{
+        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
+        //    {
+        //        throw new HubException("Error group doesnt exist.");
+        //    }
+
+        //    // Remove User from group
+        //    var resp = await this.streamingService.DeleteUserWithConnectionId(this.Context.ConnectionId);
+        //    await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, groupId.ToString());
+
+        //    // Send info that user disconnected
+        //    await this.Clients.Group(groupId.ToString()).UserDisconnected(resp.Email);
+
+        //    // Create a new group with only the user
+        //    var newGuid = Guid.NewGuid();
+
+        //    if (!(await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email)))
+        //    {
+        //        newGuid = Guid.NewGuid();
+        //        await this.streamingService.CreateGroupAsync(newGuid, this.activeUserService.Id.ToString(), this.Context.ConnectionId, this.activeUserService.Email);
+        //    }
+
+        //    await this.Groups.AddToGroupAsync(Context.ConnectionId, newGuid.ToString());
+        //    await this.Clients.Caller.GetGroupName(newGuid);
+
+        //    if (!resp.IsMaster)
+        //    {
+        //        return;
+        //    }
+
+        //    // Remove group if user was master
+        //    await this.RemoveGroup(groupId);
+        //}
 
         private async Task RemoveGroup(Guid groupId)
         {
