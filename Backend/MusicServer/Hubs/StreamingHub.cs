@@ -53,7 +53,8 @@ namespace MusicServer.Hubs
             await this.Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
 
             var userList = await this.streamingService.GetEmailList(groupId);
-            
+
+            await this.Clients.Client(this.Context.ConnectionId).GetGroupName(groupId);
             await this.Clients.Client(this.Context.ConnectionId).GetUserList(userList);
             await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).UserJoinedSession(this.activeUserService.Email);
         }

@@ -125,6 +125,11 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
       console.log("Set loop")
     }
 
+    this.streamingService.userJoinedEvent.subscribe(async x =>{
+      await this.streamingService.setPlayedSongDuration(this.durationSlider);
+      await this.streamingService.sendPlayerDataToUser(x);
+    })
+
   }
 
   ngOnDestroy(): void {
@@ -208,9 +213,6 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
         console.log(error)
       }
     })
-    
-
-
   }
 
   public async playPrevSong(): Promise<void>{

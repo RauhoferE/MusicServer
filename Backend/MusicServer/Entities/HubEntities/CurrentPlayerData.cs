@@ -4,6 +4,8 @@
     {
         public Guid ItemId { get; set; }
 
+        public string Target { get; set; }
+
         public bool IsPlaying { get; set; } 
 
         public double SecondsPlayed { get; set; }
