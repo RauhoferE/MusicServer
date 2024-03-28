@@ -9,26 +9,24 @@ namespace MusicServer.Interfaces
     public interface IStreamingHub
     {
         // Returns to the user who created it a unique Id
-        public Task GetGroupName(Guid id);
+        public Task ReceiveGroupName(Guid id);
 
-        public Task GetQueueData(QueueDataDto queueDataDto);
+        public Task ReceiveQueueData(QueueDataDto queueDataDto);
 
-        public Task GetQueueEntities(QueueSongDto[] queueDataDto);
+        public Task ReceiveQueueEntities(QueueSongDto[] queueDataDto);
 
-        public Task GetCurrentPlayingSong(PlaylistSongDto song);
-
-
-
-        public Task UserJoinedSession(string email);
+        public Task ReceiveCurrentPlayingSong(PlaylistSongDto song);
 
         public Task UserDisconnected(string email);
 
-        public Task GetUserList(string[] userList);
-
         public Task GroupDeleted();
 
-        public Task GetPlayerData(CurrentPlayerData playerData);
+        public Task ReceiveUserList(string[] userList);
 
-        public Task GetQueue(QueueSongDto[] songs);
+        public Task UserJoinedSession(string email);
+
+        public Task ReceiveSongProgress(bool isSongPlaying, double secondsPlayed);
+
+        public Task UpdateQueueView();
     }
 }

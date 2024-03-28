@@ -55,5 +55,7 @@ namespace MusicServer.Interfaces
         public Task SetQueueDataAsync(QueueData queueData);
 
         public Task SetQueueEntitiesAsync(QueueEntity[] queueEntities);
+
+        public Task RemoveQueueDataAndEntitiesAsync(Guid groupName);
     }
 }

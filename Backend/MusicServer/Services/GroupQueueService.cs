@@ -754,5 +754,19 @@ namespace MusicServer.Services
             var entities = this.mapper.Map<GroupQueueEntity[]>(queueEntities);
             this.dbContext.GroupQueueEntities.AddRange(entities);
         }
+
+        public async Task RemoveQueueDataAndEntitiesAsync(Guid groupName)
+        {
+            var groupData = this.dbContext.GroupQueueData.FirstOrDefault(x => x.GroupId == groupName);
+            var groupEntities = this.dbContext.GroupQueueEntities.Where(x => x.GroupId == groupName);
+
+            if (groupData != null)
+            {
+                this.dbContext.GroupQueueData.Remove(groupData);
+            }
+
+            this.dbContext.GroupQueueEntities.RemoveRange(groupEntities);
+            await this.dbContext.SaveChangesAsync();
+        }
     }
 }
