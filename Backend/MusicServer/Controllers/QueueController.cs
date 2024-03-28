@@ -5,6 +5,7 @@ using MusicServer.Const;
 using MusicServer.Core.Const;
 using MusicServer.Entities.Requests.Song;
 using MusicServer.Interfaces;
+using Org.BouncyCastle.Asn1.X509;
 using System.ComponentModel.DataAnnotations;
 using static MusicServer.Const.ApiRoutes;
 
@@ -97,8 +98,6 @@ namespace MusicServer.Controllers
             return Ok();
         }
 
-
-
         [HttpGet]
         [Route(ApiRoutes.Queue.Default)]
         public async Task<IActionResult> GetCurrentQueue()
@@ -174,6 +173,7 @@ namespace MusicServer.Controllers
         [Route(ApiRoutes.Queue.ChangeQueue)]
         public async Task<IActionResult> RandomizeQueue([FromQuery] bool randomize = false)
         {
+            //TODO: Test if the queue view also gets updated
             var queueData = await this.queueService.GetQueueDataAsync();
             await this.queueService.UpdateQueueDataAsync(queueData.ItemId, queueData.LoopMode, queueData.SortAfter, queueData.Target, randomize, queueData.Asc);
             if (queueData.Target == QueueTarget.Favorites)
@@ -223,6 +223,16 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> UpdateQueueData([FromQuery, Required]Guid itemId, [FromQuery, Required] string loopMode, [FromQuery, Required] string sortAfter, [FromQuery, Required] string target, [FromQuery, Required] bool randomize, [FromQuery, Required] bool asc)
         {
             await this.queueService.UpdateQueueDataAsync(itemId, loopMode, sortAfter, target, randomize, asc);
+            return Ok(await this.queueService.GetQueueDataAsync());
+        }
+
+        // TODO: Put this method in the frontend instead of update queue data
+        [HttpGet]
+        [Route(ApiRoutes.Queue.LoopMode)]
+        public async Task<IActionResult> UpdateLoopMode([FromQuery, Required] string loopMode)
+        {
+            var data = await this.queueService.GetQueueDataAsync();
+            await this.queueService.UpdateQueueDataAsync(data.ItemId, loopMode, data.SortAfter, data.Target, data.Random, data.Asc);
             return Ok(await this.queueService.GetQueueDataAsync());
         }
 

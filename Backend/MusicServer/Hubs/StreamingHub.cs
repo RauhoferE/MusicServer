@@ -229,8 +229,6 @@ namespace MusicServer.Hubs
             await this.Clients.Caller.ReceiveQueueData(data);
         }
 
-        // TODO: Replace with a single method that updates the loop mode 
-        // TOOD: Also do this in the queue controller
         public async Task UpdateQueueData(Guid groupId, Guid itemId, string loopMode, string sortAfter, string target, bool randomize, bool asc)
         {
             if (!(await this.streamingService.GroupExistsAsync(groupId)))
@@ -240,6 +238,19 @@ namespace MusicServer.Hubs
 
             await this.groupQueueService.UpdateQueueDataAsync(groupId, itemId, loopMode, sortAfter, target, randomize, asc, this.activeUserService.Id);
             var data = await this.groupQueueService.GetQueueDataAsync(groupId);
+            await this.Clients.Group(groupId.ToString()).ReceiveQueueData(data);
+        }
+
+        public async Task UpdateLoopMode(Guid groupId, string loopMode)
+        {
+            if (!(await this.streamingService.GroupExistsAsync(groupId)))
+            {
+                throw new HubException("Error group doesnt exist.");
+            }
+
+            var data = await this.groupQueueService.GetQueueDataAsync(groupId);
+            await this.groupQueueService.UpdateQueueDataAsync(groupId, data.ItemId, loopMode, data.SortAfter, data.Target, data.Random, data.Asc, data.UserId);
+            data = await this.groupQueueService.GetQueueDataAsync(groupId);
             await this.Clients.Group(groupId.ToString()).ReceiveQueueData(data);
         }
 
@@ -290,6 +301,22 @@ namespace MusicServer.Hubs
 
             await this.Clients.Group(groupId.ToString()).UpdateQueueView();
             await this.Clients.Group(groupId.ToString()).UpdateCurrentSong();
+        }
+
+        public async Task AddAlbumToQueue(Guid groupId, Guid albumId)
+        {
+            var albumSongCount = await this.songService.GetSongCountOfAlbumAsync(albumId);
+            var albumSongs = await this.songService.GetSongsInAlbumAsync(albumId, 0, albumSongCount);
+            await this.groupQueueService.AddSongsToQueueAsync(groupId, albumSongs.Songs.Select(x => x.Id).ToArray());
+            await this.Clients.Group(groupId.ToString()).UpdateQueueView();
+        }
+
+        public async Task AddPlaylistToQueue(Guid groupId, Guid playlistId)
+        {
+            var playlistSongCount = await this.playlistService.GetPlaylistSongCountAsync(playlistId);
+            var playlistSongs = await this.playlistService.GetSongsInPlaylistAsync(playlistId, 0, playlistSongCount, "name", true, null);
+            await this.groupQueueService.AddSongsToQueueAsync(groupId, playlistSongs.Songs.Select(x => x.Id).ToArray());
+            await this.Clients.Group(groupId.ToString()).UpdateQueueView();
         }
 
         public override async Task OnConnectedAsync()

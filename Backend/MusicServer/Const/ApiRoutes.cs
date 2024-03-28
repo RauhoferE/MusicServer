@@ -103,6 +103,7 @@
             public const string ChangeQueue = "change";
             public const string SongWithIndex = "song/{index}";
             public const string QueueData = "data";
+            public const string LoopMode = "loop";
 
         }
     }
