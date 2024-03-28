@@ -28,5 +28,7 @@ namespace MusicServer.Interfaces
         public Task ReceiveSongProgress(bool isSongPlaying, double secondsPlayed);
 
         public Task UpdateQueueView();
+
+        public Task UpdateCurrentSong();
     }
 }

@@ -48,7 +48,7 @@ namespace MusicServer.Interfaces
         // This method is called when a song is already playing and the user wants to randomize the rest of the queue
         public Task<PlaylistSongDto> ChangeQueueAsync(Guid groupName, SongDto[] songs, bool randomize);
 
-        public Task UpdateQueueDataAsync(Guid groupName, Guid itemId, string loopMode, string sortAfter, string target, bool randomize, bool asc);
+        public Task UpdateQueueDataAsync(Guid groupName, Guid itemId, string loopMode, string sortAfter, string target, bool randomize, bool asc, long userId);
 
         public Task<QueueDataDto> GetQueueDataAsync(Guid groupName);
 

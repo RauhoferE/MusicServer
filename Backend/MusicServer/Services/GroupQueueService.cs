@@ -425,7 +425,9 @@ namespace MusicServer.Services
     .Include(x => x.LoopMode)
     .FirstOrDefault(x => x.GroupId == groupName) ?? throw new DataNotFoundException("No queue Data available");
 
-            return this.mapper.Map<QueueDataDto>(queueData);
+            var data = this.mapper.Map<QueueDataDto>(queueData);
+            data.UserId = queueData.UserId;
+            return data;
         }
 
         public async Task<PlaylistSongDto> GetSongInQueueWithIndexAsync(Guid groupName, int index)
@@ -665,7 +667,7 @@ namespace MusicServer.Services
             return await this.GetCurrentSongInQueueAsync(groupName);
         }
 
-        public async Task UpdateQueueDataAsync(Guid groupName, Guid itemId, string loopMode, string sortAfter, string target, bool randomize, bool asc)
+        public async Task UpdateQueueDataAsync(Guid groupName, Guid itemId, string loopMode, string sortAfter, string target, bool randomize, bool asc, long userId)
         {
             var queueData = this.dbContext.GroupQueueData.Include(x => x.SortAfter)
     .Include(x => x.Target)
@@ -682,6 +684,7 @@ namespace MusicServer.Services
             queueData.ItemId = itemId;
             queueData.Asc = asc;
             queueData.Random = randomize;
+            queueData.UserId = userId;
 
             switch (loopMode)
             {

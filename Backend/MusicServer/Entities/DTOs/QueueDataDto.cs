@@ -15,5 +15,7 @@ namespace MusicServer.Entities.DTOs
         public string SortAfter { get; set; }
 
         public Guid ItemId { get; set; }
+
+        public long UserId { get; set; }
     }
 }

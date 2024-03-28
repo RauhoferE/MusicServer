@@ -23,5 +23,9 @@ namespace DataAccess.Entities
         public LovLoopMode LoopMode { get; set; }
 
         public Guid ItemId { get; set; }
+
+        // This is used in connection with the target for favorites
+        // So you know which favorites 
+        public long UserId { get; set; }
     }
 }

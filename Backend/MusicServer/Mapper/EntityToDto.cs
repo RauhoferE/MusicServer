@@ -179,7 +179,8 @@ namespace MusicServer.Mapper
             this.CreateMap<QueueData, QueueDataDto>(MemberList.Destination)
     .ForMember(dest => dest.Target, opt => opt.MapFrom(ps => ps.Target.Name))
     .ForMember(dest => dest.LoopMode, opt => opt.MapFrom(ps => ps.LoopMode.Name))
-    .ForMember(dest => dest.SortAfter, opt => opt.MapFrom(ps => ps.SortAfter.Name));
+    .ForMember(dest => dest.SortAfter, opt => opt.MapFrom(ps => ps.SortAfter.Name))
+    .ForMember(dest => dest.UserId, opt => opt.MapFrom(ps => ps.UserId));
 
             this.CreateMap<GroupQueueEntity, PlaylistSongDto>(MemberList.Destination)
         .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.Song.Id))
@@ -206,7 +207,8 @@ namespace MusicServer.Mapper
             this.CreateMap<GroupQueueData, QueueDataDto>(MemberList.Destination)
     .ForMember(dest => dest.Target, opt => opt.MapFrom(ps => ps.Target.Name))
     .ForMember(dest => dest.LoopMode, opt => opt.MapFrom(ps => ps.LoopMode.Name))
-    .ForMember(dest => dest.SortAfter, opt => opt.MapFrom(ps => ps.SortAfter.Name));
+    .ForMember(dest => dest.SortAfter, opt => opt.MapFrom(ps => ps.SortAfter.Name))
+    .ForMember(dest => dest.UserId, opt => opt.MapFrom(ps => ps.UserId));
         }
     }
 }

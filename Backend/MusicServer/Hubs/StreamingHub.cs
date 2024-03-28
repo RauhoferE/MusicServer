@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using MusicServer.Core.Const;
 using MusicServer.Entities.DTOs;
 using MusicServer.Entities.HubEntities;
 using MusicServer.Entities.Requests.Song;
@@ -120,11 +121,12 @@ namespace MusicServer.Hubs
 
             
             var currentSong = await this.groupQueueService.SkipBackInQueueAsync(groupId);
-            currentSong = await this.groupQueueService.MarkPlaylistSongAsFavorite(this.activeUserService.Id, currentSong);
+            //currentSong = await this.groupQueueService.MarkPlaylistSongAsFavorite(this.activeUserService.Id, currentSong);
 
 
-            await this.Clients.Group(groupId.ToString()).ReceiveCurrentPlayingSong(currentSong);
+            //await this.Clients.Group(groupId.ToString()).ReceiveCurrentPlayingSong(currentSong);
             await this.Clients.Group(groupId.ToString()).UpdateQueueView();
+            await this.Clients.Group(groupId.ToString()).UpdateCurrentSong();
         }
 
         public async Task SkipForwardInQueue(Guid groupId, int index = 0)
@@ -147,13 +149,14 @@ namespace MusicServer.Hubs
                 currentSong = await this.groupQueueService.SkipForwardInQueueAsync(groupId, index);
             }
 
-            if (currentSong != null)
-            {
-                currentSong = await this.groupQueueService.MarkPlaylistSongAsFavorite(this.activeUserService.Id, currentSong);
-            }
+            //if (currentSong != null)
+            //{
+            //    currentSong = await this.groupQueueService.MarkPlaylistSongAsFavorite(this.activeUserService.Id, currentSong);
+            //}
 
-            await this.Clients.Group(groupId.ToString()).ReceiveCurrentPlayingSong(currentSong);
+            //await this.Clients.Group(groupId.ToString()).ReceiveCurrentPlayingSong(currentSong);
             await this.Clients.Group(groupId.ToString()).UpdateQueueView();
+            await this.Clients.Group(groupId.ToString()).UpdateCurrentSong();
         }
 
         public async Task ClearQueue(Guid groupId)
@@ -203,15 +206,91 @@ namespace MusicServer.Hubs
             await this.Clients.Group(groupId.ToString()).UpdateQueueView();
         }
 
-        //public async Task UpdatePlayerData(Guid groupId, CurrentPlayerData playerData)
-        //{
-        //    if (!(await this.streamingService.GroupExistsAsync(groupId)))
-        //    {
-        //        throw new HubException("Error group doesnt exist.");
-        //    }
+        public async Task GetCurrentSong(Guid groupId)
+        {
+            if (!(await this.streamingService.GroupExistsAsync(groupId)))
+            {
+                throw new HubException("Error group doesnt exist.");
+            }
 
-        //    await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).GetPlayerData(playerData);
-        //}
+            var currentSong = await this.groupQueueService.GetCurrentSongInQueueAsync(groupId);
+            currentSong = await this.groupQueueService.MarkPlaylistSongAsFavorite(this.activeUserService.Id, currentSong);
+            await this.Clients.Caller.ReceiveCurrentPlayingSong(currentSong);
+        }
+
+        public async Task GetQueueData(Guid groupId)
+        {
+            if (!(await this.streamingService.GroupExistsAsync(groupId)))
+            {
+                throw new HubException("Error group doesnt exist.");
+            }
+
+            var data = await this.groupQueueService.GetQueueDataAsync(groupId);
+            await this.Clients.Caller.ReceiveQueueData(data);
+        }
+
+        // TODO: Replace with a single method that updates the loop mode 
+        // TOOD: Also do this in the queue controller
+        public async Task UpdateQueueData(Guid groupId, Guid itemId, string loopMode, string sortAfter, string target, bool randomize, bool asc)
+        {
+            if (!(await this.streamingService.GroupExistsAsync(groupId)))
+            {
+                throw new HubException("Error group doesnt exist.");
+            }
+
+            await this.groupQueueService.UpdateQueueDataAsync(groupId, itemId, loopMode, sortAfter, target, randomize, asc, this.activeUserService.Id);
+            var data = await this.groupQueueService.GetQueueDataAsync(groupId);
+            await this.Clients.Group(groupId.ToString()).ReceiveQueueData(data);
+        }
+
+        // Add method that updates loopback
+
+        public async Task RandomizeQueue(Guid groupId, bool randomize = false)
+        {
+            if (!(await this.streamingService.GroupExistsAsync(groupId)))
+            {
+                throw new HubException("Error group doesnt exist.");
+            }
+
+            var queueEntitiy = await this.groupQueueService.GetQueueDataAsync(groupId);
+            await this.groupQueueService.UpdateQueueDataAsync(groupId, queueEntitiy.ItemId, queueEntitiy.LoopMode, queueEntitiy.SortAfter, queueEntitiy.Target, randomize, queueEntitiy.Asc, queueEntitiy.UserId);
+            var queueData = await this.groupQueueService.GetQueueDataAsync(groupId);
+            await this.Clients.Group(groupId.ToString()).ReceiveQueueData(queueData);
+            if (queueData.Target == QueueTarget.Favorites)
+            {
+                // Get favroites
+                var favoriteSongCount = await this.playlistService.GetFavoriteSongCountAsync(queueData.UserId);
+                var favorites = await this.playlistService.GetFavoritesOfUserAsync(queueData.UserId, 0, favoriteSongCount, null, true, null);
+                await this.groupQueueService.ChangeQueueAsync(groupId, favorites.Songs, randomize);
+            }
+
+            if (queueData.Target == QueueTarget.Playlist)
+            {
+                // Get playlist
+                var playlistSongCount = await this.playlistService.GetPlaylistSongCountAsync(queueEntitiy.ItemId);
+                var playlistSongs = await this.playlistService.GetSongsInPlaylistOfUserAsync(queueData.UserId, queueEntitiy.ItemId, 0, playlistSongCount, null, true, null);
+                await this.groupQueueService.ChangeQueueAsync(groupId, playlistSongs.Songs, randomize);
+            }
+
+            if (queueData.Target == QueueTarget.Album)
+            {
+                // Get Album songs
+                var albumSongCount = await this.songService.GetSongCountOfAlbumAsync(queueEntitiy.ItemId);
+                var albumSongs = await this.songService.GetSongsInAlbumAsync(queueEntitiy.ItemId, 0, albumSongCount);
+                await this.groupQueueService.ChangeQueueAsync(groupId, albumSongs.Songs, randomize);
+            }
+
+            if (queueData.Target == QueueTarget.Song)
+            {
+                var songDetails = await this.songService.GetSongInformationAsync(queueEntitiy.ItemId);
+                var albumSongCount = await this.songService.GetSongCountOfAlbumAsync(songDetails.Album.Id);
+                var albumSongs = await this.songService.GetSongsInAlbumAsync(songDetails.Album.Id, 0, albumSongCount);
+                await this.groupQueueService.ChangeQueueAsync(groupId, albumSongs.Songs, randomize);
+            }
+
+            await this.Clients.Group(groupId.ToString()).UpdateQueueView();
+            await this.Clients.Group(groupId.ToString()).UpdateCurrentSong();
+        }
 
         public override async Task OnConnectedAsync()
         {
@@ -249,6 +328,7 @@ namespace MusicServer.Hubs
             // set the queue data as the group queue data and return it to the caller
             if (queueData != null)
             {
+                queueData.UserId = this.activeUserService.Id;
                 await this.groupQueueService.SetQueueDataAsync(queueData);
                 var data = await this.groupQueueService.GetQueueDataAsync(newGuid);
                 await this.Clients.Caller.ReceiveQueueData(data);

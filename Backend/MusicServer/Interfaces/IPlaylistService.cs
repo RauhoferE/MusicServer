@@ -55,5 +55,11 @@ namespace MusicServer.Interfaces
         public Task<int> GetPlaylistSongCountAsync(Guid playlistId);
 
         public Task<int> GetFavoriteSongCountAsync();
+
+        public Task<int> GetFavoriteSongCountAsync(long userId);
+
+        public Task<PlaylistSongPaginationResponse> GetFavoritesOfUserAsync(long userId, int skip, int take, string sortAfter, bool asc, string query);
+
+        public Task<PlaylistSongPaginationResponse> GetSongsInPlaylistOfUserAsync(long userId, Guid playlistId, int skip, int take, string sortAfter, bool asc, string query);
     }
 }
