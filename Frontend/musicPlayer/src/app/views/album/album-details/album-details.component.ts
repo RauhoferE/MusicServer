@@ -155,7 +155,8 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
       // TOOD: Replace with interface
       target : QUEUETYPES.album,
       loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
-      random: this.queueModel.random == undefined ? false: this.queueModel.random
+      random: this.queueModel.random == undefined ? false: this.queueModel.random,
+      userId: this.queueModel.userId
     });
 
     this.queueService.CreateQueueFromAlbum(this.albumId, this.queueModel.random, this.queueModel.loopMode,-1).subscribe({
@@ -207,7 +208,8 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
       itemId : this.albumId,
       target : QUEUETYPES.album,
       loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
-      random: this.queueModel.random == undefined ? false: this.queueModel.random
+      random: this.queueModel.random == undefined ? false: this.queueModel.random,
+      userId: this.queueModel.userId
     });
 
     this.queueService.CreateQueueFromAlbum(this.albumId, this.queueModel.random,this.queueModel.loopMode, skipSongs).subscribe({

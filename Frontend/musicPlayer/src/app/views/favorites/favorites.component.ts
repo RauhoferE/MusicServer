@@ -140,7 +140,8 @@ export class FavoritesComponent implements OnInit, OnDestroy{
       itemId : '-1',
       target : QUEUETYPES.favorites,
       loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
-      random: this.queueModel.random == undefined ? false: this.queueModel.random
+      random: this.queueModel.random == undefined ? false: this.queueModel.random,
+      userId: this.queueModel.userId
     });
 
     this.queueService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
@@ -194,7 +195,8 @@ export class FavoritesComponent implements OnInit, OnDestroy{
       itemId : '-1',
       target : QUEUETYPES.favorites,
       loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
-      random: this.queueModel.random == undefined ? false: this.queueModel.random
+      random: this.queueModel.random == undefined ? false: this.queueModel.random,
+      userId: this.queueModel.userId
     });
 
     this.queueService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({

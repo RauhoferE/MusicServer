@@ -18,4 +18,5 @@ export interface QueueModel extends PaginationModel{
     // IF the mediaplayer has random actived
     random: boolean;
 
+    userId: number;
 }

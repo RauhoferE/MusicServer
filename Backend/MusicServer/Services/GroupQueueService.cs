@@ -746,16 +746,23 @@ namespace MusicServer.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        public async Task SetQueueDataAsync(QueueData queueData)
+        public async Task SetQueueDataAsync(Guid groupId, QueueData queueData)
         {
             var data = this.mapper.Map<GroupQueueData>(queueData);
+            data.GroupId = groupId;
             this.dbContext.GroupQueueData.Add(data);
+            await this.dbContext.SaveChangesAsync();
         }
 
-        public async Task SetQueueEntitiesAsync(QueueEntity[] queueEntities)
+        public async Task SetQueueEntitiesAsync(Guid groupId, QueueEntity[] queueEntities)
         {
             var entities = this.mapper.Map<GroupQueueEntity[]>(queueEntities);
+            foreach (var item in entities)
+            {
+                item.GroupId = groupId;
+            }
             this.dbContext.GroupQueueEntities.AddRange(entities);
+            await this.dbContext.SaveChangesAsync();
         }
 
         public async Task RemoveQueueDataAndEntitiesAsync(Guid groupName)

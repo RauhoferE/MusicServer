@@ -1,6 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { CurrentMediaPlayerData } from 'src/app/models/hub-models';
+import { QueueModel } from 'src/app/models/storage';
+import { QueueService } from 'src/app/services/queue.service';
+import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { StreamingClientService } from 'src/app/services/streaming-client.service';
 
 @Component({
@@ -16,14 +19,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   private groupName: string = '';
   private isMaster: boolean = true;
   private userList: string[] = [];
-  private playerData: CurrentMediaPlayerData = {} as CurrentMediaPlayerData;
 
   public groupNameInput: string = ''
 
   /**
    *
    */
-  constructor(private streamingService: StreamingClientService) {
+  constructor(private streamingService: StreamingClientService, private queueService: QueueService, private rxjsStorage: RxjsStorageService) {
     
     
   }
@@ -37,20 +39,36 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.userList = x;
     });
 
-    this.streamingService.playerDataUpdated$.pipe(takeUntil(this.destroy)).subscribe(x=>{
-      this.playerData = x;
-      console.log(x);
+    this.streamingService.isMasterUpdated$.pipe(takeUntil(this.destroy)).subscribe(x=>{
+      this.isMaster = x;
     });
 
-    this.streamingService.groupDeletedEvent.pipe(takeUntil(this.destroy)).subscribe(x =>{
-      this.isMaster = true;
-
+    this.streamingService.groupDeletedEvent.pipe(takeUntil(this.destroy)).subscribe(() =>{
+      console.log("Group has been deleted");
     });
 
-    this.streamingService.queueUpdated$.pipe(takeUntil(this.destroy)).subscribe(x=>{
-      console.log(x)
-    })
+    this.streamingService.userJoinedEvent.pipe(takeUntil(this.destroy)).subscribe(x=>{
+      console.log("New User joined", x);
+    });
 
+    this.streamingService.connectionClosedEvent.pipe(takeUntil(this.destroy)).subscribe(async ()=>{
+      try {
+        var song = await lastValueFrom(this.queueService.GetCurrentSong());
+        this.rxjsStorage.setCurrentPlayingSong(song);
+        this.rxjsStorage.showMediaPlayer(true);
+      } catch (error) {
+        this.rxjsStorage.setCurrentPlayingSong({} as any);
+        this.rxjsStorage.showMediaPlayer(false);
+      }
+
+      try {
+        var data = await lastValueFrom(this.queueService.GetQueueData());
+        this.rxjsStorage.setQueueFilterAndPagination(data);
+      } catch (error) {
+        this.rxjsStorage.setQueueFilterAndPagination({} as any);
+      }
+      
+    });
 
   }
 
@@ -58,15 +76,17 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.destroy.next(true);
   }
 
+  async createSession(){
+    await this.streamingService.startSession();
+  }
+
   async joinSession() {
     console.log(this.groupNameInput)
     await this.streamingService.joinSession(this.groupNameInput);
-    this.isMaster = false;
   }
 
   async leaveSession() {
-    await this.streamingService.leaveGroup(this.groupName);
-    this.isMaster = true;
+    await this.streamingService.disconnect();
   }
 
   public get GroupName(){

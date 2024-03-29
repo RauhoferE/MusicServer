@@ -56,6 +56,11 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
       await this.playNextSong();
     });
 
+    this.streamingService.songProgressUpdated.pipe(takeUntil(this.destroy)).subscribe(x=>{
+      this.rxjsService.setIsSongPlaylingState(x.isSongPlaying);
+      this.durationSlider = x.secondsPlayed;
+    });
+
   }
 
 
@@ -108,17 +113,14 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
       this.queueModel = x;
     })
 
-    if (!this.queueModel.random || !this.queueModel.loopMode) {
-      console.log("No Loop or random found")
-      this.queueModel.random = this.randomizePlay;
+    if (!this.queueModel.loopMode) {
+      console.log("No Loop data found")
+      //this.queueModel.random = this.randomizePlay;
       this.queueModel.loopMode = this.loopMode;
       this.rxjsService.setQueueFilterAndPagination(this.queueModel);
     }
-
-    if (this.queueModel.random) {
-      this.randomizePlay = this.queueModel.random;
-      console.log("Set random")
-    }
+    
+    this.randomizePlay = this.queueModel.random;
 
     if (this.queueModel.loopMode) {
       this.loopMode = this.queueModel.loopMode;
@@ -126,8 +128,7 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
     }
 
     this.streamingService.userJoinedEvent.subscribe(async x =>{
-      await this.streamingService.setPlayedSongDuration(this.durationSlider);
-      await this.streamingService.sendPlayerDataToUser(x);
+      await this.streamingService.sendCurrentSongProgressToNewUser(this.isSongPlaying, this.durationSlider);
     })
 
   }
@@ -357,7 +358,7 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
 
     try {
       // Update the quemodel in the db
-      var res = await lastValueFrom(this.queueService.UpdateQueueData(this.queueModel.itemId, this.queueModel.asc, this.queueModel.random, this.queueModel.target, this.queueModel.loopMode, this.queueModel.sortAfter));
+      var res = await lastValueFrom(this.queueService.UpdateLoopMode(this.queueModel.loopMode));
     } catch (error) {
       console.log(error);
     }

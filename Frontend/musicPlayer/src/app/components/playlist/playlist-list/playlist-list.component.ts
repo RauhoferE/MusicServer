@@ -279,7 +279,8 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
       itemId : playlistId,
       target : QUEUETYPES.playlist,
       loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
-      random: this.queueModel.random == undefined ? false: this.queueModel.random
+      random: this.queueModel.random == undefined ? false: this.queueModel.random,
+      userId: this.queueModel.userId
     });
 
     this.queueService.CreateQueueFromPlaylist(playlistId, this.queueModel.random, this.queueModel.loopMode, this.pagination.sortAfter, this.pagination.asc, -1).subscribe({

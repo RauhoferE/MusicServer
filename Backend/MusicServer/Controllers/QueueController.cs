@@ -7,7 +7,6 @@ using MusicServer.Entities.Requests.Song;
 using MusicServer.Interfaces;
 using Org.BouncyCastle.Asn1.X509;
 using System.ComponentModel.DataAnnotations;
-using static MusicServer.Const.ApiRoutes;
 
 namespace MusicServer.Controllers
 {
@@ -75,7 +74,6 @@ namespace MusicServer.Controllers
             }
 
             return Ok(await this.queueService.CreateQueueAsync(new[] {song} , false, -1));
-
         }
 
         [HttpGet]
@@ -103,13 +101,6 @@ namespace MusicServer.Controllers
         public async Task<IActionResult> GetCurrentQueue()
         {
             return Ok(await this.queueService.GetCurrentQueueAsync());
-        }
-
-        [HttpGet]
-        [Route(ApiRoutes.Queue.SongWithIndex)]
-        public async Task<IActionResult> GetSongWithIndexFromQueue([FromRoute, Required] int index)
-        {
-            return Ok(await this.queueService.GetSongInQueueWithIndexAsync(index));
         }
 
         [HttpDelete]
@@ -218,15 +209,6 @@ namespace MusicServer.Controllers
             return Ok(await this.queueService.GetQueueDataAsync());
         }
 
-        [HttpPost]
-        [Route(ApiRoutes.Queue.QueueData)]
-        public async Task<IActionResult> UpdateQueueData([FromQuery, Required]Guid itemId, [FromQuery, Required] string loopMode, [FromQuery, Required] string sortAfter, [FromQuery, Required] string target, [FromQuery, Required] bool randomize, [FromQuery, Required] bool asc)
-        {
-            await this.queueService.UpdateQueueDataAsync(itemId, loopMode, sortAfter, target, randomize, asc);
-            return Ok(await this.queueService.GetQueueDataAsync());
-        }
-
-        // TODO: Put this method in the frontend instead of update queue data
         [HttpGet]
         [Route(ApiRoutes.Queue.LoopMode)]
         public async Task<IActionResult> UpdateLoopMode([FromQuery, Required] string loopMode)

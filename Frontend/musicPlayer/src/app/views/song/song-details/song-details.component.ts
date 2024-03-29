@@ -98,7 +98,8 @@ export class SongDetailsComponent implements OnInit, OnDestroy {
       itemId : this.songId,
       target : QUEUETYPES.song,
       loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
-      random: this.queueModel.random == undefined ? false: this.queueModel.random
+      random: this.queueModel.random == undefined ? false: this.queueModel.random,
+      userId: this.queueModel.userId
     });
 
     this.queueService.CreateQueueFromSingleSong(this.songId, this.queueModel.random, this.queueModel.loopMode).subscribe({

@@ -16,7 +16,9 @@ namespace MusicServer.Interfaces
         public Task DeleteGroupAsync(Guid groupId);
 
         // This checks if the user isnt already part of a group with atleast 1 other member
-        public Task<bool> CanUserJoinGroup(string userId);
+        public Task<bool> CanUserJoinGroup(long userId);
+
+        public Task<bool> IsUserPartOfGroup(long userId);
 
         public Task<bool> JoinGroup(Guid id, long userId, string connectionId, string email);
 

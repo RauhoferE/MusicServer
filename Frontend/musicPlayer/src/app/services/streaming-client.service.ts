@@ -7,6 +7,7 @@ import { BehaviorSubject, Observable, Subject, firstValueFrom, lastValueFrom } f
 import { PlaylistSongModel, QueueSongModel } from '../models/playlist-models';
 import { RxjsStorageService } from './rxjs-storage.service';
 import { QueueModel } from '../models/storage';
+import { MediaPlayerProgressParams } from '../models/events';
 
 @Injectable({
   providedIn: 'root'
@@ -29,24 +30,16 @@ export class StreamingClientService {
 
   private usersProp: string[] = [];
 
-  private playerData = new Subject<CurrentMediaPlayerData>();
-  playerDataUpdated$: Observable<CurrentMediaPlayerData> = this.playerData.asObservable();
+  public songProgressUpdated = new EventEmitter<MediaPlayerProgressParams>();
 
-  private playerDataProp: CurrentMediaPlayerData = {}as CurrentMediaPlayerData;
-
-  private queue = new Subject<QueueSongModel[]>();
-  queueUpdated$: Observable<QueueSongModel[]> = this.queue.asObservable();
-
-  private queueProp: QueueSongModel[] = [];
-
-  private currentPlayingSong = new Subject<PlaylistSongModel>();
-  songUpdated$: Observable<PlaylistSongModel> = this.currentPlayingSong.asObservable();
-
-  private currentPlayingSongProp: PlaylistSongModel = {} as PlaylistSongModel;
+  public updateQueueEvent = new EventEmitter<void>();
 
   public groupDeletedEvent = new EventEmitter<void>();
 
   public userJoinedEvent = new EventEmitter<string>();
+
+  // IF the connection closed so you can get the current song and queue from the queue controller.
+  public connectionClosedEvent = new EventEmitter<void>();
 
 
   constructor(private rxjsStorage: RxjsStorageService) { 
@@ -54,101 +47,70 @@ export class StreamingClientService {
     .withUrl(`${environment.hubUrl}`) // Replace with your SignalR hub URL
     .build();
 
-    this.hubConnection.on(HUBEMITS.getGroupName, (groupName: string)=>{
-      this.groupName.next(groupName);
-      this.users.next([]);
-      console.log("Connected with: ", groupName);
+    this.hubConnection.on(HUBEMITS.receiveCurrentPlayingSong, x =>{
+      this.rxjsStorage.setCurrentPlayingSong(x);
     });
 
-    this.hubConnection.on(HUBEMITS.userJoinedSession, (email: string)=>{
-      console.log("User joined: ", email);
-      var groupName = this.groupNameProp;
-      var playerUpdate = this.playerDataProp;
-      var users = this.usersProp;
+    this.hubConnection.on(HUBEMITS.receiveGroupName, x =>{
+      this.groupName.next(x);
+    });
+
+    this.hubConnection.on(HUBEMITS.userJoinedSession, email=>{
+      let users = this.usersProp;
       users.push(email);
       this.users.next(users);
-      console.log("Users: ", users);
       this.userJoinedEvent.emit(email);
-      //this.sendCurrentSongToJoinedUser(groupName, email, playerUpdate)
     });
 
-
-    this.hubConnection.on(HUBEMITS.getUserList, (users: string[])=>{
+    this.hubConnection.on(HUBEMITS.receiveUserList, users =>{
       this.users.next(users);
-    })
+    });
 
-    this.hubConnection.on(HUBEMITS.userDisconnected, (email: string)=>{
-      console.log("User disconnected: ", email);
-      //var users = await lastValueFrom(this.users);
-      var users = this.usersProp;
-      var indexToRemove = users.indexOf(email);
-      if (indexToRemove > -1) {
-        users = users.splice(indexToRemove, 1)
+    this.hubConnection.on(HUBEMITS.userDisconnected, (email)=>{
+      console.log("Disconnected")
+      let users = this.usersProp;
+      const index = users.findIndex(x=> x == email);
+      if (index > -1) {
+        users.splice(index, 1);
       }
-      // Remove groupname
       this.users.next(users);
     });
 
     this.hubConnection.on(HUBEMITS.groupDeleted, ()=>{
-      console.log("Group deleted: ");
+      this.groupName.next('');
       this.users.next([]);
-      
-      // Get current playing song, queue and data
-      this.groupDeletedEvent.emit();
+      this.isMaster.next(true);
+      this.disconnect().then(()=>this.groupDeletedEvent.emit());
     });
 
-    this.hubConnection.on(HUBEMITS.getPlayerData, (data: CurrentMediaPlayerData)=>{
-      console.log("Receiving player data: ", data);
-      this.playerData.next(data);
-      // this.rxjsStorage.setQueueFilterAndPagination({
-      //   itemId: data.itemId,
-      //   loopMode: data.loopMode,
-
-
-      // } as QueueModel)
+    this.hubConnection.on(HUBEMITS.receiveSongProgress, (isSongPlaying: boolean, secondsPlayed: number)=>{
+      this.songProgressUpdated.emit({isSongPlaying: isSongPlaying, secondsPlayed: secondsPlayed});
     });
 
-    this.hubConnection.on(HUBEMITS.getQueue, (queue: QueueSongModel[])=>{
-      console.log("Get queue: ", queue);
-      this.queue.next(queue);
+    this.hubConnection.on(HUBEMITS.updateQueueView, ()=>{
+      this.updateQueueEvent.emit();
     });
 
-    this.hubConnection.on(HUBEMITS.getCurrentPlayingSong, (song: PlaylistSongModel)=>{
-      console.log("Get current plaing song: ", song);
-      this.currentPlayingSong.next(song);
-      //var playerData = await lastValueFrom(this.playerData);
-      var playerData = this.playerDataProp;
-      this.rxjsStorage.setCurrentPlayingSong(song);
-      playerData.secondsPlayed = 0;
-      this.playerData.next(playerData);
+    this.hubConnection.on(HUBEMITS.updateCurrentSong, ()=>{
+      this.getCurrentSong();
     });
 
-    this.rxjsStorage.currentQueueFilterAndPagination.subscribe((x: QueueModel) => {
-      var playerData = this.playerDataProp;
-      playerData.itemId = x.itemId;
-      playerData.loopMode = x.loopMode;
-      playerData.random = x.random;
-      this.playerData.next(playerData);
-
+    this.hubConnection.on(HUBEMITS.receiveQueueData, (data: QueueModel)=>{
+      let oldModel = {} as QueueModel;
+      this.rxjsStorage.currentQueueFilterAndPagination.subscribe((x: QueueModel) => {
+        oldModel = x;
+        oldModel.random = data.random;
+        oldModel.asc = data.asc;
+        oldModel.target = data.target;
+        oldModel.loopMode = data.loopMode;
+        oldModel.sortAfter = data.sortAfter;
+        oldModel.itemId = data.itemId;
+        oldModel.userId = data.userId;
+        
+      });
+      console.log("model set", oldModel);
+      this.rxjsStorage.setQueueFilterAndPagination(oldModel);
     });
-
-    this.rxjsStorage.isSongPlayingState.subscribe(x =>{
-      var playerData = this.playerDataProp;
-      playerData.isPlaying = x;
-      this.playerData.next(playerData);
-    })
-
-    this.songUpdated$.subscribe(x=>{
-      this.currentPlayingSongProp = x;
-    })
-
-    this.queueUpdated$.subscribe(x=>{
-      this.queueProp = x;
-    })
-
-    this.playerDataUpdated$.subscribe(x=>{
-      this.playerDataProp = x;
-    })
 
     this.usersUpdated$.subscribe(x=>{
       this.usersProp = x;
@@ -163,78 +125,133 @@ export class StreamingClientService {
     })
   }
 
-  async startSession(){
-    this.hubConnection
-    .start()
-    .then(() => console.log('Connected to SignalR hub'))
-    .catch(err => console.error('Error connecting to SignalR hub:', err));
+  async startSession(): Promise<void>{
+    if (this.groupNameProp != '') {
+      return;
+    }
+
+    await this.hubConnection.start();
+
+    await this.hubConnection.invoke(HUBINVOKES.createSession);
   }
 
-  async joinSession(groupId: string) {
-    this.hubConnection
-    .start()
-    .then(() => console.log('Connected to SignalR hub'))
-    .catch(err => console.error('Error connecting to SignalR hub:', err));
+  async joinSession(groupId: string): Promise<void> {
+    if (this.groupNameProp == groupId) {
+      return;
+    }
+
+    if (this.hubConnection.state == signalR.HubConnectionState.Connected) {
+      await this.hubConnection
+      .stop();
+    }
+
+    await this.hubConnection
+    .start();
 
     await this.hubConnection.invoke(HUBINVOKES.joinSession, groupId);
+    this.isMaster.next(false);
   }
 
-  async disconnect(){
-    this.hubConnection
-    .stop()
-    .then(() => console.log('Disconnected SignalR hub'))
-    .catch(err => console.error('Error disconnecting SignalR hub:', err));
+  async leaveSession(): Promise<void>{
+    await this.hubConnection.stop();
+    this.isMaster.next(true);
+    this.groupName.next('');
+
+    await this.startSession();
   }
 
-  async sendCurrentSongToJoinedUser(groupId: string, email: string, data: CurrentMediaPlayerData) {
-    await this.hubConnection.invoke(HUBINVOKES.sendCurrentSongToJoinedUser, groupId, email, data);
+  async disconnect(): Promise<void>{
+    await this.hubConnection
+    .stop();
+    console.log('Disconnected SignalR hub')
+    this.isMaster.next(true);
+    this.groupName.next('');
+    this.connectionClosedEvent.emit();
   }
 
-  async sendPlayerDataToUser(email: string){
-    await this.sendCurrentSongToJoinedUser(this.groupNameProp, email, this.playerDataProp);
+  async sendCurrentSongProgressToNewUser(isSongPlaying: boolean, secondsPlayed: number): Promise<void>{
+    //Only send to new user if the current user is master of the session
+    if (!this.isMaster) {
+      return;
+    }
+
+    await this.hubConnection.invoke(HUBINVOKES.sendCurrentSongProgress, this.groupNameProp, isSongPlaying, secondsPlayed);
   }
 
-  async getCurrentQueue(groupId: string) {
-    await this.hubConnection.invoke(HUBINVOKES.getCurrentQueue, groupId);
+  async sendCurrentSongProgress(isSongPlaying: boolean, secondsPlayed: number): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.sendCurrentSongProgress, this.groupNameProp, isSongPlaying, secondsPlayed);
   }
 
-  async addSongsToQueue(groupId: string, songIds: string[]) {
-    await this.hubConnection.invoke(HUBINVOKES.addSongsToQueue, groupId, songIds);
+  async getCurrentSongQueue(): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.getCurrentSongQueue, this.groupNameProp);
   }
 
-  async skipBackInQueue(groupId: string) {
-    await this.hubConnection.invoke(HUBINVOKES.skipBackInQueue, groupId);
+  async skipBackInQueue(): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.skipBackInQueue, this.groupNameProp);
   }
 
-  async skipForwardInQueue(groupId: string, index: number = 0) {
-    await this.hubConnection.invoke(HUBINVOKES.skipForwardInQueue, groupId, index);
+  async skipForwardInQueue(index: number = 0): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.skipForwardInQueue, this.groupNameProp, index);
   }
 
-  async clearQueue(groupId: string) {
-    await this.hubConnection.invoke(HUBINVOKES.clearQueue, groupId);
+  async clearQueue(): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.clearQueue, this.groupNameProp);
   }
 
-  async removeSongsInQueue(groupId: string, orderIds: number[]) {
-    await this.hubConnection.invoke(HUBINVOKES.removeSongsInQueue, groupId, orderIds);
+  async addSongsToQueue(songIds: string[]): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.addSongsToQueue, this.groupNameProp, songIds);
   }
 
-  async pushSongInQueue(groupId: string, srcIndex: number, targetIndex: number, markAsAddedManually: number = -1) {
-    await this.hubConnection.invoke(HUBINVOKES.pushSongInQueue, groupId, srcIndex, targetIndex, markAsAddedManually);
+  async removeSongsInQueue(orderIds: number[]): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.removeSongsInQueue,this.groupName, orderIds);
   }
 
-  async updatePlayerData(groupId: string, data: CurrentMediaPlayerData) {
-    await this.hubConnection.invoke(HUBINVOKES.clearQueue, groupId, data);
+  async pushSongInQueue(srcIndex: number, targetIndex: number, markAsAddedManually: number = -1): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.pushSongInQueue, this.groupNameProp, srcIndex, targetIndex, markAsAddedManually);
   }
 
-  async leaveGroup(groupId: string){
-    await this.hubConnection.invoke(HUBINVOKES.leaveGroup, groupId);
+  async getCurrentSong(): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.getCurrentSong, this.groupName);
   }
 
-  async setPlayedSongDuration(played: number){
-    let playerData = this.playerDataProp;
-    playerData.secondsPlayed = played;
-    this.playerData.next(playerData);
+  async getQueueData(): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.getQueueData, this.groupName);
   }
+
+  async updateLoopMode(loopMode: string): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.updateLoopMode, this.groupNameProp, loopMode);
+  }
+
+  async randomizeQueue(randomize: boolean): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.randomizeQueue, this.groupNameProp, randomize);
+  }
+
+  async createQueueFromAlbum(albumId: string, randomize: boolean, loopMode: string, playFromIndex: number = 0): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.createQueueFromAlbum, this.groupNameProp, albumId, randomize, loopMode, playFromIndex);
+  }
+
+  async createQueueFromPlaylist(playlistId: string, randomize: boolean, loopMode: string, sortAfter: string, asc: boolean = true, playFromOrder: number = 0): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.createQueueFromAlbum, this.groupNameProp, playlistId, randomize, loopMode, sortAfter, asc, playFromOrder);
+  }
+
+  async createQueueFromFavorites(randomize: boolean, loopMode: string, sortAfter: string, asc: boolean = true, playFromOrder: number = 0): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.createQueueFromAlbum, this.groupNameProp, randomize, loopMode, sortAfter, asc, playFromOrder);
+  }
+
+  async createQueueFromSingleSong(songId: string, randomize: boolean, loopMode: string,): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.createQueueFromAlbum, this.groupNameProp, songId, randomize, loopMode);
+  }
+
+  async addAlbumToQueue(albumId: string): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.getQueueData, this.groupName, albumId);
+  }
+
+  async addPlaylistToQueue(playlistId: string): Promise<void>{
+    await this.hubConnection.invoke(HUBINVOKES.getQueueData, this.groupName, playlistId);
+  }
+
+
+
 
 
 

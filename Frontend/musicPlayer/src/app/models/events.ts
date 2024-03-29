@@ -43,3 +43,8 @@ export interface DragDropQueueParams extends DragDropSongParams{
     // 1 mark as true
     markAsManuallyAdded: number;
 }
+
+export interface MediaPlayerProgressParams{
+    isSongPlaying: boolean;
+    secondsPlayed: number;
+}

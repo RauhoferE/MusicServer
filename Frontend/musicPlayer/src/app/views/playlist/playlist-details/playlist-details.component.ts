@@ -166,7 +166,8 @@ export class PlaylistDetailsComponent implements OnDestroy {
       itemId : this.playlistId,
       target : QUEUETYPES.playlist,
       loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
-      random: this.queueModel.random == undefined ? false: this.queueModel.random
+      random: this.queueModel.random == undefined ? false: this.queueModel.random,
+      userId: this.queueModel.userId
     });
 
     this.queueService.CreateQueueFromPlaylist(this.playlistId, this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
@@ -220,7 +221,8 @@ export class PlaylistDetailsComponent implements OnDestroy {
       itemId : this.playlistId,
       target : QUEUETYPES.playlist,
       loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
-      random: this.queueModel.random == undefined ? false: this.queueModel.random
+      random: this.queueModel.random == undefined ? false: this.queueModel.random,
+      userId: this.queueModel.userId
     });
 
     this.queueService.CreateQueueFromPlaylist(this.playlistId, this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({

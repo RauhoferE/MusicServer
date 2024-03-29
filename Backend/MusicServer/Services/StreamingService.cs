@@ -81,11 +81,16 @@ namespace MusicServer.Services
             }
         }
 
-        public async Task<bool> CanUserJoinGroup(string userId)
+        public async Task<bool> CanUserJoinGroup(long userId)
         {
-            var group = this.dBContext.Groups.FirstOrDefault(x => x.UserId == long.Parse(userId)).GroupName;
+            var group = this.dBContext.Groups.FirstOrDefault(x => x.UserId == userId).GroupName;
             var groups = this.dBContext.Groups.Where(x => x.GroupName == group);
             return groups.Count() < 2;
+        }
+
+        public async Task<bool> IsUserPartOfGroup(long userId)
+        {
+            return this.dBContext.Groups.FirstOrDefault(x => x.UserId == userId) != null;
         }
 
         public async Task<bool> JoinGroup(Guid id, long userId, string connectionId, string email)

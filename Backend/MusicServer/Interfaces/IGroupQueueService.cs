@@ -52,9 +52,9 @@ namespace MusicServer.Interfaces
 
         public Task<QueueDataDto> GetQueueDataAsync(Guid groupName);
 
-        public Task SetQueueDataAsync(QueueData queueData);
+        public Task SetQueueDataAsync(Guid groupId, QueueData queueData);
 
-        public Task SetQueueEntitiesAsync(QueueEntity[] queueEntities);
+        public Task SetQueueEntitiesAsync(Guid groupId, QueueEntity[] queueEntities);
 
         public Task RemoveQueueDataAndEntitiesAsync(Guid groupName);
     }

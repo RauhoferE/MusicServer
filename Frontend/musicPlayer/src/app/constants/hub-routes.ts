@@ -1,50 +1,77 @@
 
 export interface HubInvokes {
+    createSession:string;
     joinSession:string;
-    sendCurrentSongToJoinedUser: string;
-    getCurrentQueue: string;
-    addSongsToQueue: string;
+    sendCurrentSongProgress: string;
+    getCurrentSongQueue: string;
     skipBackInQueue: string;
     skipForwardInQueue: string;
     clearQueue: string;
+    addSongsToQueue: string;
     removeSongsInQueue: string;
     pushSongInQueue: string;
-    updatePlayerData: string;
-    leaveGroup: string;
+    getCurrentSong: string;
+    getQueueData: string;
+    updateQueueData: string;
+    updateLoopMode: string;
+    randomizeQueue: string;
+    createQueueFromAlbum: string;
+    createQueueFromPlaylist: string;
+    createQueueFromFavorites: string;
+    createQueueFromSingleSong: string;
+    addAlbumToQueue: string;
+    addPlaylistToQueue: string;
 }
 
 export interface HubEmits{
-    getGroupName: string;
-    userJoinedSession: string;
+    receiveGroupName: string;
+    receiveQueueData: string;
+    receiveQueueEntities: string;
+    receiveCurrentPlayingSong: string;
     userDisconnected: string;
     groupDeleted: string;
-    getPlayerData: string;
-    getQueue: string;
-    getCurrentPlayingSong: string;
-    getUserList: string;
+    receiveUserList: string;
+    userJoinedSession: string;
+    receiveSongProgress: string;
+    updateQueueView: string;
+    updateCurrentSong: string;
 }
 
 export const HUBINVOKES: HubInvokes = {
+    createSession: 'CreateSession',
     addSongsToQueue: 'AddSongsToQueue',
     clearQueue: 'ClearQueue',
-    getCurrentQueue: 'GetCurrentQueue',
+    getCurrentSongQueue: 'GetCurrentSongQueue',
     joinSession: 'JoinSession',
     pushSongInQueue: 'PushSongInQueue',
     removeSongsInQueue: 'RemoveSongsInQueue',
-    sendCurrentSongToJoinedUser: 'SendCurrentSongToJoinedUser',
+    sendCurrentSongProgress: 'SendCurrentSongProgress',
     skipBackInQueue: 'SkipBackInQueue',
     skipForwardInQueue: 'SkipForwardInQueue',
-    updatePlayerData: 'UpdatePlayerData',
-    leaveGroup: 'LeaveGroup'
+    addAlbumToQueue: 'AddAlbumToQueue',
+    addPlaylistToQueue: 'AddPlaylistToQueue',
+    createQueueFromAlbum: 'CreateQueueFromAlbum',
+    createQueueFromFavorites: 'CreateQueueFromFavorites',
+    createQueueFromPlaylist: 'CreateQueueFromPlaylist',
+    createQueueFromSingleSong: 'CreateQueueFromSingleSong',
+    getCurrentSong: 'GetCurrentSong',
+    randomizeQueue: 'RandomizeQueue',
+    updateLoopMode:'UpdateLoopMode',
+    updateQueueData: 'UpdateQueueData',
+    getQueueData: 'GetQueueData'
 }
 
 export const HUBEMITS: HubEmits = {
-    getGroupName: 'GetGroupName',
-    userJoinedSession: 'UserJoinedSession',
-    userDisconnected: 'UserDisconnected',
     groupDeleted: 'GroupDeleted',
-    getPlayerData: 'GetPlayerData',
-    getQueue: 'GetQueue',
-    getCurrentPlayingSong: 'GetCurrentPlayingSong',
-    getUserList: 'GetUserList'
+    receiveCurrentPlayingSong: 'ReceiveCurrentPlayingSong',
+    receiveGroupName: 'ReceiveGroupName',
+    receiveQueueData: 'ReceiveQueueData',
+    receiveQueueEntities: 'ReceiveQueueEntities',
+    receiveSongProgress: 'ReceiveSongProgress',
+    receiveUserList: 'ReceiveUserList',
+    updateCurrentSong: 'UpdateCurrentSong',
+    updateQueueView: 'UpdateQueueView',
+    userDisconnected: 'UserDisconnected',
+    userJoinedSession: 'UserJoinedSession'
+
 }

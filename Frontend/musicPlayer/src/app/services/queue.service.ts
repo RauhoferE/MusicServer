@@ -67,12 +67,6 @@ export class QueueService {
     })
   }
 
-  public GetSongWithIndexFromQueue(index: number): Observable<PlaylistSongModel>{
-    return this.httpClient.get<PlaylistSongModel>(`${environment.apiUrl}/${APIROUTES.queue}/song?index=${index}`,{
-      withCredentials: true
-    })
-  }
-
   public ClearQueue(): Observable<object>{
     return this.httpClient.delete<object>(`${environment.apiUrl}/${APIROUTES.queue}`,{
       withCredentials: true
@@ -126,21 +120,9 @@ export class QueueService {
     })
   }
 
-  public UpdateQueueData(itemId: string,
-    asc: boolean,
-    random: boolean,
-    target: string,
-    loopMode: string,
-    sortAfter: string): Observable<object>{
-      if (itemId == '-1') {
-        return this.httpClient.post<object>(`${environment.apiUrl}/${APIROUTES.queue}/data?itemId=00000000-0000-0000-0000-000000000000&asc=${asc}&randomize=${random}&target=${target}&loopMode=${loopMode}&sortAfter=${sortAfter}`,
-        {},{
-          withCredentials: true
-        })
-      }
-
-    return this.httpClient.post<object>(`${environment.apiUrl}/${APIROUTES.queue}/data?itemId=${itemId}&asc=${asc}&randomize=${random}&target=${target}&loopMode=${loopMode}&sortAfter=${sortAfter}`,
-    {},{
+  public UpdateLoopMode(loopMode: string): Observable<object>{
+    return this.httpClient.get<object>(`${environment.apiUrl}/${APIROUTES.queue}/loop?loopMode=${loopMode}`,
+    {
       withCredentials: true
     })
   }
