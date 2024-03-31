@@ -186,11 +186,13 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
     if (this.isSongPlaying) {
       console.log("Stop playback");
       this.rxjsService.setIsSongPlaylingState(false);
+      //TODO: Send via streaming client
       return;
     }
 
     console.log("Start playback");
     this.rxjsService.setIsSongPlaylingState(true);
+    //TODO: Send via streaming client
   }
 
   public async randomizePlayback(): Promise<void>{
