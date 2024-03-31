@@ -48,3 +48,8 @@ export interface MediaPlayerProgressParams{
     isSongPlaying: boolean;
     secondsPlayed: number;
 }
+
+export interface MediaPlayerParams{
+    random: boolean;
+    loopMode: string;
+}

@@ -7,7 +7,7 @@ import { BehaviorSubject, Observable, Subject, firstValueFrom, lastValueFrom } f
 import { PlaylistSongModel, QueueSongModel } from '../models/playlist-models';
 import { RxjsStorageService } from './rxjs-storage.service';
 import { QueueModel } from '../models/storage';
-import { MediaPlayerProgressParams } from '../models/events';
+import { MediaPlayerParams, MediaPlayerProgressParams } from '../models/events';
 
 @Injectable({
   providedIn: 'root'
@@ -40,6 +40,8 @@ export class StreamingClientService {
 
   // IF the connection closed so you can get the current song and queue from the queue controller.
   public connectionClosedEvent = new EventEmitter<void>();
+
+  public queueDataUpdated = new EventEmitter<MediaPlayerParams>();
 
 
   constructor(private rxjsStorage: RxjsStorageService) { 
@@ -110,6 +112,7 @@ export class StreamingClientService {
       });
       console.log("model set", oldModel);
       this.rxjsStorage.setQueueFilterAndPagination(oldModel);
+      this.queueDataUpdated.emit({random: oldModel.random, loopMode: oldModel.loopMode});
     });
 
     this.usersUpdated$.subscribe(x=>{
@@ -171,7 +174,7 @@ export class StreamingClientService {
 
   async sendCurrentSongProgressToNewUser(isSongPlaying: boolean, secondsPlayed: number): Promise<void>{
     //Only send to new user if the current user is master of the session
-    if (!this.isMaster) {
+    if (!this.isMaster || this.groupNameProp == '') {
       return;
     }
 
@@ -179,75 +182,147 @@ export class StreamingClientService {
   }
 
   async sendCurrentSongProgress(isSongPlaying: boolean, secondsPlayed: number): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.sendCurrentSongProgress, this.groupNameProp, isSongPlaying, secondsPlayed);
   }
 
   async getCurrentSongQueue(): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.getCurrentSongQueue, this.groupNameProp);
   }
 
   async skipBackInQueue(): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.skipBackInQueue, this.groupNameProp);
   }
 
   async skipForwardInQueue(index: number = 0): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.skipForwardInQueue, this.groupNameProp, index);
   }
 
   async clearQueue(): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.clearQueue, this.groupNameProp);
   }
 
   async addSongsToQueue(songIds: string[]): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.addSongsToQueue, this.groupNameProp, songIds);
   }
 
   async removeSongsInQueue(orderIds: number[]): Promise<void>{
-    await this.hubConnection.invoke(HUBINVOKES.removeSongsInQueue,this.groupName, orderIds);
+    if (this.groupNameProp == '') {
+      return;
+    }
+
+    await this.hubConnection.invoke(HUBINVOKES.removeSongsInQueue,this.groupNameProp, orderIds);
   }
 
   async pushSongInQueue(srcIndex: number, targetIndex: number, markAsAddedManually: number = -1): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.pushSongInQueue, this.groupNameProp, srcIndex, targetIndex, markAsAddedManually);
   }
 
   async getCurrentSong(): Promise<void>{
-    await this.hubConnection.invoke(HUBINVOKES.getCurrentSong, this.groupName);
+    if (this.groupNameProp == '') {
+      return;
+    }
+
+    await this.hubConnection.invoke(HUBINVOKES.getCurrentSong, this.groupNameProp);
   }
 
   async getQueueData(): Promise<void>{
-    await this.hubConnection.invoke(HUBINVOKES.getQueueData, this.groupName);
+    if (this.groupNameProp == '') {
+      return;
+    }
+
+    await this.hubConnection.invoke(HUBINVOKES.getQueueData, this.groupNameProp);
   }
 
   async updateLoopMode(loopMode: string): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.updateLoopMode, this.groupNameProp, loopMode);
   }
 
   async randomizeQueue(randomize: boolean): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.randomizeQueue, this.groupNameProp, randomize);
   }
 
   async createQueueFromAlbum(albumId: string, randomize: boolean, loopMode: string, playFromIndex: number = 0): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.createQueueFromAlbum, this.groupNameProp, albumId, randomize, loopMode, playFromIndex);
   }
 
   async createQueueFromPlaylist(playlistId: string, randomize: boolean, loopMode: string, sortAfter: string, asc: boolean = true, playFromOrder: number = 0): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.createQueueFromAlbum, this.groupNameProp, playlistId, randomize, loopMode, sortAfter, asc, playFromOrder);
   }
 
   async createQueueFromFavorites(randomize: boolean, loopMode: string, sortAfter: string, asc: boolean = true, playFromOrder: number = 0): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.createQueueFromAlbum, this.groupNameProp, randomize, loopMode, sortAfter, asc, playFromOrder);
   }
 
   async createQueueFromSingleSong(songId: string, randomize: boolean, loopMode: string,): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+
     await this.hubConnection.invoke(HUBINVOKES.createQueueFromAlbum, this.groupNameProp, songId, randomize, loopMode);
   }
 
   async addAlbumToQueue(albumId: string): Promise<void>{
-    await this.hubConnection.invoke(HUBINVOKES.getQueueData, this.groupName, albumId);
+    if (this.groupNameProp == '') {
+      return;
+    }
+
+    await this.hubConnection.invoke(HUBINVOKES.getQueueData, this.groupNameProp, albumId);
   }
 
   async addPlaylistToQueue(playlistId: string): Promise<void>{
-    await this.hubConnection.invoke(HUBINVOKES.getQueueData, this.groupName, playlistId);
+    if (this.groupNameProp == '') {
+      return;
+    }
+    
+    await this.hubConnection.invoke(HUBINVOKES.getQueueData, this.groupNameProp, playlistId);
   }
 
 
