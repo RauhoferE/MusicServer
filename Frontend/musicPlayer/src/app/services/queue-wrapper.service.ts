@@ -70,11 +70,29 @@ export class QueueWrapperService {
   }
 
   public async AddAlbumToQueue(albumId: string): Promise<void>{
+    if (this.groupName == '') {
+      await lastValueFrom(this.queueService.AddAlbumToQueue(albumId));
+      //this.updateQueue();
+      // This method call is outside of the method
+      //this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist && this.isSongPlaying);
+      
+      return;
+    }
 
+    await this.streamingService.addAlbumToQueue(albumId);
   }
 
   public async AddPlaylistToQueue(playlistId: string): Promise<void>{
+    if (this.groupName == '') {
+      await lastValueFrom(this.queueService.AddPlaylistToQueue(playlistId));
+      //this.updateQueue();
+      // This method call is outside of the method
+      //this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist && this.isSongPlaying);
+      
+      return;
+    }
 
+    await this.streamingService.addPlaylistToQueue(playlistId);
   }
 
   public async ChangeQueue(randomize: boolean): Promise<void>{

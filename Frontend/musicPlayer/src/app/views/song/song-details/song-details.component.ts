@@ -7,9 +7,11 @@ import { LOOPMODES } from 'src/app/constants/loop-modes';
 import { QUEUETYPES } from 'src/app/constants/queue-types';
 import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { QueueModel } from 'src/app/models/storage';
+import { QueueWrapperService } from 'src/app/services/queue-wrapper.service';
 import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SongService } from 'src/app/services/song.service';
+import { StreamingClientService } from 'src/app/services/streaming-client.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -40,7 +42,8 @@ export class SongDetailsComponent implements OnInit, OnDestroy {
    */
   constructor(private route: ActivatedRoute, 
     private songService: SongService, private message: NzMessageService, 
-    private rxjsStorageService: RxjsStorageService, private queueService: QueueService) {
+    private rxjsStorageService: RxjsStorageService, private queueService: QueueService,
+    private streamingService: StreamingClientService, private wrapperService: QueueWrapperService) {
     
       if (!this.route.snapshot.paramMap.has('songId')) {
         console.log("Playlist id not found");
@@ -80,12 +83,14 @@ export class SongDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  public playSongs(): void{
+  public async playSongs(): Promise<void>{
     console.log("Play songs")
 
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.currentPlayingSong && this.currentPlayingSong.id == this.songModel.id) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
+      await this.streamingService.playPauseSong(true);
+      await this.streamingService.playPauseSong(true);
       return;
     }
 
@@ -102,25 +107,17 @@ export class SongDetailsComponent implements OnInit, OnDestroy {
       userId: this.queueModel.userId
     });
 
-    this.queueService.CreateQueueFromSingleSong(this.songId, this.queueModel.random, this.queueModel.loopMode).subscribe({
-      next:(song: PlaylistSongModel)=>{
-        
-        this.rxjsStorageService.setCurrentPlayingSong(song);
-        this.rxjsStorageService.setIsSongPlaylingState(true);
-        this.rxjsStorageService.showMediaPlayer(true);
-        console.log(song)
-      },
-      error:(error: any)=>{
-        this.message.error("Error when getting queue.");
-      },
-      complete: () => {
-      }
-    });
+    await this.wrapperService.CreateQueueFromSingleSong(this.songId, this.queueModel.random, this.queueModel.loopMode);
+    this.rxjsStorageService.setIsSongPlaylingState(true);
+    this.rxjsStorageService.showMediaPlayer(true);
+    await this.rxjsStorageService.setUpdateSongState();
+    await this.streamingService.sendCurrentSongProgress(true, 0);
   }
 
-  public pauseSongs(): void {
+  public async pauseSongs(): Promise<void> {
     // Stop playing of song
     this.rxjsStorageService.setIsSongPlaylingState(false);
+    await this.streamingService.playPauseSong(false);
   }
 
   public updateSong(): void{

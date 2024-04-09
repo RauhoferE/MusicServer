@@ -14,6 +14,8 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { Subject, takeUntil } from 'rxjs';
+import { StreamingClientService } from 'src/app/services/streaming-client.service';
+import { QueueWrapperService } from 'src/app/services/queue-wrapper.service';
 
 @Component({
   selector: 'app-album-list',
@@ -42,7 +44,8 @@ export class AlbumListComponent implements OnInit, OnDestroy {
    */
   constructor(private queueService: QueueService, 
     private playlistService: PlaylistService,private nzContextMenuService: NzContextMenuService,
-    private message: NzMessageService,  private rxjstorageService: RxjsStorageService) {
+    private message: NzMessageService,  private rxjstorageService: RxjsStorageService,
+    private streamingService: StreamingClientService, private wrapperService: QueueWrapperService) {
     
     
   }
@@ -66,7 +69,7 @@ export class AlbumListComponent implements OnInit, OnDestroy {
   }
 
 
-  addAlbumToPlaylist(id: string, params: AlbumModel): void{
+  public addAlbumToPlaylist(id: string, params: AlbumModel): void{
 
     this.playlistService.AddAlbumToPlaylist(id, params.id).subscribe({
       next: ()=>{
@@ -80,24 +83,16 @@ export class AlbumListComponent implements OnInit, OnDestroy {
 
   }
 
-  addAlbumToQueue(params: AlbumModel): void{
+  public async addAlbumToQueue(params: AlbumModel): Promise<void>{
     if (params.songCount == 0) {
       this.message.error("Album doesnt have songs!");
       return;
     }
 
-    this.queueService.AddAlbumToQueue(params.id).subscribe({
-      next: ()=>{
-        //this.updateDashBoard();
-
-      },
-      error: (error)=>{
-        console.log(error);
-      }
-    })
+    await this.wrapperService.AddAlbumToQueue(params.id);
   }
 
-  contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: AlbumModel): void {
+  public contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: AlbumModel): void {
     this.selectedTableItem = item;
     this.playlistService.GetModifieablePlaylists(-1).subscribe((val)=>{
       this.modifieablePlaylists = val.playlists;
@@ -109,11 +104,11 @@ export class AlbumListComponent implements OnInit, OnDestroy {
 
   }
 
-  closeMenu(): void {
+  public closeMenu(): void {
     this.nzContextMenuService.close();
   }
 
-  playSong(id: string): void{
+  public async playSong(id: string): Promise<void>{
     console.log("Play songs")
 
     // If the user previously clicked stop and wants to resume the playlist with the same queue
@@ -121,6 +116,7 @@ export class AlbumListComponent implements OnInit, OnDestroy {
       this.queueModel.target == QUEUETYPES.album && 
       this.queueModel.itemId == id) {
       this.rxjstorageService.setIsSongPlaylingState(true);
+      await this.streamingService.playPauseSong(true);
       return;
     }
     this.rxjstorageService.setQueueFilterAndPagination({
@@ -137,28 +133,19 @@ export class AlbumListComponent implements OnInit, OnDestroy {
       userId: this.queueModel.userId
     });
 
-    this.queueService.CreateQueueFromAlbum(id, this.queueModel.random, this.queueModel.loopMode,-1).subscribe({
-      next:async (song: PlaylistSongModel)=>{
-        console.log(song)
-        
-        this.rxjstorageService.setCurrentPlayingSong(song);
-        await this.rxjstorageService.setUpdateSongState();
-        this.rxjstorageService.setIsSongPlaylingState(true);
-        this.rxjstorageService.showMediaPlayer(true);
-      },
-      error:(error: any)=>{
-        this.message.error("Error when getting queue.");
-      },
-      complete: () => {
-      }
-    });
+    await this.wrapperService.CreateQueueFromAlbum(id, this.queueModel.random, this.queueModel.loopMode,-1);
+    this.rxjstorageService.setIsSongPlaylingState(true);
+    this.rxjstorageService.showMediaPlayer(true);
+    await this.rxjstorageService.setUpdateSongState();
+    await this.streamingService.sendCurrentSongProgress(true, 0);
   }
 
-  pauseSong(): void{
+  public async pauseSong(): Promise<void>{
     this.rxjstorageService.setIsSongPlaylingState(false);
+    await this.streamingService.playPauseSong(false);
   }
 
-  updateDashBoard(): void{
+  private updateDashBoard(): void{
     var currenState = false;
     this.rxjstorageService.updateDashboardBoolean$.subscribe((val) =>{
       currenState = val;
@@ -168,7 +155,7 @@ export class AlbumListComponent implements OnInit, OnDestroy {
     this.rxjstorageService.setUpdateDashboardBoolean(!currenState);
   }
 
-  getAlbumCoverSrc(albumId: string): string{
+  public getAlbumCoverSrc(albumId: string): string{
     if (!albumId) {
       return '';
     }
@@ -177,7 +164,7 @@ export class AlbumListComponent implements OnInit, OnDestroy {
 
   }
 
-  getYear(date: Date): number{
+  public getYear(date: Date): number{
     return new Date(date).getFullYear();
   }
 

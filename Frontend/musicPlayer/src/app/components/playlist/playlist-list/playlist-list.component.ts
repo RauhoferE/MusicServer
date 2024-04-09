@@ -15,8 +15,10 @@ import { UserModel } from 'src/app/models/user-models';
 import { FileService } from 'src/app/services/file.service';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
+import { QueueWrapperService } from 'src/app/services/queue-wrapper.service';
 import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
+import { StreamingClientService } from 'src/app/services/streaming-client.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -69,7 +71,8 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
    */
   constructor(private playlistService: PlaylistService, private rxjsService: RxjsStorageService, private modal: NzModalService,
     private nzContextMenuService: NzContextMenuService, private jwtService: JwtService, private fileService: FileService, 
-    @Inject(DOCUMENT) private doc: Document, private queueService: QueueService, private message: NzMessageService) {
+    @Inject(DOCUMENT) private doc: Document, private queueService: QueueService, private message: NzMessageService,
+    private streamingService: StreamingClientService, private wrapperService: QueueWrapperService) {
     this.IsLoading = this.rxjsService.currentSongTableLoading$;
     this.currentUserId = jwtService.getUserId();
     
@@ -147,22 +150,14 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
     })
   }
 
-  public addPlaylistToQueue(): void {
+  public async addPlaylistToQueue(): Promise<void> {
 
     if (this.selectedTableItem.playlistModel.songCount == 0) {
       this.message.error("Playlist needs to have songs to be played!");
       return;
     }
     
-    this.queueService.AddPlaylistToQueue(this.selectedTableItem.playlistModel.id).subscribe({
-      next: ()=>{
-        //this.updateDashBoard();
-
-      },
-      error: (error)=>{
-        console.log(error);
-      }
-    })
+    await this.wrapperService.AddPlaylistToQueue(this.selectedTableItem.playlistModel.id);
   }
 
   public async savePlaylist(event: EditPlaylistModalParams): Promise<void> {
@@ -267,6 +262,7 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
       this.QueueModel.target == QUEUETYPES.playlist && 
       this.QueueModel.itemId == playlistId) {
       this.rxjsService.setIsSongPlaylingState(true);
+      await this.streamingService.playPauseSong(true);
       return;
     }
 
@@ -283,26 +279,17 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
       userId: this.queueModel.userId
     });
 
-    this.queueService.CreateQueueFromPlaylist(playlistId, this.queueModel.random, this.queueModel.loopMode, this.pagination.sortAfter, this.pagination.asc, -1).subscribe({
-      next:async (song: PlaylistSongModel)=>{
-        console.log(song)
-        
-        this.rxjsService.setCurrentPlayingSong(song);
-        await this.rxjsService.setUpdateSongState();
-        this.rxjsService.setIsSongPlaylingState(true);
-        this.rxjsService.showMediaPlayer(true);
-      },
-      error:(error: any)=>{
-        this.message.error("Error when getting queue.");
-      },
-      complete: () => {
-      }
-    });
+    await this.wrapperService.CreateQueueFromPlaylist(playlistId, this.queueModel.random, this.queueModel.loopMode, this.pagination.sortAfter, this.pagination.asc, -1);
+    this.rxjsService.setIsSongPlaylingState(true);
+    this.rxjsService.showMediaPlayer(true);
+    await this.rxjsService.setUpdateSongState();
+    await this.streamingService.sendCurrentSongProgress(true, 0);
   }
 
-  public pausePlaylist(): void {
+  public async pausePlaylist(): Promise<void> {
     // Stop playing of song
     this.rxjsService.setIsSongPlaylingState(false);
+    await this.streamingService.playPauseSong(false);
   }
 
   public setPublic(playlist: PlaylistUserShortModel): void {
