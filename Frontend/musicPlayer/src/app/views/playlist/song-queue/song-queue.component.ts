@@ -3,9 +3,11 @@ import { Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { DragDropQueueParams, DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, QueueSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
+import { QueueWrapperService } from 'src/app/services/queue-wrapper.service';
 import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SongService } from 'src/app/services/song.service';
+import { StreamingClientService } from 'src/app/services/streaming-client.service';
 
 @Component({
   selector: 'app-song-queue',
@@ -27,7 +29,8 @@ export class SongQueueComponent implements OnInit, OnDestroy {
   /**
    *
    */
-  constructor(private rxjsStorageService: RxjsStorageService, private songService: SongService, private queueService: QueueService) {
+  constructor(private rxjsStorageService: RxjsStorageService, private songService: SongService, 
+    private wrapperService: QueueWrapperService, private streamingService: StreamingClientService) {
 
   }
 
@@ -35,7 +38,7 @@ export class SongQueueComponent implements OnInit, OnDestroy {
     this.destroy.next(true);
   }
 
-  ngOnInit(): void {
+  public async ngOnInit(): Promise<void> {
     // TOOD: When changing site the subscribe gets called more often
     this.rxjsStorageService.updateQueueBoolean$.pipe(takeUntil(this.destroy)).subscribe(x => {
       console.log("Update queue")
@@ -49,6 +52,23 @@ export class SongQueueComponent implements OnInit, OnDestroy {
 
     this.rxjsStorageService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.isSongPlaying = x;
+    })
+
+    this.streamingService.queueItemsReceivedEvents.pipe(takeUntil(this.destroy)).subscribe(songs => {
+      songs.splice(0,1);
+      this.queueModel = {
+        songs: songs.filter(x => !x.addedManualy),
+        totalCount: songs.filter(x => !x.addedManualy).length
+      };
+
+      this.nextSongsModel = {
+        songs: songs.filter(x => x.addedManualy),
+        totalCount: songs.filter(x => x.addedManualy).length
+      };
+    })
+
+    this.streamingService.updateQueueEvent.pipe(takeUntil(this.destroy)).subscribe(async ()=>{
+      await this.wrapperService.GetCurrentQueue();
     })
 
     // this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
@@ -70,69 +90,50 @@ export class SongQueueComponent implements OnInit, OnDestroy {
     this.rxjsStorageService.setSongTableLoadingState(true);
 
     // this.rxjsStorageService.setSongQueue(songsList);
-    this.queueService.GetCurrentQueue().subscribe({
-      next: (songs: QueueSongModel[]) => {
-        songs.splice(0,1);
-        this.queueModel = {
-          songs: songs.filter(x => !x.addedManualy),
-          totalCount: songs.filter(x => !x.addedManualy).length
-        };
+    let songs = await this.wrapperService.GetCurrentQueue();
+    this.rxjsStorageService.setSongTableLoadingState(false);
+    // Return if user is in a group, because we get the song, queueu from an event via the hub
+    if (songs.length == 0) {
+      return;
+    }
 
-        this.nextSongsModel = {
-          songs: songs.filter(x => x.addedManualy),
-          totalCount: songs.filter(x => x.addedManualy).length
-        };
+    songs.splice(0,1);
+    this.queueModel = {
+      songs: songs.filter(x => !x.addedManualy),
+      totalCount: songs.filter(x => !x.addedManualy).length
+    };
 
-      },
-      complete: ()=>{
-        this.rxjsStorageService.setSongTableLoadingState(false);
-      }
-      
-    })
-
+    this.nextSongsModel = {
+      songs: songs.filter(x => x.addedManualy),
+      totalCount: songs.filter(x => x.addedManualy).length
+    };
     
   }
 
-  async onCurrentSongPaginationUpdated(): Promise<void> {
+  public async onCurrentSongPaginationUpdated(): Promise<void> {
 
     this.rxjsStorageService.setSongTableLoadingState(true);
 
-    this.queueService.GetCurrentSong().subscribe({
-      next: (song: PlaylistSongModel) => {
-        this.rxjsStorageService.setCurrentPlayingSong(song);
-
-      },
-      complete: ()=>{
-        this.rxjsStorageService.setSongTableLoadingState(false);
-      }
-      
-    })
-
+    let song = await this.wrapperService.GetCurrentSong();
     this.rxjsStorageService.setSongTableLoadingState(false);
+    // Return if user is in a group, because we get the song, queueu from an event via the hub
+    if (song.id == '-1') {
+      return;
+    }
+    this.rxjsStorageService.setCurrentPlayingSong(song);
   }
 
-  public onPlaySongClicked(event: PlaylistSongModelParams): void{
+  public async onPlaySongClicked(event: PlaylistSongModelParams): Promise<void>{
     this.rxjsStorageService.setSongTableLoadingState(true);
 
-    this.queueService.SkipForwardInQueue(event.songModel.order).subscribe({
-      next: (song: PlaylistSongModel) => {
-        // Set the new song
-        this.rxjsStorageService.setCurrentPlayingSong(song);
-
-        // Update the queue
-        this.onQueueTablePaginationUpdated();
-
-      },
-      complete: ()=>{
-        this.rxjsStorageService.setSongTableLoadingState(false);
-      }
-      
-    })
-
+    await this.wrapperService.SkipForwardInQueue(event.songModel.order);
+    this.rxjsStorageService.setSongTableLoadingState(false);
+    this.onQueueTablePaginationUpdated();
   }
 
-  public resumeSong(event: PlaylistSongModelParams): void{
+  public async resumeSong(event: PlaylistSongModelParams): Promise<void>{
     this.rxjsStorageService.setIsSongPlaylingState(!this.isSongPlaying);
+    await this.streamingService.playPauseSong(!this.isSongPlaying);
   }
 
   async getSongDetails(songId: string): Promise<PlaylistSongModel>{
@@ -147,28 +148,25 @@ export class SongQueueComponent implements OnInit, OnDestroy {
     
   }
 
-  changeSongPosition(event: DragDropQueueParams): void {
+  public async changeSongPosition(event: DragDropQueueParams): Promise<void> {
     this.rxjsStorageService.setSongTableLoadingState(true);
     console.log(event)
 
-    this.queueService.PushSongInQueue(event.srcSong.order, event.destSong.order, event.markAsManuallyAdded).subscribe({
-      next: (songs: QueueSongModel[])=>{
-        songs.splice(0,1);
-        this.queueModel = {
-          songs: songs.filter(x => !x.addedManualy),
-          totalCount: songs.filter(x => !x.addedManualy).length
-        };
+    let songs = await this.wrapperService.PushSongInQueue(event.srcSong.order, event.destSong.order, event.markAsManuallyAdded);
+    this.rxjsStorageService.setSongTableLoadingState(false);
+    if (songs.length == 0) {
+      return;
+    }
+    songs.splice(0,1);
+    this.queueModel = {
+      songs: songs.filter(x => !x.addedManualy),
+      totalCount: songs.filter(x => !x.addedManualy).length
+    };
 
-        this.nextSongsModel = {
-          songs: songs.filter(x => x.addedManualy),
-          totalCount: songs.filter(x => x.addedManualy).length
-        };
-      },
-      complete: ()=>{
-        //this.onQueueTablePaginationUpdated();
-        this.rxjsStorageService.setSongTableLoadingState(false);
-      }
-    })
+    this.nextSongsModel = {
+      songs: songs.filter(x => x.addedManualy),
+      totalCount: songs.filter(x => x.addedManualy).length
+    };
     
   }
 

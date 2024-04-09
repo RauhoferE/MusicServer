@@ -17,6 +17,8 @@ import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-dr
 import { DOCUMENT } from '@angular/common';
 import { QueueService } from 'src/app/services/queue.service';
 import { FileService } from 'src/app/services/file.service';
+import { QueueWrapperService } from 'src/app/services/queue-wrapper.service';
+import { StreamingClientService } from 'src/app/services/streaming-client.service';
 
 @Component({
   selector: 'app-song-table',
@@ -88,8 +90,8 @@ export class SongTableComponent implements OnInit, OnDestroy {
    */
   constructor(private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService,
     private message: NzMessageService, private modal: NzModalService, private nzContextMenuService: NzContextMenuService, private songService: SongService,
-    private queueService: QueueService, private fileService: FileService,
-     @Inject(DOCUMENT) private doc: Document) {
+     private fileService: FileService, private wrapperService: QueueWrapperService,
+     @Inject(DOCUMENT) private doc: Document, private streamingService: StreamingClientService) {
     console.log("Construct")
     this.IsLoading = this.rxjsStorageService.currentSongTableLoading$;
   }
@@ -100,8 +102,6 @@ export class SongTableComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     let pModel = {} as PaginationModel;
-    let isSongPlaying = false;
-    let currentPlayingSong: PlaylistSongModel = undefined as any;
     this.rxjsStorageService.currentPaginationSongModel$.pipe(takeUntil(this.destroy)).subscribe((val) => {
       
       pModel = val as PaginationModel;
@@ -122,42 +122,25 @@ export class SongTableComponent implements OnInit, OnDestroy {
     // this.currentPlayingSong = currentPlayingSong;
   }
 
-  onSearchQueryInput(): void{
+  public onSearchQueryInput(): void{
     this.pagination.query = this.SearchString;
     this.rxjsStorageService.setCurrentPaginationSongModel(this.pagination);
     this.paginationUpdated.emit();
   }
 
-  addSongToQueue(song: PlaylistSongModel): void {
-    this.queueService.AddSongsToQueue([song.id]).subscribe({
-      next: ()=>{
-        this.updateQueue();
-      },
-      error: (error)=>{
-        console.log("Error when adding song to queue");
-      }
-    });
+  public async addSongToQueue(song: PlaylistSongModel): Promise<void> {
+    await this.wrapperService.AddSongsToQueue([song.id]);
     
   }
 
-  addSelectedSongsToQueue(): void {
+  public async addSelectedSongsToQueue(): Promise<void> {
     var checkedSongs = this.songs.songs.filter(x => x.checked);
 
-    this.queueService.AddSongsToQueue(checkedSongs.map(x => x.id)).subscribe({
-      next: ()=>{
-        this.updateQueue();
-      },
-      error: (error)=>{
-        console.log("Error when adding songs to queue");
-      },
-      complete: ()=>{
-        this.checkAll(false);
-      }
-    });
-    // this.checkAll(false);
+    await this.wrapperService.AddSongsToQueue(checkedSongs.map(x => x.id));
+    this.checkAll(false)
   }
 
-  onQueryParamsChange(event: any): void{
+  public onQueryParamsChange(event: any): void{
     console.log("Query Changed")
 
     var sortAfter = event.sort.find((x: any) => x.value);
@@ -211,7 +194,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: PlaylistSongModel, index: number): void {
+  public contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: PlaylistSongModel, index: number): void {
     this.selectedTableItem = { index: index, songModel: item};
     this.getPlaylists();
 
@@ -251,15 +234,15 @@ export class SongTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  closeMenu(): void {
+  public closeMenu(): void {
     this.nzContextMenuService.close();
   }
 
-  getAlbumCoverSrc(id: string): string{
+  public getAlbumCoverSrc(id: string): string{
     return `${environment.apiUrl}/${APIROUTES.file}/album/${id}`;
   }
 
-  getHeaderSortOrder(sortOrder: string): string | null{
+  public getHeaderSortOrder(sortOrder: string): string | null{
     if (this.pagination.sortAfter == sortOrder && this.pagination.asc) {
       return 'ascend';
     }
@@ -271,7 +254,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  checkAll(value: boolean): void {
+  public checkAll(value: boolean): void {
     this.songs.songs.forEach(data => {
       data.checked = value;
     });
@@ -279,34 +262,34 @@ export class SongTableComponent implements OnInit, OnDestroy {
     this.refreshTableHeader();
   }
 
-  refreshTableHeader(): void{
+  public refreshTableHeader(): void{
     const allChecked = this.songs.songs.length > 0 && this.songs.songs.every(value => value.checked === true);
     const allUnChecked = this.songs.songs.every(value => !value.checked);
     this.AllChecked = allChecked;
     this.Indeterminate = !allChecked && !allUnChecked;
   }
 
-  removeSongFromFavorites(songId: string): void{
+  public removeSongFromFavorites(songId: string): void{
     // Remove Song from Favorites
     this.removeSongsFromFavorites([songId]);
   }
 
-  addSongToFavorites(id: string): void{
+  public addSongToFavorites(id: string): void{
     // Add Song to Favorites
     this.addSongsToFavorite([id]);
   }
 
-  addSongToPlaylist(playlistId: string): void{
+  public addSongToPlaylist(playlistId: string): void{
     console.log(playlistId)
     this.addSongsToPlaylist([this.SelectedTableItem.id], playlistId);
   }
 
-  addSelectedSongsToPlaylist(playlistId: string): void{
+  public addSelectedSongsToPlaylist(playlistId: string): void{
     var checkedSongIds = this.songs.songs.filter(x => x.checked).map(x => x.id);
     this.addSongsToPlaylist(checkedSongIds, playlistId);
   }
 
-  removeSongFromPlaylist(): void{
+  public removeSongFromPlaylist(): void{
     if (this.playlistId == undefined) {
       return;
     }
@@ -314,7 +297,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
     this.removeSongsFromPlaylist([this.SelectedTableItem.order], this.playlistId);
   }
 
-  removeSelectedSongsFromPlaylist(): void{
+  public removeSelectedSongsFromPlaylist(): void{
     if (this.playlistId == undefined) {
       return;
     }
@@ -323,7 +306,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
     this.removeSongsFromPlaylist(checkedSongIds, this.playlistId);
   }
 
-  removeSongsFromPlaylist(orderIds: number[], playlistId: string): void{
+  public removeSongsFromPlaylist(orderIds: number[], playlistId: string): void{
     this.playlistService.RemoveSongsFromPlaylist(orderIds, playlistId).subscribe({
       next: ()=>{
         // Show All good modal
@@ -343,7 +326,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
     })
   }
 
-  addSelectedSongsToFavorites(): void{
+  public addSelectedSongsToFavorites(): void{
     var checkedSongIds = this.songs.songs.filter(x => x.checked && !x.isInFavorites).map(x => x.id);
 
     if (checkedSongIds.length == 0) {
@@ -353,7 +336,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
     this.addSongsToFavorite(checkedSongIds);
   }
 
-  removeSelectedSongsFromFavorites(): void{
+  public removeSelectedSongsFromFavorites(): void{
     var checkedSongIds = this.songs.songs.filter(x => x.checked && x.isInFavorites).map(x => x.id);
 
     if (checkedSongIds.length == 0) {
@@ -363,7 +346,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
     this.removeSongsFromFavorites(checkedSongIds);
   }
 
-  addSongsToFavorite(ids: string[]): void{
+  public addSongsToFavorite(ids: string[]): void{
     this.playlistService.AddSongsToFavorites(ids).subscribe({
       next: ()=>{
         // Show Modal
@@ -386,7 +369,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
     })
   }
 
-  addSongsToPlaylist(ids: string[], playlistId: string): void{
+  public addSongsToPlaylist(ids: string[], playlistId: string): void{
     this.playlistService.AddSongsToPlaylist(ids, playlistId).subscribe({
       next: ()=>{
         // Show Modal
@@ -415,7 +398,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
     })
   }
 
-  showRemoveSongsFromFavoritesModal(songIds: string[]): void{
+  public showRemoveSongsFromFavoritesModal(songIds: string[]): void{
     this.modal.confirm({
       nzTitle: 'Delete Favorites?',
       nzContent: '<b class="error-color">Are you sure you want to delete the songs from your favorites</b>',
@@ -428,7 +411,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
     });
   }
   
-  removeSongsFromFavorites(songIds: string[]): void{
+  public removeSongsFromFavorites(songIds: string[]): void{
     this.playlistService.RemoveSongsFromFavorites(songIds).subscribe({
       next: ()=>{
         // Show All good modal
@@ -450,14 +433,15 @@ export class SongTableComponent implements OnInit, OnDestroy {
     });
   }
 
-  playSong(model: PlaylistSongModel, index: number): void{
+  public playSong(model: PlaylistSongModel, index: number): void{
     
     // Send event to outside component
     this.playSongClicked.emit({index: index, songModel: model} as PlaylistSongModelParams);
   }
 
-  pauseSong(): void{
+  public async pauseSong(): Promise<void>{
     this.rxjsStorageService.setIsSongPlaylingState(false);
+    await this.streamingService.playPauseSong(false);
   }
 
   updateDashBoard(): void{
@@ -502,12 +486,12 @@ export class SongTableComponent implements OnInit, OnDestroy {
     })
   }
 
-  getArtistsNamesAsList(artists: ArtistShortModel[]): string{
+  public getArtistsNamesAsList(artists: ArtistShortModel[]): string{
     return artists.map(x => x.name).join(', ');
 
   }
 
-  drop(event: CdkDragDrop<string[]>): void {
+  public drop(event: CdkDragDrop<string[]>): void {
     console.log("drop")
     this.doc.body.classList.remove('inheritCursors');
     this.doc.body.style.cursor = 'unset'; 
@@ -527,7 +511,7 @@ export class SongTableComponent implements OnInit, OnDestroy {
     this.songDropped.emit({ srcSong: srcSong, destSong: destSong, srcIndex: event.previousIndex, destIndex: event.currentIndex});
   }
 
-  drag(event: CdkDragStart<any>): void {
+  public drag(event: CdkDragStart<any>): void {
     console.log("drag")
     this.doc.body.classList.add('inheritCursors');
     this.doc.body.style.cursor = 'grabbing'; 

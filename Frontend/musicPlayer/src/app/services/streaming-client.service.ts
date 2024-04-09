@@ -47,6 +47,8 @@ export class StreamingClientService {
 
   public playPauseStateUpdated = new EventEmitter<boolean>();
 
+  public queueItemsReceivedEvents = new EventEmitter<QueueSongModel[]>();
+
 
   constructor(private rxjsStorage: RxjsStorageService) { 
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -118,6 +120,10 @@ export class StreamingClientService {
     this.hubConnection.on(HUBEMITS.receivePlayPauseSongState, (state: boolean)=>{
       this.playPauseStateUpdated.emit(state);
     });
+
+    this.hubConnection.on(HUBEMITS.receiveQueueEntities, (models: QueueSongModel[])=>{
+      this.queueItemsReceivedEvents.emit(models);
+    })
 
     this.usersUpdated$.subscribe(x=>{
       this.usersProp = x;

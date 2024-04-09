@@ -15,6 +15,8 @@ import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SongService } from 'src/app/services/song.service';
 import { environment } from 'src/environments/environment';
 import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop';
+import { StreamingClientService } from 'src/app/services/streaming-client.service';
+import { QueueWrapperService } from 'src/app/services/queue-wrapper.service';
 
 @Component({
   selector: 'app-queue-table',
@@ -64,7 +66,7 @@ export class QueueTableComponent implements OnInit, OnDestroy{
    */
   constructor(private rxjsStorageService: RxjsStorageService, private playlistService: PlaylistService,
     private message: NzMessageService, private modal: NzModalService, private nzContextMenuService: NzContextMenuService, private songService: SongService,
-    private queueService: QueueService,
+    private queueService: QueueService, private streamingService: StreamingClientService, private wrapperService: QueueWrapperService,
      @Inject(DOCUMENT) private doc: Document) {
     console.log("Construct")
     this.IsLoading = this.rxjsStorageService.currentSongTableLoading$;
@@ -88,85 +90,45 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     // this.currentPlayingSong = currentPlayingSong;
   }
 
-  removeSongFromQueue(songId: string, index: number): void {
+  public async removeSongFromQueue(songId: string, index: number): Promise<void> {
 
-    this.queueService.RemoveSongsFromQueue([index]).subscribe({
-      next: ()=>{
-        this.updateQueue();
-      },
-      error: (error)=>{
-        console.log("Error when removing song to queue");
-      }
-    });
+    await this.wrapperService.RemoveSongsFromQueue([index]);
   }
 
-  addSongToQueue(song: PlaylistSongModel): void {
-    this.queueService.AddSongsToQueue([song.id]).subscribe({
-      next: ()=>{
-        this.updateQueue();
-      },
-      error: (error)=>{
-        console.log("Error when adding song to queue");
-      }
-    });
-    
+  public async addSongToQueue(song: PlaylistSongModel): Promise<void> {
+    await this.wrapperService.AddSongsToQueue([song.id]);   
   }
 
   // This method is only used when the queue is displayed
-  removeSelectedSongsFromQueue(): void {
+  public async removeSelectedSongsFromQueue(): Promise<void> {
     var checkedSongs = this.queue.songs.filter(x => x.checked);
 
-    this.queueService.RemoveSongsFromQueue(checkedSongs.map(x => x.order)).subscribe({
-      next: ()=>{
-        this.updateQueue();
-      },
-      error: (error)=>{
-        console.log("Error when removing songs to queue");
-      },
-      complete: ()=>{
-        this.checkAll(false);
-      }
-    });
+    await this.wrapperService.RemoveSongsFromQueue(checkedSongs.map(x => x.order));
+    this.checkAll(false);
 
     //this.checkAll(false);
   }
 
-  addSelectedSongsToQueue(): void {
+  public async addSelectedSongsToQueue(): Promise<void> {
     var checkedSongs = this.queue.songs.filter(x => x.checked);
 
-    this.queueService.AddSongsToQueue(checkedSongs.map(x => x.id)).subscribe({
-      next: ()=>{
-        this.updateQueue();
-      },
-      error: (error)=>{
-        console.log("Error when adding songs to queue");
-      },
-      complete: ()=>{
-        this.checkAll(false);
-      }
-    });
+    await this.wrapperService.AddSongsToQueue(checkedSongs.map(x => x.id));
+    this.checkAll(false);
     // this.checkAll(false);
   }
 
-  clearQueue(): void{
-    this.queueService.ClearQueue().subscribe({
-      next: () => {
-        this.paginationUpdated.emit();
-      },
-      error: (error) => {
-        console.log(error);
-      }
-
-    })
+  public async clearQueue(): Promise<void>{
+    await this.wrapperService.ClearQueue();
+    this.paginationUpdated.emit();
   }
 
-  onQueryParamsChange(event: any): void{
+  public onQueryParamsChange(event: any): void{
     console.log("Query Changed")
 
     this.paginationUpdated.emit();
   }
 
-  contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: PlaylistSongModel, index: number): void {
+  public contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: PlaylistSongModel, index: number): void {
     this.selectedTableItem = { index: index, songModel: item};
     this.playlistService.GetModifieablePlaylists(-1).subscribe((val)=>{
       this.modifieablePlaylists = val.playlists;
@@ -186,7 +148,7 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     return `${environment.apiUrl}/${APIROUTES.file}/album/${id}`;
   }
 
-  checkAll(value: boolean): void {
+  public checkAll(value: boolean): void {
     this.queue.songs.forEach(data => {
       data.checked = value;
     });
@@ -201,27 +163,27 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     this.Indeterminate = !allChecked && !allUnChecked;
   }
 
-  removeSongFromFavorites(songId: string): void{
+  public removeSongFromFavorites(songId: string): void{
     // Remove Song from Favorites
     this.removeSongsFromFavorites([songId]);
   }
 
-  addSongToFavorites(id: string): void{
+  public addSongToFavorites(id: string): void{
     // Add Song to Favorites
     this.addSongsToFavorite([id]);
   }
 
-  addSongToPlaylist(playlistId: string): void{
+  public addSongToPlaylist(playlistId: string): void{
     console.log(playlistId)
     this.addSongsToPlaylist([this.SelectedTableItem.id], playlistId);
   }
 
-  addSelectedSongsToPlaylist(playlistId: string): void{
+  public addSelectedSongsToPlaylist(playlistId: string): void{
     var checkedSongIds = this.queue.songs.filter(x => x.checked).map(x => x.id);
     this.addSongsToPlaylist(checkedSongIds, playlistId);
   }
 
-  removeSongsFromPlaylist(orderIds: number[], playlistId: string): void{
+  public removeSongsFromPlaylist(orderIds: number[], playlistId: string): void{
     this.playlistService.RemoveSongsFromPlaylist(orderIds, playlistId).subscribe({
       next: ()=>{
         // Show All good modal
@@ -241,7 +203,7 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     })
   }
 
-  addSelectedSongsToFavorites(): void{
+  public addSelectedSongsToFavorites(): void{
     var checkedSongIds = this.queue.songs.filter(x => x.checked && !x.isInFavorites).map(x => x.id);
 
     if (checkedSongIds.length == 0) {
@@ -251,7 +213,7 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     this.addSongsToFavorite(checkedSongIds);
   }
 
-  removeSelectedSongsFromFavorites(): void{
+  public removeSelectedSongsFromFavorites(): void{
     var checkedSongIds = this.queue.songs.filter(x => x.checked && x.isInFavorites).map(x => x.id);
 
     if (checkedSongIds.length == 0) {
@@ -261,7 +223,7 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     this.removeSongsFromFavorites(checkedSongIds);
   }
 
-  addSongsToFavorite(ids: string[]): void{
+  public addSongsToFavorite(ids: string[]): void{
     this.playlistService.AddSongsToFavorites(ids).subscribe({
       next: ()=>{
         // Show Modal
@@ -284,7 +246,7 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     })
   }
 
-  addSongsToPlaylist(ids: string[], playlistId: string): void{
+  public addSongsToPlaylist(ids: string[], playlistId: string): void{
     this.playlistService.AddSongsToPlaylist(ids, playlistId).subscribe({
       next: ()=>{
         // Show Modal
@@ -313,7 +275,7 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     })
   }
 
-  showRemoveSongsFromFavoritesModal(songIds: string[]): void{
+  public showRemoveSongsFromFavoritesModal(songIds: string[]): void{
     this.modal.confirm({
       nzTitle: 'Delete Favorites?',
       nzContent: '<b class="error-color">Are you sure you want to delete the songs from your favorites</b>',
@@ -326,7 +288,7 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     });
   }
   
-  removeSongsFromFavorites(songIds: string[]): void{
+  public removeSongsFromFavorites(songIds: string[]): void{
     this.playlistService.RemoveSongsFromFavorites(songIds).subscribe({
       next: ()=>{
         // Show All good modal
@@ -348,14 +310,15 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     });
   }
 
-  playSong(model: PlaylistSongModel, index: number): void{
+  public playSong(model: PlaylistSongModel, index: number): void{
     
     // Send event to outside component
     this.playSongClicked.emit({index: index, songModel: model} as PlaylistSongModelParams);
   }
 
-  pauseSong(): void{
+  public async pauseSong(): Promise<void>{
     this.rxjsStorageService.setIsSongPlaylingState(false);
+    await this.streamingService.playPauseSong(false);
   }
 
   updateDashBoard(): void{
@@ -400,12 +363,12 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     })
   }
 
-  getArtistsNamesAsList(artists: ArtistShortModel[]): string{
+  public getArtistsNamesAsList(artists: ArtistShortModel[]): string{
     return artists.map(x => x.name).join(', ');
 
   }
 
-  drop(event: CdkDragDrop<string[]>): void {
+  public drop(event: CdkDragDrop<string[]>): void {
     console.log("drop")
     this.doc.body.classList.remove('inheritCursors');
     this.doc.body.style.cursor = 'unset'; 
@@ -458,7 +421,7 @@ export class QueueTableComponent implements OnInit, OnDestroy{
     this.songDropped.emit({ srcSong: srcSong, destSong: destSong, srcIndex: event.previousIndex, destIndex: event.currentIndex, markAsManuallyAdded: markAsManuallyAdded});
   }
 
-  drag(event: CdkDragStart<any>): void {
+  public drag(event: CdkDragStart<any>): void {
     console.log("drag")
     this.doc.body.classList.add('inheritCursors');
     this.doc.body.style.cursor = 'grabbing'; 
