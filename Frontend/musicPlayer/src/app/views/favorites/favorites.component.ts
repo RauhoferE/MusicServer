@@ -9,9 +9,11 @@ import { PlaylistSongModel, SongPaginationModel } from 'src/app/models/playlist-
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
+import { QueueWrapperService } from 'src/app/services/queue-wrapper.service';
 import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SessionStorageService } from 'src/app/services/session-storage.service';
+import { StreamingClientService } from 'src/app/services/streaming-client.service';
 
 @Component({
   selector: 'app-favorites',
@@ -46,10 +48,10 @@ export class FavoritesComponent implements OnInit, OnDestroy{
    *
    */
   constructor(private playlistService: PlaylistService,
-    private queueService: QueueService,
-     private message: NzMessageService, 
+    private queueService: QueueService, private message: NzMessageService, 
     private sessionStorage: SessionStorageService, private jwtService: JwtService,
-    private rxjsStorageService: RxjsStorageService) {
+    private rxjsStorageService: RxjsStorageService, private wrapperService: QueueWrapperService,
+    private streamingService: StreamingClientService) {
     
       this.userName = this.jwtService.getUserName();
       this.userId = parseInt(this.jwtService.getUserId());
@@ -128,8 +130,10 @@ export class FavoritesComponent implements OnInit, OnDestroy{
     console.log(this.queueModel)
     // If the user previously clicked stop and wants to resume the playlist with the same queue
     if (this.QueueModel &&
-      this.QueueModel.target == QUEUETYPES.favorites) {
+      this.QueueModel.target == QUEUETYPES.favorites &&
+    this.queueModel.userId == this.userId) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
+      this.streamingService.playPauseSong(true);
       return;
     }
     const paginationModel = await this.getCurrentPaginationModel();
@@ -144,28 +148,20 @@ export class FavoritesComponent implements OnInit, OnDestroy{
       target : QUEUETYPES.favorites,
       loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
       random: this.queueModel.random == undefined ? false: this.queueModel.random,
-      userId: this.queueModel.userId
+      userId: this.userId
     });
 
-    this.queueService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
-      next:async (song: PlaylistSongModel)=>{
-        this.rxjsStorageService.setCurrentPlayingSong(song);
-        await this.rxjsStorageService.setUpdateSongState();
-        this.rxjsStorageService.setIsSongPlaylingState(true);
-        this.rxjsStorageService.showMediaPlayer(true);
-        console.log(song)
-      },
-      error:(error: any)=>{
-        this.message.error("Error when getting queue.");
-      },
-      complete: () => {
-      }
-    });
+    await this.wrapperService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1);
+    this.rxjsStorageService.setIsSongPlaylingState(true);
+    this.rxjsStorageService.showMediaPlayer(true);
+    await this.rxjsStorageService.setUpdateSongState();
+    await this.streamingService.sendCurrentSongProgress(true, 0);
   }
 
   public pauseSongs(): void {
     // Stop playing of song
     this.rxjsStorageService.setIsSongPlaylingState(false);
+    this.streamingService.playPauseSong(false);
   }
 
   public async onPlaySongClicked(event: PlaylistSongModelParams): Promise<void>{
@@ -181,6 +177,7 @@ export class FavoritesComponent implements OnInit, OnDestroy{
     if (this.CurrentPlayingSong && 
       this.CurrentPlayingSong.id == songModel.id) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
+      this.streamingService.playPauseSong(true);
       return;
     }
 
@@ -199,23 +196,14 @@ export class FavoritesComponent implements OnInit, OnDestroy{
       target : QUEUETYPES.favorites,
       loopMode: this.queueModel.loopMode== undefined ? LOOPMODES.none: this.queueModel.loopMode,
       random: this.queueModel.random == undefined ? false: this.queueModel.random,
-      userId: this.queueModel.userId
+      userId: this.userId
     });
 
-    this.queueService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({
-      next:async (song: PlaylistSongModel)=>{
-        console.log(song)
-        this.rxjsStorageService.setCurrentPlayingSong(song);
-        await this.rxjsStorageService.setUpdateSongState();
-        this.rxjsStorageService.setIsSongPlaylingState(true);
-        this.rxjsStorageService.showMediaPlayer(true);
-      },
-      error:(error: any)=>{
-        this.message.error("Error when getting queue.");
-      },
-      complete: () => {
-      }
-    });
+    await this.wrapperService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order);
+    this.rxjsStorageService.setIsSongPlaylingState(true);
+    this.rxjsStorageService.showMediaPlayer(true);
+    await this.rxjsStorageService.setUpdateSongState();
+    await this.streamingService.sendCurrentSongProgress(true, 0);
   }
 
   changeSongPosition(event: DragDropSongParams): void {
