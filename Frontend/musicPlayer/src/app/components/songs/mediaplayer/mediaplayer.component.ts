@@ -68,7 +68,7 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
 
 
   async ngOnInit(): Promise<void> {
-
+    
     this.rxjsService.isSongPlayingState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.isSongPlaying = x;
 
@@ -109,6 +109,7 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
 
     this.rxjsService.updateReplaySongState.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.audioElement.currentTime = 0;
+      this.durationSlider = 0;
     })
 
     this.rxjsService.currentQueueFilterAndPagination.pipe(takeUntil(this.destroy)).subscribe(x => {
@@ -139,10 +140,21 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
       this.durationSlider = x.secondsPlayed;
     });
 
+    this.streamingService.playPauseStateUpdated.subscribe(x=>{
+      this.rxjsService.setIsSongPlaylingState(x);
+    });
+
     this.streamingService.queueDataUpdated.subscribe(x=>{
       this.randomizePlay = x.random;
       this.loopMode = x.loopMode;
-      this.setLoopMode();
+      if (this.loopMode == LOOPMODES.audio) {
+        this.loopAudio = true;
+        this.audioElement.loop = true;
+        return;
+      }
+
+      this.loopAudio = false;
+      this.audioElement.loop = false;
     });
 
   }
@@ -358,39 +370,35 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  private setLoopMode(): void{
-        // Check the current loop mode
-        switch (this.loopMode) {
-          case this.LoopModeNone:
-            this.loopMode = this.LoopModePlaylist;
-            this.loopAudio = false;
-            break;
-          case this.LoopModeAudio:
-            this.loopMode = this.LoopModeNone;
-            this.loopAudio = false;
-            break;
-          case this.LoopModePlaylist:
-            this.loopMode = this.LoopModeAudio;
-            this.loopAudio = true;
-            break;
-          default:
-            break;
-        }
-    
-        
-        this.audioElement.loop = this.loopAudio;
-  }
-
   public async loopPlayback(): Promise<void>{
+    
+    // Check the current loop mode
+    switch (this.loopMode) {
+      case this.LoopModeNone:
+        this.loopMode = this.LoopModePlaylist;
+        this.loopAudio = false;
+        break;
+      case this.LoopModeAudio:
+        this.loopMode = this.LoopModeNone;
+        this.loopAudio = false;
+        break;
+      case this.LoopModePlaylist:
+        this.loopMode = this.LoopModeAudio;
+        this.loopAudio = true;
+        break;
+      default:
+        break;
+    }
 
-    this.setLoopMode();
+    
+    this.audioElement.loop = this.loopAudio;
     this.queueModel.loopMode = this.loopMode;
     this.rxjsService.setQueueFilterAndPagination(this.queueModel);
 
     try {
       // Update the quemodel in the db
       //await lastValueFrom(this.queueService.UpdateLoopMode(this.queueModel.loopMode));
-      await this.wrapperService.UpdateLoopMode(this.queueModel.loopMode);
+      await this.wrapperService.UpdateLoopMode(this.loopMode);
     } catch (error) {
       console.log(error);
     }

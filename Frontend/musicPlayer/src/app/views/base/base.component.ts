@@ -45,7 +45,7 @@ export class BaseComponent implements OnInit, OnDestroy {
    */
   constructor(private userService: UserService, private jwtService: JwtService, private rxjsService: RxjsStorageService, 
     private queueService: QueueService, private playlistService: PlaylistService, private fileService: FileService,
-    private message: NzMessageService) {
+    private message: NzMessageService, private streamingService: StreamingClientService) {
     this.rxjsService.updateDashboardBoolean$.subscribe((val) => this.getFollowedEntities());
     
   }
@@ -63,6 +63,27 @@ export class BaseComponent implements OnInit, OnDestroy {
 
     this.rxjsService.updateProfilePicBoolean$.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.updateProfileSrc();
+    });
+
+    this.streamingService.connectionClosedEvent.pipe(takeUntil(this.destroy)).subscribe(async ()=>{
+      try {
+        var song = await lastValueFrom(this.queueService.GetCurrentSong());
+        this.rxjsService.setCurrentPlayingSong(song);
+        this.rxjsService.showMediaPlayer(true);
+        await this.rxjsService.setUpdateSongState();
+      } catch (error) {
+        this.rxjsService.setCurrentPlayingSong({} as any);
+        this.rxjsService.showMediaPlayer(false);
+      }
+
+      try {
+        var data = await lastValueFrom(this.queueService.GetQueueData());
+        this.rxjsService.setQueueFilterAndPagination(data);
+      } catch (error) {
+        console.log("Error")
+        this.rxjsService.setQueueFilterAndPagination({} as any);
+      }
+      
     });
 
     this.getFollowedEntities();

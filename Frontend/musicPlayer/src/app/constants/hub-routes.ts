@@ -21,6 +21,7 @@ export interface HubInvokes {
     createQueueFromSingleSong: string;
     addAlbumToQueue: string;
     addPlaylistToQueue: string;
+    playPauseSong: string;
 }
 
 export interface HubEmits{
@@ -35,6 +36,7 @@ export interface HubEmits{
     receiveSongProgress: string;
     updateQueueView: string;
     updateCurrentSong: string;
+    receivePlayPauseSongState: string;
 }
 
 export const HUBINVOKES: HubInvokes = {
@@ -58,7 +60,8 @@ export const HUBINVOKES: HubInvokes = {
     randomizeQueue: 'RandomizeQueue',
     updateLoopMode:'UpdateLoopMode',
     updateQueueData: 'UpdateQueueData',
-    getQueueData: 'GetQueueData'
+    getQueueData: 'GetQueueData',
+    playPauseSong: 'PlayPauseSong'
 }
 
 export const HUBEMITS: HubEmits = {
@@ -72,6 +75,7 @@ export const HUBEMITS: HubEmits = {
     updateCurrentSong: 'UpdateCurrentSong',
     updateQueueView: 'UpdateQueueView',
     userDisconnected: 'UserDisconnected',
-    userJoinedSession: 'UserJoinedSession'
+    userJoinedSession: 'UserJoinedSession',
+    receivePlayPauseSongState: 'ReceivePlayPauseSongState'
 
 }

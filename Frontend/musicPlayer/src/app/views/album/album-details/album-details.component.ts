@@ -9,10 +9,12 @@ import { AlbumModel } from 'src/app/models/artist-models';
 import { PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, SongPaginationModel, PlaylistUserShortModel } from 'src/app/models/playlist-models';
 import { PaginationModel, QueueModel } from 'src/app/models/storage';
+import { QueueWrapperService } from 'src/app/services/queue-wrapper.service';
 import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SessionStorageService } from 'src/app/services/session-storage.service';
 import { SongService } from 'src/app/services/song.service';
+import { StreamingClientService } from 'src/app/services/streaming-client.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -54,7 +56,7 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private rxjsService: RxjsStorageService, private songService: SongService,
     private message: NzMessageService, 
     private sessionStorage: SessionStorageService,
-    private queueService: QueueService) {
+    private queueService: QueueService, private wrapperService: QueueWrapperService, private streamingService: StreamingClientService) {
 
     this.rxjsService.setCurrentPaginationSongModel(this.paginationModel);
     
@@ -135,7 +137,7 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
       pModel.asc, pModel.query);
   }
 
-  public playSongs(): void{
+  public async playSongs(): Promise<void>{
     console.log("Play songs")
 
     // If the user previously clicked stop and wants to resume the playlist with the same queue
@@ -143,8 +145,10 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
       this.QueueModel.target == QUEUETYPES.album && 
       this.QueueModel.itemId == this.albumId) {
       this.rxjsService.setIsSongPlaylingState(true);
+      await this.streamingService.playPauseSong(true);
       return;
     }
+    
     this.rxjsService.setQueueFilterAndPagination({
       asc : this.paginationModel.asc,
       page : 0,
@@ -158,30 +162,37 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
       random: this.queueModel.random == undefined ? false: this.queueModel.random,
       userId: this.queueModel.userId
     });
+    await this.wrapperService.CreateQueueFromAlbum(this.albumId, this.queueModel.random, this.queueModel.loopMode,-1);
+    
+    this.rxjsService.setIsSongPlaylingState(true);
+    this.rxjsService.showMediaPlayer(true);
+    await this.rxjsService.setUpdateSongState();
+    await this.streamingService.sendCurrentSongProgress(true, 0);
 
-    this.queueService.CreateQueueFromAlbum(this.albumId, this.queueModel.random, this.queueModel.loopMode,-1).subscribe({
-      next:async (song: PlaylistSongModel)=>{
-        console.log(song)
+    // .subscribe({
+    //   next:async (song: PlaylistSongModel)=>{
+    //     console.log(song)
         
-        this.rxjsService.setCurrentPlayingSong(song);
-        await this.rxjsService.setUpdateSongState();
-        this.rxjsService.setIsSongPlaylingState(true);
-        this.rxjsService.showMediaPlayer(true);
-      },
-      error:(error: any)=>{
-        this.message.error("Error when getting queue.");
-      },
-      complete: () => {
-      }
-    });
+    //     this.rxjsService.setCurrentPlayingSong(song);
+    //     await this.rxjsService.setUpdateSongState();
+    //     this.rxjsService.setIsSongPlaylingState(true);
+    //     this.rxjsService.showMediaPlayer(true);
+    //   },
+    //   error:(error: any)=>{
+    //     this.message.error("Error when getting queue.");
+    //   },
+    //   complete: () => {
+    //   }
+    // });
   }
 
-  public pauseSongs(): void {
+  public async pauseSongs(): Promise<void> {
     // Stop playing of song
     this.rxjsService.setIsSongPlaylingState(false);
+    this.streamingService.playPauseSong(false);
   }
 
-  public onPlaySongClicked(event: PlaylistSongModelParams): void{
+  public async onPlaySongClicked(event: PlaylistSongModelParams): Promise<void>{
     console.log(event);
     const indexOfSong = event.index;
     const songModel = event.songModel;
@@ -194,6 +205,7 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
     if (this.CurrentPlayingSong && 
       this.CurrentPlayingSong.id == songModel.id) {
       this.rxjsService.setIsSongPlaylingState(true);
+      await this.streamingService.playPauseSong(true);
       return;
     }
 
@@ -212,20 +224,11 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
       userId: this.queueModel.userId
     });
 
-    this.queueService.CreateQueueFromAlbum(this.albumId, this.queueModel.random,this.queueModel.loopMode, skipSongs).subscribe({
-      next:async (song: PlaylistSongModel)=>{
-        console.log(song)
-        this.rxjsService.setCurrentPlayingSong(song);
-        await this.rxjsService.setUpdateSongState();
-        this.rxjsService.setIsSongPlaylingState(true);
-        this.rxjsService.showMediaPlayer(true);
-      },
-      error:(error: any)=>{
-        this.message.error("Error when getting queue.");
-      },
-      complete: () => {
-      }
-    });
+    await this.wrapperService.CreateQueueFromAlbum(this.albumId, this.queueModel.random,this.queueModel.loopMode, skipSongs);
+    this.rxjsService.setIsSongPlaylingState(true);
+    this.rxjsService.showMediaPlayer(true);
+    await this.rxjsService.setUpdateSongState();
+    await this.streamingService.sendCurrentSongProgress(true, 0);
   }
 
   public getAlbumCoverSrc(): string{

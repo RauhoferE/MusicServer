@@ -157,6 +157,16 @@ namespace MusicServer.Hubs
             await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).ReceiveSongProgress(isSongPlaying, secondsPlayed);
         }
 
+        public async Task PlayPauseSong(Guid groupId, bool isSongPlaying)
+        {
+            if (!(await this.streamingService.GroupExistsAsync(groupId)))
+            {
+                throw new HubException("Error group doesnt exist.");
+            }
+
+            await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).ReceivePlayPauseSongState(isSongPlaying);
+        }
+
         public async Task GetCurrentSongQueue(Guid groupId)
         {
             if (!(await this.streamingService.GroupExistsAsync(groupId)))
@@ -287,7 +297,7 @@ namespace MusicServer.Hubs
         }
 
         public async Task UpdateLoopMode(Guid groupId, string loopMode)
-        {
+        {   
             if (!(await this.streamingService.GroupExistsAsync(groupId)))
             {
                 throw new HubException("Error group doesnt exist.");
@@ -352,6 +362,8 @@ namespace MusicServer.Hubs
             var albumSongs = await this.songService.GetSongsInAlbumAsync(albumId, 0, albumSongCount);
             await this.groupQueueService.UpdateQueueDataAsync(groupId, albumId, loopMode, SortingElementsOwnPlaylistSongs.Name, QueueTarget.Album, randomize, true, this.activeUserService.Id);
             await this.groupQueueService.CreateQueueAsync(groupId, albumSongs.Songs, randomize, playFromIndex);
+            var data = await this.groupQueueService.GetQueueDataAsync(groupId);
+            await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).ReceiveQueueData(data);
             await this.Clients.Group(groupId.ToString()).UpdateQueueView();
             await this.Clients.Group(groupId.ToString()).UpdateCurrentSong();
         }
@@ -362,6 +374,8 @@ namespace MusicServer.Hubs
             var playlistSongs = await this.playlistService.GetSongsInPlaylistOfUserAsync(this.activeUserService.Id, playlistId, 0, playlistSongCount, sortAfter, asc, null);
             await this.groupQueueService.UpdateQueueDataAsync(groupId, playlistId, loopMode, sortAfter, QueueTarget.Playlist, randomize, asc, this.activeUserService.Id);
             await this.groupQueueService.CreateQueueAsync(groupId, playlistSongs.Songs, randomize, playFromOrder);
+            var data = await this.groupQueueService.GetQueueDataAsync(groupId);
+            await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).ReceiveQueueData(data);
             await this.Clients.Group(groupId.ToString()).UpdateQueueView();
             await this.Clients.Group(groupId.ToString()).UpdateCurrentSong();
         }
@@ -372,6 +386,8 @@ namespace MusicServer.Hubs
             var favoriteSongs = await this.playlistService.GetFavoritesOfUserAsync(this.activeUserService.Id, 0, favoriteSongCount, sortAfter, asc, null);
             await this.groupQueueService.UpdateQueueDataAsync(groupId, Guid.Empty, loopMode, sortAfter, QueueTarget.Favorites, randomize, asc, this.activeUserService.Id);
             await this.groupQueueService.CreateQueueAsync(groupId, favoriteSongs.Songs, randomize, playFromOrder);
+            var data = await this.groupQueueService.GetQueueDataAsync(groupId);
+            await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).ReceiveQueueData(data);
             await this.Clients.Group(groupId.ToString()).UpdateQueueView();
             await this.Clients.Group(groupId.ToString()).UpdateCurrentSong();
         }
@@ -390,6 +406,10 @@ namespace MusicServer.Hubs
             }
 
             await this.groupQueueService.CreateQueueAsync(groupId, new[] { song }, false, -1);
+            var data = await this.groupQueueService.GetQueueDataAsync(groupId);
+            await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).ReceiveQueueData(data);
+            await this.Clients.Group(groupId.ToString()).UpdateQueueView();
+            await this.Clients.Group(groupId.ToString()).UpdateCurrentSong();
         }
 
         public async Task AddAlbumToQueue(Guid groupId, Guid albumId)

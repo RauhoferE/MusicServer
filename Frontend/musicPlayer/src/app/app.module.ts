@@ -64,6 +64,7 @@ import { UserDetailsComponent } from './views/user/user-details/user-details.com
 import { PlaylistEditComponent } from './components/playlist/playlist-edit/playlist-edit.component';
 import { StreamingClientService } from './services/streaming-client.service';
 import { QueueWrapperService } from './services/queue-wrapper.service';
+import { RxjsStorageService } from './services/rxjs-storage.service';
 
 
 
@@ -136,7 +137,8 @@ registerLocaleData(en);
     CookieService,
     { provide: NZ_I18N, useValue: en_US },
     StreamingClientService,
-    QueueWrapperService
+    QueueWrapperService,
+    RxjsStorageService
   ],
   bootstrap: [AppComponent]
 })

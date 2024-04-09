@@ -51,24 +51,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       console.log("New User joined", x);
     });
 
-    this.streamingService.connectionClosedEvent.pipe(takeUntil(this.destroy)).subscribe(async ()=>{
-      try {
-        var song = await lastValueFrom(this.queueService.GetCurrentSong());
-        this.rxjsStorage.setCurrentPlayingSong(song);
-        this.rxjsStorage.showMediaPlayer(true);
-      } catch (error) {
-        this.rxjsStorage.setCurrentPlayingSong({} as any);
-        this.rxjsStorage.showMediaPlayer(false);
-      }
 
-      try {
-        var data = await lastValueFrom(this.queueService.GetQueueData());
-        this.rxjsStorage.setQueueFilterAndPagination(data);
-      } catch (error) {
-        this.rxjsStorage.setQueueFilterAndPagination({} as any);
-      }
-      
-    });
 
   }
 

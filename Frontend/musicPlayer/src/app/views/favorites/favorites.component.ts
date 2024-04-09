@@ -40,6 +40,8 @@ export class FavoritesComponent implements OnInit, OnDestroy{
 
   private destroy:Subject<any> = new Subject();
 
+  private userId: number = -1;
+
   /**
    *
    */
@@ -50,6 +52,7 @@ export class FavoritesComponent implements OnInit, OnDestroy{
     private rxjsStorageService: RxjsStorageService) {
     
       this.userName = this.jwtService.getUserName();
+      this.userId = parseInt(this.jwtService.getUserId());
 
       let savedPagination = this.sessionStorage.GetLastPaginationOfFavorites();
   
@@ -270,6 +273,10 @@ export class FavoritesComponent implements OnInit, OnDestroy{
 
   public get UserName(): string{
     return this.userName;
+  }
+
+  public get UserId(): number{
+    return this.userId;
   }
 
 }

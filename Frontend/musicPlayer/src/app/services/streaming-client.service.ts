@@ -15,20 +15,22 @@ import { MediaPlayerParams, MediaPlayerProgressParams } from '../models/events';
 export class StreamingClientService {
   private hubConnection: signalR.HubConnection;
 
-  private groupName = new Subject<string>();
+  private groupName = new BehaviorSubject<string>('');
   groupNameUpdated$: Observable<string> = this.groupName.asObservable();
 
   private groupNameProp: string = '';
 
-  private isMaster = new Subject<boolean>();
+  private isMaster = new BehaviorSubject<boolean>(true);
   isMasterUpdated$: Observable<boolean> = this.isMaster.asObservable();
 
   private isMasterProp: boolean = true;
 
-  private users = new Subject<string[]>();
+  private users = new BehaviorSubject<string[]>([]);
   usersUpdated$: Observable<string[]> = this.users.asObservable();
 
   private usersProp: string[] = [];
+
+  private model: QueueModel = {} as QueueModel;
 
   public songProgressUpdated = new EventEmitter<MediaPlayerProgressParams>();
 
@@ -42,6 +44,8 @@ export class StreamingClientService {
   public connectionClosedEvent = new EventEmitter<void>();
 
   public queueDataUpdated = new EventEmitter<MediaPlayerParams>();
+
+  public playPauseStateUpdated = new EventEmitter<boolean>();
 
 
   constructor(private rxjsStorage: RxjsStorageService) { 
@@ -98,21 +102,21 @@ export class StreamingClientService {
     });
 
     this.hubConnection.on(HUBEMITS.receiveQueueData, (data: QueueModel)=>{
-      let oldModel = {} as QueueModel;
-      this.rxjsStorage.currentQueueFilterAndPagination.subscribe((x: QueueModel) => {
-        oldModel = x;
-        oldModel.random = data.random;
-        oldModel.asc = data.asc;
-        oldModel.target = data.target;
-        oldModel.loopMode = data.loopMode;
-        oldModel.sortAfter = data.sortAfter;
-        oldModel.itemId = data.itemId;
-        oldModel.userId = data.userId;
-        
-      });
-      console.log("model set", oldModel);
+      console.log("Receive queue data", data);
+      let oldModel = this.model;
+      oldModel.random = data.random;
+      oldModel.asc = data.asc;
+      oldModel.target = data.target;
+      oldModel.loopMode = data.loopMode;
+      oldModel.sortAfter = data.sortAfter;
+      oldModel.itemId = data.itemId;
+      oldModel.userId = data.userId;
       this.rxjsStorage.setQueueFilterAndPagination(oldModel);
       this.queueDataUpdated.emit({random: oldModel.random, loopMode: oldModel.loopMode});
+    });
+
+    this.hubConnection.on(HUBEMITS.receivePlayPauseSongState, (state: boolean)=>{
+      this.playPauseStateUpdated.emit(state);
     });
 
     this.usersUpdated$.subscribe(x=>{
@@ -126,6 +130,10 @@ export class StreamingClientService {
     this.groupNameUpdated$.subscribe(x=>{
       this.groupNameProp = x;
     })
+
+    this.rxjsStorage.currentQueueFilterAndPagination.subscribe((x: QueueModel) => {
+      this.model = x;
+    });
   }
 
   async startSession(): Promise<void>{
@@ -290,7 +298,7 @@ export class StreamingClientService {
       return;
     }
 
-    await this.hubConnection.invoke(HUBINVOKES.createQueueFromAlbum, this.groupNameProp, playlistId, randomize, loopMode, sortAfter, asc, playFromOrder);
+    await this.hubConnection.invoke(HUBINVOKES.createQueueFromPlaylist, this.groupNameProp, playlistId, randomize, loopMode, sortAfter, asc, playFromOrder);
   }
 
   async createQueueFromFavorites(randomize: boolean, loopMode: string, sortAfter: string, asc: boolean = true, playFromOrder: number = 0): Promise<void>{
@@ -298,7 +306,7 @@ export class StreamingClientService {
       return;
     }
 
-    await this.hubConnection.invoke(HUBINVOKES.createQueueFromAlbum, this.groupNameProp, randomize, loopMode, sortAfter, asc, playFromOrder);
+    await this.hubConnection.invoke(HUBINVOKES.createQueueFromFavorites, this.groupNameProp, randomize, loopMode, sortAfter, asc, playFromOrder);
   }
 
   async createQueueFromSingleSong(songId: string, randomize: boolean, loopMode: string,): Promise<void>{
@@ -306,7 +314,7 @@ export class StreamingClientService {
       return;
     }
 
-    await this.hubConnection.invoke(HUBINVOKES.createQueueFromAlbum, this.groupNameProp, songId, randomize, loopMode);
+    await this.hubConnection.invoke(HUBINVOKES.createQueueFromSingleSong, this.groupNameProp, songId, randomize, loopMode);
   }
 
   async addAlbumToQueue(albumId: string): Promise<void>{
@@ -314,7 +322,7 @@ export class StreamingClientService {
       return;
     }
 
-    await this.hubConnection.invoke(HUBINVOKES.getQueueData, this.groupNameProp, albumId);
+    await this.hubConnection.invoke(HUBINVOKES.addAlbumToQueue, this.groupNameProp, albumId);
   }
 
   async addPlaylistToQueue(playlistId: string): Promise<void>{
@@ -322,7 +330,15 @@ export class StreamingClientService {
       return;
     }
     
-    await this.hubConnection.invoke(HUBINVOKES.getQueueData, this.groupNameProp, playlistId);
+    await this.hubConnection.invoke(HUBINVOKES.addPlaylistToQueue, this.groupNameProp, playlistId);
+  }
+
+  async playPauseSong(state: boolean): Promise<void>{
+    if (this.groupNameProp == '') {
+      return;
+    }
+    
+    await this.hubConnection.invoke(HUBINVOKES.playPauseSong, this.groupNameProp, state);
   }
 
 
