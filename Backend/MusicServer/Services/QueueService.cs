@@ -363,7 +363,8 @@ namespace MusicServer.Services
                 .ThenInclude(x => x.Artists)
                 .ThenInclude(x => x.Artist)
                 .Include(x => x.Song.Album)
-                .Where(x => x.UserId == userId);
+                .Where(x => x.UserId == userId)
+                .OrderBy(x=>x.Order);
 
             if (!queue.Any(x => x.Order < 0))
             {
@@ -371,9 +372,10 @@ namespace MusicServer.Services
                 throw new SongNotFoundException();
             }
 
-            var manuallyAddedSongCount = this.dbContext.Queues.Count(x => x.UserId == userId && x.AddedManualy &&  x.Order != 0);
+            var manuallyAddedSongCount = 
+                this.dbContext.Queues.Count(x => x.UserId == userId && x.AddedManualy &&  x.Order != 0);
 
-            int addToOrder = 1;
+            int addToOrder = 1; 
 
             List<QueueEntity> toRemove = new List<QueueEntity>();
 
@@ -403,6 +405,8 @@ namespace MusicServer.Services
 
                 queueEntity.Order = queueEntity.Order + addToOrder;
             }
+
+            this.dbContext.Queues.RemoveRange(toRemove);
 
             await this.dbContext.SaveChangesAsync();
             return await this.GetCurrentSongInQueueAsync();

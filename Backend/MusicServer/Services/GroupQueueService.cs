@@ -531,7 +531,8 @@ namespace MusicServer.Services
      .ThenInclude(x => x.Artists)
      .ThenInclude(x => x.Artist)
      .Include(x => x.Song.Album)
-     .Where(x => x.GroupId == groupName);
+     .Where(x => x.GroupId == groupName)
+     .OrderBy(x => x.Order);
 
             if (!queue.Any(x => x.Order < 0))
             {
@@ -572,6 +573,7 @@ namespace MusicServer.Services
                 queueEntity.Order = queueEntity.Order + addToOrder;
             }
 
+            this.dbContext.GroupQueueEntities.RemoveRange(toRemove);
             await this.dbContext.SaveChangesAsync();
             // TODO: Mark songs as favorite
             return await this.GetCurrentSongInQueueAsync(groupName);
