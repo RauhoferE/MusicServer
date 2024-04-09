@@ -189,7 +189,7 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
   public async pauseSongs(): Promise<void> {
     // Stop playing of song
     this.rxjsService.setIsSongPlaylingState(false);
-    this.streamingService.playPauseSong(false);
+    await this.streamingService.playPauseSong(false);
   }
 
   public async onPlaySongClicked(event: PlaylistSongModelParams): Promise<void>{

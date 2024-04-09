@@ -12,9 +12,11 @@ import { PaginationModel, QueueModel } from 'src/app/models/storage';
 import { FileService } from 'src/app/services/file.service';
 import { JwtService } from 'src/app/services/jwt.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
+import { QueueWrapperService } from 'src/app/services/queue-wrapper.service';
 import { QueueService } from 'src/app/services/queue.service';
 import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SessionStorageService } from 'src/app/services/session-storage.service';
+import { StreamingClientService } from 'src/app/services/streaming-client.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -60,9 +62,9 @@ export class PlaylistDetailsComponent implements OnDestroy {
   constructor(private route: ActivatedRoute, 
     private playlistService: PlaylistService, private message: NzMessageService, 
     private sessionStorage: SessionStorageService, private jwtService: JwtService,
-    private rxjsStorageService: RxjsStorageService,
+    private rxjsStorageService: RxjsStorageService, private streamingService: StreamingClientService,
     private queueService: QueueService, private fileService: FileService, private router: Router,
-    private modal: NzModalService) {
+    private modal: NzModalService, private wrapperService: QueueWrapperService) {
     let savedPagination = this.sessionStorage.GetLastPaginationOfPlaylist();
   
     if (savedPagination) {
@@ -153,6 +155,7 @@ export class PlaylistDetailsComponent implements OnDestroy {
       this.QueueModel.target == QUEUETYPES.playlist && 
       this.QueueModel.itemId == this.playlistId) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
+      await this.streamingService.playPauseSong(true);
       return;
     }
     const paginationModel = await this.getCurrentPaginationModel();
@@ -170,26 +173,17 @@ export class PlaylistDetailsComponent implements OnDestroy {
       userId: this.queueModel.userId
     });
 
-    this.queueService.CreateQueueFromPlaylist(this.playlistId, this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1).subscribe({
-      next:async (song: PlaylistSongModel)=>{
-        console.log(song)
-        
-        this.rxjsStorageService.setCurrentPlayingSong(song);
-        await this.rxjsStorageService.setUpdateSongState();
-        this.rxjsStorageService.setIsSongPlaylingState(true);
-        this.rxjsStorageService.showMediaPlayer(true);
-      },
-      error:(error: any)=>{
-        this.message.error("Error when getting queue.");
-      },
-      complete: () => {
-      }
-    });
+    await this.wrapperService.CreateQueueFromPlaylist(this.playlistId, this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1);
+    this.rxjsStorageService.setIsSongPlaylingState(true);
+    this.rxjsStorageService.showMediaPlayer(true);
+    await this.rxjsStorageService.setUpdateSongState();
+    await this.streamingService.sendCurrentSongProgress(true, 0);
   }
 
-  public pauseSongs(): void {
+  public async pauseSongs(): Promise<void> {
     // Stop playing of song
     this.rxjsStorageService.setIsSongPlaylingState(false);
+    await this.streamingService.playPauseSong(false);
   }
 
   public async onPlaySongClicked(event: PlaylistSongModelParams): Promise<void>{
@@ -225,20 +219,11 @@ export class PlaylistDetailsComponent implements OnDestroy {
       userId: this.queueModel.userId
     });
 
-    this.queueService.CreateQueueFromPlaylist(this.playlistId, this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order).subscribe({
-      next:async (song: PlaylistSongModel)=>{
-        console.log(song)
-        this.rxjsStorageService.setCurrentPlayingSong(song);
-        await this.rxjsStorageService.setUpdateSongState();
-        this.rxjsStorageService.setIsSongPlaylingState(true);
-        this.rxjsStorageService.showMediaPlayer(true);
-      },
-      error:(error: any)=>{
-        this.message.error("Error when getting queue.");
-      },
-      complete: () => {
-      }
-    });
+    await this.wrapperService.CreateQueueFromPlaylist(this.playlistId, this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order);
+    this.rxjsStorageService.setIsSongPlaylingState(true);
+    this.rxjsStorageService.showMediaPlayer(true);
+    await this.rxjsStorageService.setUpdateSongState();
+    await this.streamingService.sendCurrentSongProgress(true, 0);
   }
 
   changeSongPosition(event: DragDropSongParams): void {

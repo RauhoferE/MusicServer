@@ -158,10 +158,10 @@ export class FavoritesComponent implements OnInit, OnDestroy{
     await this.streamingService.sendCurrentSongProgress(true, 0);
   }
 
-  public pauseSongs(): void {
+  public async pauseSongs(): Promise<void> {
     // Stop playing of song
     this.rxjsStorageService.setIsSongPlaylingState(false);
-    this.streamingService.playPauseSong(false);
+    await this.streamingService.playPauseSong(false);
   }
 
   public async onPlaySongClicked(event: PlaylistSongModelParams): Promise<void>{
