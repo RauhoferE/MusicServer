@@ -43,6 +43,8 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
 
   private destroy:Subject<any> = new Subject();
 
+  private disableMuteButton: boolean = false;
+
   constructor(private rxjsService: RxjsStorageService, private playlistService: PlaylistService,
      private streamingService: StreamingClientService, private wrapperService: QueueWrapperService,
     private message: NzMessageService) {
@@ -163,6 +165,13 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
       this.loopAudio = false;
       this.audioElement.loop = false;
     });
+
+    this.streamingService.isMasterUpdated$.pipe(takeUntil(this.destroy)).subscribe(x =>{
+      // Only the master should be able to hear the music for now
+      this.mutedAudio = !x;
+      this.audioElement.muted = !x;
+      this.disableMuteButton = !x;
+    })
 
   }
 
@@ -522,5 +531,9 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
 
   get CurrentLoopMode(): string{
     return this.loopMode;
+  }
+
+  get DisableMuteButton(): boolean{
+    return this.disableMuteButton;
   }
 }

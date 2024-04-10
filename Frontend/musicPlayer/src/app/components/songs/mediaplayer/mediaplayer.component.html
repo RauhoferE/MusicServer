@@ -44,7 +44,8 @@
         </div>
         <div nz-row style="font-size: 150%;">
             <app-audio-svg *ngIf="!this.mutedAudio" nz-col nzSpan="2" style="width: 1em; height: 1em; align-self: center;" class="clickable" (click)="muteUnmuteAudio()"/>
-            <app-audio-off-svg *ngIf="this.mutedAudio" nz-col nzSpan="2" style="width: 1em; height: 1em; align-self: center;" class="clickable" (click)="muteUnmuteAudio()"/>
+            <app-audio-off-svg *ngIf="this.mutedAudio && !DisableMuteButton" nz-col nzSpan="2" style="width: 1em; height: 1em; align-self: center;" class="clickable" (click)="muteUnmuteAudio()"/>
+            <app-audio-off-svg *ngIf="this.mutedAudio && DisableMuteButton" nz-col nzSpan="2" style="width: 1em; height: 1em; align-self: center;" class="clickable" aria-disabled="true" />
             <nz-slider
             nz-col
             nzOffset="1"
