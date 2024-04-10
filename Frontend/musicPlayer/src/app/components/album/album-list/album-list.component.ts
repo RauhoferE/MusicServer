@@ -89,7 +89,14 @@ export class AlbumListComponent implements OnInit, OnDestroy {
       return;
     }
 
-    await this.wrapperService.AddAlbumToQueue(params.id);
+    try {
+      await this.wrapperService.AddAlbumToQueue(params.id);  
+    } catch (error: any) {
+      if (error.message) {
+        this.message.error("Error when adding album to queue");
+      }
+    }
+    
   }
 
   public contextMenu($event: MouseEvent, menu: NzDropdownMenuComponent, item: AlbumModel): void {
@@ -116,9 +123,15 @@ export class AlbumListComponent implements OnInit, OnDestroy {
       this.queueModel.target == QUEUETYPES.album && 
       this.queueModel.itemId == id) {
       this.rxjstorageService.setIsSongPlaylingState(true);
-      await this.streamingService.playPauseSong(true);
+      try {
+        await this.streamingService.playPauseSong(true);  
+      } catch (error) {
+        
+      }
+      
       return;
     }
+
     this.rxjstorageService.setQueueFilterAndPagination({
       asc : true,
       page : 0,
@@ -133,16 +146,26 @@ export class AlbumListComponent implements OnInit, OnDestroy {
       userId: this.queueModel.userId
     });
 
-    await this.wrapperService.CreateQueueFromAlbum(id, this.queueModel.random, this.queueModel.loopMode,-1);
-    this.rxjstorageService.setIsSongPlaylingState(true);
-    this.rxjstorageService.showMediaPlayer(true);
-    await this.rxjstorageService.setUpdateSongState();
-    await this.streamingService.sendCurrentSongProgress(true, 0);
+    try {
+      await this.wrapperService.CreateQueueFromAlbum(id, this.queueModel.random, this.queueModel.loopMode,-1);
+      this.rxjstorageService.setIsSongPlaylingState(true);
+      this.rxjstorageService.showMediaPlayer(true);
+      await this.rxjstorageService.setUpdateSongState();
+      await this.streamingService.sendCurrentSongProgress(true, 0);
+    } catch (error: any) {
+      this.message.error("Error when creating queue");
+    }
+
   }
 
   public async pauseSong(): Promise<void>{
     this.rxjstorageService.setIsSongPlaylingState(false);
-    await this.streamingService.playPauseSong(false);
+    try {
+      await this.streamingService.playPauseSong(false);  
+    } catch (error) {
+      
+    }
+    
   }
 
   private updateDashBoard(): void{

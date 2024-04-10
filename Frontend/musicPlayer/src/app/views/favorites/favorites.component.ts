@@ -133,7 +133,12 @@ export class FavoritesComponent implements OnInit, OnDestroy{
       this.QueueModel.target == QUEUETYPES.favorites &&
     this.queueModel.userId == this.userId) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
-      this.streamingService.playPauseSong(true);
+      try {
+        this.streamingService.playPauseSong(true);  
+      } catch (error) {
+        
+      }
+      
       return;
     }
     const paginationModel = await this.getCurrentPaginationModel();
@@ -151,17 +156,27 @@ export class FavoritesComponent implements OnInit, OnDestroy{
       userId: this.userId
     });
 
-    await this.wrapperService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1);
-    this.rxjsStorageService.setIsSongPlaylingState(true);
-    this.rxjsStorageService.showMediaPlayer(true);
-    await this.rxjsStorageService.setUpdateSongState();
-    await this.streamingService.sendCurrentSongProgress(true, 0);
+    try {
+      await this.wrapperService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, -1);
+      this.rxjsStorageService.setIsSongPlaylingState(true);
+      this.rxjsStorageService.showMediaPlayer(true);
+      await this.rxjsStorageService.setUpdateSongState();
+      await this.streamingService.sendCurrentSongProgress(true, 0);
+    } catch (error) {
+      this.message.error("Error when creatign queue.");
+    }
+
   }
 
   public async pauseSongs(): Promise<void> {
     // Stop playing of song
     this.rxjsStorageService.setIsSongPlaylingState(false);
-    await this.streamingService.playPauseSong(false);
+    try {
+      await this.streamingService.playPauseSong(false);  
+    } catch (error) {
+      
+    }
+    
   }
 
   public async onPlaySongClicked(event: PlaylistSongModelParams): Promise<void>{
@@ -177,7 +192,12 @@ export class FavoritesComponent implements OnInit, OnDestroy{
     if (this.CurrentPlayingSong && 
       this.CurrentPlayingSong.id == songModel.id) {
       this.rxjsStorageService.setIsSongPlaylingState(true);
-      this.streamingService.playPauseSong(true);
+      try {
+        this.streamingService.playPauseSong(true);  
+      } catch (error) {
+        
+      }
+      
       return;
     }
 
@@ -199,11 +219,16 @@ export class FavoritesComponent implements OnInit, OnDestroy{
       userId: this.userId
     });
 
-    await this.wrapperService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order);
-    this.rxjsStorageService.setIsSongPlaylingState(true);
-    this.rxjsStorageService.showMediaPlayer(true);
-    await this.rxjsStorageService.setUpdateSongState();
-    await this.streamingService.sendCurrentSongProgress(true, 0);
+    try {
+      await this.wrapperService.CreateQueueFromFavorites(this.queueModel.random, this.queueModel.loopMode, paginationModel.sortAfter, paginationModel.asc, event.songModel.order);
+      this.rxjsStorageService.setIsSongPlaylingState(true);
+      this.rxjsStorageService.showMediaPlayer(true);
+      await this.rxjsStorageService.setUpdateSongState();
+      await this.streamingService.sendCurrentSongProgress(true, 0);
+    } catch (error) {
+      this.message.error("Error when creating queue.");
+    }
+
   }
 
   changeSongPosition(event: DragDropSongParams): void {

@@ -37,6 +37,7 @@ export interface HubEmits{
     updateQueueView: string;
     updateCurrentSong: string;
     receivePlayPauseSongState: string;
+    receiveErrorMessage: string;
 }
 
 export const HUBINVOKES: HubInvokes = {
@@ -76,6 +77,7 @@ export const HUBEMITS: HubEmits = {
     updateQueueView: 'UpdateQueueView',
     userDisconnected: 'UserDisconnected',
     userJoinedSession: 'UserJoinedSession',
-    receivePlayPauseSongState: 'ReceivePlayPauseSongState'
+    receivePlayPauseSongState: 'ReceivePlayPauseSongState',
+    receiveErrorMessage: 'ReceiveErrorMessage'
 
 }

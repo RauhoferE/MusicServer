@@ -1,8 +1,10 @@
 using DataAccess;
 using FluentValidation;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MusicServer.Entities.Requests.User;
 using MusicServer.Extensions;
+using MusicServer.HubFilters;
 using MusicServer.Hubs;
 using MusicServer.Interfaces;
 using MusicServer.Middleware;
@@ -24,7 +26,10 @@ internal class Program
         // Add services to the container.
         ServiceInstaller.InstallControllers(builder);
         ServiceInstaller.InstallServices(builder);
-        builder.Services.AddSignalR();
+        builder.Services.AddSignalR(options =>
+        {
+            options.AddFilter<ErrorFilter>();
+        });
 
         var app = builder.Build();
 

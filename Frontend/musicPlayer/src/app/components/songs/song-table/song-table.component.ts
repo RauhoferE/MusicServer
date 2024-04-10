@@ -129,14 +129,21 @@ export class SongTableComponent implements OnInit, OnDestroy {
   }
 
   public async addSongToQueue(song: PlaylistSongModel): Promise<void> {
-    await this.wrapperService.AddSongsToQueue([song.id]);
-    
+    try {
+      await this.wrapperService.AddSongsToQueue([song.id]);  
+    } catch (error) {
+      this.message.error("Error when adding songs to queue!");
+    } 
   }
 
   public async addSelectedSongsToQueue(): Promise<void> {
-    var checkedSongs = this.songs.songs.filter(x => x.checked);
+    try {
+      var checkedSongs = this.songs.songs.filter(x => x.checked);
+      await this.wrapperService.AddSongsToQueue(checkedSongs.map(x => x.id));
+    } catch (error) {
+      this.message.error("Error when adding songs to queue!");
+    }
 
-    await this.wrapperService.AddSongsToQueue(checkedSongs.map(x => x.id));
     this.checkAll(false)
   }
 
@@ -441,7 +448,12 @@ export class SongTableComponent implements OnInit, OnDestroy {
 
   public async pauseSong(): Promise<void>{
     this.rxjsStorageService.setIsSongPlaylingState(false);
-    await this.streamingService.playPauseSong(false);
+    try {
+      await this.streamingService.playPauseSong(false);  
+    } catch (error) {
+      
+    }
+    
   }
 
   updateDashBoard(): void{

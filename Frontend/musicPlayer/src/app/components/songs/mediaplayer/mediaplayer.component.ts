@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, firstValueFrom, lastValueFrom, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
 import { LOOPMODES } from 'src/app/constants/loop-modes';
@@ -43,7 +44,8 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
   private destroy:Subject<any> = new Subject();
 
   constructor(private rxjsService: RxjsStorageService, private playlistService: PlaylistService,
-     private streamingService: StreamingClientService, private wrapperService: QueueWrapperService) {
+     private streamingService: StreamingClientService, private wrapperService: QueueWrapperService,
+    private message: NzMessageService) {
     this.audioElement.autoplay = false;
     
     this.audioElement.addEventListener("timeupdate", (x) => {
@@ -131,7 +133,12 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
     }
 
     this.streamingService.userJoinedEvent.subscribe(async x =>{
-      await this.streamingService.sendCurrentSongProgressToNewUser(this.isSongPlaying, this.durationSlider);
+      try {
+        await this.streamingService.sendCurrentSongProgressToNewUser(this.isSongPlaying, this.durationSlider);  
+      } catch (error) {
+        
+      }
+      
     });
 
     this.streamingService.songProgressUpdated.subscribe(x =>{
@@ -167,7 +174,12 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
     // Is number
     this.audioElement.currentTime = value;
     console.log("Send current song progress")
-    await this.streamingService.sendCurrentSongProgress(this.isSongPlaying, this.durationSlider);
+    try {
+      await this.streamingService.sendCurrentSongProgress(this.isSongPlaying, this.durationSlider);  
+    } catch (error) {
+      
+    }
+    
   }
 
   public onVolumeChanged(value: any){
@@ -216,14 +228,23 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
     if (this.isSongPlaying) {
       console.log("Stop playback");
       this.rxjsService.setIsSongPlaylingState(false);
+      try {
+        await this.streamingService.sendCurrentSongProgress(false, this.durationSlider);  
+      } catch (error) {
+        
+      }
       
-      await this.streamingService.sendCurrentSongProgress(false, this.durationSlider);
       return;
     }
 
     console.log("Start playback");
     this.rxjsService.setIsSongPlaylingState(true);
-    await this.streamingService.sendCurrentSongProgress(true, this.durationSlider);
+    try {
+      await this.streamingService.sendCurrentSongProgress(true, this.durationSlider);  
+    } catch (error) {
+      
+    }
+    
     
   }
 
@@ -236,19 +257,12 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
 
     this.queueModel.random = this.randomizePlay;
     this.rxjsService.setQueueFilterAndPagination(this.queueModel);
-    await this.wrapperService.ChangeQueue(this.randomizePlay);
-    // this.queueService.ChangeQueue(this.randomizePlay).subscribe({
-    //   next: (song: PlaylistSongModel) => {
-    //     this.rxjsService.setCurrentPlayingSong(song);
-    //     console.log("Ranomdize queue")
-    //     // Update possible queue view
-    //     this.updateSongTable();
-    //     this.updateQueue();
-    //   },
-    //   error: (error) => {
-    //     console.log(error)
-    //   }
-    // })
+    try {
+      await this.wrapperService.ChangeQueue(this.randomizePlay);  
+    } catch (error) {
+      this.message.error("Error when randomizing playback");
+    }
+    
   }
 
   public async playPrevSong(): Promise<void>{
@@ -329,6 +343,7 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
       this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist && this.isSongPlaying);
       //this.updateQueue();
     } catch (error) {
+      this.message.error("There was a problem with playing the queue!");
       console.log(error);
     }
 
@@ -342,6 +357,7 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
       this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist&& this.isSongPlaying);
       //this.updateQueue();
     } catch (error) {
+      this.message.error("There was a problem with playing the queue!");
       console.log(error);
     }
   }
@@ -354,6 +370,7 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
       this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist&& this.isSongPlaying);
       //this.updateQueue();
     } catch (error) {
+      this.message.error("There was a problem with playing the queue!");
       console.log(error);
     }
   }
@@ -366,6 +383,7 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
       this.rxjsService.setIsSongPlaylingState(this.loopMode == this.LoopModePlaylist&& this.isSongPlaying);
       //this.updateQueue();
     } catch (error) {
+      this.message.error("There was a problem with playing the queue!");
       console.log(error);
     }
   }
@@ -400,7 +418,7 @@ export class MediaplayerComponent implements OnInit, OnDestroy {
       //await lastValueFrom(this.queueService.UpdateLoopMode(this.queueModel.loopMode));
       await this.wrapperService.UpdateLoopMode(this.loopMode);
     } catch (error) {
-      console.log(error);
+      this.message.error("Error when changing loop mode!");
     }
   }
 

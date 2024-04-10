@@ -145,7 +145,12 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
       this.QueueModel.target == QUEUETYPES.album && 
       this.QueueModel.itemId == this.albumId) {
       this.rxjsService.setIsSongPlaylingState(true);
-      await this.streamingService.playPauseSong(true);
+      try {
+        await this.streamingService.playPauseSong(true);  
+      } catch (error) {
+        
+      }
+      
       return;
     }
     
@@ -162,34 +167,28 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
       random: this.queueModel.random == undefined ? false: this.queueModel.random,
       userId: this.queueModel.userId
     });
-    await this.wrapperService.CreateQueueFromAlbum(this.albumId, this.queueModel.random, this.queueModel.loopMode,-1);
-    
-    this.rxjsService.setIsSongPlaylingState(true);
-    this.rxjsService.showMediaPlayer(true);
-    await this.rxjsService.setUpdateSongState();
-    await this.streamingService.sendCurrentSongProgress(true, 0);
 
-    // .subscribe({
-    //   next:async (song: PlaylistSongModel)=>{
-    //     console.log(song)
-        
-    //     this.rxjsService.setCurrentPlayingSong(song);
-    //     await this.rxjsService.setUpdateSongState();
-    //     this.rxjsService.setIsSongPlaylingState(true);
-    //     this.rxjsService.showMediaPlayer(true);
-    //   },
-    //   error:(error: any)=>{
-    //     this.message.error("Error when getting queue.");
-    //   },
-    //   complete: () => {
-    //   }
-    // });
+    try {
+      await this.wrapperService.CreateQueueFromAlbum(this.albumId, this.queueModel.random, this.queueModel.loopMode,-1);
+      this.rxjsService.setIsSongPlaylingState(true);
+      this.rxjsService.showMediaPlayer(true);
+      await this.rxjsService.setUpdateSongState();
+      await this.streamingService.sendCurrentSongProgress(true, 0);
+    } catch (error) {
+      this.message.error("Error when creating queue");
+    }
+
   }
 
   public async pauseSongs(): Promise<void> {
     // Stop playing of song
     this.rxjsService.setIsSongPlaylingState(false);
-    await this.streamingService.playPauseSong(false);
+    try {
+      await this.streamingService.playPauseSong(false);  
+    } catch (error) {
+      
+    }
+    
   }
 
   public async onPlaySongClicked(event: PlaylistSongModelParams): Promise<void>{
@@ -205,7 +204,12 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
     if (this.CurrentPlayingSong && 
       this.CurrentPlayingSong.id == songModel.id) {
       this.rxjsService.setIsSongPlaylingState(true);
-      await this.streamingService.playPauseSong(true);
+      try {
+        await this.streamingService.playPauseSong(true);  
+      } catch (error) {
+        
+      }
+      
       return;
     }
 
@@ -224,11 +228,16 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
       userId: this.queueModel.userId
     });
 
-    await this.wrapperService.CreateQueueFromAlbum(this.albumId, this.queueModel.random,this.queueModel.loopMode, skipSongs);
-    this.rxjsService.setIsSongPlaylingState(true);
-    this.rxjsService.showMediaPlayer(true);
-    await this.rxjsService.setUpdateSongState();
-    await this.streamingService.sendCurrentSongProgress(true, 0);
+    try {
+      await this.wrapperService.CreateQueueFromAlbum(this.albumId, this.queueModel.random,this.queueModel.loopMode, skipSongs);
+      this.rxjsService.setIsSongPlaylingState(true);
+      this.rxjsService.showMediaPlayer(true);
+      await this.rxjsService.setUpdateSongState();
+      await this.streamingService.sendCurrentSongProgress(true, 0);
+    } catch (error) {
+      this.message.error("Error when creating queue.");
+    }
+
   }
 
   public getAlbumCoverSrc(): string{

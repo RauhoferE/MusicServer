@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { DragDropQueueParams, DragDropSongParams, PlaylistSongModelParams } from 'src/app/models/events';
 import { PlaylistSongModel, QueueSongModel, SongPaginationModel } from 'src/app/models/playlist-models';
@@ -30,7 +31,8 @@ export class SongQueueComponent implements OnInit, OnDestroy {
    *
    */
   constructor(private rxjsStorageService: RxjsStorageService, private songService: SongService, 
-    private wrapperService: QueueWrapperService, private streamingService: StreamingClientService) {
+    private wrapperService: QueueWrapperService, private streamingService: StreamingClientService,
+  private message: NzMessageService) {
 
   }
 
@@ -68,7 +70,12 @@ export class SongQueueComponent implements OnInit, OnDestroy {
     })
 
     this.streamingService.updateQueueEvent.pipe(takeUntil(this.destroy)).subscribe(async ()=>{
-      await this.wrapperService.GetCurrentQueue();
+      try {
+        await this.wrapperService.GetCurrentQueue();  
+      } catch (error) {
+        this.message.error("Error when updating queue!");
+      }
+      
     })
 
     // this.rxjsStorageService.updateCurrentTableBoolean$.subscribe(x => {
@@ -90,50 +97,70 @@ export class SongQueueComponent implements OnInit, OnDestroy {
     this.rxjsStorageService.setSongTableLoadingState(true);
 
     // this.rxjsStorageService.setSongQueue(songsList);
-    let songs = await this.wrapperService.GetCurrentQueue();
-    this.rxjsStorageService.setSongTableLoadingState(false);
-    // Return if user is in a group, because we get the song, queueu from an event via the hub
-    if (songs.length == 0) {
-      return;
+    try {
+      let songs = await this.wrapperService.GetCurrentQueue();
+      this.rxjsStorageService.setSongTableLoadingState(false);
+      // Return if user is in a group, because we get the song, queueu from an event via the hub
+      if (songs.length == 0) {
+        return;
+      }
+  
+      songs.splice(0,1);
+      this.queueModel = {
+        songs: songs.filter(x => !x.addedManualy),
+        totalCount: songs.filter(x => !x.addedManualy).length
+      };
+  
+      this.nextSongsModel = {
+        songs: songs.filter(x => x.addedManualy),
+        totalCount: songs.filter(x => x.addedManualy).length
+      };
+    } catch (error) {
+      this.message.error("Error when getting queue!");
+      this.rxjsStorageService.setSongTableLoadingState(false);
     }
 
-    songs.splice(0,1);
-    this.queueModel = {
-      songs: songs.filter(x => !x.addedManualy),
-      totalCount: songs.filter(x => !x.addedManualy).length
-    };
-
-    this.nextSongsModel = {
-      songs: songs.filter(x => x.addedManualy),
-      totalCount: songs.filter(x => x.addedManualy).length
-    };
     
   }
 
   public async onCurrentSongPaginationUpdated(): Promise<void> {
 
     this.rxjsStorageService.setSongTableLoadingState(true);
-
-    let song = await this.wrapperService.GetCurrentSong();
-    this.rxjsStorageService.setSongTableLoadingState(false);
-    // Return if user is in a group, because we get the song, queueu from an event via the hub
-    if (song.id == '-1') {
-      return;
+    try {
+      let song = await this.wrapperService.GetCurrentSong();
+      this.rxjsStorageService.setSongTableLoadingState(false);
+      // Return if user is in a group, because we get the song, queueu from an event via the hub
+      if (song.id == '-1') {
+        return;
+      }
+      this.rxjsStorageService.setCurrentPlayingSong(song);
+    } catch (error) {
+      this.message.error("Error when getting current song!");
+      this.rxjsStorageService.setSongTableLoadingState(false);
     }
-    this.rxjsStorageService.setCurrentPlayingSong(song);
+
   }
 
   public async onPlaySongClicked(event: PlaylistSongModelParams): Promise<void>{
-    this.rxjsStorageService.setSongTableLoadingState(true);
+    try {
+      this.rxjsStorageService.setSongTableLoadingState(true);
+      await this.wrapperService.SkipForwardInQueue(event.songModel.order);
+      this.rxjsStorageService.setSongTableLoadingState(false);
+      this.onQueueTablePaginationUpdated();
+    } catch (error) {
+      this.message.error("Error when playing song!");
+    }
 
-    await this.wrapperService.SkipForwardInQueue(event.songModel.order);
-    this.rxjsStorageService.setSongTableLoadingState(false);
-    this.onQueueTablePaginationUpdated();
   }
 
   public async resumeSong(event: PlaylistSongModelParams): Promise<void>{
     this.rxjsStorageService.setIsSongPlaylingState(!this.isSongPlaying);
-    await this.streamingService.playPauseSong(!this.isSongPlaying);
+    try {
+      await this.streamingService.playPauseSong(!this.isSongPlaying);  
+    } catch (error) {
+      
+    }
+    
   }
 
   async getSongDetails(songId: string): Promise<PlaylistSongModel>{
@@ -151,22 +178,27 @@ export class SongQueueComponent implements OnInit, OnDestroy {
   public async changeSongPosition(event: DragDropQueueParams): Promise<void> {
     this.rxjsStorageService.setSongTableLoadingState(true);
     console.log(event)
-
-    let songs = await this.wrapperService.PushSongInQueue(event.srcSong.order, event.destSong.order, event.markAsManuallyAdded);
-    this.rxjsStorageService.setSongTableLoadingState(false);
-    if (songs.length == 0) {
-      return;
+    try {
+      let songs = await this.wrapperService.PushSongInQueue(event.srcSong.order, event.destSong.order, event.markAsManuallyAdded);
+      this.rxjsStorageService.setSongTableLoadingState(false);
+      if (songs.length == 0) {
+        return;
+      }
+      songs.splice(0,1);
+      this.queueModel = {
+        songs: songs.filter(x => !x.addedManualy),
+        totalCount: songs.filter(x => !x.addedManualy).length
+      };
+  
+      this.nextSongsModel = {
+        songs: songs.filter(x => x.addedManualy),
+        totalCount: songs.filter(x => x.addedManualy).length
+      };
+    } catch (error) {
+      this.message.error("Error when changing song position!");
+      this.rxjsStorageService.setSongTableLoadingState(false);
     }
-    songs.splice(0,1);
-    this.queueModel = {
-      songs: songs.filter(x => !x.addedManualy),
-      totalCount: songs.filter(x => !x.addedManualy).length
-    };
 
-    this.nextSongsModel = {
-      songs: songs.filter(x => x.addedManualy),
-      totalCount: songs.filter(x => x.addedManualy).length
-    };
     
   }
 

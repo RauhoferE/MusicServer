@@ -49,6 +49,8 @@ export class StreamingClientService {
 
   public queueItemsReceivedEvents = new EventEmitter<QueueSongModel[]>();
 
+  public errorReceivedEvent = new EventEmitter<string>();
+
 
   constructor(private rxjsStorage: RxjsStorageService) { 
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -124,6 +126,10 @@ export class StreamingClientService {
     this.hubConnection.on(HUBEMITS.receiveQueueEntities, (models: QueueSongModel[])=>{
       this.queueItemsReceivedEvents.emit(models);
     })
+
+    this.hubConnection.on(HUBEMITS.receiveErrorMessage, (msg: string)=>{
+      this.errorReceivedEvent.emit(msg);
+    });
 
     this.usersUpdated$.subscribe(x=>{
       this.usersProp = x;

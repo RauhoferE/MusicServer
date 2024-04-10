@@ -66,14 +66,6 @@ namespace MusicServer.Middleware
                 responseMessage = "Action is not allowed.";
             }
 
-
-            if (exception.GetType() == typeof(PlayListAlreadyInUseException))
-            {
-                statusCode = (int)HttpStatusCode.BadRequest;
-                responseMessage = "Playlist was already added to user.";
-            }
-
-
             if (exception.GetType() == typeof(SongNotFoundException))
             {
                 statusCode = (int)HttpStatusCode.BadRequest;

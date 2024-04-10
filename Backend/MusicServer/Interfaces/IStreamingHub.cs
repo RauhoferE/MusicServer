@@ -32,5 +32,7 @@ namespace MusicServer.Interfaces
         public Task UpdateQueueView();
 
         public Task UpdateCurrentSong();
+
+        public Task ReceiveErrorMessage(string msg);
     }
 }

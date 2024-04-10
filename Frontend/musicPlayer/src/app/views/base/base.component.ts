@@ -66,6 +66,7 @@ export class BaseComponent implements OnInit, OnDestroy {
     });
 
     this.streamingService.connectionClosedEvent.pipe(takeUntil(this.destroy)).subscribe(async ()=>{
+      this.message.info("Session closed!");
       try {
         var song = await lastValueFrom(this.queueService.GetCurrentSong());
         this.rxjsService.setCurrentPlayingSong(song);
@@ -80,10 +81,21 @@ export class BaseComponent implements OnInit, OnDestroy {
         var data = await lastValueFrom(this.queueService.GetQueueData());
         this.rxjsService.setQueueFilterAndPagination(data);
       } catch (error) {
-        console.log("Error")
         this.rxjsService.setQueueFilterAndPagination({} as any);
       }
       
+    });
+
+    this.streamingService.errorReceivedEvent.pipe(takeUntil(this.destroy)).subscribe((msg: string)=>{
+      this.message.error(msg);
+    })
+
+    this.streamingService.groupDeletedEvent.pipe(takeUntil(this.destroy)).subscribe(() =>{
+      this.message.info("Session closed, because the group was deleted!");
+    });
+
+    this.streamingService.userJoinedEvent.pipe(takeUntil(this.destroy)).subscribe(x=>{
+      console.log("New User joined the session", x);
     });
 
     this.getFollowedEntities();

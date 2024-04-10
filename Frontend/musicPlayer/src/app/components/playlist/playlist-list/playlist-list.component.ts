@@ -157,7 +157,12 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
       return;
     }
     
-    await this.wrapperService.AddPlaylistToQueue(this.selectedTableItem.playlistModel.id);
+    try {
+      await this.wrapperService.AddPlaylistToQueue(this.selectedTableItem.playlistModel.id);  
+    } catch (error) {
+      this.message.error("Error when adding the playlis to the queue.");
+    }
+    
   }
 
   public async savePlaylist(event: EditPlaylistModalParams): Promise<void> {
@@ -262,7 +267,12 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
       this.QueueModel.target == QUEUETYPES.playlist && 
       this.QueueModel.itemId == playlistId) {
       this.rxjsService.setIsSongPlaylingState(true);
-      await this.streamingService.playPauseSong(true);
+      try {
+        await this.streamingService.playPauseSong(true);  
+      } catch (error) {
+        
+      }
+      
       return;
     }
 
@@ -279,17 +289,27 @@ export class PlaylistListComponent implements OnInit, OnDestroy {
       userId: this.queueModel.userId
     });
 
-    await this.wrapperService.CreateQueueFromPlaylist(playlistId, this.queueModel.random, this.queueModel.loopMode, this.pagination.sortAfter, this.pagination.asc, -1);
-    this.rxjsService.setIsSongPlaylingState(true);
-    this.rxjsService.showMediaPlayer(true);
-    await this.rxjsService.setUpdateSongState();
-    await this.streamingService.sendCurrentSongProgress(true, 0);
+    try {
+      await this.wrapperService.CreateQueueFromPlaylist(playlistId, this.queueModel.random, this.queueModel.loopMode, this.pagination.sortAfter, this.pagination.asc, -1);
+      this.rxjsService.setIsSongPlaylingState(true);
+      this.rxjsService.showMediaPlayer(true);
+      await this.rxjsService.setUpdateSongState();
+      await this.streamingService.sendCurrentSongProgress(true, 0);
+    } catch (error) {
+      this.message.error("Error when creating queue.")
+    }
+
   }
 
   public async pausePlaylist(): Promise<void> {
     // Stop playing of song
     this.rxjsService.setIsSongPlaylingState(false);
-    await this.streamingService.playPauseSong(false);
+    try {
+      await this.streamingService.playPauseSong(false);  
+    } catch (error) {
+      
+    }
+    
   }
 
   public setPublic(playlist: PlaylistUserShortModel): void {

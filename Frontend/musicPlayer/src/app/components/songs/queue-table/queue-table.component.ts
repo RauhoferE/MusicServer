@@ -91,34 +91,54 @@ export class QueueTableComponent implements OnInit, OnDestroy{
   }
 
   public async removeSongFromQueue(songId: string, index: number): Promise<void> {
-
-    await this.wrapperService.RemoveSongsFromQueue([index]);
+    try {
+      await this.wrapperService.RemoveSongsFromQueue([index]);  
+    } catch (error) {
+      this.message.error("Error when removing songs from queue!");
+    }
+    
   }
 
   public async addSongToQueue(song: PlaylistSongModel): Promise<void> {
-    await this.wrapperService.AddSongsToQueue([song.id]);   
+    try {
+      await this.wrapperService.AddSongsToQueue([song.id]);     
+    } catch (error) {
+      this.message.error("Error when adding songs to queue!");
+    }
+    
   }
 
   // This method is only used when the queue is displayed
   public async removeSelectedSongsFromQueue(): Promise<void> {
-    var checkedSongs = this.queue.songs.filter(x => x.checked);
+    try {
+      var checkedSongs = this.queue.songs.filter(x => x.checked);
+      await this.wrapperService.RemoveSongsFromQueue(checkedSongs.map(x => x.order));
+    } catch (error) {
+      this.message.error("Error when removing songs from queue!");
+    }
 
-    await this.wrapperService.RemoveSongsFromQueue(checkedSongs.map(x => x.order));
     this.checkAll(false);
-
-    //this.checkAll(false);
   }
 
   public async addSelectedSongsToQueue(): Promise<void> {
-    var checkedSongs = this.queue.songs.filter(x => x.checked);
+    try {
+      var checkedSongs = this.queue.songs.filter(x => x.checked);
+      await this.wrapperService.AddSongsToQueue(checkedSongs.map(x => x.id));
+    } catch (error) {
+      this.message.error("Error when adding songs to queue!");
+    }
 
-    await this.wrapperService.AddSongsToQueue(checkedSongs.map(x => x.id));
     this.checkAll(false);
     // this.checkAll(false);
   }
 
   public async clearQueue(): Promise<void>{
-    await this.wrapperService.ClearQueue();
+    try {
+      await this.wrapperService.ClearQueue();  
+    } catch (error) {
+      this.message.error("Error when clearing queue.");
+    }
+    
     this.paginationUpdated.emit();
   }
 
@@ -318,7 +338,12 @@ export class QueueTableComponent implements OnInit, OnDestroy{
 
   public async pauseSong(): Promise<void>{
     this.rxjsStorageService.setIsSongPlaylingState(false);
-    await this.streamingService.playPauseSong(false);
+    try {
+      await this.streamingService.playPauseSong(false);  
+    } catch (error) {
+      
+    }
+    
   }
 
   updateDashBoard(): void{

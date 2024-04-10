@@ -60,16 +60,28 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   async createSession(){
-    await this.streamingService.startSession();
+    try {
+      await this.streamingService.startSession();
+    } catch (error) {
+    }
+    
   }
 
   async joinSession() {
-    console.log(this.groupNameInput)
-    await this.streamingService.joinSession(this.groupNameInput);
+    try {
+      await this.streamingService.joinSession(this.groupNameInput);
+    } catch (error) {
+      
+    }
   }
 
   async leaveSession() {
-    await this.streamingService.disconnect();
+    try {
+      await this.streamingService.disconnect();  
+    } catch (error) {
+      
+    }
+    
   }
 
   public get GroupName(){
