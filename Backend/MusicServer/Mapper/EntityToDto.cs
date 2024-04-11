@@ -142,13 +142,13 @@ namespace MusicServer.Mapper
 
             this.CreateMap<User, UserDetailsDto>(MemberList.Destination)
                 .ForMember(dest => dest.FollowedArtists,
-                opt => opt.MapFrom((ps, o, d, t) => t.Mapper.Map<GuidNameDto[]>(ps.FollowedArtists)))
+                opt => opt.MapFrom((ps, o, d, t) => t.Mapper.Map<GuidNameDto[]>(ps.FollowedArtists.ToArray())))
                 .ForMember(dest => dest.FollowedUsers,
-                opt => opt.MapFrom((ps, o, d, t) => t.Mapper.Map<LongNameDto[]>(ps.FollowedUsers)))
+                opt => opt.MapFrom((ps, o, d, t) => t.Mapper.Map<LongNameDto[]>(ps.FollowedUsers.ToArray())))
                 .ForMember(dest => dest.Playlists,
-                opt => opt.MapFrom((ps, o, d, t) => t.Mapper.Map<PlaylistUserShortDto[]>(ps.Playlists)))
+                opt => opt.MapFrom((ps, o, d, t) => t.Mapper.Map<PlaylistUserShortDto[]>(ps.Playlists.ToArray())))
                 .ForMember(dest => dest.Roles,
-                opt => opt.MapFrom((ps, o, d, t) => t.Mapper.Map<LongNameDto[]>(ps.UserRoles)));
+                opt => opt.MapFrom((ps, o, d, t) => t.Mapper.Map<LongNameDto[]>(ps.UserRoles.ToArray())));
 
             this.CreateMap<UserRole, LongNameDto>(MemberList.Destination)
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(ps => ps.RoleId))

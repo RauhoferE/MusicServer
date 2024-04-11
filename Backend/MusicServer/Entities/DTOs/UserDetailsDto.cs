@@ -27,7 +27,7 @@
 
         public DateTime? LockoutEnd { get; set; }
 
-        public UserDto[] FollowedUsers { get; set; }
+        public LongNameDto[] FollowedUsers { get; set; }
 
         public GuidNameDto[] FollowedArtists { get; set; }
 

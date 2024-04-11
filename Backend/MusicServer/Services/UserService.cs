@@ -120,6 +120,7 @@ namespace MusicServer.Services
                 .Include(x => x.UserRoles)
                 .ThenInclude(x => x.Role)
                 .Include(x => x.FollowedUsers)
+                .ThenInclude(x => x.FollowedUser)
                 .Include(x => x.Playlists)
                 .ThenInclude(x => x.Playlist)
                 .Include(x => x.FollowedArtists)
