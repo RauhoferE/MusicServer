@@ -21,7 +21,7 @@ namespace MusicServer.Interfaces
 
         public Task GroupDeleted();
 
-        public Task ReceiveUserList(string[] userList);
+        public Task ReceiveUserList(SessionUserData[] userList);
 
         public Task UserJoinedSession(string email);
 

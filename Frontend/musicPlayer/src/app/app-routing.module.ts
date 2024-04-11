@@ -18,6 +18,7 @@ import { AlbumDetailsComponent } from './views/album/album-details/album-details
 import { SongDetailsComponent } from './views/song/song-details/song-details.component';
 import { ArtistDetailsComponent } from './views/artist/artist-details/artist-details.component';
 import { UserDetailsComponent } from './views/user/user-details/user-details.component';
+import { SessionComponent } from './views/playlist/session/session.component';
 
 const routes: Routes = [
   { 
@@ -54,6 +55,10 @@ const routes: Routes = [
       {
         path: '',
         component: HomeComponent
+      },
+      {
+        path: 'session',
+        component: SessionComponent
       },
       {
         path: 'queue',

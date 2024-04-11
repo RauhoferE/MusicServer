@@ -6,3 +6,10 @@ export interface CurrentMediaPlayerData{
     random: boolean;
     loopMode: string;
 }
+
+export interface SessionUserData{
+    email: string;
+    userId: number;
+    isMaster: boolean;
+
+}

@@ -65,6 +65,7 @@ import { PlaylistEditComponent } from './components/playlist/playlist-edit/playl
 import { StreamingClientService } from './services/streaming-client.service';
 import { QueueWrapperService } from './services/queue-wrapper.service';
 import { RxjsStorageService } from './services/rxjs-storage.service';
+import { SessionComponent } from './views/playlist/session/session.component';
 
 
 
@@ -99,7 +100,8 @@ registerLocaleData(en);
     QueueTableComponent,
     PlaylistListComponent,
     UserDetailsComponent,
-    PlaylistEditComponent
+    PlaylistEditComponent,
+    SessionComponent
   ],
   imports: [
     BrowserModule,

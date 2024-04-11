@@ -31,25 +31,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.streamingService.groupNameUpdated$.pipe(takeUntil(this.destroy)).subscribe(x=>{
-      this.groupName = x;
-    });
 
-    this.streamingService.usersUpdated$.pipe(takeUntil(this.destroy)).subscribe(x=>{
-      this.userList = x;
-    });
-
-    this.streamingService.isMasterUpdated$.pipe(takeUntil(this.destroy)).subscribe(x=>{
-      this.isMaster = x;
-    });
-
-    this.streamingService.groupDeletedEvent.pipe(takeUntil(this.destroy)).subscribe(() =>{
-      console.log("Group has been deleted");
-    });
-
-    this.streamingService.userJoinedEvent.pipe(takeUntil(this.destroy)).subscribe(x=>{
-      console.log("New User joined", x);
-    });
 
 
 
@@ -57,43 +39,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.destroy.next(true);
-  }
-
-  async createSession(){
-    try {
-      await this.streamingService.startSession();
-    } catch (error) {
-    }
-    
-  }
-
-  async joinSession() {
-    try {
-      await this.streamingService.joinSession(this.groupNameInput);
-    } catch (error) {
-      
-    }
-  }
-
-  async leaveSession() {
-    try {
-      await this.streamingService.disconnect();  
-    } catch (error) {
-      
-    }
-    
-  }
-
-  public get GroupName(){
-    return this.groupName;
-  }
-
-  public get IsMaster(){
-    return this.isMaster;
-  }
-
-  public get Emails(){
-    return this.userList;
   }
 
 }

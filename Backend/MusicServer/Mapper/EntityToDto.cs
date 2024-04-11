@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess.Entities;
 using MusicServer.Entities.DTOs;
+using MusicServer.Entities.HubEntities;
 
 namespace MusicServer.Mapper
 {
@@ -209,6 +210,11 @@ namespace MusicServer.Mapper
     .ForMember(dest => dest.LoopMode, opt => opt.MapFrom(ps => ps.LoopMode.Name))
     .ForMember(dest => dest.SortAfter, opt => opt.MapFrom(ps => ps.SortAfter.Name))
     .ForMember(dest => dest.UserId, opt => opt.MapFrom(ps => ps.UserId));
+
+            this.CreateMap<Group, SessionUserData>(MemberList.Destination)
+                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(ps => ps.UserId))
+    .ForMember(dest => dest.IsMaster, opt => opt.MapFrom(ps => ps.IsMaster))
+    .ForMember(dest => dest.Email, opt => opt.MapFrom(ps => ps.Email));
         }
     }
 }

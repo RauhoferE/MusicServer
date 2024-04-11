@@ -43,7 +43,7 @@ internal class Program
 
         // Configure the HTTP request pipeline.
         app.UseCors("MusicServerCorsPolicy");
-        
+        app.UseSerilogRequestLogging();
         app.UseHttpsRedirection();
         app.UseRouting();
         app.UseAuthentication();

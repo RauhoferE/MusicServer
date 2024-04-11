@@ -2,7 +2,7 @@ import { EventEmitter, Injectable, OnInit } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { environment } from 'src/environments/environment';
 import { HUBEMITS, HUBINVOKES } from '../constants/hub-routes';
-import { CurrentMediaPlayerData } from '../models/hub-models';
+import { CurrentMediaPlayerData, SessionUserData } from '../models/hub-models';
 import { BehaviorSubject, Observable, Subject, firstValueFrom, lastValueFrom } from 'rxjs';
 import { PlaylistSongModel, QueueSongModel } from '../models/playlist-models';
 import { RxjsStorageService } from './rxjs-storage.service';
@@ -25,10 +25,10 @@ export class StreamingClientService {
 
   private isMasterProp: boolean = true;
 
-  private users = new BehaviorSubject<string[]>([]);
-  usersUpdated$: Observable<string[]> = this.users.asObservable();
+  private users = new BehaviorSubject<SessionUserData[]>([]);
+  usersUpdated$: Observable<SessionUserData[]> = this.users.asObservable();
 
-  private usersProp: string[] = [];
+  private usersProp: SessionUserData[] = [];
 
   private model: QueueModel = {} as QueueModel;
 

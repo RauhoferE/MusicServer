@@ -1,4 +1,5 @@
-﻿using DataAccess;
+﻿using AutoMapper;
+using DataAccess;
 using DataAccess.Entities;
 using MusicServer.Entities.HubEntities;
 using MusicServer.Exceptions;
@@ -11,9 +12,12 @@ namespace MusicServer.Services
     {
         private readonly MusicServerDBContext dBContext;
 
-        public StreamingService(MusicServerDBContext dBContext)
+        private readonly IMapper mapper;
+
+        public StreamingService(MusicServerDBContext dBContext, IMapper mapper)
         {
             this.dBContext = dBContext;
+            this.mapper = mapper;
                 
         }
 
@@ -112,9 +116,11 @@ namespace MusicServer.Services
             return true;
         }
 
-        public async Task<string[]> GetEmailList(Guid groupId)
+        public async Task<SessionUserData[]> GetEmailList(Guid groupId)
         {
-            return this.dBContext.Groups.Where(x => x.GroupName == groupId).Select(x => x.Email).ToArray();
+            return this.dBContext.Groups.Where(x => x.GroupName == groupId)
+                .Select(x => this.mapper.Map<SessionUserData>(x))
+                .ToArray();
         }
     }
 }

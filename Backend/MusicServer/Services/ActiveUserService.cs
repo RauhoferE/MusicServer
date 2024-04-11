@@ -30,6 +30,8 @@ namespace MusicServer.Services
 
         public string Email => this.user.Email;
 
+        public string UserName => this.user.UserName;
+
         public long Id => this.user.Id;
 
         public bool IsNull => this.user == null;

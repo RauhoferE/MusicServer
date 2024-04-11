@@ -138,7 +138,7 @@ namespace MusicServer.Hubs
 
             // Send the new user the groupname, userlist, current song, and queue data
             await this.Clients.Caller.ReceiveGroupName(groupId);
-            await this.Clients.Caller.ReceiveUserList(userList.Where(x => x != this.activeUserService.Email).ToArray());
+            await this.Clients.Caller.ReceiveUserList(userList.Where(x => x.Email != this.activeUserService.Email).ToArray());
             await this.Clients.Caller.ReceiveQueueData(queueData);
             await this.Clients.Caller.ReceiveCurrentPlayingSong(currentSong);
             

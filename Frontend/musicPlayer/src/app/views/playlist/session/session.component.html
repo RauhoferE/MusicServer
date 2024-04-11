@@ -1,0 +1,30 @@
+<div>
+    <div>
+        <span nz-icon nzType="team" nzTheme="outline" style="font-size: 300px;"></span>
+
+        <h1>
+            Session
+        </h1>
+        <p>
+            <span *ngIf="this.GroupName == ''">Not in a session</span>
+            <span *ngIf="this.IsMaster && this.GroupName != ''">You are currently sesssion leader</span>
+            <span *ngIf="!this.IsMaster && this.GroupName != ''">Session leader: <a [routerLink]="['/user', this.Leader.userId]">{{this.Leader}}</a> </span>
+        </p>
+    </div>
+    <div *ngIf="this.GroupName != ''">
+        <span>Other users:</span>
+        <span *ngFor="let email of OtherUser">
+            {{email}}
+        </span>
+    </div>
+    <input *ngIf="this.GroupName == ''" nz-input [(ngModel)]="groupNameInput">
+    <button *ngIf="this.GroupName == ''" (click)="createSession()">
+        Create Session
+    </button>
+    <button *ngIf="this.GroupName == ''" (click)="joinSession()" [disabled]="this.groupNameInput == ''">
+        Join Session
+    </button>
+    <button *ngIf="this.GroupName != ''" (click)="leaveSession()">
+        Leave Session
+    </button>
+</div>

@@ -37,10 +37,14 @@
         </div>
     </div>
     <div nz-col nzSpan="4" style="align-self: center; font-size: 150%;">
-        <div nz-row style="justify-content: center;">
-            <a nz-tooltip nzTooltipTitle="Queue" [routerLink]="['/queue']" class="clickable">
+        <div nz-row>
+            <a nz-col nzSpan="12" nz-tooltip nzTooltipTitle="Session" [routerLink]="['/session']" class="clickable">
+                <span nz-icon nzType="team" nzTheme="outline"></span>
+            </a>
+            <a nz-col nzSpan="12" style="text-align: center;" nz-tooltip nzTooltipTitle="Queue" [routerLink]="['/queue']" class="clickable">
                 <span nz-icon nzType="menu" nzTheme="outline"></span>
             </a>
+
         </div>
         <div nz-row style="font-size: 150%;">
             <app-audio-svg *ngIf="!this.mutedAudio" nz-col nzSpan="2" style="width: 1em; height: 1em; align-self: center;" class="clickable" (click)="muteUnmuteAudio()"/>

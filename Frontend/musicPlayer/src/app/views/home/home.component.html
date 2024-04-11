@@ -1,26 +1,3 @@
 <div>
-    <div *ngIf="this.GroupName != ''">
-        <span>Current Group</span>
-        <span *ngIf="this.IsMaster">Master of {{this.GroupName}}</span>
-        <span *ngIf="!this.IsMaster">Slave of {{this.GroupName}}</span>
-    </div>
-    <div *ngIf="this.GroupName != ''">
-        <span>User List</span>
-        <span *ngFor="let email of Emails">
-            {{email}}
-        </span>
-    </div>
-    <div *ngIf="this.GroupName == ''">
-        Not connected
-    </div>
-    <input *ngIf="this.GroupName == ''" nz-input [(ngModel)]="groupNameInput">
-    <button *ngIf="this.GroupName == ''" (click)="createSession()">
-        Create Session
-    </button>
-    <button *ngIf="this.GroupName == ''" (click)="joinSession()" [disabled]="this.groupNameInput == ''">
-        Join Session
-    </button>
-    <button *ngIf="this.GroupName != ''" (click)="leaveSession()">
-        Leave Session
-    </button>
+    Home works!
 </div>
