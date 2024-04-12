@@ -59,6 +59,19 @@ Then register your root user and then assign the correct role to this user.
 This is only needed for the Root user all other registered users will have the correct role.
 This will be fixed in future updates.
 
+## Further additions
+
+In the following paragraphs are serveral ideas for the continuation and improvment of the project.
+
+Since the main point of the project is to offer the user a local audio library, one of the main improvements would be the creation of a peer to peer structure.
+This would allow him to connect his own library to others, so that the offered music catalogue would increase. Furthermore this would allow the users to create playlists, sessions and listen to music together over the internet.
+
+Another point of interest would be the implementation of a search engine, if the library contained a large amount of songs.
+That allows the user not only to search the available library faster, but also filter it after genres, artists and instruments.
+
+Lastly through advancements in the field of artificial intelligence the implementation of a similarity search algorithm would increase the usability of the platform. 
+One possible use-case is the search for similar tracks in the available music catalogue or the creation of whole playlists that are based on the audio attributes of a specific song.
+
 
 
 ## Configuration for the MusicServer
