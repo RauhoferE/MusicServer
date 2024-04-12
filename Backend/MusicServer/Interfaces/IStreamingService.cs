@@ -22,6 +22,6 @@ namespace MusicServer.Interfaces
 
         public Task<bool> JoinGroup(Guid id, long userId, string connectionId, string email);
 
-        public Task<SessionUserData[]> GetEmailList(Guid groupId);
+        public Task<SessionUserData[]> GetUserList(Guid groupId);
     }
 }

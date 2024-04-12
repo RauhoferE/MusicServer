@@ -38,7 +38,7 @@ export class StreamingClientService {
 
   public groupDeletedEvent = new EventEmitter<void>();
 
-  public userJoinedEvent = new EventEmitter<string>();
+  public userJoinedEvent = new EventEmitter<SessionUserData>();
 
   // IF the connection closed so you can get the current song and queue from the queue controller.
   public connectionClosedEvent = new EventEmitter<void>();
@@ -65,25 +65,26 @@ export class StreamingClientService {
       this.groupName.next(x);
     });
 
-    this.hubConnection.on(HUBEMITS.userJoinedSession, email=>{
+    this.hubConnection.on(HUBEMITS.userJoinedSession, user=>{
       let users = this.usersProp;
-      users.push(email);
+      users.push(user);
       this.users.next(users);
-      this.userJoinedEvent.emit(email);
+      this.userJoinedEvent.emit(user);
     });
 
     this.hubConnection.on(HUBEMITS.receiveUserList, users =>{
       this.users.next(users);
     });
 
-    this.hubConnection.on(HUBEMITS.userDisconnected, (email)=>{
+    this.hubConnection.on(HUBEMITS.userDisconnected, (user)=>{
       console.log("Disconnected")
       let users = this.usersProp;
-      const index = users.findIndex(x=> x == email);
+      const index = users.findIndex(x=> x.email == user.email);
       if (index > -1) {
         users.splice(index, 1);
       }
       this.users.next(users);
+      console.log(users)
     });
 
     this.hubConnection.on(HUBEMITS.groupDeleted, ()=>{

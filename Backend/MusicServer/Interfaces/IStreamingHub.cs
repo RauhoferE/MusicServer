@@ -17,13 +17,13 @@ namespace MusicServer.Interfaces
 
         public Task ReceiveCurrentPlayingSong(PlaylistSongDto song);
 
-        public Task UserDisconnected(string email);
+        public Task UserDisconnected(SessionUserData user);
 
         public Task GroupDeleted();
 
         public Task ReceiveUserList(SessionUserData[] userList);
 
-        public Task UserJoinedSession(string email);
+        public Task UserJoinedSession(SessionUserData user);
 
         public Task ReceiveSongProgress(bool isSongPlaying, double secondsPlayed);
 

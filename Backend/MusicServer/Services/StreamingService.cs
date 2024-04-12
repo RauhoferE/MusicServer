@@ -116,7 +116,7 @@ namespace MusicServer.Services
             return true;
         }
 
-        public async Task<SessionUserData[]> GetEmailList(Guid groupId)
+        public async Task<SessionUserData[]> GetUserList(Guid groupId)
         {
             return this.dBContext.Groups.Where(x => x.GroupName == groupId)
                 .Select(x => this.mapper.Map<SessionUserData>(x))

@@ -131,7 +131,7 @@ namespace MusicServer.Hubs
 
             await this.Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
 
-            var userList = await this.streamingService.GetEmailList(groupId);
+            var userList = await this.streamingService.GetUserList(groupId);
             var queueData = await this.groupQueueService.GetQueueDataAsync(groupId);
             var currentSong = await this.groupQueueService.GetCurrentSongInQueueAsync(groupId);
             currentSong = await this.groupQueueService.MarkPlaylistSongAsFavorite(this.activeUserService.Id, currentSong);
@@ -141,9 +141,14 @@ namespace MusicServer.Hubs
             await this.Clients.Caller.ReceiveUserList(userList.Where(x => x.Email != this.activeUserService.Email).ToArray());
             await this.Clients.Caller.ReceiveQueueData(queueData);
             await this.Clients.Caller.ReceiveCurrentPlayingSong(currentSong);
-            
+
             // Send other people a message that the user joined
-            await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).UserJoinedSession(this.activeUserService.Email);
+            await this.Clients.GroupExcept(groupId.ToString(), this.Context.ConnectionId).UserJoinedSession(new SessionUserData()
+            {
+                Email = this.activeUserService.Email,
+                IsMaster = false,
+                UserId = this.activeUserService.Id
+            });
         }
 
         public async Task SendCurrentSongProgress(Guid groupId, bool isSongPlaying, double secondsPlayed)
@@ -465,7 +470,12 @@ namespace MusicServer.Hubs
             //await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, groupId.ToString());
 
             // Send info that user disconnected
-            await this.Clients.Group(groupId.ToString()).UserDisconnected(resp.Email);
+            await this.Clients.Group(groupId.ToString()).UserDisconnected(new SessionUserData()
+            {
+                Email= this.activeUserService.Email,
+                IsMaster = false,
+                UserId = this.activeUserService.Id
+            });
 
             if (!resp.IsMaster)
             {

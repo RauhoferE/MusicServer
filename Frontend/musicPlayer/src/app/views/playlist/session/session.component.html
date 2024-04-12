@@ -6,25 +6,47 @@
             Session
         </h1>
         <p>
-            <span *ngIf="this.GroupName == ''">Not in a session</span>
-            <span *ngIf="this.IsMaster && this.GroupName != ''">You are currently sesssion leader</span>
-            <span *ngIf="!this.IsMaster && this.GroupName != ''">Session leader: <a [routerLink]="['/user', this.Leader.userId]">{{this.Leader}}</a> </span>
+            <span *ngIf="this.SessionId == ''">Not in a session</span>
+            <span *ngIf="this.IsMaster && this.SessionId != ''">You are currently sesssion leader</span>
+            <span *ngIf="!this.IsMaster && this.SessionId != ''">Session leader: <a [routerLink]="['/user', this.Leader.userId]">{{this.Leader.email}}</a> </span>
         </p>
     </div>
-    <div *ngIf="this.GroupName != ''">
-        <span>Other users:</span>
-        <span *ngFor="let email of OtherUser">
-            {{email}}
+    <div *ngIf="this.IsMaster && this.SessionId != ''">
+        <span >
+            <span style="font-weight: bold;">Session Id:</span> {{this.SessionId}} 
         </span>
+        <button (click)="copySessionIdToClipboard()">
+            <span nz-icon nzType="copy" nzTheme="outline"></span>
+        </button>
     </div>
-    <input *ngIf="this.GroupName == ''" nz-input [(ngModel)]="groupNameInput">
-    <button *ngIf="this.GroupName == ''" (click)="createSession()">
+    <div>
+        <h3>Other users:</h3>
+        <!-- <span>Other users:</span> -->
+        <!-- <span *ngFor="let email of OtherUser">
+            {{email}}
+        </span> -->
+        <nz-list nzItemLayout="horizontal">
+              <nz-list-item *ngFor="let item of OtherUser">
+                <nz-list-item-meta
+                  [nzAvatar]="getAvatarSrc(item.userId)"
+                  nzDescription=""
+                >
+                  <nz-list-item-meta-title>
+                    <a [routerLink]="['/user', item.userId]">{{ item.email }}</a>
+                  </nz-list-item-meta-title>
+                </nz-list-item-meta>
+              </nz-list-item>
+              <nz-list-empty *ngIf="OtherUser.length == 0" />
+          </nz-list>
+    </div>
+    <input nz-input [(ngModel)]="sessionIdInput" [disabled]="this.SessionId != ''">
+    <button (click)="createSession()" [disabled]="this.SessionId != ''">
         Create Session
     </button>
-    <button *ngIf="this.GroupName == ''" (click)="joinSession()" [disabled]="this.groupNameInput == ''">
+    <button (click)="joinSession()" [disabled]="this.sessionIdInput == '' || this.SessionId != ''">
         Join Session
     </button>
-    <button *ngIf="this.GroupName != ''" (click)="leaveSession()">
+    <button (click)="leaveSession()" [disabled]="this.SessionId == ''">
         Leave Session
     </button>
 </div>
