@@ -53,6 +53,8 @@ export class PlaylistDetailsComponent implements OnDestroy {
 
   private userId: string = '-1';
 
+  private showPlaylistShareModal: boolean = false;
+
   private destroy:Subject<any> = new Subject();
 
 
@@ -411,6 +413,14 @@ export class PlaylistDetailsComponent implements OnDestroy {
     }
     
     return (this.playlistModel.users.findIndex(x => x.id == parseInt(this.userId)) > -1)
+  }
+
+  public get ShowPlaylistShareModal(): boolean{
+    return this.showPlaylistShareModal;
+  }
+
+  public set ShowPlaylistShareModal(val: boolean){
+    this.showPlaylistShareModal = val;
   }
 
   public get IsSongPlaying(): boolean{

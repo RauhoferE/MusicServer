@@ -1,1 +1,14 @@
-<p>share works!</p>
+<nz-modal [(nzVisible)]="visible"
+(nzOnCancel)="cancel()"
+[nzTitle]="modalTitle"
+[nzContent]="modalContent"
+[nzFooter]="modalFooter">
+<ng-template #modalTitle>Manage users that can view/modify the playlist {{this.playlistDetails.name}}</ng-template>
+<ng-template #modalContent>
+    Works
+</ng-template>
+<ng-template #modalFooter>
+</ng-template>
+
+
+</nz-modal>

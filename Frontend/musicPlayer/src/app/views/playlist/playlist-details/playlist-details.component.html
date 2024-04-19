@@ -26,6 +26,10 @@
                 <span nz-icon nzType="mail" nzTheme="outline"></span>
             </button>
 
+            <button nz-col nz-button nzType="default" class="clickable-button" nzShape="circle" (click)="this.ShowPlaylistShareModal = true">
+                <span nz-icon nzType="share-alt" nzTheme="outline"></span>
+            </button>
+
             <button nz-col nz-button nzType="default" [disabled]="!this.PlaylistModel.isCreator && !this.isUserPartOfPlaylist()" class="clickable-button-danger" nzShape="circle" (click)="deletePlaylist()">
                 <span nz-icon nzType="delete" nzTheme="outline"></span>
             </button>
@@ -48,4 +52,6 @@
      (paginationUpdated)="onPaginationUpdated()" (playSongClicked)="onPlaySongClicked($event)" (songDropped)="changeSongPosition($event)"></app-song-table>
      <app-playlist-edit *ngIf="this.ShowPlaylistCreateModal" [visible]="this.ShowPlaylistCreateModal" 
      [playlistDetails]="this.PlaylistModel" (onCancleModal)="this.ShowPlaylistCreateModal = false" (onSaveModal)="this.createPlaylist($event)"></app-playlist-edit>
+     <app-share *ngIf="this.ShowPlaylistShareModal" [visible]="this.ShowPlaylistShareModal" (onCancleModal)="this.ShowPlaylistShareModal = false"
+     [playlistId]="this.PlaylistModel.id"></app-share>
 </div>
