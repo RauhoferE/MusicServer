@@ -66,6 +66,7 @@ import { StreamingClientService } from './services/streaming-client.service';
 import { QueueWrapperService } from './services/queue-wrapper.service';
 import { RxjsStorageService } from './services/rxjs-storage.service';
 import { SessionComponent } from './views/playlist/session/session.component';
+import { ShareComponent } from './components/playlist/share/share.component';
 
 
 
@@ -101,7 +102,8 @@ registerLocaleData(en);
     PlaylistListComponent,
     UserDetailsComponent,
     PlaylistEditComponent,
-    SessionComponent
+    SessionComponent,
+    ShareComponent
   ],
   imports: [
     BrowserModule,

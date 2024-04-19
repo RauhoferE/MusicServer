@@ -13,6 +13,7 @@ import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SongService } from 'src/app/services/song.service';
 import { StreamingClientService } from 'src/app/services/streaming-client.service';
 import { environment } from 'src/environments/environment';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-song-details',
@@ -42,7 +43,7 @@ export class SongDetailsComponent implements OnInit, OnDestroy {
    */
   constructor(private route: ActivatedRoute, 
     private songService: SongService, private message: NzMessageService, 
-    private rxjsStorageService: RxjsStorageService, private queueService: QueueService,
+    private rxjsStorageService: RxjsStorageService, private queueService: QueueService,private clipboard: Clipboard,
     private streamingService: StreamingClientService, private wrapperService: QueueWrapperService) {
     
       if (!this.route.snapshot.paramMap.has('songId')) {
@@ -143,6 +144,11 @@ export class SongDetailsComponent implements OnInit, OnDestroy {
         this.message.error("Error when getting song details.");
       }
     })
+  }
+
+  async copyLinkToClipboard(): Promise<void> {
+    await this.clipboard.copy(window.location.href);
+    this.message.success("Link successfuly copied to clipboard!");
   }
 
   public getAlbumCoverSrc(): string{

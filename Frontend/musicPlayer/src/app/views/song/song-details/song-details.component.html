@@ -12,6 +12,9 @@
             </span>
             / <a [routerLink]="['/album', this.SongModel.album.id]"> {{this.SongModel.album.name}} </a> / {{this.ReleaseDate.getFullYear()}} / {{this.SongModel.duration | secondsToMinute}}
         </p>
+        <button nz-col nz-button nzType="default" class="clickable-button" nzShape="circle" (click)="copyLinkToClipboard()">
+            <span nz-icon nzType="share-alt" nzTheme="outline"></span>
+        </button>
     </div>
     <div>
         <span *ngIf="this.IsSongPlaying  && this.SongModel.id == this.CurrentPlayingSong.id"

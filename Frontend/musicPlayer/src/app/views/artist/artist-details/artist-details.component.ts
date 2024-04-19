@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
@@ -9,6 +9,7 @@ import { RxjsStorageService } from 'src/app/services/rxjs-storage.service';
 import { SongService } from 'src/app/services/song.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-artist-details',
@@ -35,7 +36,7 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
    *
    */
   constructor(private route: ActivatedRoute, private rxjsService: RxjsStorageService, private songService: SongService,
-    private userService: UserService,
+    private userService: UserService,private clipboard: Clipboard,
     private message: NzMessageService ) {
 
       this.route.paramMap.pipe(takeUntil(this.destroy)).subscribe((params: ParamMap) => {
@@ -156,6 +157,11 @@ export class ArtistDetailsComponent implements OnInit, OnDestroy {
 
     // Update value in rxjs so the dashboard gets updated
     this.rxjsService.setUpdateDashboardBoolean(!currenState);
+  }
+
+  async copyLinkToClipboard(): Promise<void> {
+    await this.clipboard.copy(window.location.href);
+    this.message.success("Link successfuly copied to clipboard!");
   }
 
   public getAlbumCoverSrc(): string{

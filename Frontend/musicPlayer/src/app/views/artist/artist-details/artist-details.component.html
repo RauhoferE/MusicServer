@@ -17,6 +17,9 @@
             <button *ngIf="this.ArtistModel.receiveNotifications" nz-col nz-button nzType="default" class="clickable-button success-color" nzShape="circle" (click)="activateNotifications()">
                 <span nz-icon nzType="mail" nzTheme="outline"></span>
             </button>
+            <button nz-col nz-button nzType="default" class="clickable-button" nzShape="circle" (click)="copyLinkToClipboard()">
+                <span nz-icon nzType="share-alt" nzTheme="outline"></span>
+            </button>
         </div>
         <p >
             {{this.ArtistModel.description == null ? 'No description' : this.ArtistModel.description}}

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject, takeUntil } from 'rxjs';
 import { APIROUTES } from 'src/app/constants/api-routes';
@@ -16,6 +16,7 @@ import { SessionStorageService } from 'src/app/services/session-storage.service'
 import { SongService } from 'src/app/services/song.service';
 import { StreamingClientService } from 'src/app/services/streaming-client.service';
 import { environment } from 'src/environments/environment';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-album-details',
@@ -54,7 +55,7 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
    *
    */
   constructor(private route: ActivatedRoute, private rxjsService: RxjsStorageService, private songService: SongService,
-    private message: NzMessageService, 
+    private message: NzMessageService, private clipboard: Clipboard,
     private sessionStorage: SessionStorageService,
     private queueService: QueueService, private wrapperService: QueueWrapperService, private streamingService: StreamingClientService) {
 
@@ -97,6 +98,11 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
     this.rxjsService.updateCurrentTableBoolean$.pipe(takeUntil(this.destroy)).subscribe(x => {
       this.onPaginationUpdated();
     });
+  }
+
+  async copyLinkToClipboard(): Promise<void> {
+    await this.clipboard.copy(window.location.href);
+    this.message.success("Link successfuly copied to clipboard!");
   }
 
   public onGetSongs(page: number, take: number, sortAfter: string, asc: boolean, query: string): void{
